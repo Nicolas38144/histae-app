@@ -1,406 +1,252 @@
 # Histae App — roadmap de développement
 
-Mise à jour : 23 août 2026.
+Mise à jour : 15 octobre 2026.
 
-## 1. Objectif et périmètre
+[Accueil](README.md) · [Résumé d'intégration](resume.md) · [Contrat HTTP Rust](../histae-api-rust/docs/http-contract.md)
 
-Construire l’application Flutter iOS et Android destinée aux utilisateurs de Histae. Le dashboard d’administration existe déjà et reste entièrement hors de ce dépôt : l’application ne doit appeler aucune route `/admin/*`, ne doit contenir aucun rôle opérateur et ne doit proposer aucune fonction de modération administrative.
+## 1. État de départ et suivi
 
-Le backend utilisateur est désormais suffisamment stable pour commencer Flutter. Les priorités API P0 et P1 sont implémentées et couvertes par des contrats HTTP : bootstrap de session, traits courants, découverte, matchs enrichis, messages idempotents, lecture groupée, SSE, appareils/FCM, suppression sécurisée et abonnement Stripe.
+Le dépôt contient uniquement le squelette Flutter Android/iOS et son compteur. Aucun lot métier n'est livré. La documentation et l'inventaire mobile ci-dessous ont été remis en cohérence avec l'API Rust ; le choix des packages, le design et les validations d'intégration restent à effectuer.
 
-Le seul manque fonctionnel important reste le véritable système de photo. L’API accepte provisoirement une URL HTTPS externe ; upload, stockage Histae, transformation, modération et URL signée restent à construire avant une bêta publique.
+Cette roadmap couvre toutes les capacités utilisateur de l'API actuelle. Elle exclut l'administration, les webhooks fournisseur, la supervision et les opérations internes. Elle ne dépend pas des anciens dépôts NestJS ou d'un endpoint OpenAPI.
 
-## 2. Périmètre du produit mobile
+Les états doivent distinguer : `À faire`, `En cours`, `Implémenté`, `Intégré API`, `Validé sur appareil`. Une fonctionnalité ne passe pas directement à « validée » parce que son endpoint existe. Renseigner dans le suivi les vérifications, l'environnement et les blocages fournisseur ; ne pas mettre de données privées dans les preuves.
 
-### MVP utilisateur
+## 2. Ordre des lots
 
-- authentification par OTP et restauration de session ;
-- consentements juridiques versionnés et onboarding reprenable ;
-- profil majeur, bio, préférences, traits et localisation à l’usage ;
-- diagnostic de préparation à la découverte ;
-- feed géolocalisé et swipes `like`/`pass` ;
-- création d’un match par likes réciproques ;
-- liste des matchs enrichie, révélation mutuelle et continuation ;
-- conversation texte paginée, idempotente et avec lecture groupée ;
-- synchronisation SSE et notifications FCM ;
-- signalement, blocage et déblocage ;
-- demandes RGPD, export, logout et suppression de compte ;
-- consultation des plans et de l’abonnement ;
-- Checkout Stripe hébergé et portail client, sous réserve des règles des stores ciblés.
-
-### Hors périmètre initial
-
-- toute fonctionnalité administrateur ou superadministrateur ;
-- pièces jointes de chat, audio et vidéo ;
-- galerie multi-photo ;
-- localisation permanente en arrière-plan ;
-- file durable de swipes hors ligne ;
-- algorithme de recommandation local ;
-- collecte de carte bancaire dans l’application ;
-- clients web et desktop.
-
-## 3. État de préparation de l’API
-
-| Domaine | État pour Flutter | Décision mobile |
+| Lot | Objectif | État |
 | --- | --- | --- |
-| Auth/session | Prêt | refresh single-flight et refresh token en stockage sécurisé |
-| Consentements | Prêt | `required_actions` reste la source de vérité |
-| Profil/préférences | Prêt | traiter les `404` comme étapes d’onboarding |
-| Photos | Provisoire | URL HTTPS nullable ; pipeline Histae avant bêta publique |
-| Traits/localisation | Prêt | utiliser les routes utilisateur et la position ponctuelle |
-| Découverte/swipes | Prêt | pagination opaque, aucune annulation locale d’un swipe |
-| Matchs/chat | Prêt | idempotence, non-lus, dernier message et lecture groupée disponibles |
-| Temps réel/push | Prêt côté API | SSE comme signal d’invalidation, FCM à valider sur appareils réels |
-| Sûreté/RGPD | Prêt | suppression avec jeton de confirmation dédié |
-| Stripe | Prêt côté API | Checkout/portail hébergés, droits issus du webhook uniquement |
-| OpenAPI/tests | Prêt | `/docs-json` et 51 contrats HTTP utilisateur |
+| L0 | Vérifier le contrat, l'inventaire, les parcours et l'environnement mobile | Documentation et inventaire établis ; audit d'implémentation à poursuivre |
+| L1 | Bootstrap, configuration, navigation, thème et client HTTP | À faire |
+| L2 | OTP, session et onboarding juridique reprenable | À faire |
+| L3 | Profil, préférences, traits, questions, photo et modération propriétaire | À faire |
+| L4 | Présence, diagnostic de préparation, découverte et swipes | À faire |
+| L5 | Matchs, chat, lecture et synchronisation SSE | À faire |
+| L6 | Révélation, continuation, crédits et récompenses volontaires | À faire |
+| L7 | Sûreté, paramètres de confidentialité, sessions, export et suppression | À faire |
+| L8 | Appareils, notifications push et ouverture depuis notification | À faire |
+| L9 | Offres, abonnement, Checkout et portail selon la distribution retenue | À faire |
+| L10 | Robustesse, accessibilité, appareils réels et préparation bêta | À faire |
 
-Il n’est plus nécessaire d’attendre de nouvelles routes pour commencer les écrans. Les seules décisions préalables sont maintenant des décisions Flutter/produit : architecture, design, navigation, gestion provisoire de la photo, retour depuis Stripe et activation de la monétisation selon les règles Apple/Google.
+Ces lots peuvent être divisés en interventions plus petites. Introduire les mécanismes nécessaires au bon moment : sécurité des jetons dès L2, blocage dès qu'une interaction est utilisable, contrôle d'état des matchs dès L5. Ne pas attendre L10 pour tester les risques métier.
 
-## 4. Chemin critique actualisé
+## 3. L0 — contrat et préparation
 
-```text
-gel OpenAPI, UX et conventions
-             │
-             ▼
-socle Flutter, navigation et client HTTP
-             │
-             ▼
-authentification, session et consentements
-             │
-             ▼
-profil, localisation et découverte
-             │
-             ▼
-matchs, chat, SSE et notifications
-             │
-             ▼
-sûreté, vie privée et abonnement
-             │
-             ▼
-tests appareils, conformité et bêta
-```
+- Lire le contrat HTTP, les DTO/routes/tests Rust concernés et les collections Postman.
+- Confirmer que la matrice couvre toutes les capacités mobiles, sans inclure les callbacks serveur.
+- Repérer les erreurs qui orientent vers une autre étape plutôt que vers un simple message.
+- Examiner le SDK Flutter/Dart disponible et choisir les dépendances utiles avec leur documentation officielle.
+- Définir navigation et composants communs : français, accessibilité, chargement, vide, erreur, hors ligne et action en cours.
+- Choisir l'environnement API de développement et une URL accessible aux appareils ; ne pas utiliser de secrets serveur dans les paramètres Flutter.
+- Préparer des fixtures à partir des DTO et réponses contractuelles actuels, sans les présenter comme des appels réseau réels.
 
-Le véritable pipeline photo, la configuration opérationnelle Stripe/FCM et l’infrastructure de bêta peuvent avancer en parallèle. La photo ne bloque pas le socle, l’authentification, les paramètres, le chat ou le développement des cartes avec un placeholder.
+Critère de sortie : premier lot borné, sources identifiées, convention d'URL claire et aucun modèle repris d'un ancien contrat.
 
-## 5. Phase 0 — figer le contrat mobile et les décisions UX
+## 4. L1 — socle Flutter
 
-### Contrat
+- Adapter le compteur et son test sans supprimer de fichier.
+- Structurer application, socle partagé et fonctionnalités sans multiplier les couches vides.
+- Ajouter configuration d'environnement, client HTTP, modèles initiaux et erreurs typées.
+- Distinguer réseau indisponible, timeout, erreur de formulaire, `401`, `403`, `409`, `410`, `413`, `429` et `503`.
+- Respecter `Retry-After`, annuler les requêtes devenues inutiles et garder un diagnostic expurgé avec `X-Request-ID`.
+- Mettre en place thème, navigation et premiers composants accessibles.
+- Vérifier un appel public réel au catalogue lorsque l'environnement est disponible.
 
-- Exporter `/docs-json` depuis un environnement de développement et le conserver comme référence de génération/fixtures.
-- Définir une convention unique : les routes de la matrice ci-dessous sont relatives à une base se terminant par `/api`.
-- Créer une fixture succès et une fixture erreur pour chaque écran critique.
-- Recenser les codes d’erreur qui déclenchent une navigation plutôt qu’un simple message.
-- Décider comment versionner les modèles si l’OpenAPI évolue pendant le développement.
+Critère de sortie : app démarrable, origine API configurable, premier appel et états d'erreur utilisables ; aucune fausse session.
 
-### Produit et design
+## 5. L2 — OTP, session et consentements
 
-- Valider les parcours OTP, onboarding, découverte, match/chat, profil, sûreté, RGPD et abonnement.
-- Définir le design system et les états chargement, vide, erreur, hors ligne et action en cours.
-- Valider le vocabulaire français des consentements, motifs de signalement, statuts de match et statuts d’abonnement.
-- Définir la présentation avant/après révélation mutuelle de la photo.
-- Choisir le placeholder photo et le comportement tant que l’upload Histae n’existe pas.
-- Décider si Checkout Stripe est activé dès le MVP ou derrière un feature flag par plateforme/pays.
-- Définir les liens de retour Checkout/portail et leur comportement si l’application a été tuée.
+- Livrer téléphone → demande OTP → vérification → bootstrap → consentements.
+- Distinguer demande acceptée et SMS reçu ; gérer livraison inconnue, rate limit et renvoi explicite.
+- Stocker le refresh de façon sécurisée, access token en mémoire, avec une seule rotation concurrente.
+- Gérer réponse de refresh perdue sans rejouer aveuglément un ancien token.
+- Restaurer ou fermer proprement la session et éviter les doubles requêtes au redémarrage.
+- Présenter les quatre types de consentement avec documents et versions serveur ; aucun choix précoché.
+- Reprendre le parcours interrompu à partir des actions requises, avec accès aux routes de vie privée autorisées.
+- Implémenter le logout courant et la purge dès ce lot ; compléter la gestion des autres sessions en L7.
 
-### Critère de sortie
+Critère de sortie : connexion réelle et reprise d'onboarding sans jeton exposé, rotation concurrente ni dépendance à un rôle admin.
 
-Chaque écran peut être implémenté avec un modèle API connu, un état d’erreur défini et aucune dépendance à une route administrative.
+## 6. L3 — profil, préférences et photo
 
-## 6. Phase 1 — socle Flutter
+- Créer/modifier un profil majeur sans effacer `sex` ou `bio` par omission.
+- Lire et modifier les quatre préférences ensemble.
+- Charger les traits, sélectionner/retirer avec `traitId` et les identifiants serveur.
+- Charger les questions et remplacer l'ensemble ordonné des réponses sans perte involontaire.
+- Afficher les états de modération propriétaire et expliquer le contenu en attente ou rejeté.
+- Ajouter sélection et préparation d'une photo unique, multipart, idempotence, remplacement et retrait.
+- Respecter 500 000 octets en entrée, les formats admis et l'expiration des URL signées.
+- Ne pas reprendre un champ d'URL externe ni créer une galerie.
 
-### Architecture
+Critère de sortie : profil et photo réels modifiables ; erreurs, modération, réponse perdue et URL expirée ont un comportement explicite.
 
-- Remplacer l’application compteur par un bootstrap minimal.
-- Organiser `lib/` par fonctionnalité avec séparation présentation, application et données.
-- Installer et configurer les choix retenus pour état/injection, navigation, HTTP, modèles JSON, stockage sécurisé et localisation.
-- Prévoir dès le socle les modules `realtime`, `notifications` et `subscription`.
-- Mettre en place le design system, la localisation française et les composants d’état partagés.
+## 7. L4 — localisation et découverte
 
-### Proposition technique
+- Demander consentement métier et permission système au bon moment, sans suivi de fond.
+- Envoyer une présence fraîche et traiter permission refusée, services désactivés et précision insuffisante si pertinente.
+- Guider par `discovery-status` : profil, sexe, préférences, consentements et présence.
+- Afficher feed et profils sans photo, avec bio, traits et réponses autorisés.
+- Paginer avec curseurs opaques, dédupliquer et reprendre après curseur invalide.
+- Envoyer like/pass ; rejouer seulement le même choix en cas d'incertitude, sans annulation ni file durable hors ligne.
+- Ouvrir le match reçu après réciprocité.
 
-| Besoin | Choix de départ |
+Critère de sortie : deux comptes de développement peuvent se découvrir et créer un seul match cohérent.
+
+## 8. L5 — matchs, chat et SSE
+
+- Lister les matchs avec dernier message, non-lus, profil du partenaire et champs individuels.
+- Respecter `active`, `awaiting_continuation`, `confirmed`, `expired`, `ended` dès l'affichage et l'envoi.
+- Afficher les échéances serveur ; suspendre l'envoi pendant la décision sans masquer l'historique accessible.
+- Livrer historique paginé, envoi idempotent, états d'envoi et déduplication.
+- Utiliser la lecture groupée ; conserver la route unitaire comme capacité disponible sans multiplier les appels.
+- Ouvrir SSE avec Bearer, gérer expiration/révocation, backoff et une seule connexion utile.
+- Resynchroniser après reconnexion, invalidation et reprise : aucun replay hors ligne n'est garanti.
+- Ajouter fin volontaire d'un match et retrait des données devenues inaccessibles.
+
+Critère de sortie : deux comptes échangent sans doublon, voient les lectures et retrouvent un état cohérent après coupure ou clôture.
+
+## 9. L6 — révélation, continuations et récompenses
+
+- Proposer la révélation comme accord séparé ; aucune photo de partenaire avant révélation mutuelle.
+- Lire le quota avant de présenter le coût ; afficher stock, réservations et plafond fournis par le serveur.
+- Envoyer le coût maximal accepté `credit_cost: 0` ou `1`, sans calcul local du débit.
+- Gérer accord privé en attente, confirmation mutuelle, refus/expiration et changement de plan ou de semaine.
+- Ne pas promettre de remboursement d'un crédit déjà débité à la clôture.
+- Prévoir une action vidéo volontaire uniquement pour un compte éligible et un fournisseur disponible.
+- Créer/reprendre l'intention, fournir `ad_unit` et `custom_data` au SDK, suivre le statut et annuler si approprié.
+- Aucun crédit au callback client : attendre la validation serveur puis recharger le quota.
+
+Critère de sortie : règles Free/Premium et confidentialité des choix respectées ; récompense validée côté serveur ou blocage fournisseur clairement identifié.
+
+## 10. L7 — sûreté, paramètres et vie privée
+
+- Rendre signalement et blocage accessibles dès qu'un profil de partenaire est exposé.
+- Utiliser les motifs fermés ; gérer blocages et déblocages sans restaurer artificiellement un ancien match.
+- Lister/révoquer les sessions et proposer la déconnexion globale ; traiter la révocation de la session courante.
+- Gérer les consentements et les effets destructifs de leur retrait, sans proposer un retrait CGU/notice absent de l'API.
+- Créer et consulter les demandes RGPD avec leurs statuts.
+- Télécharger l'export, permettre son partage explicite et nettoyer le temporaire privé.
+- Présenter une confirmation de suppression, obtenir le jeton dédié puis envoyer le DELETE.
+- Sur `202`, fermer la session et annoncer le nettoyage en cours, sans prétendre qu'il est terminé.
+- Traiter une réponse de suppression perdue sans réutiliser le Bearer invalide comme suivi public.
+
+Critère de sortie : droits accessibles même quand l'onboarding est incomplet si l'API l'autorise, purge locale cohérente et absence de promesse d'effacement prématurée.
+
+## 11. L8 — appareils et push
+
+- Configurer Android/iOS et Firebase sans embarquer de compte de service serveur.
+- Demander la permission en contexte ; enregistrer et mettre à jour token, plateforme et version.
+- Afficher/révoquer les appareils avec les données publiques de l'API.
+- Gérer rotation FCM, permission refusée, réinstallation et désactivation fournisseur.
+- Traiter premier plan, arrière-plan et application arrêtée ; dédupliquer `notification_id`.
+- Valider session et ressource au retour d'une notification, sans exposer de contenu privé ni ouvrir un match devenu inaccessible.
+
+Critère de sortie : essais documentés sur Android et iOS réels, ou limites d'environnement explicitement ouvertes.
+
+## 12. L9 — offres et abonnement
+
+- Charger les tarifs, devise, essai et fonctionnalités du catalogue ; aucun montant métier figé dans les écrans.
+- Afficher l'état d'abonnement à partir de `access_granted`, des dates et du plan effectif.
+- Vérifier la stratégie de distribution avec les règles officielles des stores et marchés visés avant activation des ventes.
+- Définir liens de retour, navigation externe et configuration d'activation ; ne pas supposer un feature flag distant déjà fourni par l'API.
+- Créer/reprendre Checkout avec `monthly` ou `annual` et une clé stable, jamais un identifiant Stripe ou montant client.
+- Relire l'abonnement au retour et après événement ; ne pas accorder Premium depuis l'URL de succès.
+- Ouvrir le portail selon sa disponibilité réelle et sa configuration.
+- Valider essai, SCA, échec, renouvellement, annulation, retour après arrêt de l'app et état de paiement incertain en environnement Stripe test.
+
+Critère de sortie : droits réellement projetés par l'API et vente activée seulement pour une distribution vérifiée ; sinon catalogue/état utilisables et paiement explicitement en attente.
+
+## 13. L10 — qualité et bêta
+
+- Vérifier accessibilité, grandes polices, textes longs, clavier et tailles d'écran.
+- Vérifier suspension/reprise, changement Wi-Fi/mobile, réseau lent, erreurs fournisseur et requêtes concurrentes.
+- Contrôler logs, rapports de crash, caches, fichiers temporaires, liens entrants et HTTPS.
+- Préparer identifiants d'application, signatures, icônes, splash, permissions et fiches de distribution.
+- Préparer déclarations de confidentialité et textes juridiques appropriés avec les personnes responsables.
+- Valider l'environnement API ciblé : SMS, stockage/modération, PostgreSQL, Redis, outbox, maintenance, push, publicité, Stripe et supervision selon les fonctions activées.
+- Distinguer vérification automatique, intégration backend, validation fournisseur et essai sur appareil réel.
+
+Critère de sortie : chaque parcours activé a une preuve adaptée ; les fonctions dépendant encore d'une configuration externe ne sont pas annoncées comme opérationnelles.
+
+## 14. Matrice de couverture des routes mobiles
+
+Chemins complets, préfixe `/api` inclus. Toutes les lignes sont `À faire` dans le client au 15 octobre 2026. Après chaque lot, mettre à jour l'état et associer la vérification concrète. La lecture unitaire peut être couverte comme alternative contractuelle à la lecture groupée sans créer un second écran.
+
+| Méthode | Route | Lot | Écran ou usage | État |
+| --- | --- | --- | --- | --- |
+| POST | `/api/auth/otp/send` | L2 | Demander/renvoyer OTP | À faire |
+| POST | `/api/auth/otp/verify` | L2 | Vérifier OTP et créer/restaurer le compte | À faire |
+| POST | `/api/auth/refresh` | L2 | Rotation de session sérialisée | À faire |
+| GET | `/api/auth/me` | L2 | Bootstrap authentifié | À faire |
+| POST | `/api/auth/logout` | L2 | Déconnexion courante | À faire |
+| GET | `/api/auth/sessions` | L7 | Liste des sessions | À faire |
+| DELETE | `/api/auth/sessions/:id` | L7 | Révoquer une session | À faire |
+| POST | `/api/auth/logout-all` | L7 | Déconnexion globale | À faire |
+| GET | `/api/users/me/consents` | L2 | État et documents requis | À faire |
+| PUT | `/api/users/me/consents` | L2, L7 | Accepter et gérer les choix autorisés | À faire |
+| GET | `/api/users/me` | L3 | Profil propriétaire | À faire |
+| PATCH | `/api/users/me/profile` | L3 | Créer/modifier le profil | À faire |
+| GET | `/api/users/me/preferences` | L3 | Préférences courantes | À faire |
+| PATCH | `/api/users/me/preferences` | L3 | Modifier les préférences | À faire |
+| PATCH | `/api/users/me/presence` | L4 | Position ponctuelle | À faire |
+| PUT | `/api/users/me/photo` | L3 | Envoyer/remplacer la photo unique | À faire |
+| DELETE | `/api/users/me/photo` | L3 | Retirer la photo | À faire |
+| GET | `/api/traits` | L3 | Catalogue des traits | À faire |
+| GET | `/api/users/me/traits` | L3 | Traits sélectionnés | À faire |
+| POST | `/api/users/me/traits` | L3 | Ajouter un trait | À faire |
+| DELETE | `/api/users/me/traits/:traitId` | L3 | Retirer un trait | À faire |
+| GET | `/api/profile-questions` | L3 | Catalogue des questions | À faire |
+| GET | `/api/users/me/profile-answers` | L3 | Réponses propriétaires et modération | À faire |
+| PUT | `/api/users/me/profile-answers` | L3 | Remplacer la liste ordonnée des réponses | À faire |
+| GET | `/api/users/me/discovery-status` | L4 | Diagnostic de préparation | À faire |
+| GET | `/api/feed` | L4 | Découverte paginée | À faire |
+| POST | `/api/swipes` | L4 | Like/pass et résultat du match | À faire |
+| GET | `/api/matches/me` | L5 | Liste des matchs | À faire |
+| PATCH | `/api/matches/:id/reveal` | L6 | Accord de révélation | À faire |
+| PATCH | `/api/matches/:id/continue` | L6 | Accord de continuation et coût | À faire |
+| PATCH | `/api/matches/:id/end` | L5 | Terminer un match | À faire |
+| GET | `/api/users/me/continuation-quota` | L6 | Crédits, réservations et plafond | À faire |
+| GET | `/api/matches/:id/messages` | L5 | Historique paginé | À faire |
+| POST | `/api/matches/:id/messages` | L5 | Envoi idempotent | À faire |
+| PATCH | `/api/matches/:id/messages/read` | L5 | Lecture groupée | À faire |
+| PATCH | `/api/matches/:id/messages/:msgId/read` | L5 | Lecture unitaire si nécessaire | À faire |
+| POST | `/api/users/me/advertising-rewards` | L6 | Créer/reprendre une intention | À faire |
+| GET | `/api/users/me/advertising-rewards/:id` | L6 | Suivre la validation serveur | À faire |
+| DELETE | `/api/users/me/advertising-rewards/:id` | L6 | Annuler une intention | À faire |
+| GET | `/api/users/me/devices` | L8 | Liste des appareils | À faire |
+| POST | `/api/users/me/devices` | L8 | Enregistrer/rafraîchir le token push | À faire |
+| DELETE | `/api/users/me/devices/:id` | L8 | Retirer un appareil | À faire |
+| GET | `/api/users/me/events` | L5 | SSE authentifié | À faire |
+| GET | `/api/plans` | L1, L6, L9 | Catalogue, tarifs et disponibilité publicitaire | À faire |
+| GET | `/api/users/me/subscription` | L9 | Abonnement et droits effectifs | À faire |
+| POST | `/api/users/me/subscription/checkout` | L9 | Achat hébergé si distribution compatible | À faire |
+| POST | `/api/users/me/subscription/portal` | L9 | Gestion de l'abonnement | À faire |
+| GET | `/api/users/me/blocks` | L7 | Comptes bloqués | À faire |
+| POST | `/api/users/me/blocks/:userId` | L7 | Bloquer un compte | À faire |
+| DELETE | `/api/users/me/blocks/:userId` | L7 | Débloquer un compte | À faire |
+| POST | `/api/reports` | L7 | Signaler un compte/contenu | À faire |
+| POST | `/api/users/me/data-subject-requests` | L7 | Déposer une demande RGPD | À faire |
+| GET | `/api/users/me/data-subject-requests` | L7 | Suivi des demandes | À faire |
+| GET | `/api/users/me/data-export` | L7 | Export JSON privé | À faire |
+| POST | `/api/users/me/deletion-token` | L7 | Préparer la confirmation de suppression | À faire |
+| DELETE | `/api/users/me` | L7 | Accepter la suppression, fermer la session sur 202 | À faire |
+
+Le webhook AdMob figure dans la section récompenses du contrat API, mais il est appelé par le fournisseur, jamais par Flutter. Il en va de même pour les webhooks Stripe et Sweego. Les routes de santé peuvent servir au diagnostic de développement, sans être un parcours utilisateur ou remplacer les erreurs des appels métier.
+
+## 15. Dépendances externes et définition de terminé
+
+| Dépendance | Validation restant à réaliser côté mobile |
 | --- | --- |
-| État et injection | `flutter_riverpod` |
-| Navigation | `go_router` |
-| HTTP | `dio` avec intercepteurs limités |
-| Modèles | `json_serializable` avec enums fermés |
-| Refresh token | `flutter_secure_storage` |
-| Localisation | `geolocator` |
-| Push | `firebase_core` et `firebase_messaging` |
-| URLs Stripe | navigateur système + gestion de liens de retour |
-| Tests de parcours | `integration_test` |
-
-Ces choix restent à confirmer au début de l’implémentation ; la roadmap ne fige pas leurs versions.
-
-### Environnements
-
-- Prévoir `development`, `staging` et `production` via `--dart-define`.
-- Utiliser `10.0.2.2` sur émulateur Android et une adresse LAN explicite sur appareil physique.
-- Autoriser HTTP en clair uniquement en développement local.
-- Ne compiler aucun secret Stripe, Sweego, Firebase service account ou secret API.
-- Ajouter les identifiants de bundle, signatures et permissions minimales iOS/Android.
-
-### Client HTTP
-
-- Ajouter un Bearer seulement lorsqu’un access token existe.
-- Générer un `X-Request-ID` UUID par requête logique et le conserver pendant un retry.
-- Convertir `{ "error": { "code", "message" } }` en erreurs typées.
-- Implémenter timeouts, annulation et refresh single-flight.
-- Rejouer une requête au plus une fois après refresh.
-- Propager `Retry-After` et empêcher les boucles de retry.
-- Ne jamais journaliser téléphone, jetons, coordonnées, corps de message ou export RGPD.
-
-### Qualité
-
-- Remplacer le test compteur par des tests de bootstrap et de navigation.
-- Définir une commande locale regroupant format, analyse et tests.
-- Garder `flutter analyze` sans avertissement.
-- Ajouter les premières fixtures contractuelles issues de l’OpenAPI.
-
-### Critère de sortie
-
-L’application démarre par environnement, affiche le thème, choisit une route depuis un faux état de session et transforme correctement une réponse ou erreur API simulée.
-
-## 7. Phase 2 — authentification et onboarding légal
-
-### Authentification
-
-- Saisir et normaliser un numéro français `+33`.
-- Envoyer l’OTP avec une `Idempotency-Key` UUID v4 stable pendant les retries techniques.
-- Vérifier le code à six chiffres et stocker uniquement le refresh token dans le stockage sécurisé.
-- Garder l’access token en mémoire.
-- Restaurer la session au démarrage par `POST /auth/refresh`, puis appeler `GET /auth/me`.
-- Implémenter un seul refresh concurrent et purger la session après échec définitif.
-- Au logout, envoyer le refresh token et le `device_id` éventuel, puis purger toutes les données locales.
-
-### Consentements
-
-- Charger `GET /users/me/consents` après création ou restauration de session.
-- Présenter séparément CGU et notice avec leurs versions et URLs serveur.
-- Ne précocher aucun choix.
-- Enregistrer avec `PUT /users/me/consents` et piloter la navigation avec `required_actions`.
-- Demander les consentements sensible et de localisation juste avant les usages concernés.
-- Expliquer les effets destructifs d’un retrait avant confirmation.
-
-### Tests prioritaires
-
-- retry OTP avec même clé et renvoi explicite avec nouvelle clé ;
-- OTP invalide/expiré, `429` et `503` ;
-- plusieurs `401` simultanés ;
-- redémarrage avec refresh valide, invalide ou révoqué ;
-- reprise d’onboarding après fermeture ;
-- changement de version juridique imposant un nouveau passage.
-
-### Critère de sortie
-
-Un utilisateur peut créer/restaurer sa session, terminer ou reprendre les consentements et se déconnecter sans laisser de jeton exploitable.
-
-## 8. Phase 3 — profil, préférences et découverte
-
-### Profil et traits
-
-- Créer/modifier prénom, date de naissance, sexe, bio et photo provisoire nullable.
-- Laisser le serveur décider définitivement de la majorité et des contraintes métier.
-- Charger `GET /users/me/traits`, afficher le catalogue `GET /traits`, puis ajouter/retirer les sélections.
-- Utiliser un placeholder tant que le stockage photo Histae n’est pas livré.
-
-### Localisation et préparation
-
-- Expliquer l’usage avant la permission native « lors de l’utilisation ».
-- Enregistrer le consentement métier indépendamment de la permission système.
-- Envoyer une position courante à `PATCH /users/me/presence`, sans suivi de fond.
-- Utiliser `GET /users/me/discovery-status` pour guider précisément vers `profile`, `sex`, `preferences`, `sensitive_data_consent`, `location_consent` ou `fresh_presence`.
-- Traiter `profile_not_found` et `preferences_not_found` comme des étapes, pas comme des pannes.
-
-### Feed et swipes
-
-- Charger `GET /feed` avec le curseur opaque du serveur.
-- Afficher prénom, âge, sexe, bio, distance et traits, sans inventer de photo dans le feed.
-- Précharger raisonnablement la page suivante sans dupliquer les profils.
-- Envoyer un choix `like` ou `pass` et ne jamais proposer de décision opposée ensuite.
-- Retenter seulement la même décision lorsque le résultat réseau est inconnu.
-- Ne pas persister de file de swipes hors ligne.
-- Ouvrir le match renvoyé lorsque `matched=true`.
-
-### Critère de sortie
-
-Deux comptes de test peuvent terminer leur configuration, se découvrir, swiper et créer un seul match cohérent.
-
-## 9. Phase 4 — matchs, chat et temps réel
-
-### Matchs
-
-- Charger `GET /matches/me` par curseur et conserver l’ordre serveur.
-- Afficher l’autre utilisateur, le dernier message, les non-lus, `my_revealed`, `photos_revealed` et `my_continued`.
-- Représenter `active`, `awaiting_continuation`, `confirmed`, `expired` et `ended`.
-- Afficher un compte à rebours depuis `expires_at`, puis resynchroniser à l’échéance.
-- Enregistrer révélation et continuation sans deviner l’accord de l’autre personne.
-- Charger le quota de continuation depuis l’API.
-
-### Messagerie
-
-- Charger les messages récents puis paginer vers l’historique avec `next_cursor`.
-- Générer une `Idempotency-Key` UUID v4 par message logique et la conserver pour ses retries.
-- Présenter les états local/envoi/confirmé/échec sans créer de doublon.
-- Marquer les messages reçus avec la route groupée « lu jusqu’à ».
-- Conserver la route de lecture unitaire seulement pour compatibilité si nécessaire.
-- Interdire l’envoi local lorsque l’état serveur ne permet plus la messagerie.
-
-### SSE
-
-- Ouvrir `GET /users/me/events` après authentification.
-- Reconnecter avec backoff après perte réseau, reprise de l’application ou rotation de session.
-- Traiter `match.created`, `match.updated`, `matches.invalidated`, `message.created`, `message.read` et `subscription.updated` comme des signaux de resynchronisation.
-- Toujours relire la ressource HTTP concernée ; un événement SSE n’est pas une source de vérité durable.
-- Ne pas maintenir le flux inutilement lorsque l’application reste longtemps suspendue.
-
-### Critère de sortie
-
-Deux comptes observent les mêmes transitions, discutent sans doublon, accusent lecture et se resynchronisent après coupure ou reprise.
-
-## 10. Phase 5 — sûreté, vie privée et paramètres
-
-### Sûreté
-
-- Rendre signalement et blocage accessibles depuis le profil de match et le chat.
-- Utiliser uniquement les motifs fermés fournis par le contrat.
-- Après blocage `204`, fermer l’écran concerné et purger immédiatement match, profil et messages locaux.
-- Lister les comptes bloqués et permettre leur déblocage.
-
-### Droits et consentements
-
-- Afficher et modifier profil, préférences, traits, localisation et consentements facultatifs.
-- Créer une demande RGPD et afficher son historique/statut.
-- Transformer l’export JSON en fichier temporaire partageable puis le supprimer.
-- Afficher les conséquences de la suppression du compte.
-- Appeler d’abord `POST /users/me/deletion-token`, puis confirmer avec `DELETE /users/me`.
-- Ne considérer la suppression réussie qu’après le `204`; proposer un retry explicite sur `503`.
-
-### Critère de sortie
-
-L’utilisateur contrôle ses données et sa sûreté sans dashboard, et chaque mutation invalide les caches concernés.
-
-## 11. Phase 6 — appareils, push et notifications
-
-- Demander l’autorisation de notification au moment pertinent, pas au premier écran sans contexte.
-- Enregistrer le token FCM et la plateforme avec `POST /users/me/devices`.
-- Rafraîchir l’enregistrement après rotation du token ou mise à jour importante de l’application.
-- Conserver localement le `device_id` public pour logout/suppression explicite.
-- Lister/révoquer les appareils si cette interface est retenue dans les paramètres.
-- Ouvrir la bonne ressource après notification puis la recharger depuis l’API.
-- Ne jamais afficher ou journaliser le token fournisseur.
-- Tester token révoqué, appareil réinstallé, notification en premier plan/arrière-plan et application tuée.
-
-### Critère de sortie
-
-Un appareil réel reçoit les notifications prévues sans contenu privé et toute ouverture produit une resynchronisation fiable.
-
-## 12. Phase 7 — plans et abonnement Stripe
-
-### Expérience utilisateur
-
-- Charger les offres avec `GET /plans` et l’état effectif avec `GET /users/me/subscription`.
-- Utiliser uniquement `access_granted` et la projection serveur pour débloquer Premium.
-- Choisir `monthly` ou `annual`; ne jamais envoyer montant, devise, Product ID, Price ID ou Customer ID.
-- Créer Checkout avec une clé d’idempotence stable et ouvrir l’URL dans un navigateur sécurisé.
-- Au retour, recharger l’abonnement ; ne pas déduire un paiement réussi de l’URL seule.
-- Utiliser le portail client pour paiement, changement de tarif et annulation.
-- Réagir à `subscription.updated` et aux notifications de paiement sans exposer de donnée financière.
-
-### Préconditions de mise en vente
-
-- Valider le parcours complet avec les clés et cartes de test Stripe.
-- Tester SCA, paiement échoué, essai, renouvellement, annulation et retour application.
-- Vérifier les règles Apple App Store et Google Play pour chaque plateforme/pays avant d’afficher un lien Checkout externe.
-- Activer la monétisation par feature flag afin de pouvoir masquer Checkout sans nouvelle version urgente.
-- Ne jamais intégrer de clé secrète Stripe dans Flutter ; Checkout est hébergé par Stripe et les droits viennent des webhooks API.
-
-### Critère de sortie
-
-L’utilisateur consulte son état, ouvre Checkout ou le portail, puis voit les droits réellement confirmés par l’API.
-
-## 13. Phase 8 — durcissement et bêta
-
-### Tests
-
-- Tester repositories, modèles, mapping d’erreurs et refresh single-flight.
-- Couvrir chaque écran critique en chargement, vide, succès, erreur et hors ligne.
-- Automatiser OTP simulé, onboarding, découverte, match/chat, blocage, export, suppression et abonnement de test.
-- Tester au minimum un iPhone réel et un appareil Android d’entrée de gamme.
-- Tester grandes polices, lecteur d’écran, mode sombre si retenu et reprise après suspension.
-
-### Sécurité et confidentialité
-
-- Auditer logs et rapports de crash pour exclure toute donnée personnelle.
-- Vérifier la purge des caches et fichiers temporaires au logout et à la suppression.
-- Vérifier permissions et textes de justification iOS/Android.
-- Revoir stockage des jetons, deep links, navigation externe et HTTPS.
-- Faire valider les écrans juridiques/localisation par le juriste ou DPO.
-
-### Exploitation
-
-- Ajouter une remontée de crash compatible avec les décisions juridiques.
-- Préparer icônes, splash screens, signatures et fiches stores.
-- Compléter les déclarations de confidentialité Apple/Google.
-- Valider l’environnement backend de bêta : SMS, Stripe, FCM, Redis, Scylla, worker de maintenance, métriques, alertes et sauvegardes.
-- Réaliser les essais sur réseau lent, perte de réseau et changement Wi-Fi/mobile.
-
-### Critère de sortie
-
-Les parcours critiques passent sur appareils réels, aucun secret ou donnée privée ne fuit, et l’environnement de bêta possède une supervision minimale.
-
-## 14. Matrice des routes mobiles
-
-Toutes les routes sont relatives à la base `/api`.
-
-| Lot | Routes consommées |
-| --- | --- |
-| Auth | `GET /auth/me`, `POST /auth/otp/send`, `POST /auth/otp/verify`, `POST /auth/refresh`, `POST /auth/logout` |
-| Plans/abonnement | `GET /plans`, `GET /users/me/subscription`, `POST /users/me/subscription/checkout`, `POST /users/me/subscription/portal` |
-| Profil | `GET /users/me`, `PATCH /users/me/profile`, `GET/PATCH /users/me/preferences`, `PATCH /users/me/presence` |
-| Consentements | `GET/PUT /users/me/consents` |
-| Traits | `GET /traits`, `GET /users/me/traits`, `POST /users/me/traits`, `DELETE /users/me/traits/:traitId` |
-| Découverte | `GET /users/me/discovery-status`, `GET /feed`, `POST /swipes` |
-| Matchs | `GET /matches/me`, `PATCH /matches/:id/reveal`, `PATCH /matches/:id/continue`, `GET /users/me/continuation-quota` |
-| Chat | `GET/POST /matches/:id/messages`, `PATCH /matches/:id/messages/read`, `PATCH /matches/:id/messages/:msgId/read` |
-| Appareils/temps réel | `GET/POST /users/me/devices`, `DELETE /users/me/devices/:id`, `GET /users/me/events` |
-| Sûreté | `POST /reports`, `GET /users/me/blocks`, `POST/DELETE /users/me/blocks/:userId` |
-| Vie privée | `GET/POST /users/me/data-subject-requests`, `GET /users/me/data-export`, `POST /users/me/deletion-token`, `DELETE /users/me` |
-
-Le mobile n’appelle ni le webhook Stripe ni aucune route `/admin/*`.
-
-## 15. Jalons
-
-| Jalon | Contenu | Validation |
-| --- | --- | --- |
-| M0 — Contrat gelé | phase 0 | OpenAPI/fixtures et décisions UX validés |
-| M1 — Alpha onboarding | phases 1 et 2 | session et consentements sur iOS/Android |
-| M2 — Alpha découverte | phase 3 | deux comptes créent un match réel |
-| M3 — Bêta interne | phases 4 à 6 | chat, SSE, push, sûreté et RGPD opérationnels |
-| M4 — Monétisation test | phase 7 | parcours Stripe test complet et resynchronisé |
-| M5 — Bêta publique | phase 8 + photos | appareils réels, juridique, exploitation et pipeline photo validés |
-
-## 16. Définition de « terminé »
-
-Une fonctionnalité n’est terminée que si :
-
-- succès, chargement, vide, erreur et hors ligne sont traités ;
-- les codes d’erreur API déclenchent le bon comportement ;
-- l’accessibilité de base est vérifiée ;
-- aucune donnée sensible n’est journalisée ;
-- les caches sont invalidés après mutation ou événement ;
-- tests unitaires et widget pertinents passent ;
-- au moins un test couvre le parcours principal ;
-- `dart format`, `flutter analyze` et `flutter test` passent ;
-- aucune route ou notion d’administration n’est introduite.
-
-## 17. Prochaines actions concrètes
-
-1. Exporter et figer `/docs-json` pour le client mobile.
-2. Valider les maquettes OTP → consentements → profil → découverte → match/chat.
-3. Choisir les packages du socle et l’architecture de dossiers.
-4. Décider le placeholder et le feature flag photo jusqu’au pipeline Histae.
-5. Définir les deep links Stripe et valider la stratégie stores.
-6. Remplacer le compteur Flutter par le bootstrap, le routeur et le client HTTP typé.
-
+| SMS/OTP | Configuration de développement, quotas et livraison réelle contrôlée |
+| S3 et modération | Upload réel, formats appareils, état propriétaire, URL expirée et retrait |
+| Maintenance/outbox | Transitions, effets différés et resynchronisation sans les simuler localement |
+| FCM | Configuration iOS/Android et réception sur appareils réels |
+| AdMob | Configuration serveur et SDK, mode de test, validation signée, disponibilité effective |
+| Stripe | Environnement test, portail, retours app et droits projetés |
+| Distribution | Stratégie de paiement, signatures, permissions et déclarations selon les règles applicables |
+
+Une tranche est terminée lorsque son parcours fonctionne avec les vrais contrats, que chargement/vide/erreur/hors ligne sont traités, que les données privées sont protégées et que les vérifications pertinentes sont documentées. Pour les changements Flutter, effectuer formatage, analyse et tests ciblés disponibles ; signaler un outil ou un appareil manquant sans annoncer de réussite. Les tests ordinaires n'envoient ni SMS ni paiement ni récompense publicitaire réels.
+
+Un blocage fournisseur ne doit pas arrêter les tâches indépendantes : garder la capacité dans la matrice, décrire ce qui est implémenté et ce qui reste à valider. Ne pas déclarer une fonction opérationnelle en production sur la seule base de fixtures.
+
+Après chaque intervention, mettre à jour ce suivi et le résumé, expliquer le prochain petit lot et fournir un message de commit en anglais. Aucune commande Git ni suppression de fichier. Si un script `.sh` est créé ou modifié, ne pas effectuer de tests de ce script.
