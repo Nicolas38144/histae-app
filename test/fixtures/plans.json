@@ -1,0 +1,44 @@
+{
+  "plans": [
+    {
+      "code": "free",
+      "display_name": "Free",
+      "monthly_price_cents": 0,
+      "annual_price_cents": 0,
+      "currency": "EUR",
+      "trial_days": 0,
+      "weekly_continuation_limit": 6,
+      "weekly_included_credits": 3,
+      "advertising_credit_stock_limit": 3,
+      "ads_removed": false,
+      "rewarded_advertising_enabled": false,
+      "features": [
+        {
+          "code": "messages",
+          "display_name": "Messaging",
+          "description": null,
+          "feature_value": {"enabled": true}
+        }
+      ]
+    },
+    {
+      "code": "premium",
+      "display_name": "Premium",
+      "monthly_price_cents": 1234,
+      "annual_price_cents": 9876,
+      "currency": "EUR",
+      "trial_days": 7,
+      "advertising_credit_stock_limit": 3,
+      "ads_removed": true,
+      "rewarded_advertising_enabled": false,
+      "features": [
+        {
+          "code": "no_ads",
+          "display_name": null,
+          "description": null,
+          "feature_value": true
+        }
+      ]
+    }
+  ]
+}

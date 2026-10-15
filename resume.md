@@ -8,7 +8,7 @@ Mise à jour : 15 octobre 2026.
 
 `histae-app` est le futur client Flutter Android/iOS des utilisateurs de Histae. Le backend de référence est `histae-api-rust`, écrit en Rust avec Axum, Tokio et SQLx. PostgreSQL contient les données transactionnelles ; Redis sert notamment aux limites de débit et au relais temps réel ; les photos sont privées dans un stockage compatible S3. L'API, l'outbox et la maintenance ont des cycles de vie distincts.
 
-L'app reste le compteur initial : un seul fichier applicatif `lib/main.dart`, le test widget du modèle, les projets Android/iOS et aucune intégration métier. Le manifeste déclare Dart `^3.13.1` et `cupertino_icons`. Une capacité disponible dans l'API ne signifie pas qu'elle est intégrée au mobile ni validée avec un fournisseur réel.
+L1 remplace le compteur par l'accueil et la consultation du catalogue public. Le socle fournit configuration, thème clair/sombre, navigation publique, erreurs typées et HTTP annulable. Le manifeste conserve Dart `^3.13.1` et `cupertino_icons`, avec les ajouts `http: ^1.6.0` et `flutter_localizations` du SDK. Flutter 3.47.7 / Dart 3.13.5 vérifiés. Aucune session ni fonctionnalité métier authentifiée n'est livrée ; une capacité serveur ne signifie pas une intégration mobile validée.
 
 Le dashboard est hors périmètre. Aucun rôle administratif, WebAuthn administrateur, écran de modération ou route `/api/admin/*` ne doit être ajouté au mobile.
 
@@ -23,6 +23,8 @@ Références complémentaires : [architecture](../histae-api-rust/docs/architect
 ## 3. Conventions HTTP
 
 La matrice mobile utilise les chemins complets, préfixe `/api` inclus. Choisir une seule convention dans le futur client afin de ne pas doubler ce préfixe. L'origine API doit être configurable selon l'environnement ; ne jamais fixer `localhost` dans le code métier. Adapter l'accès réseau à l'émulateur et au téléphone. HTTP en clair peut être nécessaire localement ; HTTPS reste requis pour la production.
+
+Convention L1 : `API_BASE_URL` est une origine sans `/api`, chemins complets dans les repositories. Cible par défaut fournie par l'utilisateur : `https://api.histae.com/api/` ; origine `https://api.histae.com`, `APP_ENV=production`. Remplacement possible par `--dart-define` (voir README). HTTP refusé sauf `development` + debug ; exceptions natives limitées au debug. Catalogue réel accessible : HTTP 200 et deux formules décodées depuis cet hôte.
 
 - JSON, sauf upload photo multipart ; champs inconnus refusés et corps JSON limité à 1 Mio.
 - Date de naissance `YYYY-MM-DD` ; horodatages avec fuseau, calculs en UTC et affichage local.
@@ -148,11 +150,11 @@ Les consentements, demandes de droits, export et suppression ne doivent pas deve
 
 ## 15. Organisation Flutter proposée
 
-La structure n'est pas encore implémentée. Préférer une organisation par fonctionnalité avec `app` pour le bootstrap et le routeur, `core` pour réseau/configuration/sécurité/composants et `features` pour les parcours métier. Séparer présentation, état applicatif et accès API ; n'ajouter une couche de domaine que si une logique locale le justifie. Les widgets ne manipulent ni secrets ni JSON réseau directement.
+Structure L1 : `app` (application/navigation/thème), `core` (configuration, réseau, textes français, composants) et `features/catalog/{data,application,presentation}`. `CatalogController` utilise `ChangeNotifier`, le repository décode les DTO, le client HTTP est injecté. Aucune couche vide ajoutée pour les lots futurs. Les widgets ne manipulent ni secrets ni JSON réseau directement.
 
-Choisir les packages après examen du SDK installé et de leur documentation officielle, sans figer ici des versions ou une bibliothèque d'état. Ajouter les dépendances à mesure que les lots en ont besoin. Prévoir dès le socle français, traductions futures, grandes polices, lecteur d'écran et composants chargement/vide/erreur/hors ligne.
+Choix L1 après consultation des documentations officielles : `http` pour les requêtes annulables, `Navigator` / `MaterialPageRoute` pour les deux écrans publics, `ChangeNotifier` pour leur état, `flutter_localizations` pour les libellés Material français. Les textes applicatifs sont centralisés dans `AppStrings` ; ajouter un délégué de traduction à l'introduction d'une seconde langue. Les thèmes suivent le système ; aucune réduction forcée de la taille du texte. Chargement, vide, erreur réseau, délai dépassé et nouvelle tentative sont explicites.
 
-Le routeur tient compte de la session et des consentements. Une découverte non prête doit orienter vers sa préparation sans verrouiller tout le reste de l'app. Les liens entrants nécessitent une ressource accessible et une session valable.
+La navigation actuelle est uniquement publique et ne fabrique pas de session. Les gardes de session et consentements seront introduites en L2 à partir des réponses réelles. Une découverte non prête doit orienter vers sa préparation sans verrouiller tout le reste de l'app. Les liens entrants nécessiteront une ressource accessible et une session valable.
 
 ## 16. Stockage et validation
 
@@ -164,6 +166,9 @@ Les tests Flutter pertinents couvrent sérialisation, erreurs, rotation concurre
 
 ## 17. Première tranche et limites restantes
 
-Commencer par vérifier la matrice de la roadmap, choisir le socle et livrer un bootstrap avec URL configurable, thème, client HTTP et erreurs typées. Poursuivre avec session et OTP, puis consentements, profil et découverte. Chaque intervention réalise un petit lot complet et actualise les deux documents de suivi.
+L1 est implémenté : accueil/catalogue, origine configurable, thèmes et erreurs typées. Le client envoie un UUID v4 `X-Request-ID`, ne suit pas les redirections et n'effectue aucun retry ni refresh automatique. Timeout couvrant en-têtes et corps ; annulation à la fermeture/suspension, réponses tardives ignorées, reprise de la seule lecture interrompue. `Retry-After` en secondes ou date interdit la nouvelle tentative avant échéance. Les erreurs conservent seulement statut, code, identifiant de demande validé et délai ; aucun corps, message anglais ou URL n'est journalisé. Le catalogue reste en mémoire, sans persistance et sans action d'achat.
 
-Tout le client Histae reste à construire. Les capacités serveur photo, SMS, push, publicité et Stripe nécessitent la configuration appropriée et des validations réelles ; leur présence dans le code ne prouve pas la disponibilité de l'environnement. Les signatures mobiles, liens de retour, permissions, règles de distribution et déclarations de confidentialité restent à préparer. Consulter la roadmap production API pour les limites d'exploitation, sans les masquer par une simulation mobile.
+Les fixtures suivent les DTO `SubscriptionPlan` et `PlanFeature` Rust ; les prix sont illustratifs et uniquement dans les tests. Les tests backend et Postman ont été consultés, pas exécutés. Vérifications mobile : formatage, analyse sans problème, 54 tests réussis et compilation Android debug. Aucun appel authentifié ou fournisseur effectué. Le GET réel a répondu HTTP 200 et les deux formules ont été décodées par le client Dart (`tool/check_catalog.dart`, contrôle volontaire séparé des tests). L'interface traduit les fonctionnalités connues par code sans déduire quotas ou droits. Validation sur appareils et compilation iOS restent ouvertes. Le prochain lot est L2 : OTP/session sécurisée puis consentements versionnés et navigation associée.
+
+Les parcours L2 à L10 restent à construire. Les capacités serveur photo, SMS, push, publicité et Stripe nécessitent la configuration appropriée et des validations réelles ; leur présence dans le code ne prouve pas la disponibilité de l'environnement. Les signatures mobiles, liens de retour, permissions métier, règles de distribution et déclarations de confidentialité restent à préparer. Les plist iOS commun/debug sont à maintenir ensemble et à compiler sur Mac ; aucune validation iOS réalisée sur cet hôte Windows. Consulter la roadmap production API pour les limites d'exploitation, sans les masquer par une simulation mobile.
+

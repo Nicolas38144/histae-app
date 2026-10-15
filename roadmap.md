@@ -6,7 +6,7 @@ Mise à jour : 15 octobre 2026.
 
 ## 1. État de départ et suivi
 
-Le dépôt contient uniquement le squelette Flutter Android/iOS et son compteur. Aucun lot métier n'est livré. La documentation et l'inventaire mobile ci-dessous ont été remis en cohérence avec l'API Rust ; le choix des packages, le design et les validations d'intégration restent à effectuer.
+L1 est implémenté : accueil, catalogue public, configuration, thème, navigation et client HTTP. L'intégration du catalogue est vérifiée sur `https://api.histae.com/api/plans` : HTTP 200 et décodage de deux formules par le client Dart. Les parcours métier L2 à L10 restent à faire ; aucune authentification ni vente n'est livrée.
 
 Cette roadmap couvre toutes les capacités utilisateur de l'API actuelle. Elle exclut l'administration, les webhooks fournisseur, la supervision et les opérations internes. Elle ne dépend pas des anciens dépôts NestJS ou d'un endpoint OpenAPI.
 
@@ -16,8 +16,8 @@ Les états doivent distinguer : `À faire`, `En cours`, `Implémenté`, `Intégr
 
 | Lot | Objectif | État |
 | --- | --- | --- |
-| L0 | Vérifier le contrat, l'inventaire, les parcours et l'environnement mobile | Documentation et inventaire établis ; audit d'implémentation à poursuivre |
-| L1 | Bootstrap, configuration, navigation, thème et client HTTP | À faire |
+| L0 | Vérifier le contrat, l'inventaire, les parcours et l'environnement mobile | Vérifié pour L1 : SDK, catalogue, erreurs, routes/DTO/services, tests et Postman consultés ; approfondir par lot |
+| L1 | Bootstrap, configuration, navigation, thème et client HTTP | Intégré API pour le catalogue ; 54 tests, analyse et compilation Android debug ; appareils/iOS en attente |
 | L2 | OTP, session et onboarding juridique reprenable | À faire |
 | L3 | Profil, préférences, traits, questions, photo et modération propriétaire | À faire |
 | L4 | Présence, diagnostic de préparation, découverte et swipes | À faire |
@@ -53,6 +53,18 @@ Critère de sortie : premier lot borné, sources identifiées, convention d'URL 
 - Vérifier un appel public réel au catalogue lorsque l'environnement est disponible.
 
 Critère de sortie : app démarrable, origine API configurable, premier appel et états d'erreur utilisables ; aucune fausse session.
+
+### Livraison L1 — 15 octobre 2026
+
+- **Interface** : accueil → catalogue → retour, thème clair/sombre, français, chargement/vide/erreur/service non configuré, reprise explicite ; tests petit écran à 200 % et accessibilité de l'accueil. Aucun écran métier supplémentaire.
+- **Accès API** : `CatalogRepository` appelle `GET /api/plans`, lit les DTO Rust (options omises, champs de fonctionnalités nullables, prix en centimes) sans pagination ni Bearer. Base par défaut fournie par l'utilisateur : `https://api.histae.com/api/`, représentée en configuration par l'origine `https://api.histae.com`. L'environnement reste remplaçable par `--dart-define`.
+- **Socle** : `http` annulable, délai incluant la lecture du corps, UUID v4 `X-Request-ID`, erreurs par statut et `error.code`, `Retry-After` secondes/date et bouton bloqué jusqu'à l'échéance. Aucune relance automatique. Annulation au retour et à la suspension ; seule la lecture interrompue est reprise au retour au premier plan.
+- **Architecture** : `app`, `core`, `features/catalog/{data,application,presentation}`, `Navigator` et `ChangeNotifier`. Les gardes session/consentements appartiendront à L2 avec une vraie session.
+- **Sources vérifiées** : contrat HTTP, `src/catalog/{http,domain,service}.rs`, erreurs HTTP, routeur, tests `http_contract.rs`, `contract_harness.rs`, `catalog_postgres.rs`, requête publique `GET /api/plans` des collections Postman. Aucun test backend exécuté ; aucun changement backend.
+- **Vérifications automatiques** : formatage, analyse sans problème, 54 tests réussis (configuration, DTO, erreurs, reprise, annulation sur HTTP local réel, navigation, suspension/reprise, petit écran et accessibilité), compilation Android debug. XML des manifestes Android et plist iOS vérifié ; cela ne valide pas leur comportement sur appareil.
+- **Intégration réelle** : `GET https://api.histae.com/api/plans` → HTTP 200 ; deux formules décodées avec le client/repository Dart via `tool/check_catalog.dart`, hors suite de tests. Aucun succès fournisseur ou appareil revendiqué. Les fonctionnalités connues sont traduites en français par code, sans fixer localement les valeurs métier.
+
+Prochain petit lot : L2, OTP et session sécurisée (idempotence OTP, refresh sérialisé, restauration et logout), puis consentements versionnés et gardes de navigation. Prévoir des essais OTP autorisés et la configuration du stockage sécurisé ; ne pas remplacer les fournisseurs par des comptes simulés.
 
 ## 5. L2 — OTP, session et consentements
 
@@ -170,7 +182,7 @@ Critère de sortie : chaque parcours activé a une preuve adaptée ; les fonctio
 
 ## 14. Matrice de couverture des routes mobiles
 
-Chemins complets, préfixe `/api` inclus. Toutes les lignes sont `À faire` dans le client au 15 octobre 2026. Après chaque lot, mettre à jour l'état et associer la vérification concrète. La lecture unitaire peut être couverte comme alternative contractuelle à la lecture groupée sans créer un second écran.
+Chemins complets, préfixe `/api` inclus. Les 56 routes restent suivies ; seul le catalogue est intégré à ce stade, avec validation réseau depuis l'hôte, sans essai sur appareil. Après chaque lot, mettre à jour l'état et associer la vérification concrète. La lecture unitaire peut être couverte comme alternative contractuelle à la lecture groupée sans créer un second écran.
 
 | Méthode | Route | Lot | Écran ou usage | État |
 | --- | --- | --- | --- | --- |
@@ -217,7 +229,7 @@ Chemins complets, préfixe `/api` inclus. Toutes les lignes sont `À faire` dans
 | POST | `/api/users/me/devices` | L8 | Enregistrer/rafraîchir le token push | À faire |
 | DELETE | `/api/users/me/devices/:id` | L8 | Retirer un appareil | À faire |
 | GET | `/api/users/me/events` | L5 | SSE authentifié | À faire |
-| GET | `/api/plans` | L1, L6, L9 | Catalogue, tarifs et disponibilité publicitaire | À faire |
+| GET | `/api/plans` | L1, L6, L9 | Catalogue, tarifs et disponibilité publicitaire | Intégré API L1 : HTTP 200, deux formules décodées ; usages L6/L9 et appareils à faire |
 | GET | `/api/users/me/subscription` | L9 | Abonnement et droits effectifs | À faire |
 | POST | `/api/users/me/subscription/checkout` | L9 | Achat hébergé si distribution compatible | À faire |
 | POST | `/api/users/me/subscription/portal` | L9 | Gestion de l'abonnement | À faire |
@@ -250,3 +262,4 @@ Une tranche est terminée lorsque son parcours fonctionne avec les vrais contrat
 Un blocage fournisseur ne doit pas arrêter les tâches indépendantes : garder la capacité dans la matrice, décrire ce qui est implémenté et ce qui reste à valider. Ne pas déclarer une fonction opérationnelle en production sur la seule base de fixtures.
 
 Après chaque intervention, mettre à jour ce suivi et le résumé, expliquer le prochain petit lot et fournir un message de commit en anglais. Aucune commande Git ni suppression de fichier. Si un script `.sh` est créé ou modifié, ne pas effectuer de tests de ce script.
+
