@@ -49,7 +49,6 @@ app.*.map.json
 
 /pictures
 
-# Local public app configuration; keep the installation template.
+# Local public app configuration.
 .env
 .env.*
-!.env.example

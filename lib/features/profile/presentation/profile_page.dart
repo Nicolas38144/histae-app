@@ -8,6 +8,10 @@ import '../../auth/application/session_controller.dart';
 import '../../catalog/data/catalog_repository.dart';
 import '../../catalog/presentation/catalog_page.dart';
 import '../../consents/presentation/consents_page.dart';
+import '../../discovery/application/discovery_controller.dart';
+import '../../discovery/data/discovery_repository.dart';
+import '../../discovery/data/device_location.dart';
+import '../../discovery/presentation/discovery_page.dart';
 import '../application/profile_controller.dart';
 import '../data/profile_repository.dart';
 import 'profile_editors.dart';
@@ -24,6 +28,10 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
   late final controller = ProfileController(ProfileRepository(widget.session));
+  late final discovery = DiscoveryController(
+    DiscoveryRepository(widget.session),
+    DeviceLocation(),
+  );
   @override
   void initState() {
     super.initState();
@@ -43,6 +51,7 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     controller.dispose();
+    discovery.dispose();
     super.dispose();
   }
 
@@ -103,6 +112,14 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                   body: 'Une façon de vous raconter, avant de vous rencontrer. Votre photo restera absente du feed.',
                 ),
                 const SizedBox(height: 16),
+                FilledButton.icon(
+                  onPressed: () => _open(
+                    DiscoveryPage(controller: discovery, profile: controller),
+                  ),
+                  icon: const Icon(Icons.explore_outlined),
+                  label: const Text('Découvrir les profils'),
+                ),
+                const SizedBox(height: 12),
                 TextButton(
                   onPressed: () => _open(ConsentsPage(session: widget.session)),
                   child: Text(strings.privacyTitle),

@@ -42,6 +42,7 @@ class ApiClient {
     String method,
     String path, {
     Object? body,
+    Map<String, String>? query,
     List<int>? photo,
     String? bearer,
     String? idempotencyKey,
@@ -69,13 +70,10 @@ class ApiClient {
       throw const ApiFailure(ApiFailureKind.payloadTooLarge);
     }
     final http.BaseRequest request;
+    final uri = origin.resolve(path).replace(queryParameters: query);
     if (photo != null) {
       request =
-          http.AbortableMultipartRequest(
-              method,
-              origin.resolve(path),
-              abortTrigger: trigger,
-            )
+          http.AbortableMultipartRequest(method, uri, abortTrigger: trigger)
             ..files.add(
               http.MultipartFile.fromBytes(
                 'photo',
@@ -85,11 +83,7 @@ class ApiClient {
               ),
             );
     } else {
-      request = http.AbortableRequest(
-        method,
-        origin.resolve(path),
-        abortTrigger: trigger,
-      );
+      request = http.AbortableRequest(method, uri, abortTrigger: trigger);
       if (body != null) {
         request.headers['Content-Type'] = 'application/json';
         (request as http.Request).body = jsonEncode(body);

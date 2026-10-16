@@ -6,7 +6,7 @@ Mise à jour : 16 octobre 2026.
 
 ## État réel du dépôt
 
-L1, L2 et L3 sont implémentés : accueil/catalogue public, inscription/reconnexion OTP, session sécurisée, consentements versionnés, profil majeur, préférences, traits, réponses ordonnées et photo unique. L'OTP valide crée le compte s'il n'existe pas ou reconnecte son propriétaire. L'espace personnel attend une session authentifiée puis les consentements obligatoires serveur. Le catalogue seul est vérifié en réseau réel ; L2/L3 utilisent les vrais contrats, avec tests simulés, sans validation compte/SMS/photo sur appareil. La découverte désigne le feed de profils sans photo, prévu en L4 ; aucun guide interactif n'est sous-entendu. Notifications, publicités et ventes restent à construire.
+L1 à L4 sont implémentés : accueil/catalogue public, OTP, session sécurisée, consentements, profil/préférences/photo et découverte sans photo avec localisation ponctuelle, diagnostic, pagination et choix like/pass. Un intérêt réciproque ouvre le récapitulatif du match retourné par le serveur. Le blocage est accessible dès le feed. Seul le catalogue est vérifié en réseau réel ; les parcours privés utilisent les vrais contrats et des contrôles simulés, sans validation SMS/compte/appareil. Le chat et la liste persistante des matchs arrivent en L5. Notifications, publicités et ventes restent à construire.
 
 Le manifeste conserve Dart `^3.13.1` et `cupertino_icons`. Aux dépendances L1/L2 s'ajoutent en L3 `image_picker: ^1.2.4`, `flutter_image_compress: ^2.5.1`, `http_parser: ^4.1.2` et `path_provider: ^2.1.6`. Navigation avec `Navigator` / `MaterialPageRoute`, état avec `ChangeNotifier`, dépendances injectées par constructeur. SDK vérifié : Flutter 3.47.7, Dart 3.13.5.
 
@@ -27,7 +27,7 @@ L'API actuelle est écrite en Rust avec Axum, Tokio et SQLx. PostgreSQL, Redis e
 
 ## Démarrage
 
-Installer un SDK Flutter compatible avec la contrainte Dart du manifeste et les outils de la plateforme ciblée. À la première installation, copier `.env.example` vers `.env` (le fichier local a déjà été créé dans cet espace de travail), puis :
+Installer un SDK Flutter compatible avec la contrainte Dart du manifeste et les outils de la plateforme ciblée. Créer le fichier local `.env` avec les deux valeurs publiques ci-dessous (il existe déjà dans cet espace de travail), puis :
 
 ```bash
 flutter pub get
@@ -48,7 +48,7 @@ APP_ENV=development
 API_BASE_URL=http://10.0.2.2:8080
 ```
 
-`.env` est ignoré dans le suivi des fichiers ; `.env.example` reste le modèle d'installation. Le fichier est embarqué dans le paquet mobile : **configuration publique uniquement, aucun secret**. Il n'y a plus de surcharge par `--dart-define`. Le lecteur accepte commentaires sur des lignes séparées et valeurs entre guillemets ; aucune interpolation ni variable supplémentaire. Clé manquante, doublon ou valeur invalide ferme l'intégration sans adresse de secours ni journalisation. En CI, fournir `.env` avant compilation.
+`.env` est ignoré dans le suivi des fichiers. À la demande de l'utilisateur, aucun fichier d'exemple ne doit être recréé. Le fichier est embarqué dans le paquet mobile : **configuration publique uniquement, aucun secret**. Il n'y a plus de surcharge par `--dart-define`. Le lecteur accepte commentaires sur des lignes séparées et valeurs entre guillemets ; aucune interpolation ni variable supplémentaire. Clé manquante, doublon ou valeur invalide ferme l'intégration sans adresse de secours ni journalisation. En CI, fournir `.env` avant compilation.
 
 `10.0.2.2` rejoint l'ordinateur depuis l'émulateur Android standard. Pour un téléphone, utiliser l'IP LAN réelle de l'ordinateur, par exemple `http://192.168.1.10:8080`, sur le même réseau ; pour le simulateur iOS, l'adresse de l'hôte Mac. `localhost` sur un téléphone désigne le téléphone. Vérifier écoute et pare-feu du serveur ; la configuration Docker de développement de l'API écoute par défaut sur `127.0.0.1` (`HISTAE_API_BIND_IP` permet de choisir l'interface).
 
@@ -106,13 +106,26 @@ L'app relit les versions juste avant le PUT et refuse un accord si elles diffèr
 
 Sources : contrat HTTP Rust, DTO/routes/services profils, catalogue et média, tests `profiles_contract.rs`, `catalog_postgres.rs`, `media_integration.rs`, `photo_codec.rs` et collections Postman. Backend consulté uniquement, aucun changement ni test exécuté. Références de packages : [sélecteur Flutter](https://pub.dev/packages/image_picker), [compression native](https://pub.dev/packages/flutter_image_compress), [répertoires temporaires](https://pub.dev/packages/path_provider), [multipart HTTP annulable](https://pub.dev/documentation/http/latest/http/AbortableMultipartRequest-class.html).
 
-Prochain lot : **L4**, consentement et permission de localisation, présence fraîche, diagnostic de préparation et feed sans photo. Les validations réelles de L2/L3 restent ouvertes.
+Suite livrée en L4 ci-dessous. Les validations réelles de L2/L3 restent ouvertes.
+
+## L4 — découverte sans photo
+
+- **Parcours** : « Découvrir les profils » depuis votre espace personnel ; retour au profil et aux choix de vie privée toujours disponible. Le diagnostic serveur ouvre les étapes profil/sexe, préférences et consentements, sans déduire une éligibilité locale.
+- **Localisation** : `geolocator: ^14.1.1`, accord métier courant puis explication et permission système. Une seule mesure, abonnement natif annulé après acquisition ou sortie/arrière-plan/retrait/logout. Pas de dernière position connue, de suivi de fond, de persistance ni de journalisation des coordonnées. Les positions approximatives sont acceptées ; refus, refus permanent, services désactivés, délai et mesure ancienne/invalide sont distincts. Le PATCH n'envoie que latitude/longitude. Après réponse perdue, relecture du diagnostic, aucun renvoi automatique. L'expiration `presence_expires_at` provoque une relecture, sans déclencher le GPS.
+- **Feed** : composition ivoire/forêt inspirée de la référence, prénom/âge, distance reçue, bio, traits et réponses approuvées. Aucune photo ni URL partenaire dans le modèle ou les téléchargements. Aucune ville/catégorie inventée. Curseur opaque encodé, limite conservée, déduplication, reprise sans curseur après `invalid_cursor` et arrêt à `null`. Modification des préférences ou reprise au premier plan relit les ressources.
+- **Choix** : double appui pour aimer ; geste vers le haut en fin de lecture pour passer, boutons accessibles en complément. Un geste servant à lire un profil long ne le passe pas : un autre geste depuis le bas est nécessaire. Aucun retour au profil précédent par geste vers le bas. Pendant un résultat incertain, seule la même cible/décision peut être reprise explicitement. Intention en mémoire dans la session, y compris après retour au profil ; aucune file durable ni retry universel. Quotas temporels respectés via `Retry-After`.
+- **Match et sûreté** : seule la réponse `201` réciproque, avec membres vérifiés, ouvre le récapitulatif. Celui-ci confirme la rencontre créée sans prétendre connaître des droits de chat actuels ou révéler une photo. Le chat, l'historique des matchs et la synchronisation de leurs états restent L5. Blocage confirmé via `POST /api/users/me/blocks/:userId` (`204`), disponible même pour remplacer une intention like/pass incertaine ; aucun choix opposé n'est envoyé. Gestion complète des blocages et signalements reste L7.
+- **Contrôles exécutés** : huit contrôles L4 ciblés réussis ; configuration existante vérifiée après retrait du fichier modèle. Vérification supplémentaire ciblée du geste de lecture longue, deux aperçus de feed inspectés, compilation Android debug réussie. Aucun essai authentifié entre deux comptes réels ni permission/GPS sur appareil. Aucun test backend exécuté et aucun changement backend.
+
+Android déclare les permissions de position approximative/précise, sans permission de localisation en arrière-plan ni service de suivi demandé par l'app. Les deux plist iOS déclarent uniquement la localisation en cours d'utilisation. Pour une compilation iOS via Swift Package Manager, le plugin Apple résolu demande le flag de compilation natif `BYPASS_PERMISSION_LOCATION_ALWAYS=1` afin d'exclure l'appel « toujours » du binaire : sur Mac, `BYPASS_PERMISSION_LOCATION_ALWAYS=1 flutter build ios`. Ce flag ne va pas dans le `.env` de l'app. Configuration, compilation/signature et comportement iOS restent à valider sur Mac/appareil. Référence : [documentation officielle Geolocator](https://pub.dev/packages/geolocator) et manifeste Swift du plugin Apple résolu.
+
+Prochain lot : **L5**, liste des matchs, chat, lecture et synchronisation SSE, avec les états et échéances serveur.
 
 ## Direction artistique
 
 La composition de [la référence fournie](pictures/exemple_feed.png) guide toute l'app : cartes généreuses, titres à empattements, séparateurs fins, icônes sobres et espacements aérés. À la demande de l'utilisateur, **aucune palette rose/corail** : ivoire `#FAF8F3`, papier `#FFFDF8`, vert forêt `#345647`, encre `#252C28`, sable `#E4DAC9`. Le mode sombre conserve cette identité. Les titres utilisent DM Serif Display embarquée, sans téléchargement de police au lancement ; les contrôles gardent la typographie système et les grandes polices restent autorisées.
 
-Les aperçus sont générés depuis les vrais widgets avec des données explicitement simulées, dans `build/previews/{welcome,registration,consents,profile,profile-editor,answers}.png`. Pour les régénérer, définir `FLUTTER_ROOT` vers le SDK puis lancer `flutter test tool/preview_app_test.dart --update-goldens`. Ils ont été inspectés visuellement ; ils ne constituent pas des captures d'appareil. Le feed sera réalisé en L4, sans photo, avec swipe vers le haut pour passer et double appui pour liker, sans retour vers le bas.
+Les aperçus sont générés depuis les vrais widgets avec des données explicitement simulées, dans `build/previews/{welcome,registration,consents,profile,profile-editor,answers,feed,feed-end}.png`. Pour les régénérer, définir `FLUTTER_ROOT` vers le SDK puis lancer `flutter test tool/preview_app_test.dart --update-goldens`. Ils ont été inspectés visuellement ; ils ne constituent pas des captures d'appareil. Le feed L4 applique cette DA sans photo : geste haut en fin de lecture pour passer et double appui pour liker, sans retour à un profil précédent.
 
 ## Principes de développement
 

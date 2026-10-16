@@ -47,6 +47,8 @@
 			</array>
 		</dict>
 	</dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Histae utilise une position ponctuelle pour proposer des rencontres à proximité. Votre position exacte reste privée, sans suivi en arrière-plan.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 <string>Choisissez votre unique photo de profil Histae. Elle sera révélée uniquement après un accord mutuel.</string>
 <key>UIApplicationSupportsIndirectInputEvents</key>

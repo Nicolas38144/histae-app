@@ -9,6 +9,7 @@ import 'package:histae_app/app/app.dart';
 
 import '../test/support/auth_fixture.dart';
 import '../test/support/profile_fixture.dart';
+import '../test/support/discovery_fixture.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -42,6 +43,48 @@ void main() {
         Future.value(ByteData.sublistView(await iconFile.readAsBytes())),
       );
     await icons.load();
+  });
+  testWidgets('preview L4 discovery with synthetic profiles only', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final session = testSession(
+      (request) async => defaultDiscoveryResponse(request),
+    );
+    await session.establish(testTokens);
+    const preview = Key('discovery-preview');
+    await tester.pumpWidget(
+      RepaintBoundary(
+        key: preview,
+        child: HistaeApp(sessionController: session),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Découvrir les profils'),
+      180,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.text('Découvrir les profils'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Découvrir les profils'));
+    await tester.pumpAndSettle();
+    await expectLater(
+      find.byKey(preview),
+      matchesGoldenFile('../build/previews/feed.png'),
+    );
+    await tester.drag(
+      find.byKey(const Key('feed-profile-scroll')),
+      const Offset(0, -210),
+    );
+    await tester.pumpAndSettle();
+    await expectLater(
+      find.byKey(preview),
+      matchesGoldenFile('../build/previews/feed-end.png'),
+    );
   });
   testWidgets('preview welcome, registration and consent direction', (
     tester,

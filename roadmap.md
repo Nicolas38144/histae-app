@@ -6,7 +6,7 @@ Mise à jour : 16 octobre 2026.
 
 ## 1. État de départ et suivi
 
-L1 est intégré pour le catalogue. L2 et L3 sont implémentés : OTP/session/consentements, profil majeur, préférences, traits, réponses et photo personnelle. Les sept routes L2 et treize routes L3 utilisent les contrats réels ; seuls des tests simulés couvrent ces parcours privés. SMS, compte réel, stockage sécurisé et photo sur appareil restent à valider. L4 à L10 restent à construire. La découverte de L4 désigne le feed de profils sans photo. La DA suit `pictures/exemple_feed.png`, en ivoire/vert forêt/encre/sable, sans rose ni corail. Configuration publique déplacée dans `.env`, avec `.env.example` et sans adresse de secours dans Dart.
+L1 est intégré pour le catalogue. L2 à L4 sont implémentés : session/consentements, profil/photo et découverte sans photo. Les quatre routes L4 et le blocage depuis le feed sont reliés aux contrats réels, avec contrôles simulés ; SMS, deux comptes, GPS et appareils restent à valider. L5 à L10 restent à construire, avec le début du blocage L7 livré en L4. La DA suit `pictures/exemple_feed.png`, en ivoire/vert forêt/encre/sable. Configuration publique dans `.env`, sans adresse de secours dans Dart ; le fichier modèle supprimé par l'utilisateur ne doit pas être recréé.
 
 Cette roadmap couvre toutes les capacités utilisateur de l'API actuelle. Elle exclut l'administration, les webhooks fournisseur, la supervision et les opérations internes. Elle ne dépend pas des anciens dépôts NestJS ou d'un endpoint OpenAPI.
 
@@ -20,7 +20,7 @@ Les états doivent distinguer : `À faire`, `En cours`, `Implémenté`, `Intégr
 | L1 | Bootstrap, configuration, navigation, thème et client HTTP | Intégré API pour le catalogue ; 54 tests, analyse et compilation Android debug ; appareils/iOS en attente |
 | L2 | Inscription/reconnexion OTP, session et onboarding juridique reprenable | Implémenté ; 85 tests au total et compilation Android debug ; SMS, compte réel et appareils à valider |
 | L3 | Profil, préférences, traits, questions, photo et modération propriétaire | Implémenté sur les treize routes ; vérifications automatiques ci-dessous ; compte/photo/appareils à valider |
-| L4 | Présence, diagnostic de préparation, découverte et swipes | À faire |
+| L4 | Présence, diagnostic de préparation, découverte et swipes | Implémenté sur quatre routes + blocage ; huit contrôles ciblés ; deux comptes et appareils à valider |
 | L5 | Matchs, chat, lecture et synchronisation SSE | À faire |
 | L6 | Révélation, continuation, crédits et récompenses volontaires | À faire |
 | L7 | Sûreté, paramètres de confidentialité, sessions, export et suppression | À faire |
@@ -110,7 +110,7 @@ Critère de sortie : profil et photo réels modifiables ; erreurs, modération, 
 - **Interface** : espace personnel éditorial et cinq parcours : présentation, préférences, traits, réponses ordonnées et photo unique. Prénom/date requis, majorité UTC et date stricte, limites UTF-8. Sexe/bio envoyés explicitement, quatre préférences ensemble. Questions et traits fournis par le serveur ; `traitId` exact, ordre conservé, maximum trois réponses et remplacement/effacement confirmés. Brouillon conservé en cas d'erreur, abandon confirmé.
 - **Photo/API** : JPEG local sans EXIF, réduction progressive sous 500 000 octets, fichier unique multipart, UUID v4 et octets immuables pour une reprise explicite pendant 24 h. Pas de retry après timeout ; une écriture incertaine impose une relecture, sauf reprise photo identique. Conflits consommé/en cours distincts, remplacement et retrait explicites, modération propriétaire. Retrait confirmé en `204`, sans annoncer le nettoyage distant achevé.
 - **Confidentialité** : aucun profil/brouillon/photo persisté ; sélection Android interrompue non réaffectée automatiquement. Nettoyage limité aux copies dans le cache privé de l'app. Aperçu du seul propriétaire, sans Bearer/redirection/cache disque au stockage ni URL dans les logs ; purge des octets du cache mémoire à la fermeture. Lien de 300 s renouvelé par relecture après quatre minutes et au retour au premier plan. Purge et fermeture des éditeurs lors d'un changement de consentements/session ; réponses tardives ignorées. Vie privée et logout accessibles sans profil prêt.
-- **Configuration** : `.env` ignoré dans le suivi, `.env.example` fourni, chargement avant initialisation des clients ; aucun hôte/environnement de secours dans le code Dart. Fichier public embarqué dans le paquet, sans secret ; origine validée et HTTPS hors debug local. Lire le README pour installation/CI.
+- **Configuration** : `.env` ignoré dans le suivi, aucun fichier modèle à recréer, chargement avant initialisation des clients ; aucun hôte/environnement de secours dans le code Dart. Fichier public embarqué dans le paquet, sans secret ; origine validée et HTTPS hors debug local. Lire le README pour installation/CI.
 - **Sources** : contrat HTTP, profils/catalogue/media (routes, DTO, services), collections Postman et tests profils/catalogue/media/codec consultés. Aucun changement ni test backend exécuté.
 - **Validation restante** : aucun SMS, compte ou upload réel testé. Sélection/compression native, refus de permission, récupération après arrêt, HEIC et modération/S3 réels restent à essayer sur Android et iOS. Compilation/signature iOS sur Mac ouverte. Aucun feed construit avant L4.
 - **Contrôles exécutés** : suite complète de 107 tests réussie, puis 23 tests L3 ciblés réussis après les derniers ajouts (110 tests présents au total). Deux contrôles de rendu supplémentaires ont généré six aperçus inspectés, dont les trois nouveaux écrans L3. Compilation Android debug réussie, analyse sans problème et formatage sans changement. Les deux plist iOS sont des XML valides avec une seule déclaration photothèque chacun. Ne pas refaire systématiquement toute la suite : l'utilisateur demande désormais de cibler les contrôles indispensables.
@@ -130,6 +130,18 @@ Prochain lot : L4, présence et diagnostic serveur puis feed sans photo, swipe h
 - Ouvrir le match reçu après réciprocité.
 
 Critère de sortie : deux comptes de développement peuvent se découvrir et créer un seul match cohérent.
+
+### Implémentation L4 — 16 octobre 2026
+
+- **Parcours/API** : accès depuis l'espace personnel, étapes `discovery-status` réparables par les écrans existants, localisation ponctuelle et feed sans photo ; les quatre routes L4 sont utilisées. Date d'expiration serveur relue à l'échéance et au retour au premier plan. Aucun calcul local d'éligibilité.
+- **Permission/confidentialité** : `geolocator 14.1.1`, consentement courant avant permission et avant envoi. Une mesure récente, précision réduite admise, erreurs natives distinctes et liens vers les réglages ; abonnement arrêté après mesure/sortie/arrière-plan. Pas de coordonnée en stockage/logs, ni de position connue réutilisée. Annulation/purge sur changement de consentements/session, réponses tardives ignorées. Android coarse/fine et iOS when-in-use déclarés ; pas de suivi de fond. Flag SPM iOS et essais Mac/appareils décrits au README, encore ouverts.
+- **Feed/gestes** : titre serif, distance arrondie reçue, bio/traits/réponses serveur, sans photo ni ville/catégorie fabriquée. Double appui = like ; geste haut depuis la fin de lecture = pass ; lecture longue protégée et boutons accessibles. Aucun retour vers un précédent profil. Curseur opaque encodé, limite stable, déduplication, reprise unique sans curseur expiré et fin explicite ; aucun filtre client inventé.
+- **Résultat perdu/match** : cible et décision conservées en mémoire entre visites du feed ; une seule demande en cours, reprise explicite du même choix et `Retry-After`, aucun stockage durable. Candidat indisponible/choix déjà enregistré retiré sans envoyer l'opposé. Seul le match retourné par le serveur avec les bons membres ouvre un récapitulatif ; chat et liste persistante restent L5, sans déduire de droit courant depuis ce reçu.
+- **Sûreté anticipée** : blocage confirmé depuis le feed ou le reçu, POST sans corps → `204`, reprise à l'identique en cas d'incertitude. Le blocage peut remplacer explicitement une intention like/pass perdue et purge le reçu local concerné. Liste/déblocage/signalement restent L7.
+- **Contrôles exécutés** : huit tests L4 ciblés réussis, puis vérification du geste de lecture longue après son ajustement. Treize vérifications existantes de configuration réussies après retrait de la dépendance au fichier modèle. Deux aperçus de feed avec données simulées générés et inspectés. Compilation Android debug réussie ; pas de nouvelle suite globale lancée. Analyse sans erreur, formatage et XML vérifiés : coarse/fine Android, when-in-use dans les deux plist, aucune localisation en arrière-plan.
+- **Sources/limites** : HTTP/DTO/services/cursor Rust découverte, présence et confidentialité, tests `discovery_contract.rs`, `discovery_postgres.rs` et Postman consultés. Aucun changement ni test backend. Aucun SMS ou compte réel utilisé : le critère deux comptes et les permissions/GPS natifs Android/iOS restent non validés, de même que les anciens essais fournisseur L2/L3. Le warning Kotlin du compresseur L3 reste à suivre.
+
+Prochain lot : L5, matchs/chat/lecture et SSE. Conserver les essais réels de L2 à L4 ouverts.
 
 ## 8. L5 — matchs, chat et SSE
 
@@ -227,7 +239,7 @@ Chemins complets, préfixe `/api` inclus. Les 56 routes restent suivies : catalo
 | PATCH | `/api/users/me/profile` | L3 | Créer/modifier le profil | Implémenté ; contrats/tests client ; compte et appareil à valider |
 | GET | `/api/users/me/preferences` | L3 | Préférences courantes | Implémenté ; contrats/tests client ; compte et appareil à valider |
 | PATCH | `/api/users/me/preferences` | L3 | Modifier les préférences | Implémenté ; contrats/tests client ; compte et appareil à valider |
-| PATCH | `/api/users/me/presence` | L4 | Position ponctuelle | À faire |
+| PATCH | `/api/users/me/presence` | L4 | Position ponctuelle | Implémenté ; contrôles client ciblés ; deux comptes/appareils à valider |
 | PUT | `/api/users/me/photo` | L3 | Envoyer/remplacer la photo unique | Implémenté ; contrats/tests client ; compte et appareil à valider |
 | DELETE | `/api/users/me/photo` | L3 | Retirer la photo | Implémenté ; contrats/tests client ; compte et appareil à valider |
 | GET | `/api/traits` | L3 | Catalogue des traits | Implémenté ; contrats/tests client ; compte et appareil à valider |
@@ -237,9 +249,9 @@ Chemins complets, préfixe `/api` inclus. Les 56 routes restent suivies : catalo
 | GET | `/api/profile-questions` | L3 | Catalogue des questions | Implémenté ; contrats/tests client ; compte et appareil à valider |
 | GET | `/api/users/me/profile-answers` | L3 | Réponses propriétaires et modération | Implémenté ; contrats/tests client ; compte et appareil à valider |
 | PUT | `/api/users/me/profile-answers` | L3 | Remplacer la liste ordonnée des réponses | Implémenté ; contrats/tests client ; compte et appareil à valider |
-| GET | `/api/users/me/discovery-status` | L4 | Diagnostic de préparation | À faire |
-| GET | `/api/feed` | L4 | Découverte paginée | À faire |
-| POST | `/api/swipes` | L4 | Like/pass et résultat du match | À faire |
+| GET | `/api/users/me/discovery-status` | L4 | Diagnostic de préparation | Implémenté ; contrôles client ciblés ; deux comptes/appareils à valider |
+| GET | `/api/feed` | L4 | Découverte paginée | Implémenté ; contrôles client ciblés ; deux comptes/appareils à valider |
+| POST | `/api/swipes` | L4 | Like/pass et résultat du match | Implémenté ; contrôles client ciblés ; deux comptes/appareils à valider |
 | GET | `/api/matches/me` | L5 | Liste des matchs | À faire |
 | PATCH | `/api/matches/:id/reveal` | L6 | Accord de révélation | À faire |
 | PATCH | `/api/matches/:id/continue` | L6 | Accord de continuation et coût | À faire |
@@ -261,7 +273,7 @@ Chemins complets, préfixe `/api` inclus. Les 56 routes restent suivies : catalo
 | POST | `/api/users/me/subscription/checkout` | L9 | Achat hébergé si distribution compatible | À faire |
 | POST | `/api/users/me/subscription/portal` | L9 | Gestion de l'abonnement | À faire |
 | GET | `/api/users/me/blocks` | L7 | Comptes bloqués | À faire |
-| POST | `/api/users/me/blocks/:userId` | L7 | Bloquer un compte | À faire |
+| POST | `/api/users/me/blocks/:userId` | L4, L7 | Bloquer un compte depuis feed ou reçu | Implémenté L4 ; confirmation et reprise ciblées ; réel à valider |
 | DELETE | `/api/users/me/blocks/:userId` | L7 | Débloquer un compte | À faire |
 | POST | `/api/reports` | L7 | Signaler un compte/contenu | À faire |
 | POST | `/api/users/me/data-subject-requests` | L7 | Déposer une demande RGPD | À faire |

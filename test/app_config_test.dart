@@ -1,22 +1,17 @@
-import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/core/config/app_config.dart';
 
 void main() {
-  test(
-    'uses the API host supplied by the user with exactly one /api prefix',
-    () {
-      final config = AppConfig.fromDotEnv(
-        File('.env.example').readAsStringSync(),
-        isDebug: false,
-      );
-      expect(
-        config.apiOrigin.resolve('/api/plans').toString(),
-        'https://api.histae.com/api/plans',
-      );
-    },
-  );
+  test('loads a public dotenv origin with exactly one /api prefix', () {
+    final config = AppConfig.fromDotEnv(
+      'APP_ENV=production\nAPI_BASE_URL=https://api.example',
+      isDebug: false,
+    );
+    expect(
+      config.apiOrigin.resolve('/api/plans').toString(),
+      'https://api.example/api/plans',
+    );
+  });
   test('dotenv accepts comments, CRLF, BOM and quoted public values', () {
     final config = AppConfig.fromDotEnv(
       '\uFEFF# public\r\n APP_ENV="development"\r\nAPI_BASE_URL=\'http://10.0.2.2:8080\'\r\n',

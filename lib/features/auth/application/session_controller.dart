@@ -163,6 +163,7 @@ class SessionController extends ChangeNotifier {
     String method,
     String path, {
     Object? body,
+    Map<String, String>? query,
     List<int>? photo,
     String? idempotencyKey,
     int expectedStatus = 200,
@@ -191,6 +192,7 @@ class SessionController extends ChangeNotifier {
         method,
         path,
         body: body,
+        query: query,
         photo: photo,
         idempotencyKey: idempotencyKey,
         bearer: tokens.accessToken,
@@ -236,6 +238,7 @@ class SessionController extends ChangeNotifier {
     String method,
     String path, {
     Object? body,
+    Map<String, String>? query,
     List<int>? photo,
     String? idempotencyKey,
     required int expectedStatus,
@@ -245,6 +248,7 @@ class SessionController extends ChangeNotifier {
     method,
     path,
     body: body,
+    query: query,
     photo: photo,
     idempotencyKey: idempotencyKey,
     expectedStatus: expectedStatus,
