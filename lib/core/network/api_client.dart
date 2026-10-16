@@ -32,10 +32,18 @@ class ApiClient {
   final _active = <RequestCancellation>{};
   bool _closed = false;
 
-  // Reads only in L1. Mutations will need route-specific replay rules.
-  // No automatic retry, refresh, redirect or private-data logging.
-  Future<Object?> getJson(
+  Future<Object?> getJson(String path, {RequestCancellation? cancellation}) =>
+      requestJson('GET', path, cancellation: cancellation);
+
+  // The transport never retries or refreshes. Callers explicitly choose their
+  // route's replay policy; request bodies and credentials are never logged.
+  Future<Object?> requestJson(
+    String method,
     String path, {
+    Object? body,
+    String? bearer,
+    String? idempotencyKey,
+    int? expectedStatus,
     RequestCancellation? cancellation,
   }) async {
     if (_closed || (cancellation?.isCancelled ?? false)) {
@@ -49,10 +57,10 @@ class ApiClient {
     }
     final abort = RequestCancellation();
     _active.add(abort);
-    final requestId = _uuidV4();
+    final requestId = newUuidV4();
     final request =
         http.AbortableRequest(
-            'GET',
+            method,
             origin.resolve(path),
             abortTrigger: cancellation == null
                 ? abort.whenCancelled
@@ -63,6 +71,14 @@ class ApiClient {
             'Accept': 'application/json',
             'X-Request-ID': requestId,
           });
+    if (bearer != null) request.headers['Authorization'] = 'Bearer $bearer';
+    if (idempotencyKey != null) {
+      request.headers['Idempotency-Key'] = idempotencyKey;
+    }
+    if (body != null) {
+      request.headers['Content-Type'] = 'application/json';
+      request.body = jsonEncode(body);
+    }
     try {
       final response = await _read(request).timeout(
         timeout,
@@ -87,7 +103,16 @@ class ApiClient {
           );
         }
       }
-      if (response.statusCode >= 200 && response.statusCode < 300) return body;
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        if (expectedStatus != null && response.statusCode != expectedStatus) {
+          throw ApiFailure(
+            ApiFailureKind.invalidResponse,
+            statusCode: response.statusCode,
+            requestId: diagnosticId,
+          );
+        }
+        return body;
+      }
       final error = body is Map<String, dynamic> ? body['error'] : null;
       final code = error is Map<String, dynamic> && error['code'] is String
           ? error['code'] as String
@@ -153,7 +178,7 @@ final _uuidPattern = RegExp(
 bool _validUuidV4(String? value) =>
     value != null && _uuidPattern.hasMatch(value);
 
-String _uuidV4() {
+String newUuidV4() {
   final random = Random.secure();
   final bytes = List<int>.generate(16, (_) => random.nextInt(256));
   bytes[6] = (bytes[6] & 0x0f) | 0x40;

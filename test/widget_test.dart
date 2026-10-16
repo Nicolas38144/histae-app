@@ -21,6 +21,9 @@ void main() {
   );
 
   Future<void> openCatalog(WidgetTester tester) async {
+    await tester.scrollUntilVisible(find.text('Découvrir les formules'), 200);
+    await tester.ensureVisible(find.text('Découvrir les formules'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Découvrir les formules'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));

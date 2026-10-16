@@ -1,6 +1,6 @@
 # Histae App — résumé technique et fonctionnel
 
-Mise à jour : 15 octobre 2026.
+Mise à jour : 16 octobre 2026.
 
 [Accueil](README.md) · [Roadmap et routes mobiles](roadmap.md) · [Contrat HTTP Rust](../histae-api-rust/docs/http-contract.md)
 
@@ -8,7 +8,7 @@ Mise à jour : 15 octobre 2026.
 
 `histae-app` est le futur client Flutter Android/iOS des utilisateurs de Histae. Le backend de référence est `histae-api-rust`, écrit en Rust avec Axum, Tokio et SQLx. PostgreSQL contient les données transactionnelles ; Redis sert notamment aux limites de débit et au relais temps réel ; les photos sont privées dans un stockage compatible S3. L'API, l'outbox et la maintenance ont des cycles de vie distincts.
 
-L1 remplace le compteur par l'accueil et la consultation du catalogue public. Le socle fournit configuration, thème clair/sombre, navigation publique, erreurs typées et HTTP annulable. Le manifeste conserve Dart `^3.13.1` et `cupertino_icons`, avec les ajouts `http: ^1.6.0` et `flutter_localizations` du SDK. Flutter 3.47.7 / Dart 3.13.5 vérifiés. Aucune session ni fonctionnalité métier authentifiée n'est livrée ; une capacité serveur ne signifie pas une intégration mobile validée.
+L1 et l'implémentation de L2 sont présents : accueil/catalogue, inscription/reconnexion OTP, session sécurisée, restauration, déconnexion et consentements versionnés. Flutter 3.47.7 / Dart 3.13.5 vérifiés, Dart `^3.13.1` conservé. L2 ajoute `flutter_secure_storage: ^11.2.0` et `url_launcher: ^6.3.2`. Le catalogue est vérifié en réseau réel ; L2 est testé avec les contrats mais pas validé avec un SMS/compte réel ou un appareil. Les fonctionnalités L3 à L10 restent à construire.
 
 Le dashboard est hors périmètre. Aucun rôle administratif, WebAuthn administrateur, écran de modération ou route `/api/admin/*` ne doit être ajouté au mobile.
 
@@ -38,13 +38,17 @@ Les curseurs sont opaques. Réutiliser les mêmes filtres, dédupliquer les iden
 
 Il n'existe pas de retry universel : appliquer les règles d'idempotence de chaque opération. OTP, photo, message et Checkout exigent une clé UUID v4 stable pour une même intention et un contenu identique. Une nouvelle clé après timeout peut créer un second effet ou être refusée. Conserver les paramètres nécessaires à la reprise pendant la fenêtre autorisée ; ne pas créer pour autant une file générale de mutations hors ligne.
 
-## 4. Authentification et sessions
+## 4. Inscription, authentification et sessions
 
-Le parcours utilise les routes d'envoi et de vérification OTP, puis `GET /api/auth/me`. Les numéros acceptés sont actuellement français E.164 `+33`. Un envoi accepté en `202` ne prouve pas la réception du SMS. Distinguer refus de livraison, livraison incertaine, code invalide/expiré et quota atteint. Un renvoi explicitement demandé crée une nouvelle intention ; une reprise technique conserve la clé d'origine.
+Les entrées « Créer mon compte » et « J'ai déjà un compte » utilisent les routes OTP, puis `GET /api/auth/me` et les consentements. La vérification crée le compte s'il n'existe pas : aucun endpoint d'inscription séparé ni mot de passe n'est inventé. L'espace personnel est conditionné par la session et les choix obligatoires serveur ; profil majeur/préférences restent en L3, découverte en L4.
+
+Les numéros sont français E.164 `+33`, normalisés comme dans Rust ; code OTP à six chiffres. `202` ne prouve pas la réception du SMS. Refus de livraison, livraison incertaine, code invalide/expiré et quota sont distincts. Le renvoi explicite crée une nouvelle intention ; la reprise conserve UUID v4 et paramètres en mémoire. Une vérification dont le résultat est perdu impose un nouveau code sans reprise automatique.
 
 Les routes mobiles utilisent `Authorization: Bearer <access_token>`. Le refresh token opaque reçu sous la forme `jti:secret` doit rester dans un stockage sécurisé. Garder l'access token en mémoire et enregistrer la rotation de façon cohérente avec le nouveau refresh.
 
 Un seul refresh doit s'exécuter à la fois. Les requêtes concurrentes attendent cette rotation ; aucune boucle de rafraîchissement n'est autorisée. Le rejeu d'un ancien refresh authentique non expiré révoque sa famille : pas de fenêtre de grâce et pas de retry aveugle après perte de réponse. Une réponse perdue peut nécessiter une nouvelle connexion OTP. Rejouer une requête métier après rotation uniquement si ses règles de rejeu le permettent.
+
+L2 remplace avant l'appel l'entrée sécurisée `ready` par `rotating`, sans ancien refresh, puis écrit et relit le nouveau refresh avant de publier l'access token. Un arrêt ou résultat incertain ferme la session. Le transport ne relance rien ; la couche session n'autorise qu'une reprise des lectures L2 ou du PUT de consentements identique après expiration de l'access token. Une révocation ferme directement la session. Logout attend la rotation courante, tente la révocation puis purge mémoire et jeton persistant ; la révocation distante incertaine est annoncée. Les réponses tardives d'un ancien compte sont ignorées.
 
 Prévoir restauration de session, logout courant, liste/révocation des sessions et logout global. Le serveur ne renvoie aucun rôle administratif dans le bootstrap mobile. Au logout, fermer SSE, désactiver les abonnements locaux et purger jetons et caches privés ; informer d'une révocation distante non confirmée si le réseau est indisponible.
 
@@ -54,7 +58,11 @@ Les quatre types sont `terms_of_service_acceptance`, `privacy_notice_acknowledge
 
 Charger les consentements après le bootstrap et guider le parcours avec `onboarding_complete` et `required_actions`. Les CGU et la notice courantes conditionnent les routes utilisateur normales ; certaines routes de session et de vie privée restent accessibles avant onboarding complet. Ne pas bloquer globalement l'accès à la déconnexion, à l'export ou à la suppression derrière la découverte.
 
+L2 affiche les quatre choix et les liens HTTPS/version serveur, sans précocher un nouvel accord. Les accords existants sont présentés comme état enregistré. Le navigateur ne reçoit aucun Bearer. Le retour d'un document conserve les choix non enregistrés seulement si les versions sont inchangées. Une relecture avant PUT détecte un changement ; le contrat ne permet pas de contrôle atomique entre ce GET et le PUT, faute de version client. Proposition backend séparée au README : versions attendues et conflit serveur, sans modification de l'API.
+
 CGU et notice ne se retirent pas par la route de consentements : on peut refuser l'onboarding ou supprimer le compte. Retirer le consentement sensible efface sexe et préférences ; retirer celui de localisation efface la présence. Expliquer ces effets avant l'action, invalider les caches et respecter l'état retourné. Une permission native ne remplace pas un consentement métier.
+
+Les retraits autorisés sont implémentés avec confirmation en L2. Documents, consentements et déconnexion restent accessibles sans profil/découverte prêts. Demandes de droits, export et suppression restent suivis en L7 ; ne pas les annoncer livrés.
 
 ## 6. Profil, préférences, traits et questions
 
@@ -148,27 +156,35 @@ La suppression du compte exige un jeton dédié, puis `DELETE /api/users/me` ave
 
 Les consentements, demandes de droits, export et suppression ne doivent pas devenir inaccessibles à cause d'un onboarding ou d'une découverte incomplète lorsque l'API les autorise.
 
-## 15. Organisation Flutter proposée
+## 15. Organisation Flutter et direction artistique
 
 Structure L1 : `app` (application/navigation/thème), `core` (configuration, réseau, textes français, composants) et `features/catalog/{data,application,presentation}`. `CatalogController` utilise `ChangeNotifier`, le repository décode les DTO, le client HTTP est injecté. Aucune couche vide ajoutée pour les lots futurs. Les widgets ne manipulent ni secrets ni JSON réseau directement.
 
+L2 ajoute `features/auth/{data,application,presentation}`, `features/consents/{data,presentation}`, `SessionController`, `OtpController` et un stockage sécurisé injectable. Le transport accepte méthode/corps/Bearer/clé sans retry. La navigation retire les écrans précédents au changement de session ; le retour système ne rouvre pas un écran privé après logout.
+
 Choix L1 après consultation des documentations officielles : `http` pour les requêtes annulables, `Navigator` / `MaterialPageRoute` pour les deux écrans publics, `ChangeNotifier` pour leur état, `flutter_localizations` pour les libellés Material français. Les textes applicatifs sont centralisés dans `AppStrings` ; ajouter un délégué de traduction à l'introduction d'une seconde langue. Les thèmes suivent le système ; aucune réduction forcée de la taille du texte. Chargement, vide, erreur réseau, délai dépassé et nouvelle tentative sont explicites.
 
-La navigation actuelle est uniquement publique et ne fabrique pas de session. Les gardes de session et consentements seront introduites en L2 à partir des réponses réelles. Une découverte non prête doit orienter vers sa préparation sans verrouiller tout le reste de l'app. Les liens entrants nécessiteront une ressource accessible et une session valable.
+La navigation distingue restauration, inscription/connexion, synchronisation, consentements requis, espace personnel et erreur de session/stockage. Aucune session n'est simulée dans l'app. Une découverte non prête ne verrouillera pas les fonctions autorisées ; les liens entrants nécessiteront session et ressource accessibles.
+
+La DA reprend la composition de `pictures/exemple_feed.png` : arrondis, titres à empattements, séparateurs fins et espaces aérés. La palette rose/corail est remplacée à la demande de l'utilisateur par ivoire `#FAF8F3`, papier `#FFFDF8`, forêt `#345647`, encre `#252C28` et sable `#E4DAC9`, avec adaptation sombre. DM Serif Display est embarquée avec sa licence SIL OFL ; le code reste propriétaire. Trois aperçus ont été inspectés (`tool/preview_app_test.dart`, données de test). L4 appliquera cette DA au feed sans photo : swipe haut pour passer, double appui pour liker, aucun retour vers le bas.
 
 ## 16. Stockage et validation
 
 Persister le strict nécessaire : refresh sécurisé, préférences d'interface et identifiants publics utiles. Garder initialement profils, feed, matchs et messages en mémoire ou dans un cache effaçable. Toute persistance ultérieure doit être justifiée, protégée et invalidable. Ne pas persister durablement OTP, coordonnées exactes, exports ou URL photo signées par défaut.
 
+L2 persiste une seule entrée sécurisée (origine, phase, refresh à l'état `ready`), sans access token, téléphone, OTP, identité ni consentements. Android : API 24 minimum réel du package, sauvegarde désactivée et préférences exclues des transferts. iOS : Keychain `unlocked_this_device`, entitlements sur les trois configurations. Une erreur ou relecture incohérente du stockage ferme l'accès ; comportement natif encore à éprouver sur appareils.
+
 Aucun jeton, téléphone, position exacte, message privé ou URL signée dans les logs ou rapports de crash. Au changement de compte, empêcher tout mélange des caches, requêtes et connexions en cours.
 
 Les tests Flutter pertinents couvrent sérialisation, erreurs, rotation concurrente, idempotence, navigation, consentements et états critiques. Les tests ordinaires n'envoient aucun SMS réel, ne créditent aucune publicité réelle et n'effectuent aucun paiement. Les essais de fournisseur utilisent les environnements dédiés. Documenter séparément analyse/tests automatisés, intégration API et validation sur appareils Android/iOS.
 
-## 17. Première tranche et limites restantes
+## 17. Vérifications et limites restantes
 
 L1 est implémenté : accueil/catalogue, origine configurable, thèmes et erreurs typées. Le client envoie un UUID v4 `X-Request-ID`, ne suit pas les redirections et n'effectue aucun retry ni refresh automatique. Timeout couvrant en-têtes et corps ; annulation à la fermeture/suspension, réponses tardives ignorées, reprise de la seule lecture interrompue. `Retry-After` en secondes ou date interdit la nouvelle tentative avant échéance. Les erreurs conservent seulement statut, code, identifiant de demande validé et délai ; aucun corps, message anglais ou URL n'est journalisé. Le catalogue reste en mémoire, sans persistance et sans action d'achat.
 
-Les fixtures suivent les DTO `SubscriptionPlan` et `PlanFeature` Rust ; les prix sont illustratifs et uniquement dans les tests. Les tests backend et Postman ont été consultés, pas exécutés. Vérifications mobile : formatage, analyse sans problème, 54 tests réussis et compilation Android debug. Aucun appel authentifié ou fournisseur effectué. Le GET réel a répondu HTTP 200 et les deux formules ont été décodées par le client Dart (`tool/check_catalog.dart`, contrôle volontaire séparé des tests). L'interface traduit les fonctionnalités connues par code sans déduire quotas ou droits. Validation sur appareils et compilation iOS restent ouvertes. Le prochain lot est L2 : OTP/session sécurisée puis consentements versionnés et navigation associée.
+Les fixtures suivent les DTO Rust du catalogue, OTP, bootstrap et consentements ; prix et identifiants d'authentification sont illustratifs. Tests backend/Postman consultés, pas exécutés. Suite mobile : **85 tests réussis**, formatage/analyse et compilation Android debug ; un rendu manuel distinct fournit trois aperçus DA. Le GET réel du catalogue a répondu HTTP 200, avec deux formules décodées par le client Dart. Aucun SMS réel, compte réel ou fournisseur testé. L2 utilise ses vrais endpoints ; intégration OTP complète, stockage/redémarrage sur appareils, documents réels et compilation iOS restent ouverts. Prochain petit lot : L3a, profil majeur et préférences pour poursuivre l'inscription avant découverte.
 
-Les parcours L2 à L10 restent à construire. Les capacités serveur photo, SMS, push, publicité et Stripe nécessitent la configuration appropriée et des validations réelles ; leur présence dans le code ne prouve pas la disponibilité de l'environnement. Les signatures mobiles, liens de retour, permissions métier, règles de distribution et déclarations de confidentialité restent à préparer. Les plist iOS commun/debug sont à maintenir ensemble et à compiler sur Mac ; aucune validation iOS réalisée sur cet hôte Windows. Consulter la roadmap production API pour les limites d'exploitation, sans les masquer par une simulation mobile.
+Les parcours L3 à L10 restent à construire. Les capacités serveur photo, SMS, push, publicité et Stripe nécessitent la configuration appropriée et des validations réelles ; leur présence dans le code ne prouve pas la disponibilité de l'environnement. Les signatures mobiles, liens de retour, permissions métier, règles de distribution et déclarations de confidentialité restent à préparer. Les plist iOS commun/debug sont à maintenir ensemble et à compiler sur Mac ; aucune validation iOS réalisée sur cet hôte Windows. Consulter la roadmap production API pour les limites d'exploitation, sans les masquer par une simulation mobile.
+
+
 

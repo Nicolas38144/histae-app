@@ -1,12 +1,12 @@
 # Histae App — roadmap de développement
 
-Mise à jour : 15 octobre 2026.
+Mise à jour : 16 octobre 2026.
 
 [Accueil](README.md) · [Résumé d'intégration](resume.md) · [Contrat HTTP Rust](../histae-api-rust/docs/http-contract.md)
 
 ## 1. État de départ et suivi
 
-L1 est implémenté : accueil, catalogue public, configuration, thème, navigation et client HTTP. L'intégration du catalogue est vérifiée sur `https://api.histae.com/api/plans` : HTTP 200 et décodage de deux formules par le client Dart. Les parcours métier L2 à L10 restent à faire ; aucune authentification ni vente n'est livrée.
+L1 est intégré pour le catalogue. L2 est implémenté et testé : inscription/reconnexion OTP, session sécurisée, restauration, déconnexion et consentements. Les sept routes L2 utilisent les vrais contrats ; leur parcours SMS/compte réel et le stockage sur appareil ne sont pas validés. L3 à L10 restent à construire. La DA suit `pictures/exemple_feed.png` pour sa composition, avec une palette ivoire/vert forêt/encre/sable, sans rose ni corail.
 
 Cette roadmap couvre toutes les capacités utilisateur de l'API actuelle. Elle exclut l'administration, les webhooks fournisseur, la supervision et les opérations internes. Elle ne dépend pas des anciens dépôts NestJS ou d'un endpoint OpenAPI.
 
@@ -18,7 +18,7 @@ Les états doivent distinguer : `À faire`, `En cours`, `Implémenté`, `Intégr
 | --- | --- | --- |
 | L0 | Vérifier le contrat, l'inventaire, les parcours et l'environnement mobile | Vérifié pour L1 : SDK, catalogue, erreurs, routes/DTO/services, tests et Postman consultés ; approfondir par lot |
 | L1 | Bootstrap, configuration, navigation, thème et client HTTP | Intégré API pour le catalogue ; 54 tests, analyse et compilation Android debug ; appareils/iOS en attente |
-| L2 | OTP, session et onboarding juridique reprenable | À faire |
+| L2 | Inscription/reconnexion OTP, session et onboarding juridique reprenable | Implémenté ; 85 tests au total et compilation Android debug ; SMS, compte réel et appareils à valider |
 | L3 | Profil, préférences, traits, questions, photo et modération propriétaire | À faire |
 | L4 | Présence, diagnostic de préparation, découverte et swipes | À faire |
 | L5 | Matchs, chat, lecture et synchronisation SSE | À faire |
@@ -64,11 +64,11 @@ Critère de sortie : app démarrable, origine API configurable, premier appel et
 - **Vérifications automatiques** : formatage, analyse sans problème, 54 tests réussis (configuration, DTO, erreurs, reprise, annulation sur HTTP local réel, navigation, suspension/reprise, petit écran et accessibilité), compilation Android debug. XML des manifestes Android et plist iOS vérifié ; cela ne valide pas leur comportement sur appareil.
 - **Intégration réelle** : `GET https://api.histae.com/api/plans` → HTTP 200 ; deux formules décodées avec le client/repository Dart via `tool/check_catalog.dart`, hors suite de tests. Aucun succès fournisseur ou appareil revendiqué. Les fonctionnalités connues sont traduites en français par code, sans fixer localement les valeurs métier.
 
-Prochain petit lot : L2, OTP et session sécurisée (idempotence OTP, refresh sérialisé, restauration et logout), puis consentements versionnés et gardes de navigation. Prévoir des essais OTP autorisés et la configuration du stockage sécurisé ; ne pas remplacer les fournisseurs par des comptes simulés.
+Étape retenue lors de L1 : L2, OTP et session sécurisée (idempotence OTP, refresh sérialisé, restauration et logout), puis consentements versionnés et gardes de navigation. Prévoir des essais OTP autorisés et la configuration du stockage sécurisé ; ne pas remplacer les fournisseurs par des comptes simulés.
 
-## 5. L2 — OTP, session et consentements
+## 5. L2 — inscription, OTP, session et consentements
 
-- Livrer téléphone → demande OTP → vérification → bootstrap → consentements.
+- Livrer inscription/reconnexion : téléphone → demande OTP → vérification (création du compte si nécessaire) → bootstrap → consentements → espace personnel. Aucun endpoint d'inscription séparé n'existe.
 - Distinguer demande acceptée et SMS reçu ; gérer livraison inconnue, rate limit et renvoi explicite.
 - Stocker le refresh de façon sécurisée, access token en mémoire, avec une seule rotation concurrente.
 - Gérer réponse de refresh perdue sans rejouer aveuglément un ancien token.
@@ -78,6 +78,19 @@ Prochain petit lot : L2, OTP et session sécurisée (idempotence OTP, refresh s�
 - Implémenter le logout courant et la purge dès ce lot ; compléter la gestion des autres sessions en L7.
 
 Critère de sortie : connexion réelle et reprise d'onboarding sans jeton exposé, rotation concurrente ni dépendance à un rôle admin.
+
+### Implémentation L2 — 16 octobre 2026
+
+- **Interface** : « Créer mon compte » et « J'ai déjà un compte », téléphone français, OTP, envoi accepté/incertain, reprise d'une intention, renvoi explicite, erreurs et `Retry-After`. Le compte est créé par le serveur lors de la vérification OTP. Le profil, la majorité et ses préférences restent en L3 ; aucun feed n'est exposé avant les prérequis serveur de L4.
+- **Session** : refresh sécurisé, access token en mémoire, restauration unique, rotation sérialisée, marqueur durable avant envoi, relecture de stockage avant publication, aucune reprise aveugle après réponse perdue. Fermeture après révocation/deuxième 401, déconnexion même hors ligne, annulation et purge des ressources de l'ancien compte.
+- **Consentements** : quatre types et documents versionnés serveur, aucun nouveau choix précoché, reprise après lecture d'un document, vérification des versions avant PUT, champs exacts `{ consent_type, granted }`. Confirmation des retraits sensible/localisation ; aucun retrait CGU/notice. Accès aux documents et à la déconnexion pendant l'onboarding ; export/demandes/suppression restent en L7.
+- **DA commune** : composition éditoriale issue de la référence utilisateur ; ivoire, forêt, encre et sable, titres DM Serif Display, cartes arrondies et séparateurs discrets. Licence de police conservée ; adaptation sombre et grand texte. Aucun feed construit en avance.
+- **Sources** : contrat HTTP ; `src/identity/mobile/{http,service,account,tokens}.rs`, service OTP ; `src/profiles/{http,domain,service}.rs` ; tests `mobile_auth_contract.rs`, `otp_sweego_contract.rs`, `profiles_contract.rs` et exemples Postman. Sources consultées, tests backend non exécutés, backend non modifié.
+- **Vérification automatique** : 85 tests Flutter, analyse et formatage ; compilation Android debug avec stockage sécurisé et police. Un rendu manuel supplémentaire produit trois aperçus inspectés, avec des données simulées identifiées. Les réglages XML natifs sont vérifiés ; cela ne prouve pas le comportement Keychain/Keystore sur appareil.
+- **Intégration réelle et fournisseur** : seul le catalogue est déjà vérifié sur la vraie API. Aucun SMS envoyé, aucun compte réel créé et aucun jeton réel récupéré pendant les tests. L2 reste à valider avec un numéro autorisé sur Android/iOS, puis par arrêt/reprise et coupure réseau. Compilation/signature iOS sur Mac encore ouverte.
+- **Limite backend à traiter séparément** : le PUT ne reçoit pas la version affichée ; la relecture mobile réduit le risque de document changé, sans contrôle atomique. Proposition de versions attendues et conflit serveur décrite dans le README, sans modifier l'API.
+
+Prochain petit lot : L3a, compléter l'inscription avec profil majeur et préférences (conservation explicite de sexe/bio), puis L3b traits/questions et L3c photo. Garder la validation SMS/appareil de L2 ouverte jusqu'à un essai réel.
 
 ## 6. L3 — profil, préférences et photo
 
@@ -98,6 +111,7 @@ Critère de sortie : profil et photo réels modifiables ; erreurs, modération, 
 - Envoyer une présence fraîche et traiter permission refusée, services désactivés et précision insuffisante si pertinente.
 - Guider par `discovery-status` : profil, sexe, préférences, consentements et présence.
 - Afficher feed et profils sans photo, avec bio, traits et réponses autorisés.
+- Appliquer la DA éditoriale de `pictures/exemple_feed.png` avec la palette forêt/ivoire. Swipe vers le haut pour passer, double appui pour liker, aucun retour par swipe vers le bas.
 - Paginer avec curseurs opaques, dédupliquer et reprendre après curseur invalide.
 - Envoyer like/pass ; rejouer seulement le même choix en cas d'incertitude, sans annulation ni file durable hors ligne.
 - Ouvrir le match reçu après réciprocité.
@@ -182,20 +196,20 @@ Critère de sortie : chaque parcours activé a une preuve adaptée ; les fonctio
 
 ## 14. Matrice de couverture des routes mobiles
 
-Chemins complets, préfixe `/api` inclus. Les 56 routes restent suivies ; seul le catalogue est intégré à ce stade, avec validation réseau depuis l'hôte, sans essai sur appareil. Après chaque lot, mettre à jour l'état et associer la vérification concrète. La lecture unitaire peut être couverte comme alternative contractuelle à la lecture groupée sans créer un second écran.
+Chemins complets, préfixe `/api` inclus. Les 56 routes restent suivies : catalogue intégré, sept routes L2 implémentées avec tests de contrat côté client, sans validation SMS/compte réel. Après chaque lot, associer la preuve adaptée. La lecture unitaire peut être couverte comme alternative à la lecture groupée sans créer un second écran.
 
 | Méthode | Route | Lot | Écran ou usage | État |
 | --- | --- | --- | --- | --- |
-| POST | `/api/auth/otp/send` | L2 | Demander/renvoyer OTP | À faire |
-| POST | `/api/auth/otp/verify` | L2 | Vérifier OTP et créer/restaurer le compte | À faire |
-| POST | `/api/auth/refresh` | L2 | Rotation de session sérialisée | À faire |
-| GET | `/api/auth/me` | L2 | Bootstrap authentifié | À faire |
-| POST | `/api/auth/logout` | L2 | Déconnexion courante | À faire |
+| POST | `/api/auth/otp/send` | L2 | Demander/renvoyer OTP | Implémenté ; UUID stable, incertitude et quotas testés ; SMS réel à valider |
+| POST | `/api/auth/otp/verify` | L2 | Inscription/reconnexion par OTP | Implémenté ; DTO et réponse perdue testés ; compte réel à valider |
+| POST | `/api/auth/refresh` | L2 | Rotation de session sérialisée | Implémenté ; concurrence, panne et redémarrage testés ; appareil à valider |
+| GET | `/api/auth/me` | L2 | Bootstrap authentifié | Implémenté ; navigation et révocation testées ; compte réel à valider |
+| POST | `/api/auth/logout` | L2 | Déconnexion courante | Implémenté ; rotation concurrente/purge/hors ligne testés ; réel à valider |
 | GET | `/api/auth/sessions` | L7 | Liste des sessions | À faire |
 | DELETE | `/api/auth/sessions/:id` | L7 | Révoquer une session | À faire |
 | POST | `/api/auth/logout-all` | L7 | Déconnexion globale | À faire |
-| GET | `/api/users/me/consents` | L2 | État et documents requis | À faire |
-| PUT | `/api/users/me/consents` | L2, L7 | Accepter et gérer les choix autorisés | À faire |
+| GET | `/api/users/me/consents` | L2 | État et documents requis | Implémenté ; quatre choix/versions/navigation testés ; réel à valider |
+| PUT | `/api/users/me/consents` | L2, L7 | Accepter et gérer les choix autorisés | Implémenté L2 ; choix et retraits confirmés testés ; réel à valider |
 | GET | `/api/users/me` | L3 | Profil propriétaire | À faire |
 | PATCH | `/api/users/me/profile` | L3 | Créer/modifier le profil | À faire |
 | GET | `/api/users/me/preferences` | L3 | Préférences courantes | À faire |
@@ -262,4 +276,6 @@ Une tranche est terminée lorsque son parcours fonctionne avec les vrais contrat
 Un blocage fournisseur ne doit pas arrêter les tâches indépendantes : garder la capacité dans la matrice, décrire ce qui est implémenté et ce qui reste à valider. Ne pas déclarer une fonction opérationnelle en production sur la seule base de fixtures.
 
 Après chaque intervention, mettre à jour ce suivi et le résumé, expliquer le prochain petit lot et fournir un message de commit en anglais. Aucune commande Git ni suppression de fichier. Si un script `.sh` est créé ou modifié, ne pas effectuer de tests de ce script.
+
+
 

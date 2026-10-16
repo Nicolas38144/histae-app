@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../network/api_failure.dart';
+import '../../features/consents/data/consent_state.dart';
 
 // Centralized French copy; add locales and a delegate when a second language
 // is introduced. Material's built-in labels are localized separately.
@@ -9,7 +10,102 @@ class AppStrings {
   static AppStrings of(BuildContext context) => const AppStrings();
 
   String get appName => 'Histae';
-  String get welcomeTitle => 'Une rencontre commence par une conversation.';
+  String get wordsFirst => 'LES MOTS D’ABORD';
+  String get registrationHeading => 'Faisons connaissance.';
+  String get loginHeading => 'Heureux de vous retrouver.';
+  String get trustHeading => 'En toute confiance.';
+  String get signIn => 'Se connecter';
+  String get createAccount => 'Créer mon compte';
+  String get existingAccount => 'J’ai déjà un compte';
+  String get myAccount => 'Mon espace';
+  String get otpIntroduction =>
+      'Validez votre numéro avec un code reçu par SMS. '
+      'Ce parcours crée votre compte s’il n’existe pas, ou vous reconnecte sinon.';
+  String get onboardingRequired =>
+      'Complétez les choix obligatoires indiqués par le serveur avant de poursuivre.';
+  String get actionInProgress => 'Action en cours…';
+  String get phoneLabel => 'Numéro français au format +33';
+  String get phoneHint => '+33 6 12 34 56 78';
+  String get phoneHelp =>
+      'Saisissez +33 suivi des 9 chiffres, sans le zéro initial.';
+  String get sendOtp => 'Demander un code';
+  String get resendOtp => 'Demander un nouveau code';
+  String get resumeOtp => 'Reprendre la demande précédente';
+  String get otpLabel => 'Code de vérification à 6 chiffres';
+  String get verifyOtp => 'Vérifier le code';
+  String get changePhone => 'Changer de numéro';
+  String get otpAccepted =>
+      'La demande a été acceptée. Cela ne confirme pas la réception du SMS.';
+  String get verificationUncertain =>
+      'La vérification n’a pas pu être confirmée. '
+      'Demandez un nouveau code pour vous reconnecter ; le précédent peut avoir été consommé.';
+  String get sessionLoading => 'Vérification de votre session…';
+  String get sessionUnavailable => 'Votre session n’est pas accessible';
+  String get logout => 'Se déconnecter';
+  String get logoutConfirmed => 'Vous êtes déconnecté.';
+  String get logoutUnconfirmed =>
+      'Vous êtes déconnecté sur cet appareil. '
+      'La révocation de la session sur le serveur n’a pas pu être confirmée.';
+  String get privacyTitle => 'Vos choix et votre vie privée';
+  String get consentsTitle => 'Vos consentements';
+  String get consentsIntro =>
+      'Chaque choix est indépendant. Les conditions d’utilisation '
+      'et la prise de connaissance de la notice sont nécessaires pour utiliser Histae. '
+      'Les autres choix concernent les données sensibles et la localisation.';
+  String get consentCurrent => 'Accord enregistré pour la version actuelle';
+  String get saveChoices => 'Enregistrer mes choix';
+  String get refreshChoices => 'Actualiser mes consentements';
+  String get withdraw => 'Retirer mon accord';
+  String get confirmWithdrawal => 'Confirmer le retrait';
+  String get cancel => 'Annuler';
+  String get openDocumentError =>
+      'Le document n’a pas pu être ouvert. Vérifiez votre connexion et réessayez.';
+  String documentVersion(String version) =>
+      'Lire le document — version $version';
+  String get documentsChanged =>
+      'Les documents ont changé. Relisez les nouvelles versions avant de confirmer vos choix.';
+  String get choicesSaved => 'Vos choix ont été enregistrés.';
+  String get accountTitle => 'Votre espace Histae';
+  String get accountReady =>
+      'Votre compte est créé et vos consentements obligatoires sont à jour. '
+      'Vous pourrez compléter votre profil lors de la prochaine mise à jour.';
+  String get privacyScope =>
+      'Vous pouvez consulter vos documents, gérer vos consentements '
+      'ou vous déconnecter ici, même si votre parcours n’est pas terminé.';
+  String consentLabel(ConsentType type) => switch (type) {
+    ConsentType.terms => 'J’accepte les conditions d’utilisation',
+    ConsentType.privacy =>
+      'J’ai pris connaissance de la notice de confidentialité',
+    ConsentType.sensitive => 'J’accepte le traitement de mes données sensibles',
+    ConsentType.location => 'J’accepte le traitement de ma localisation',
+  };
+  String consentTitle(ConsentType type) => switch (type) {
+    ConsentType.terms => 'Conditions d’utilisation',
+    ConsentType.privacy => 'Notice de confidentialité',
+    ConsentType.sensitive => 'Données sensibles',
+    ConsentType.location => 'Localisation',
+  };
+  String withdrawalMessage(ConsentType type) => type == ConsentType.sensitive
+      ? 'Ce retrait efface votre sexe et vos préférences sur le serveur. '
+            'La découverte pourra devenir indisponible. Confirmer ce retrait ?'
+      : 'Ce retrait efface votre présence sur le serveur. '
+            'La découverte pourra devenir indisponible. Il ne change pas la permission système. Confirmer ce retrait ?';
+
+  String authFailure(ApiFailure error) => switch (error.code) {
+    'invalid_phone_number' =>
+      'Saisissez un numéro français valide au format +33.',
+    'invalid_otp_request' => 'Saisissez les six chiffres du code reçu.',
+    'invalid_or_expired_otp' => 'Le code est invalide ou a expiré.',
+    'otp_delivery_unavailable' => 'L’envoi du SMS n’a pas pu être effectué. Vous pouvez reprendre la demande.',
+    'otp_delivery_unknown' =>
+      'L’envoi du SMS reste incertain. Le code peut encore arriver. '
+          'Vous pouvez saisir ce code ou reprendre la même demande.',
+    'idempotency_key_conflict' => 'Cette demande ne correspond plus à son intention d’origine. Demandez un nouveau code.',
+    'account_unavailable' => 'Ce compte n’est pas disponible.',
+    'legal_documents_changed' => documentsChanged,
+    _ => failureMessage(error.kind),
+  };
+  String get welcomeTitle => 'D’abord les mots.\nPuis la rencontre.';
   String get welcomeBody =>
       'Découvrez une personne à travers ses mots. '
       'Les photos se révèlent lorsque vous le choisissez tous les deux.';
@@ -73,6 +169,10 @@ class AppStrings {
   };
 
   String failureMessage(ApiFailureKind kind) => switch (kind) {
+    ApiFailureKind.secureStorage =>
+      'Le stockage sécurisé est indisponible. '
+          'Déverrouillez votre appareil et réessayez. La connexion reste fermée.',
+    ApiFailureKind.sessionUncertain => 'La session ne peut pas être restaurée avec certitude. Reconnectez-vous avec un nouveau code.',
     ApiFailureKind.network =>
       'Le service est injoignable. Vérifiez votre connexion puis réessayez.',
     ApiFailureKind.timeout =>

@@ -17,6 +17,8 @@ enum ApiFailureKind {
   unavailable,
   server,
   unexpected,
+  secureStorage,
+  sessionUncertain,
 }
 
 class ApiFailure implements Exception {
