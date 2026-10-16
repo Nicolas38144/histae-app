@@ -8,8 +8,10 @@ import '../../auth/application/session_controller.dart';
 import '../data/match_models.dart';
 import '../data/matches_repository.dart';
 import '../data/realtime_client.dart';
+import '../../continuation/application/match_access.dart';
+import '../../continuation/application/continuation_controller.dart';
 
-class MatchesController extends ChangeNotifier {
+class MatchesController extends ChangeNotifier implements MatchAccess {
   MatchesController(
     this.repository, {
     RealtimeClient? realtime,
@@ -28,13 +30,34 @@ class MatchesController extends ChangeNotifier {
     };
   }
   final MatchesRepository repository;
+  ContinuationController? _continuation;
+  ContinuationController get continuation =>
+      _continuation ??= ContinuationController(this);
+  @override
+  int readRevision = 0, privacyEpoch = 0;
+  @override
+  DateTime? readAt;
+  @override
+  bool isRemoved(String id) =>
+      _removed.contains(id) ||
+      _items.any((m) => m.id == id && !m.historyAllowed);
+  @override
+  void removeUnavailable(String id) {
+    _purge(id, remove: true);
+    _notify();
+    _schedule();
+  }
+
   final RealtimeClient realtime;
   final DateTime Function() _now;
   final void Function(String)? onRemoved;
+  @override
   SessionController get session => repository.session;
   late String _key;
   bool _disposed = false, _active = false, _verified = false, _dirty = false;
-  int _epoch = 0, _chatEpoch = 0, _listRevision = 0, privateRevision = 0;
+  int _epoch = 0, _chatEpoch = 0, _listRevision = 0;
+  @override
+  int privateRevision = 0;
   RequestCancellation _scope = RequestCancellation(),
       _chatScope = RequestCancellation();
   Future<void>? _sync;
@@ -49,24 +72,31 @@ class MatchesController extends ChangeNotifier {
   final _messages = <ChatMessage>[];
   List<UserMatch> get items => List.unmodifiable(_items);
   List<ChatMessage> get messages => List.unmodifiable(_messages);
-  String? listCursor, messageCursor, selectedId;
+  String? listCursor, messageCursor;
+  @override
+  String? selectedId;
   String? get pendingEnd => _closures[selectedId] == false ? selectedId : null;
   String? get pendingBlock => _closures[selectedId] == true ? selectedId : null;
   int _historyPages = 1;
   bool listLoading = false,
       historyLoading = false,
       sending = false,
-      reading = false,
-      ending = false;
+      reading = false;
+  @override
+  bool ending = false;
   bool realtimeConnected = false;
   ApiFailure? failure, chatFailure, readFailure, realtimeFailure;
   String? notice, validation;
   DateTime? _retryAt;
   bool get accessible =>
       !_disposed && session.hasSession && session.phase == SessionPhase.ready;
+  @override
   bool get active => _active && accessible;
+  @override
   bool get verified => _verified;
+  @override
   DateTime get serverNow => _now().toUtc().add(_clockOffset);
+  @override
   UserMatch? get selected {
     for (final item in _items) {
       if (item.id == selectedId) return item;
@@ -110,6 +140,7 @@ class MatchesController extends ChangeNotifier {
   void _sessionChanged() {
     if (_key == session.resourceKey && accessible) return;
     _key = session.resourceKey;
+    privacyEpoch++;
     suspend();
     _items.clear();
     _messages.clear();
@@ -191,6 +222,7 @@ class MatchesController extends ChangeNotifier {
   }
 
   void _purge(String id, {bool remove = false}) {
+    _continuation?.forgetMatch(id);
     _pending.remove(id);
     _drafts.remove(id);
     _readAttempted.removeWhere((key) => key.startsWith('$id:'));
@@ -226,6 +258,7 @@ class MatchesController extends ChangeNotifier {
       notice = 'ended';
       _notify();
     } else if (signal.type == 'matches.invalidated') {
+      privacyEpoch++;
       _epoch++;
       _chatEpoch++;
       _scope.cancel();
@@ -303,6 +336,7 @@ class MatchesController extends ChangeNotifier {
     });
   }
 
+  @override
   Future<void> refresh() {
     if (_sync case final pending?) return pending;
     if (!active || retrySeconds > 0) return Future.value();
@@ -354,6 +388,8 @@ class MatchesController extends ChangeNotifier {
         ..clear()
         ..addAll(items);
       listCursor = cursor;
+      readRevision++;
+      readAt = _now().toUtc();
       if (cursor == null) {
         for (final id in {
           ..._pending.keys,
@@ -700,6 +736,7 @@ class MatchesController extends ChangeNotifier {
 
   @override
   void dispose() {
+    _continuation?.dispose();
     _disposed = true;
     suspend();
     realtime.dispose();

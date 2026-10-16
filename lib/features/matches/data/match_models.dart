@@ -57,9 +57,14 @@ class MatchPartner {
     this.sex,
     this.bio,
     this.traits,
-    this.answers,
-  );
-  factory MatchPartner.fromJson(Object? value, String owner) {
+    this.answers, {
+    this.photo,
+  });
+  factory MatchPartner.fromJson(
+    Object? value,
+    String owner, {
+    bool photosAllowed = false,
+  }) {
     final j = jsonObject(value);
     final id = serverId(j, 'user_id');
     final age = jsonField<int>(j, 'age');
@@ -71,8 +76,8 @@ class MatchPartner {
         traits.any((t) => t is! String)) {
       invalidProfile();
     }
-    // Partner photos remain unused in L5. L6 will gate their separate view on
-    // the server's mutual revelation flag; never prefetch a signed partner URL.
+    final photo = photosAllowed ? optionalText(j, 'photo') : null;
+    if (photo != null && !validPhotoUrl(photo)) invalidProfile();
     return MatchPartner(
       id,
       jsonString(j, 'firstname'),
@@ -83,11 +88,13 @@ class MatchPartner {
       List.unmodifiable(
         jsonField<List<dynamic>>(j, 'profile_answers').map(FeedAnswer.fromJson),
       ),
+      photo: photo,
     );
   }
   final String id, firstname;
   final int age;
   final String? sex, bio;
+  final String? photo;
   final List<String> traits;
   final List<FeedAnswer> answers;
 }
@@ -108,8 +115,16 @@ class UserMatch {
   factory UserMatch.fromJson(Object? value, String owner) {
     final j = jsonObject(value);
     final id = serverId(j, 'id');
-    final partner = MatchPartner.fromJson(j['other_user'], owner);
     final status = parseMatchStatus(jsonString(j, 'status'));
+    final revealed = jsonField<bool>(j, 'photos_revealed');
+    final partner = MatchPartner.fromJson(
+      j['other_user'],
+      owner,
+      photosAllowed:
+          revealed &&
+          status != MatchStatus.ended &&
+          status != MatchStatus.expired,
+    );
     final unread = jsonField<int>(j, 'unread_count');
     if (unread < 0) invalidProfile();
     return UserMatch(
@@ -119,7 +134,7 @@ class UserMatch {
       wireTime(j['created_at']),
       partner,
       jsonField<bool>(j, 'my_revealed'),
-      jsonField<bool>(j, 'photos_revealed'),
+      revealed,
       jsonField<bool>(j, 'my_continued'),
       unread,
       j['last_message'] == null ||

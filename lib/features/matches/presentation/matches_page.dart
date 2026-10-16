@@ -6,6 +6,7 @@ import '../../../core/widgets/editorial_card.dart';
 import '../application/matches_controller.dart';
 import 'chat_page.dart';
 import 'matches_strings.dart';
+import '../../continuation/presentation/credits_page.dart';
 
 class MatchesPage extends StatefulWidget {
   const MatchesPage({super.key, required this.controller, this.initialMatchId});
@@ -83,6 +84,15 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
         appBar: AppBar(
           title: const Text('Vos rencontres'),
           actions: [
+            IconButton(
+              tooltip: 'Vos crédits',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => CreditsPage(controller: c.continuation),
+                ),
+              ),
+              icon: const Icon(Icons.account_balance_wallet_outlined),
+            ),
             IconButton(
               tooltip: 'Actualiser les rencontres',
               onPressed: c.listLoading || c.retrySeconds > 0

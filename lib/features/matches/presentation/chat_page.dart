@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../profile/presentation/profile_editors.dart';
 import '../application/matches_controller.dart';
+import '../../continuation/presentation/continuation_page.dart';
+import '../../continuation/presentation/partner_photo_page.dart';
 import 'matches_strings.dart';
 
 class ChatPage extends StatefulWidget {
@@ -104,7 +106,7 @@ class _ChatPageState extends State<ChatPage> {
           block ? 'Bloquer cette personne ?' : 'Terminer cette rencontre ?',
           block
               ? 'La rencontre sera terminée et vous ne pourrez plus vous découvrir ni échanger.'
-              : 'La conversation ne sera plus accessible. Cette action ne bloque pas cette personne.',
+              : 'La conversation ne sera plus accessible. Cette action ne bloque pas cette personne. Un crédit déjà débité ne sera pas remboursé.',
           action: block ? 'Bloquer' : 'Terminer',
         ) ||
         !mounted) {
@@ -112,6 +114,18 @@ class _ChatPageState extends State<ChatPage> {
     }
     await c.endCurrent(block: block);
     if (mounted && c.selected == null) Navigator.of(context).pop();
+  }
+
+  Future<void> _decisions() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ContinuationPage(
+          controller: c.continuation,
+          matchId: widget.matchId,
+        ),
+      ),
+    );
+    if (mounted && c.active) unawaited(c.refresh());
   }
 
   @override
@@ -145,6 +159,7 @@ class _ChatPageState extends State<ChatPage> {
             PopupMenuButton<String>(
               tooltip: 'Options de la rencontre',
               onSelected: (value) {
+                if (value == 'decisions') unawaited(_decisions());
                 if (value == 'profile') {
                   Navigator.of(context).push(
                     MaterialPageRoute<void>(
@@ -157,6 +172,10 @@ class _ChatPageState extends State<ChatPage> {
                 if (value == 'block') unawaited(_end(block: true));
               },
               itemBuilder: (_) => [
+                const PopupMenuItem(
+                  value: 'decisions',
+                  child: Text('Photos et continuation'),
+                ),
                 const PopupMenuItem(
                   value: 'profile',
                   child: Text('Voir son profil'),
@@ -224,6 +243,18 @@ class _ChatPageState extends State<ChatPage> {
                             Text(
                               MatchesStrings.stateBody(match),
                               style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextButton.icon(
+                                onPressed: _decisions,
+                                icon: const Icon(Icons.auto_awesome_outlined),
+                                label: Text(
+                                  match.status.name == 'awaitingContinuation'
+                                      ? 'Choisir la suite'
+                                      : 'Photos et continuation',
+                                ),
+                              ),
                             ),
                             if (!c.realtimeConnected)
                               const Text(
@@ -465,6 +496,21 @@ class _PartnerPage extends StatelessWidget {
                       'Découvrez cette personne au fil de vos échanges.',
                 ),
                 const SizedBox(height: 24),
+                if (match.photosRevealed && match.partner.photo != null)
+                  OutlinedButton.icon(
+                    onPressed: !controller.verified
+                        ? null
+                        : () => Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => PartnerPhotoPage(
+                                access: controller,
+                                matchId: id,
+                              ),
+                            ),
+                          ),
+                    icon: const Icon(Icons.photo_outlined),
+                    label: const Text('Voir sa photo'),
+                  ),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,

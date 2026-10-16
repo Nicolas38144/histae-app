@@ -6,7 +6,7 @@ Mise à jour : 16 octobre 2026.
 
 ## État réel du dépôt
 
-L1 à L5 sont implémentés : accueil/catalogue public, OTP/session/consentements, profil/préférences/photo, découverte sans photo et rencontres avec chat, lecture et synchronisation SSE authentifiée. Les conversations sont accessibles depuis le profil, le feed et le reçu d'un intérêt réciproque, après relecture des autorisations serveur. Le blocage est accessible dès le feed et dans le chat. Le mode nuit est désormais le thème par défaut, même si le système est en mode clair. Seul le catalogue est vérifié en réseau réel ; les parcours privés utilisent les vrais contrats et des contrôles simulés, sans validation SMS/compte/appareil. Révélation/continuation, notifications, publicités et ventes restent à construire.
+L1 à L5 et le cœur de L6 sont implémentés : catalogue, OTP/session/consentements, profil/photo, découverte, chat/SSE, révélation mutuelle, continuation et crédits serveur. Le profil et les options du chat donnent accès aux nouveaux parcours. Le mode nuit reste appliqué par défaut. Les vidéos sont désactivées à la demande de l'utilisateur : contrats et suivi de récompense préparés, SDK natif/UMP et essais fournisseur encore ouverts. Les identifiants publics Android fournis sont dans le seul `.env` local ; champs iOS à compléter. Seul le catalogue est vérifié en réseau réel ; aucun SMS, compte privé, échange ou récompense réelle n'est revendiqué. L7 à L10 restent à construire.
 
 Le manifeste conserve Dart `^3.13.1` et `cupertino_icons`. Aux dépendances L1/L2 s'ajoutent en L3 `image_picker: ^1.2.4`, `flutter_image_compress: ^2.5.1`, `http_parser: ^4.1.2` et `path_provider: ^2.1.6`. Navigation avec `Navigator` / `MaterialPageRoute`, état avec `ChangeNotifier`, dépendances injectées par constructeur. SDK vérifié : Flutter 3.47.7, Dart 3.13.5.
 
@@ -27,7 +27,7 @@ L'API actuelle est écrite en Rust avec Axum, Tokio et SQLx. PostgreSQL, Redis e
 
 ## Démarrage
 
-Installer un SDK Flutter compatible avec la contrainte Dart du manifeste et les outils de la plateforme ciblée. Créer le fichier local `.env` avec les deux valeurs publiques ci-dessous (il existe déjà dans cet espace de travail), puis :
+Installer un SDK Flutter compatible avec la contrainte Dart du manifeste et les outils de la plateforme ciblée. Fournir le fichier local `.env` avec l'environnement et l'origine API ci-dessous (il existe déjà dans cet espace de travail), puis :
 
 ```bash
 flutter pub get
@@ -39,6 +39,10 @@ L'API fournie pour les appels est **`https://api.histae.com/api/`**. La configur
 ```dotenv
 APP_ENV=production
 API_BASE_URL=https://api.histae.com
+ADMOB_ANDROID_APP_ID=
+ADMOB_IOS_APP_ID=
+ADMOB_ANDROID_REWARDED_AD_UNIT=
+ADMOB_IOS_REWARDED_AD_UNIT=
 ```
 
 `API_BASE_URL` attend une **origine sans `/api`**, paramètres, fragment ni identifiants ; les repositories ajoutent les chemins `/api/...` une seule fois. Pour un environnement local explicitement choisi, modifier `.env`, puis relancer l'application :
@@ -48,7 +52,9 @@ APP_ENV=development
 API_BASE_URL=http://10.0.2.2:8080
 ```
 
-`.env` est ignoré dans le suivi des fichiers. À la demande de l'utilisateur, aucun fichier d'exemple ne doit être recréé. Le fichier est embarqué dans le paquet mobile : **configuration publique uniquement, aucun secret**. Il n'y a plus de surcharge par `--dart-define`. Le lecteur accepte commentaires sur des lignes séparées et valeurs entre guillemets ; aucune interpolation ni variable supplémentaire. Clé manquante, doublon ou valeur invalide ferme l'intégration sans adresse de secours ni journalisation. En CI, fournir `.env` avant compilation.
+`.env` est ignoré dans le suivi des fichiers. À la demande de l'utilisateur, aucun fichier d'exemple ne doit être recréé. Il est embarqué : **configuration publique uniquement, aucun secret**. Le lecteur accepte les deux clés API obligatoires et les quatre clés AdMob facultatives ci-dessus, commentaires et valeurs entre guillemets, sans interpolation ni surcharge `--dart-define`. Les champs AdMob vides sont autorisés : IDs d'application avec `~`, unités récompensées avec `/`. Les valeurs Android reçues ont été renseignées localement ; iOS reste vide. Une clé inconnue, un doublon, une valeur invalide ou une clé API manquante ferme l'intégration sans repli ni journalisation. En CI, fournir `.env` avant compilation.
+
+Ces champs AdMob réservent la configuration du futur SDK ; les remplir n'active aucune publicité et aucun identifiant n'est codé en dur dans Dart ou les manifestes. Le futur SDK utilisera `ad_unit` et `custom_data` de l'intention API, sans identifiant Histae personnel. L'unité Android fournie devra aussi être configurée côté API pour la vérification serveur ; aucun changement de configuration backend n'a été effectué ici. L'installation SDK/UMP, le raccordement natif des IDs et l'activation fournisseur restent une intervention explicite distincte. Références : [initialisation Google](https://developers.google.com/admob/flutter/quick-start), [vidéo/SSV](https://developers.google.com/admob/flutter/rewarded), [choix UMP](https://developers.google.com/admob/flutter/privacy).
 
 `10.0.2.2` rejoint l'ordinateur depuis l'émulateur Android standard. Pour un téléphone, utiliser l'IP LAN réelle de l'ordinateur, par exemple `http://192.168.1.10:8080`, sur le même réseau ; pour le simulateur iOS, l'adresse de l'hôte Mac. `localhost` sur un téléphone désigne le téléphone. Vérifier écoute et pare-feu du serveur ; la configuration Docker de développement de l'API écoute par défaut sur `127.0.0.1` (`HISTAE_API_BIND_IP` permet de choisir l'interface).
 
@@ -128,13 +134,21 @@ Android déclare les permissions de position approximative/précise, sans permis
 - **SSE** : Bearer en en-tête, une connexion utile dans l'espace rencontres, arrêt en arrière-plan/à la sortie. Décodage UTF-8 fragmenté, commentaires, CR/LF, données multilignes et tailles bornées ; trames incomplètes abandonnées. Reconnexion avec délai progressif/aléatoire et `Retry-After`, timeout d'inactivité de 70 s. Les événements, reconnexions et reprises relisent les ressources autorisées ; aucun replay hors ligne supposé. Le `401` d'access token expiré utilise la rotation sérialisée existante ; une révocation ferme la session. Référence de format : [spécification SSE WHATWG](https://html.spec.whatwg.org/multipage/server-sent-events.html).
 - **Vérifications** : neuf tests ciblés L5 réussis, analyse sans problème, quatre aperçus simulés inspectés (dont grand texte/clavier), formatage et APK Android debug. Aucune nouvelle dépendance ni modification backend. Deux comptes réels, lecture/SSE sur réseau mobile, arrêt/reprise natifs et iOS restent à valider. L'avertissement déjà connu de compatibilité future Kotlin de `flutter_image_compress_common` subsiste.
 
-Prochain lot : **L6**, accords de révélation et de continuation, quota/crédits et récompenses volontaires. Les photos partenaires ne sont ni conservées dans les modèles L5 ni téléchargées ; leur affichage attend ce lot.
+## L6 — révélation, continuation et crédits
+
+- **Révélation** : choix distinct confirmé via PATCH sans corps. Seul `photos_revealed` reçu dans une nouvelle lecture autorise à conserver l'URL partenaire et à ouvrir sa photo ; le premier accord n'autorise aucun téléchargement. Vue dédiée, aucun préchargement dans le feed ou la liste des rencontres. Téléchargement HTTPS sans Bearer/redirection/cache disque, borné à 5 Mo et 15 s ; lien relu après quatre minutes et à la reprise. Octets et cache image évincés à la fermeture, suspension ou perte d'accès ; réponses tardives ignorées.
+- **Continuation** : quota et rencontre relus avant présentation du coût maximal personnel, `0` Premium ou `1` Free. Confirmation explicite, envoi du seul `credit_cost`, aucun calcul local de débit. Une réponse perdue conserve le coût accepté pour une reprise identique en mémoire. `continuation_plan_changed` exige une nouvelle présentation/acceptation ; changement de semaine, nouvelle lecture ou confirmation trop ancienne invalident l'offre affichée. Les choix du partenaire restent privés ; seul l'état serveur rouvre la conversation. Un crédit déjà débité n'est pas remboursé à la clôture.
+- **Crédits** : écran depuis profil/rencontres/continuation, solde, allocation, réservations, stock publicitaire et plafond lus du serveur, sans addition locale comme autorité. Les changements de rencontre/SSE, la reprise et les décisions relisent les ressources ; la formule Premium ne paie jamais pour le partenaire.
+- **Récompenses** : repository POST/GET/DELETE et suivi propriétaire préparés ; reprise par plateforme, attente progressive bornée/`Retry-After`, annulation confirmée, transition `expired` → `credited` admise. Un callback local ne crédite rien : seul `credited` serveur déclenche la relecture du quota. Aucun bouton ne crée/lance une vidéo dans la version livrée, conformément au choix utilisateur. SDK, UMP, configuration API AdMob, iOS et validation SSV réelle restent ouverts, même après renseignement des identifiants Android.
+- **Vérifications exécutées** : huit contrôles L6 ciblés, treize contrôles existants de configuration et sept contrôles existants du chat réussis. Cinq aperçus simulés en mode nuit inspectés ; grand texte/petit écran et retour de navigation vérifiés. Analyse sans problème, formatage et APK Android debug compilé. Deux comptes réels, photos/SSE sur réseau mobile et iOS restent à valider. Aucun nouveau package, aucune commande Git, aucun test ou changement backend.
+
+Prochain lot : **L7**, sûreté, sessions et vie privée. L'activation des vidéos reste suivie séparément tant qu'elle n'est pas demandée.
 
 ## Direction artistique
 
 La composition de [la référence fournie](pictures/exemple_feed.png) guide toute l'app : cartes généreuses, titres à empattements, séparateurs fins, icônes sobres et espacements aérés. À la demande de l'utilisateur, **aucune palette rose/corail** : ivoire `#FAF8F3`, papier `#FFFDF8`, vert forêt `#345647`, encre `#252C28`, sable `#E4DAC9`. Le mode nuit est appliqué par défaut à toute l'app, indépendamment du réglage système ; le thème clair reste défini. Les titres utilisent DM Serif Display embarquée, sans téléchargement de police au lancement ; les contrôles gardent la typographie système et les grandes polices restent autorisées.
 
-Les aperçus sont générés depuis les vrais widgets avec des données explicitement simulées, dans `build/previews/{welcome,registration,consents,profile,profile-editor,answers,feed,feed-end,matches,chat,chat-paused,chat-accessible}.png`. Pour les régénérer, définir `FLUTTER_ROOT` vers le SDK puis lancer `flutter test tool/preview_app_test.dart --update-goldens` ; pour L5 uniquement, ajouter `--plain-name 'preview L5'`. Ils ne constituent pas des captures d'appareil. Les quatre aperçus L5 ont été régénérés en mode nuit ; les anciens aperçus L1–L4 conservent leur rendu historique clair.
+Les aperçus proviennent des vrais widgets avec des données simulées, sous `build/previews/`. L6 ajoute `continuation`, `continuation-cost`, `continuation-recorded`, `credits` et `credits-videos-disabled` (`.png`). Définir `FLUTTER_ROOT` puis utiliser `flutter test tool/preview_app_test.dart --plain-name 'preview L6' --update-goldens` pour ce lot. Ils ne sont pas des captures d'appareil. L5/L6 sont en mode nuit ; les anciens aperçus L1–L4 gardent leur rendu historique clair.
 
 ## Principes de développement
 

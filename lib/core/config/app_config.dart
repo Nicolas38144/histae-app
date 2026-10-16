@@ -1,7 +1,14 @@
 enum AppEnvironment { development, staging, production }
 
 class AppConfig {
-  const AppConfig._(this.environment, this.apiOrigin);
+  const AppConfig._(
+    this.environment,
+    this.apiOrigin,
+    this.admobAndroidAppId,
+    this.admobIosAppId,
+    this.admobAndroidRewardedAdUnit,
+    this.admobIosRewardedAdUnit,
+  );
   factory AppConfig.fromDotEnv(String source, {required bool isDebug}) {
     final values = <String, String>{};
     for (final raw in source.replaceFirst('\uFEFF', '').split('\n')) {
@@ -13,7 +20,14 @@ class AppConfig {
       }
       final key = line.substring(0, separator).trim();
       var value = line.substring(separator + 1).trim();
-      if (!['APP_ENV', 'API_BASE_URL'].contains(key) ||
+      if (![
+            'APP_ENV',
+            'API_BASE_URL',
+            'ADMOB_ANDROID_APP_ID',
+            'ADMOB_IOS_APP_ID',
+            'ADMOB_ANDROID_REWARDED_AD_UNIT',
+            'ADMOB_IOS_REWARDED_AD_UNIT',
+          ].contains(key) ||
           values.containsKey(key)) {
         throw const FormatException('Invalid public configuration');
       }
@@ -29,6 +43,11 @@ class AppConfig {
       environment: values['APP_ENV'] ?? '',
       apiBaseUrl: values['API_BASE_URL'] ?? '',
       isDebug: isDebug,
+      admobAndroidAppId: values['ADMOB_ANDROID_APP_ID'] ?? '',
+      admobIosAppId: values['ADMOB_IOS_APP_ID'] ?? '',
+      admobAndroidRewardedAdUnit:
+          values['ADMOB_ANDROID_REWARDED_AD_UNIT'] ?? '',
+      admobIosRewardedAdUnit: values['ADMOB_IOS_REWARDED_AD_UNIT'] ?? '',
     );
   }
 
@@ -36,6 +55,10 @@ class AppConfig {
     required String environment,
     required String apiBaseUrl,
     required bool isDebug,
+    String admobAndroidAppId = '',
+    String admobIosAppId = '',
+    String admobAndroidRewardedAdUnit = '',
+    String admobIosRewardedAdUnit = '',
   }) {
     final env = AppEnvironment.values.where((e) => e.name == environment);
     final uri = Uri.tryParse(apiBaseUrl);
@@ -54,10 +77,41 @@ class AppConfig {
         (!isDebug || env.single != AppEnvironment.development)) {
       throw const FormatException('HTTPS required');
     }
-    return AppConfig._(env.single, uri.replace(path: ''));
+    String? appId(String value) {
+      if (value.isEmpty) return null;
+      if (!RegExp(r'^ca-app-pub-\d{16}~\d{10}$').hasMatch(value)) {
+        throw const FormatException(
+          'Invalid public advertising application ID',
+        );
+      }
+      return value;
+    }
+
+    String? adUnit(String value) {
+      if (value.isEmpty) return null;
+      if (!RegExp(r'^ca-app-pub-\d{16}/\d{10}$').hasMatch(value)) {
+        throw const FormatException('Invalid public rewarded ad unit');
+      }
+      return value;
+    }
+
+    return AppConfig._(
+      env.single,
+      uri.replace(path: ''),
+      appId(admobAndroidAppId),
+      appId(admobIosAppId),
+      adUnit(admobAndroidRewardedAdUnit),
+      adUnit(admobIosRewardedAdUnit),
+    );
   }
 
   final AppEnvironment environment;
   // Origin only; repositories supply full paths including /api.
   final Uri apiOrigin;
+  // Public IDs reserved for a future native SDK installation. Empty fields do
+  // not enable videos, initialize advertising, or provide an ad unit fallback.
+  final String? admobAndroidAppId, admobIosAppId;
+  // Reserved public configuration for the future SDK. The API's intent remains
+  // authoritative; these values never replace a missing server ad_unit.
+  final String? admobAndroidRewardedAdUnit, admobIosRewardedAdUnit;
 }

@@ -6,7 +6,7 @@ Mise à jour : 16 octobre 2026.
 
 ## 1. État de départ et suivi
 
-L1 est intégré pour le catalogue. L2 à L5 sont implémentés : session/consentements, profil/photo, découverte et rencontres/chat/lecture/SSE. Les contrats mobiles sont branchés avec contrôles simulés ; SMS, deux comptes, GPS, SSE sur réseau mobile et appareils restent à valider. L6 à L10 restent à construire, avec le blocage L7 amorcé dans le feed et le chat. La DA suit `pictures/exemple_feed.png`, en ivoire/vert forêt/encre/sable, avec mode nuit par défaut demandé par l'utilisateur. Configuration publique dans `.env`, sans adresse de secours dans Dart ; le fichier modèle supprimé par l'utilisateur ne doit pas être recréé.
+L1 à L5 et le cœur de L6 sont implémentés : catalogue, session/consentements, profil/photo, découverte, chat/SSE, révélation, continuation et crédits. Les récompenses ont leurs contrats/suivi préparés, mais les vidéos restent désactivées sur demande utilisateur ; SDK/UMP et validation fournisseur ouverts. Les identifiants Android fournis sont dans `.env`, champs iOS vides. Contrôles privés simulés uniquement : deux comptes et appareils restent à valider. L7 à L10 restent à construire, avec le blocage déjà amorcé. DA éditoriale en mode nuit par défaut ; aucun fichier modèle `.env` ne doit être recréé.
 
 Cette roadmap couvre toutes les capacités utilisateur de l'API actuelle. Elle exclut l'administration, les webhooks fournisseur, la supervision et les opérations internes. Elle ne dépend pas des anciens dépôts NestJS ou d'un endpoint OpenAPI.
 
@@ -22,7 +22,7 @@ Les états doivent distinguer : `À faire`, `En cours`, `Implémenté`, `Intégr
 | L3 | Profil, préférences, traits, questions, photo et modération propriétaire | Implémenté sur les treize routes ; vérifications automatiques ci-dessous ; compte/photo/appareils à valider |
 | L4 | Présence, diagnostic de préparation, découverte et swipes | Implémenté sur quatre routes + blocage ; huit contrôles ciblés ; deux comptes et appareils à valider |
 | L5 | Matchs, chat, lecture et synchronisation SSE | Implémenté sur sept routes ; neuf tests ciblés, analyse et APK Android ; deux comptes/appareils à valider |
-| L6 | Révélation, continuation, crédits et récompenses volontaires | À faire |
+| L6 | Révélation, continuation, crédits et récompenses volontaires | Cœur implémenté ; huit contrôles ciblés ; vidéos désactivées par choix utilisateur, SDK/UMP et fournisseur en attente |
 | L7 | Sûreté, paramètres de confidentialité, sessions, export et suppression | À faire |
 | L8 | Appareils, notifications push et ouverture depuis notification | À faire |
 | L9 | Offres, abonnement, Checkout et portail selon la distribution retenue | À faire |
@@ -179,6 +179,16 @@ Prochain lot : **L6**, révélation, continuation et quota/récompenses serveur.
 
 Critère de sortie : règles Free/Premium et confidentialité des choix respectées ; récompense validée côté serveur ou blocage fournisseur clairement identifié.
 
+### Implémentation L6 — 16 octobre 2026
+
+- **Accords** : écran « Photos et continuation » depuis le chat, choix indépendants et confirmations explicites. Révélation par PATCH sans corps ; conserver l'URL et ouvrir la vue photo seulement après `photos_revealed` dans une nouvelle lecture. Aucune image dans le feed ni téléchargement dans la liste. Vue privée en mémoire, HTTPS sans Bearer/redirection, limites 5 Mo/15 s, renouvellement avant cinq minutes, purge du cache image à la suspension/fermeture/perte d'accès.
+- **Crédits et coût** : quota propriétaire, stock/réservations/plafond, catalogue et formule effective serveur. Avant chaque nouvel accord, relecture de la rencontre/quota puis acceptation du coût maximal personnel `credit_cost: 0|1`. Après réponse perdue, conserver ce coût en mémoire et reprendre explicitement à l'identique. Changement de formule/lecture/semaine ou confirmation trop ancienne = nouvelle présentation requise. Aucun débit, solde ou choix du partenaire calculé localement. État `confirmed` relu avant réouverture de l'envoi ; aucun remboursement promis après débit.
+- **Récompenses et limite choisie** : POST/GET/DELETE disponibles au repository, suivi propriétaire à délai progressif borné et `Retry-After`, annulation confirmée, crédit uniquement après statut serveur `credited` puis relecture du quota. Un `expired` peut encore devenir `credited` après preuve tardive. Le callback local n'ajoute rien. **Aucun lancement/création de vidéo depuis l'interface livrée**, conformément au choix utilisateur. SDK natif, UMP, configuration AdMob côté API et validation SSV restent à réaliser avant activation. Pas de nouvelle dépendance ni de faux fournisseur.
+- **Configuration** : `.env` local conserve l'origine API et reçoit quatre champs publics AdMob facultatifs. Android renseigné avec les valeurs utilisateur ; iOS vide. IDs d'application `~` et unités `/` validés distinctement. Valeurs réservées pour le futur SDK, sans remplacer l'unité/`custom_data` de l'intention API. Aucun ID en dur dans Dart/manifestes, aucun fichier modèle recréé, backend inchangé.
+- **Sources et contrôles** : DTO/routes/services/stockage et tests Rust matchs/publicité, guide continuations/récompenses et Postman consultés, sans exécution backend. Documentation officielle Google [initialisation](https://developers.google.com/admob/flutter/quick-start), [vidéo/SSV](https://developers.google.com/admob/flutter/rewarded), [UMP](https://developers.google.com/admob/flutter/privacy). Huit contrôles L6, treize contrôles existants de configuration et sept contrôles existants du chat réussis ; cinq aperçus simulés en mode nuit inspectés, petit écran/grand texte et navigation vérifiés. Formatage et analyse sans problème ; essais entre deux comptes, photo/native et iOS ouverts. Aucun nouveau passage de toute la suite.
+
+Prochain lot : **L7**, sûreté, sessions et vie privée. L'activation des vidéos reste une étape suivie séparément.
+
 ## 10. L7 — sûreté, paramètres et vie privée
 
 - Rendre signalement et blocage accessibles dès qu'un profil de partenaire est exposé.
@@ -263,22 +273,22 @@ Chemins complets, préfixe `/api` inclus. Les 56 routes restent suivies : catalo
 | GET | `/api/feed` | L4 | Découverte paginée | Implémenté ; contrôles client ciblés ; deux comptes/appareils à valider |
 | POST | `/api/swipes` | L4 | Like/pass et résultat du match | Implémenté ; contrôles client ciblés ; deux comptes/appareils à valider |
 | GET | `/api/matches/me` | L5 | Liste des matchs | Implémenté ; contrôles client ciblés ; deux comptes/appareils à valider |
-| PATCH | `/api/matches/:id/reveal` | L6 | Accord de révélation | À faire |
-| PATCH | `/api/matches/:id/continue` | L6 | Accord de continuation et coût | À faire |
+| PATCH | `/api/matches/:id/reveal` | L6 | Accord de révélation | Implémenté ; accord et photo conditionnelle contrôlés ; deux comptes/appareils à valider |
+| PATCH | `/api/matches/:id/continue` | L6 | Accord de continuation et coût | Implémenté ; coût/reprise/changement de formule contrôlés ; deux comptes/appareils à valider |
 | PATCH | `/api/matches/:id/end` | L5 | Terminer un match | Implémenté ; contrôles client ciblés ; deux comptes/appareils à valider |
-| GET | `/api/users/me/continuation-quota` | L6 | Crédits, réservations et plafond | À faire |
+| GET | `/api/users/me/continuation-quota` | L6 | Crédits, réservations et plafond | Implémenté ; projection serveur et coût contrôlés ; compte/appareil à valider |
 | GET | `/api/matches/:id/messages` | L5 | Historique paginé | Implémenté ; contrôles client ciblés ; deux comptes/appareils à valider |
 | POST | `/api/matches/:id/messages` | L5 | Envoi idempotent | Implémenté ; contrôles client ciblés ; deux comptes/appareils à valider |
 | PATCH | `/api/matches/:id/messages/read` | L5 | Lecture groupée | Implémenté ; contrôles client ciblés ; deux comptes/appareils à valider |
 | PATCH | `/api/matches/:id/messages/:msgId/read` | L5 | Lecture unitaire si nécessaire | Disponible au repository ; UI groupée ; compte/appareil à valider |
-| POST | `/api/users/me/advertising-rewards` | L6 | Créer/reprendre une intention | À faire |
-| GET | `/api/users/me/advertising-rewards/:id` | L6 | Suivre la validation serveur | À faire |
-| DELETE | `/api/users/me/advertising-rewards/:id` | L6 | Annuler une intention | À faire |
+| POST | `/api/users/me/advertising-rewards` | L6 | Créer/reprendre une intention | Repository/suivi préparés ; aucun lancement UI ; SDK/UMP/fournisseur en attente par choix utilisateur |
+| GET | `/api/users/me/advertising-rewards/:id` | L6 | Suivre la validation serveur | Suivi et crédit serveur contrôlés en simulation ; SDK/SSV réel en attente |
+| DELETE | `/api/users/me/advertising-rewards/:id` | L6 | Annuler une intention | Repository/confirmation préparés ; protection vidéo terminée contrôlée ; réel en attente |
 | GET | `/api/users/me/devices` | L8 | Liste des appareils | À faire |
 | POST | `/api/users/me/devices` | L8 | Enregistrer/rafraîchir le token push | À faire |
 | DELETE | `/api/users/me/devices/:id` | L8 | Retirer un appareil | À faire |
 | GET | `/api/users/me/events` | L5 | SSE authentifié | Implémenté ; Bearer/refresh/connexion unique contrôlés ; réseau/appareils à valider |
-| GET | `/api/plans` | L1, L6, L9 | Catalogue, tarifs et disponibilité publicitaire | Intégré API L1 : HTTP 200, deux formules décodées ; usages L6/L9 et appareils à faire |
+| GET | `/api/plans` | L1, L6, L9 | Catalogue, tarifs et disponibilité publicitaire | Intégré API L1 ; lecture L6 branchée, vidéos maintenues désactivées ; L9/appareils en attente |
 | GET | `/api/users/me/subscription` | L9 | Abonnement et droits effectifs | À faire |
 | POST | `/api/users/me/subscription/checkout` | L9 | Achat hébergé si distribution compatible | À faire |
 | POST | `/api/users/me/subscription/portal` | L9 | Gestion de l'abonnement | À faire |

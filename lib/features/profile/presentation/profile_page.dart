@@ -15,6 +15,7 @@ import '../../discovery/presentation/discovery_page.dart';
 import '../../matches/application/matches_controller.dart';
 import '../../matches/data/matches_repository.dart';
 import '../../matches/presentation/matches_page.dart';
+import '../../continuation/presentation/credits_page.dart';
 import '../application/profile_controller.dart';
 import '../data/profile_repository.dart';
 import 'profile_editors.dart';
@@ -139,6 +140,11 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                   onPressed: _matches,
                   icon: const Icon(Icons.forum_outlined),
                   label: const Text('Vos rencontres'),
+                ),
+                TextButton(
+                  onPressed: () =>
+                      _open(CreditsPage(controller: matches.continuation)),
+                  child: const Text('Mes crédits de continuation'),
                 ),
                 TextButton(
                   onPressed: () => _open(ConsentsPage(session: widget.session)),

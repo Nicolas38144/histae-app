@@ -11,6 +11,7 @@ import '../test/support/auth_fixture.dart';
 import '../test/support/profile_fixture.dart';
 import '../test/support/discovery_fixture.dart';
 import '../test/support/matches_fixture.dart';
+import '../test/support/continuation_fixture.dart';
 
 import 'package:histae_app/features/matches/presentation/chat_page.dart';
 
@@ -47,6 +48,101 @@ void main() {
       );
     await icons.load();
   });
+  testWidgets(
+    'preview L6 continuation, cost consent and credits with synthetic responses',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      var continued = false;
+      final session = testSession((r) async {
+        if (r.url.path == '/api/matches/me') {
+          return jsonResponse({
+            'matches': [
+              {
+                ...publicMatchJson(status: 'awaiting_continuation'),
+                'my_continued': continued,
+              },
+            ],
+            'next_cursor': null,
+          });
+        }
+        if (r.url.path.endsWith('/continue')) {
+          continued = true;
+          return jsonResponse({
+            'message': 'recorded',
+            'match_confirmed': false,
+          });
+        }
+        return defaultContinuationResponse(r);
+      });
+      await session.establish(testTokens);
+      const preview = Key('continuation-preview');
+      await tester.pumpWidget(
+        RepaintBoundary(
+          key: preview,
+          child: HistaeApp(sessionController: session),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Vos rencontres'));
+      await tester.tap(find.text('Vos rencontres'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Léa, 27'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Choisir la suite'));
+      await tester.pumpAndSettle();
+      await expectLater(
+        find.byKey(preview),
+        matchesGoldenFile('../build/previews/continuation.png'),
+      );
+      await tester.scrollUntilVisible(
+        find.text('Lire le coût et choisir de continuer'),
+        180,
+        scrollable: find.byType(Scrollable).last,
+      );
+      await tester.tap(find.text('Lire le coût et choisir de continuer'));
+      await tester.pumpAndSettle();
+      await expectLater(
+        find.byKey(preview),
+        matchesGoldenFile('../build/previews/continuation-cost.png'),
+      );
+      await tester.tap(find.text('Accepter 1 crédit maximum'));
+      await tester.pumpAndSettle();
+      await expectLater(
+        find.byKey(preview),
+        matchesGoldenFile('../build/previews/continuation-recorded.png'),
+      );
+      await tester.ensureVisible(find.text('Voir mes crédits'));
+      await tester.tap(find.text('Voir mes crédits'));
+      await tester.pumpAndSettle();
+      await expectLater(
+        find.byKey(preview),
+        matchesGoldenFile('../build/previews/credits.png'),
+      );
+      await tester.scrollUntilVisible(
+        find.text('Une vidéo, si vous le souhaitez'),
+        200,
+        scrollable: find.byType(Scrollable).last,
+      );
+      await tester.pumpAndSettle();
+      await expectLater(
+        find.byKey(preview),
+        matchesGoldenFile('../build/previews/credits-videos-disabled.png'),
+      );
+      tester.view.physicalSize = const Size(320, 640);
+      tester.platformDispatcher.textScaleFactorTestValue = 2;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
   testWidgets('preview L5 matches and chat with synthetic conversations only', (
     tester,
   ) async {
