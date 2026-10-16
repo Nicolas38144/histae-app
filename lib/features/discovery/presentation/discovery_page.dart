@@ -18,9 +18,11 @@ class DiscoveryPage extends StatefulWidget {
     super.key,
     required this.controller,
     required this.profile,
+    this.openMatches,
   });
   final DiscoveryController controller;
   final ProfileController profile;
+  final Future<void> Function([String? id])? openMatches;
   @override
   State<DiscoveryPage> createState() => _DiscoveryPageState();
 }
@@ -136,7 +138,13 @@ class _DiscoveryPageState extends State<DiscoveryPage>
     if (!mounted || !c.accessible || c.session.resourceKey != _key) return;
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => EncounterPage(controller: c, receipt: receipt),
+        builder: (_) => EncounterPage(
+          controller: c,
+          receipt: receipt,
+          openMatch: widget.openMatches == null
+              ? null
+              : () => widget.openMatches!(receipt.match.id),
+        ),
       ),
     );
     if (mounted) await _resume();
@@ -438,13 +446,25 @@ class _DiscoveryPageState extends State<DiscoveryPage>
         bottomNavigationBar: NavigationBar(
           selectedIndex: 0,
           onDestinationSelected: (index) {
-            if (index == 1) Navigator.of(context).pop();
+            if (index == 1 && widget.openMatches != null) {
+              c.deactivate();
+              unawaited(
+                widget.openMatches!().then((_) {
+                  if (mounted) return _resume();
+                }),
+              );
+            }
+            if (index == 2) Navigator.of(context).pop();
           },
           destinations: const [
             NavigationDestination(
               icon: Icon(Icons.explore_outlined),
               selectedIcon: Icon(Icons.explore),
               label: 'Découvrir',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.forum_outlined),
+              label: 'Rencontres',
             ),
             NavigationDestination(
               icon: Icon(Icons.person_outline),

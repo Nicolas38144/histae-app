@@ -45,6 +45,12 @@ class DiscoveryController extends ChangeNotifier {
   bool exhausted = false;
   PendingChoice? pending;
   EncounterReceipt? encounter;
+  void forgetEncounter(String matchId) {
+    if (encounter?.match.id != matchId) return;
+    encounter = null;
+    if (!_disposed) notifyListeners();
+  }
+
   Timer? _expiryTimer, _retryTimer;
   DateTime? _retryAt, _checkedExpiry;
   bool get accessible =>

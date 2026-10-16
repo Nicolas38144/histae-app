@@ -17,6 +17,12 @@ class RequestCancellation {
   }
 }
 
+class ApiEventStream {
+  ApiEventStream(this.bytes, this.close);
+  final Stream<List<int>> bytes;
+  final void Function() close;
+}
+
 class ApiClient {
   ApiClient({
     required this.origin,
@@ -35,6 +41,102 @@ class ApiClient {
 
   Future<Object?> getJson(String path, {RequestCancellation? cancellation}) =>
       requestJson('GET', path, cancellation: cancellation);
+
+  Future<ApiEventStream> openEvents({
+    required String bearer,
+    required RequestCancellation cancellation,
+  }) async {
+    if (_closed || cancellation.isCancelled) {
+      throw const ApiFailure(ApiFailureKind.cancelled);
+    }
+    final abort = RequestCancellation();
+    _active.add(abort);
+    final id = newUuidV4();
+    void close() {
+      abort.cancel();
+      _active.remove(abort);
+    }
+
+    final request =
+        http.AbortableRequest(
+            'GET',
+            origin.resolve('/api/users/me/events'),
+            abortTrigger: Future.any([
+              abort.whenCancelled,
+              cancellation.whenCancelled,
+            ]),
+          )
+          ..followRedirects = false
+          ..headers.addAll({
+            'Accept': 'text/event-stream',
+            'Authorization': 'Bearer $bearer',
+            'X-Request-ID': id,
+          });
+    try {
+      final response = await _client.send(request).timeout(timeout);
+      if (response.statusCode != 200) {
+        final data = <int>[];
+        await for (final part in response.stream.timeout(timeout)) {
+          if (data.length + part.length > 65536) {
+            throw const ApiFailure(ApiFailureKind.invalidResponse);
+          }
+          data.addAll(part);
+        }
+        String? code;
+        try {
+          final json = jsonDecode(utf8.decode(data));
+          final error = json is Map ? json['error'] : null;
+          if (error is Map && error['code'] is String) {
+            code = error['code'] as String;
+          }
+        } on FormatException {
+          /* Only typed diagnostics are retained. */
+        }
+        throw ApiFailure(
+          ApiFailure.classify(response.statusCode, code),
+          statusCode: response.statusCode,
+          code: code,
+          requestId: id,
+          retryAt: _retryAt(response.headers['retry-after']),
+        );
+      }
+      if (response.headers['content-type']
+              ?.split(';')
+              .first
+              .trim()
+              .toLowerCase() !=
+          'text/event-stream') {
+        throw const ApiFailure(ApiFailureKind.invalidResponse);
+      }
+      Stream<List<int>> bytes() async* {
+        try {
+          yield* response.stream.timeout(const Duration(seconds: 70));
+        } on http.RequestAbortedException {
+          throw const ApiFailure(ApiFailureKind.cancelled);
+        } on TimeoutException {
+          throw const ApiFailure(ApiFailureKind.timeout);
+        } catch (_) {
+          throw const ApiFailure(ApiFailureKind.network);
+        } finally {
+          close();
+        }
+      }
+
+      return ApiEventStream(bytes(), close);
+    } on ApiFailure {
+      close();
+      rethrow;
+    } on TimeoutException {
+      close();
+      throw ApiFailure(ApiFailureKind.timeout, requestId: id);
+    } on http.RequestAbortedException {
+      close();
+      throw ApiFailure(ApiFailureKind.cancelled, requestId: id);
+    } catch (_) {
+      close();
+      throw ApiFailure(ApiFailureKind.network, requestId: id);
+    }
+  }
 
   // The transport never retries or refreshes. Callers explicitly choose their
   // route's replay policy; request bodies and credentials are never logged.

@@ -10,6 +10,9 @@ import 'package:histae_app/app/app.dart';
 import '../test/support/auth_fixture.dart';
 import '../test/support/profile_fixture.dart';
 import '../test/support/discovery_fixture.dart';
+import '../test/support/matches_fixture.dart';
+
+import 'package:histae_app/features/matches/presentation/chat_page.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -43,6 +46,86 @@ void main() {
         Future.value(ByteData.sublistView(await iconFile.readAsBytes())),
       );
     await icons.load();
+  });
+  testWidgets('preview L5 matches and chat with synthetic conversations only', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    var status = 'active';
+    final session = testSession((r) async {
+      if (r.url.path == '/api/matches/me') {
+        return jsonResponse({
+          'matches': [publicMatchJson(status: status)],
+          'next_cursor': null,
+        });
+      }
+      if (r.url.path == '/api/matches/$testMatch/messages') {
+        return jsonResponse({
+          'messages': [
+            messageJson(
+              id: outgoingId,
+              sender: testUser,
+              content: 'Les livres qui donnent envie de partir, sans hésiter.',
+              readAt: '2026-10-16T12:01:00Z',
+            ),
+            messageJson(
+              content: 'Et si on parlait de nos lectures ? Quel livre t’a donné envie de voyager ?',
+            ),
+          ],
+          'next_cursor': null,
+        });
+      }
+      return defaultMatchesResponse(r);
+    });
+    await session.establish(testTokens);
+    const preview = Key('matches-preview');
+    await tester.pumpWidget(
+      RepaintBoundary(
+        key: preview,
+        child: HistaeApp(sessionController: session),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Vos rencontres'));
+    await tester.tap(find.text('Vos rencontres'));
+    await tester.pumpAndSettle();
+    await expectLater(
+      find.byKey(preview),
+      matchesGoldenFile('../build/previews/matches.png'),
+    );
+    await tester.tap(find.text('Léa, 27'));
+    await tester.pumpAndSettle();
+    await expectLater(
+      find.byKey(preview),
+      matchesGoldenFile('../build/previews/chat.png'),
+    );
+    status = 'awaiting_continuation';
+    await tester.tap(find.byTooltip('Actualiser la conversation'));
+    await tester.pumpAndSettle();
+    await expectLater(
+      find.byKey(preview),
+      matchesGoldenFile('../build/previews/chat-paused.png'),
+    );
+    // Inspect the actual layout under a small keyboard viewport and large text.
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.viewInsets = const FakeViewPadding(bottom: 200);
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.view.resetViewInsets);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    await expectLater(
+      find.byKey(preview),
+      matchesGoldenFile('../build/previews/chat-accessible.png'),
+    );
+    // Closing the conversation also checks parent navigation after cancellation.
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+    expect(find.byType(ChatPage), findsNothing);
+    await tester.pumpWidget(const SizedBox.shrink());
   });
   testWidgets('preview L4 discovery with synthetic profiles only', (
     tester,

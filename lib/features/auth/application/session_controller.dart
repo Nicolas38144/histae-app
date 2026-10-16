@@ -163,6 +163,7 @@ class SessionController extends ChangeNotifier {
     String method,
     String path, {
     Object? body,
+    bool events = false,
     Map<String, String>? query,
     List<int>? photo,
     String? idempotencyKey,
@@ -188,18 +189,24 @@ class SessionController extends ChangeNotifier {
       if (scope.isCancelled || (cancellation?.isCancelled ?? false)) {
         throw const ApiFailure(ApiFailureKind.cancelled);
       }
-      final result = await repository.api.requestJson(
-        method,
-        path,
-        body: body,
-        query: query,
-        photo: photo,
-        idempotencyKey: idempotencyKey,
-        bearer: tokens.accessToken,
-        cancellation: combined,
-        expectedStatus: expectedStatus,
-      );
+      final result = events
+          ? await repository.api.openEvents(
+              bearer: tokens.accessToken,
+              cancellation: combined,
+            )
+          : await repository.api.requestJson(
+              method,
+              path,
+              body: body,
+              query: query,
+              photo: photo,
+              idempotencyKey: idempotencyKey,
+              bearer: tokens.accessToken,
+              cancellation: combined,
+              expectedStatus: expectedStatus,
+            );
       if (generation != _generation || _loggingOut || _disposed) {
+        if (result is ApiEventStream) result.close();
         throw const ApiFailure(ApiFailureKind.cancelled);
       }
       return result;
@@ -255,6 +262,14 @@ class SessionController extends ChangeNotifier {
     replayAfterRefresh: replayAfterRefresh,
     cancellation: cancellation,
   );
+
+  Future<ApiEventStream> openEvents(RequestCancellation cancellation) async =>
+      await _authorized(
+        'GET',
+        '/api/users/me/events',
+        events: true,
+        cancellation: cancellation,
+      ) as ApiEventStream;
 
   void _acceptConsents(ConsentState state) {
     final fingerprint = state.consents

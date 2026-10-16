@@ -12,6 +12,9 @@ import '../../discovery/application/discovery_controller.dart';
 import '../../discovery/data/discovery_repository.dart';
 import '../../discovery/data/device_location.dart';
 import '../../discovery/presentation/discovery_page.dart';
+import '../../matches/application/matches_controller.dart';
+import '../../matches/data/matches_repository.dart';
+import '../../matches/presentation/matches_page.dart';
 import '../application/profile_controller.dart';
 import '../data/profile_repository.dart';
 import 'profile_editors.dart';
@@ -32,6 +35,13 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
     DiscoveryRepository(widget.session),
     DeviceLocation(),
   );
+  late final matches = MatchesController(
+    MatchesRepository(widget.session),
+    onRemoved: discovery.forgetEncounter,
+  );
+
+  Future<void> _matches([String? id]) =>
+      _open(MatchesPage(controller: matches, initialMatchId: id));
   @override
   void initState() {
     super.initState();
@@ -51,6 +61,7 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     controller.dispose();
+    matches.dispose();
     discovery.dispose();
     super.dispose();
   }
@@ -114,12 +125,21 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                 const SizedBox(height: 16),
                 FilledButton.icon(
                   onPressed: () => _open(
-                    DiscoveryPage(controller: discovery, profile: controller),
+                    DiscoveryPage(
+                      controller: discovery,
+                      profile: controller,
+                      openMatches: _matches,
+                    ),
                   ),
                   icon: const Icon(Icons.explore_outlined),
                   label: const Text('Découvrir les profils'),
                 ),
                 const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: _matches,
+                  icon: const Icon(Icons.forum_outlined),
+                  label: const Text('Vos rencontres'),
+                ),
                 TextButton(
                   onPressed: () => _open(ConsentsPage(session: widget.session)),
                   child: Text(strings.privacyTitle),

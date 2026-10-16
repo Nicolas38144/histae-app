@@ -9,9 +9,11 @@ class EncounterPage extends StatelessWidget {
     super.key,
     required this.controller,
     required this.receipt,
+    this.openMatch,
   });
   final DiscoveryController controller;
   final EncounterReceipt receipt;
+  final Future<void> Function()? openMatch;
   @override
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: controller,
@@ -53,6 +55,18 @@ class EncounterPage extends StatelessWidget {
                 'Vos photos restent privées. Cette rencontre ne vaut pas accord pour les révéler.',
               ),
               const SizedBox(height: 24),
+              if (openMatch != null)
+                FilledButton.icon(
+                  onPressed: () async {
+                    controller.deactivate();
+                    await openMatch!();
+                    if (context.mounted && controller.accessible) {
+                      await controller.activate();
+                    }
+                  },
+                  icon: const Icon(Icons.forum_outlined),
+                  label: const Text('Ouvrir la conversation'),
+                ),
               OutlinedButton(
                 onPressed: () => Navigator.of(context).pop(),
                 child: const Text('Revenir aux découvertes'),

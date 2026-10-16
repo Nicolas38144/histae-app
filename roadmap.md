@@ -6,7 +6,7 @@ Mise à jour : 16 octobre 2026.
 
 ## 1. État de départ et suivi
 
-L1 est intégré pour le catalogue. L2 à L4 sont implémentés : session/consentements, profil/photo et découverte sans photo. Les quatre routes L4 et le blocage depuis le feed sont reliés aux contrats réels, avec contrôles simulés ; SMS, deux comptes, GPS et appareils restent à valider. L5 à L10 restent à construire, avec le début du blocage L7 livré en L4. La DA suit `pictures/exemple_feed.png`, en ivoire/vert forêt/encre/sable. Configuration publique dans `.env`, sans adresse de secours dans Dart ; le fichier modèle supprimé par l'utilisateur ne doit pas être recréé.
+L1 est intégré pour le catalogue. L2 à L5 sont implémentés : session/consentements, profil/photo, découverte et rencontres/chat/lecture/SSE. Les contrats mobiles sont branchés avec contrôles simulés ; SMS, deux comptes, GPS, SSE sur réseau mobile et appareils restent à valider. L6 à L10 restent à construire, avec le blocage L7 amorcé dans le feed et le chat. La DA suit `pictures/exemple_feed.png`, en ivoire/vert forêt/encre/sable, avec mode nuit par défaut demandé par l'utilisateur. Configuration publique dans `.env`, sans adresse de secours dans Dart ; le fichier modèle supprimé par l'utilisateur ne doit pas être recréé.
 
 Cette roadmap couvre toutes les capacités utilisateur de l'API actuelle. Elle exclut l'administration, les webhooks fournisseur, la supervision et les opérations internes. Elle ne dépend pas des anciens dépôts NestJS ou d'un endpoint OpenAPI.
 
@@ -21,7 +21,7 @@ Les états doivent distinguer : `À faire`, `En cours`, `Implémenté`, `Intégr
 | L2 | Inscription/reconnexion OTP, session et onboarding juridique reprenable | Implémenté ; 85 tests au total et compilation Android debug ; SMS, compte réel et appareils à valider |
 | L3 | Profil, préférences, traits, questions, photo et modération propriétaire | Implémenté sur les treize routes ; vérifications automatiques ci-dessous ; compte/photo/appareils à valider |
 | L4 | Présence, diagnostic de préparation, découverte et swipes | Implémenté sur quatre routes + blocage ; huit contrôles ciblés ; deux comptes et appareils à valider |
-| L5 | Matchs, chat, lecture et synchronisation SSE | À faire |
+| L5 | Matchs, chat, lecture et synchronisation SSE | Implémenté sur sept routes ; neuf tests ciblés, analyse et APK Android ; deux comptes/appareils à valider |
 | L6 | Révélation, continuation, crédits et récompenses volontaires | À faire |
 | L7 | Sûreté, paramètres de confidentialité, sessions, export et suppression | À faire |
 | L8 | Appareils, notifications push et ouverture depuis notification | À faire |
@@ -156,6 +156,16 @@ Prochain lot : L5, matchs/chat/lecture et SSE. Conserver les essais réels de L2
 
 Critère de sortie : deux comptes échangent sans doublon, voient les lectures et retrouvent un état cohérent après coupure ou clôture.
 
+### Implémentation L5 — 16 octobre 2026
+
+- **Interface et accès** : rencontres depuis profil/feed/reçu réciproque ; liste, dernier message, non-lus, profil textuel partenaire et historique paginé. Une ouverture par ID parcourt la collection mobile autorisée ; aucune route GET administrative. Ordre/cursors serveur, déduplication, redémarrage après curseur invalide. Mode nuit appliqué à toute l'app sur demande utilisateur ; aucun nouveau package.
+- **Échanges** : `201` du message décodé directement, `Idempotency-Key` UUID v4 stable et contenu immuable après timeout, reprise explicite en mémoire dans la session. Limite 2 000 points de code Unicode après normalisation ECMAScript. Lecture groupée à partir d'un message reçu visible au premier plan ; route unitaire disponible au repository. Les événements seuls ne marquent pas lu. État/date serveur, envois suspendus pendant `awaiting_continuation`, historique conservé ; aucune transition de 24 h fabriquée localement. Photos partenaires inutilisées jusqu'à L6.
+- **Temps réel et confidentialité** : SSE avec Bearer, une connexion utile dans l'espace rencontres ; arrêt à la sortie/en arrière-plan. Décodeur UTF-8 et trames bornés, timeout inactif 70 s, backoff avec aléa/`Retry-After`. Relecture aux connexions, événements, échéances et reprises. `401` expiré partage la rotation existante ; révocation ferme la session. Fin volontaire/blocage confirmés et repris à l'identique en cas de réponse incertaine. Purge à la perte d'accès, invalidation, changement de consentements/session ; anciennes réponses ignorées. Aucune persistance des messages/brouillons/clés.
+- **Sources** : contrat HTTP, DTO/routes/services/stockage Rust des matchs, messages et événements, tests contractuels et exemples Postman consultés uniquement. Format SSE vérifié dans la [spécification WHATWG](https://html.spec.whatwg.org/multipage/server-sent-events.html). Backend non modifié et tests backend non exécutés.
+- **Vérifications exécutées** : neuf tests ciblés réussis (envoi incertain, curseurs/ordre, états, purge et réponses tardives, fin/blocage, lecture visible, décodage, refresh SSE/JSON concurrent, connexion unique/annulation). Quatre aperçus simulés en mode nuit inspectés, dont grand texte/clavier et retour de navigation. Formatage, analyse sans problème et APK Android debug réussis. Pas de passage systématique de la suite entière. Essais de sortie ci-dessus encore ouverts entre deux comptes autorisés et sur appareils Android/iOS ; aucun échange réel ou succès fournisseur revendiqué.
+
+Prochain lot : **L6**, révélation, continuation et quota/récompenses serveur.
+
 ## 9. L6 — révélation, continuations et récompenses
 
 - Proposer la révélation comme accord séparé ; aucune photo de partenaire avant révélation mutuelle.
@@ -252,22 +262,22 @@ Chemins complets, préfixe `/api` inclus. Les 56 routes restent suivies : catalo
 | GET | `/api/users/me/discovery-status` | L4 | Diagnostic de préparation | Implémenté ; contrôles client ciblés ; deux comptes/appareils à valider |
 | GET | `/api/feed` | L4 | Découverte paginée | Implémenté ; contrôles client ciblés ; deux comptes/appareils à valider |
 | POST | `/api/swipes` | L4 | Like/pass et résultat du match | Implémenté ; contrôles client ciblés ; deux comptes/appareils à valider |
-| GET | `/api/matches/me` | L5 | Liste des matchs | À faire |
+| GET | `/api/matches/me` | L5 | Liste des matchs | Implémenté ; contrôles client ciblés ; deux comptes/appareils à valider |
 | PATCH | `/api/matches/:id/reveal` | L6 | Accord de révélation | À faire |
 | PATCH | `/api/matches/:id/continue` | L6 | Accord de continuation et coût | À faire |
-| PATCH | `/api/matches/:id/end` | L5 | Terminer un match | À faire |
+| PATCH | `/api/matches/:id/end` | L5 | Terminer un match | Implémenté ; contrôles client ciblés ; deux comptes/appareils à valider |
 | GET | `/api/users/me/continuation-quota` | L6 | Crédits, réservations et plafond | À faire |
-| GET | `/api/matches/:id/messages` | L5 | Historique paginé | À faire |
-| POST | `/api/matches/:id/messages` | L5 | Envoi idempotent | À faire |
-| PATCH | `/api/matches/:id/messages/read` | L5 | Lecture groupée | À faire |
-| PATCH | `/api/matches/:id/messages/:msgId/read` | L5 | Lecture unitaire si nécessaire | À faire |
+| GET | `/api/matches/:id/messages` | L5 | Historique paginé | Implémenté ; contrôles client ciblés ; deux comptes/appareils à valider |
+| POST | `/api/matches/:id/messages` | L5 | Envoi idempotent | Implémenté ; contrôles client ciblés ; deux comptes/appareils à valider |
+| PATCH | `/api/matches/:id/messages/read` | L5 | Lecture groupée | Implémenté ; contrôles client ciblés ; deux comptes/appareils à valider |
+| PATCH | `/api/matches/:id/messages/:msgId/read` | L5 | Lecture unitaire si nécessaire | Disponible au repository ; UI groupée ; compte/appareil à valider |
 | POST | `/api/users/me/advertising-rewards` | L6 | Créer/reprendre une intention | À faire |
 | GET | `/api/users/me/advertising-rewards/:id` | L6 | Suivre la validation serveur | À faire |
 | DELETE | `/api/users/me/advertising-rewards/:id` | L6 | Annuler une intention | À faire |
 | GET | `/api/users/me/devices` | L8 | Liste des appareils | À faire |
 | POST | `/api/users/me/devices` | L8 | Enregistrer/rafraîchir le token push | À faire |
 | DELETE | `/api/users/me/devices/:id` | L8 | Retirer un appareil | À faire |
-| GET | `/api/users/me/events` | L5 | SSE authentifié | À faire |
+| GET | `/api/users/me/events` | L5 | SSE authentifié | Implémenté ; Bearer/refresh/connexion unique contrôlés ; réseau/appareils à valider |
 | GET | `/api/plans` | L1, L6, L9 | Catalogue, tarifs et disponibilité publicitaire | Intégré API L1 : HTTP 200, deux formules décodées ; usages L6/L9 et appareils à faire |
 | GET | `/api/users/me/subscription` | L9 | Abonnement et droits effectifs | À faire |
 | POST | `/api/users/me/subscription/checkout` | L9 | Achat hébergé si distribution compatible | À faire |

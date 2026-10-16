@@ -89,6 +89,7 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
     debugShowCheckedModeBanner: false,
     theme: histaeTheme(Brightness.light),
     darkTheme: histaeTheme(Brightness.dark),
+    themeMode: ThemeMode.dark,
     locale: const Locale('fr'),
     supportedLocales: const [Locale('fr')],
     localizationsDelegates: GlobalMaterialLocalizations.delegates,
