@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 import 'api_failure.dart';
 
@@ -41,6 +42,7 @@ class ApiClient {
     String method,
     String path, {
     Object? body,
+    List<int>? photo,
     String? bearer,
     String? idempotencyKey,
     int? expectedStatus,
@@ -58,26 +60,49 @@ class ApiClient {
     final abort = RequestCancellation();
     _active.add(abort);
     final requestId = newUuidV4();
-    final request =
-        http.AbortableRequest(
-            method,
-            origin.resolve(path),
-            abortTrigger: cancellation == null
-                ? abort.whenCancelled
-                : Future.any([abort.whenCancelled, cancellation.whenCancelled]),
-          )
-          ..followRedirects = false
-          ..headers.addAll({
-            'Accept': 'application/json',
-            'X-Request-ID': requestId,
-          });
+    final trigger = cancellation == null
+        ? abort.whenCancelled
+        : Future.any([abort.whenCancelled, cancellation.whenCancelled]);
+    if (photo != null &&
+        (photo.isEmpty || photo.length > 500000 || body != null)) {
+      _active.remove(abort);
+      throw const ApiFailure(ApiFailureKind.payloadTooLarge);
+    }
+    final http.BaseRequest request;
+    if (photo != null) {
+      request =
+          http.AbortableMultipartRequest(
+              method,
+              origin.resolve(path),
+              abortTrigger: trigger,
+            )
+            ..files.add(
+              http.MultipartFile.fromBytes(
+                'photo',
+                photo,
+                filename: 'photo.jpg',
+                contentType: MediaType('image', 'jpeg'),
+              ),
+            );
+    } else {
+      request = http.AbortableRequest(
+        method,
+        origin.resolve(path),
+        abortTrigger: trigger,
+      );
+      if (body != null) {
+        request.headers['Content-Type'] = 'application/json';
+        (request as http.Request).body = jsonEncode(body);
+      }
+    }
+    request.followRedirects = false;
+    request.headers.addAll({
+      'Accept': 'application/json',
+      'X-Request-ID': requestId,
+    });
     if (bearer != null) request.headers['Authorization'] = 'Bearer $bearer';
     if (idempotencyKey != null) {
       request.headers['Idempotency-Key'] = idempotencyKey;
-    }
-    if (body != null) {
-      request.headers['Content-Type'] = 'application/json';
-      request.body = jsonEncode(body);
     }
     try {
       final response = await _read(request).timeout(

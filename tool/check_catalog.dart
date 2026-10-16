@@ -7,11 +7,17 @@ import 'package:histae_app/features/catalog/data/catalog_repository.dart';
 
 // Explicit, read-only integration check. Never executed by the unit test suite.
 Future<void> main() async {
-  final config = AppConfig.fromValues(
-    environment: 'production',
-    apiBaseUrl: AppConfig.defaultApiBaseUrl,
-    isDebug: false,
-  );
+  final AppConfig config;
+  try {
+    config = AppConfig.fromDotEnv(
+      await File('.env').readAsString(),
+      isDebug: false,
+    );
+  } catch (_) {
+    stderr.writeln('Configuration .env absente ou invalide.');
+    exitCode = 1;
+    return;
+  }
   final repository = CatalogRepository(ApiClient(origin: config.apiOrigin));
   try {
     final plans = await repository.load(RequestCancellation());

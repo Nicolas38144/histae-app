@@ -10,7 +10,7 @@ import 'features/auth/data/auth_repository.dart';
 import 'features/auth/data/session_vault.dart';
 import 'features/auth/application/session_controller.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   LicenseRegistry.addLicense(() async* {
     yield LicenseEntryWithLineBreaks([
@@ -19,19 +19,14 @@ void main() {
   });
   AppConfig? config;
   try {
-    config = AppConfig.fromValues(
-      environment: const String.fromEnvironment(
-        'APP_ENV',
-        defaultValue: 'production',
-      ),
-      apiBaseUrl: const String.fromEnvironment(
-        'API_BASE_URL',
-        defaultValue: AppConfig.defaultApiBaseUrl,
-      ),
+    config = AppConfig.fromDotEnv(
+      await rootBundle.loadString('.env'),
       isDebug: kDebugMode,
     );
   } on FormatException {
     // Do not log invalid configuration: it might contain credentials.
+  } on FlutterError {
+    // A missing asset leaves integration unavailable, with no fallback host.
   }
   runApp(
     HistaeApp(

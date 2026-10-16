@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/core/config/app_config.dart';
 
@@ -5,9 +7,8 @@ void main() {
   test(
     'uses the API host supplied by the user with exactly one /api prefix',
     () {
-      final config = AppConfig.fromValues(
-        environment: 'production',
-        apiBaseUrl: AppConfig.defaultApiBaseUrl,
+      final config = AppConfig.fromDotEnv(
+        File('.env.example').readAsStringSync(),
         isDebug: false,
       );
       expect(
@@ -16,6 +17,30 @@ void main() {
       );
     },
   );
+  test('dotenv accepts comments, CRLF, BOM and quoted public values', () {
+    final config = AppConfig.fromDotEnv(
+      '\uFEFF# public\r\n APP_ENV="development"\r\nAPI_BASE_URL=\'http://10.0.2.2:8080\'\r\n',
+      isDebug: true,
+    );
+    expect(config.environment, AppEnvironment.development);
+    expect(config.apiOrigin.toString(), 'http://10.0.2.2:8080');
+  });
+  test('dotenv fails closed for absent, duplicated, unknown or malformed configuration', () {
+    for (final source in [
+      '',
+      'APP_ENV=production',
+      'APP_ENV=production\nAPI_BASE_URL=',
+      'APP_ENV=production\nAPP_ENV=staging\nAPI_BASE_URL=https://api.example',
+      'APP_ENV=production\nAPI_BASE_URL="https://api.example',
+      'APP_ENV=production\nAPI_BASE_URL=https://api.example\nSERVER_SECRET=forbidden',
+      'not an assignment',
+    ]) {
+      expect(
+        () => AppConfig.fromDotEnv(source, isDebug: false),
+        throwsFormatException,
+      );
+    }
+  });
   test('keeps an origin without duplicating /api', () {
     final config = AppConfig.fromValues(
       environment: 'development',

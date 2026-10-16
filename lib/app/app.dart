@@ -9,6 +9,7 @@ import '../features/catalog/presentation/catalog_page.dart';
 import '../features/auth/application/session_controller.dart';
 import '../features/auth/presentation/otp_page.dart';
 import '../features/consents/presentation/consents_page.dart';
+import '../features/profile/presentation/profile_page.dart';
 import '../core/widgets/status_view.dart';
 import '../core/widgets/editorial_card.dart';
 import 'theme.dart';
@@ -26,6 +27,8 @@ class HistaeApp extends StatefulWidget {
 class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
   final _navigator = GlobalKey<NavigatorState>();
   bool _hadSession = false;
+  int _resourceRevision = 0;
+  SessionPhase? _previousPhase;
   @override
   void initState() {
     super.initState();
@@ -40,9 +43,14 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
     final session = widget.sessionController!;
     final reset =
         _hadSession != session.hasSession ||
+        _resourceRevision != session.resourceRevision ||
+        (_previousPhase == SessionPhase.ready &&
+            session.phase != SessionPhase.ready) ||
         session.phase == SessionPhase.signedOut ||
         session.phase == SessionPhase.storageFailure;
     _hadSession = session.hasSession;
+    _resourceRevision = session.resourceRevision;
+    _previousPhase = session.phase;
     if (reset) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
@@ -104,40 +112,7 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
       case SessionPhase.needsConsents:
         return ConsentsPage(session: session, onboarding: true);
       case SessionPhase.ready:
-        return Scaffold(
-          appBar: AppBar(title: Text(strings.accountTitle)),
-          body: SafeArea(
-            child: ListView(
-              padding: const EdgeInsets.all(24),
-              children: [
-                Text(strings.accountReady),
-                const SizedBox(height: 24),
-                FilledButton(
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => ConsentsPage(session: session),
-                    ),
-                  ),
-                  child: Text(strings.privacyTitle),
-                ),
-                const SizedBox(height: 16),
-                OutlinedButton(
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) =>
-                          CatalogPage(repository: widget.catalogRepository),
-                    ),
-                  ),
-                  child: Text(strings.catalogAction),
-                ),
-                TextButton(
-                  onPressed: session.logout,
-                  child: Text(strings.logout),
-                ),
-              ],
-            ),
-          ),
-        );
+        return ProfilePage(session: session, catalog: widget.catalogRepository);
       case SessionPhase.restoring:
       case SessionPhase.synchronizing:
         return Scaffold(

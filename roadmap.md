@@ -6,7 +6,7 @@ Mise à jour : 16 octobre 2026.
 
 ## 1. État de départ et suivi
 
-L1 est intégré pour le catalogue. L2 est implémenté et testé : inscription/reconnexion OTP, session sécurisée, restauration, déconnexion et consentements. Les sept routes L2 utilisent les vrais contrats ; leur parcours SMS/compte réel et le stockage sur appareil ne sont pas validés. L3 à L10 restent à construire. La DA suit `pictures/exemple_feed.png` pour sa composition, avec une palette ivoire/vert forêt/encre/sable, sans rose ni corail.
+L1 est intégré pour le catalogue. L2 et L3 sont implémentés : OTP/session/consentements, profil majeur, préférences, traits, réponses et photo personnelle. Les sept routes L2 et treize routes L3 utilisent les contrats réels ; seuls des tests simulés couvrent ces parcours privés. SMS, compte réel, stockage sécurisé et photo sur appareil restent à valider. L4 à L10 restent à construire. La découverte de L4 désigne le feed de profils sans photo. La DA suit `pictures/exemple_feed.png`, en ivoire/vert forêt/encre/sable, sans rose ni corail. Configuration publique déplacée dans `.env`, avec `.env.example` et sans adresse de secours dans Dart.
 
 Cette roadmap couvre toutes les capacités utilisateur de l'API actuelle. Elle exclut l'administration, les webhooks fournisseur, la supervision et les opérations internes. Elle ne dépend pas des anciens dépôts NestJS ou d'un endpoint OpenAPI.
 
@@ -19,7 +19,7 @@ Les états doivent distinguer : `À faire`, `En cours`, `Implémenté`, `Intégr
 | L0 | Vérifier le contrat, l'inventaire, les parcours et l'environnement mobile | Vérifié pour L1 : SDK, catalogue, erreurs, routes/DTO/services, tests et Postman consultés ; approfondir par lot |
 | L1 | Bootstrap, configuration, navigation, thème et client HTTP | Intégré API pour le catalogue ; 54 tests, analyse et compilation Android debug ; appareils/iOS en attente |
 | L2 | Inscription/reconnexion OTP, session et onboarding juridique reprenable | Implémenté ; 85 tests au total et compilation Android debug ; SMS, compte réel et appareils à valider |
-| L3 | Profil, préférences, traits, questions, photo et modération propriétaire | À faire |
+| L3 | Profil, préférences, traits, questions, photo et modération propriétaire | Implémenté sur les treize routes ; vérifications automatiques ci-dessous ; compte/photo/appareils à valider |
 | L4 | Présence, diagnostic de préparation, découverte et swipes | À faire |
 | L5 | Matchs, chat, lecture et synchronisation SSE | À faire |
 | L6 | Révélation, continuation, crédits et récompenses volontaires | À faire |
@@ -57,7 +57,7 @@ Critère de sortie : app démarrable, origine API configurable, premier appel et
 ### Livraison L1 — 15 octobre 2026
 
 - **Interface** : accueil → catalogue → retour, thème clair/sombre, français, chargement/vide/erreur/service non configuré, reprise explicite ; tests petit écran à 200 % et accessibilité de l'accueil. Aucun écran métier supplémentaire.
-- **Accès API** : `CatalogRepository` appelle `GET /api/plans`, lit les DTO Rust (options omises, champs de fonctionnalités nullables, prix en centimes) sans pagination ni Bearer. Base par défaut fournie par l'utilisateur : `https://api.histae.com/api/`, représentée en configuration par l'origine `https://api.histae.com`. L'environnement reste remplaçable par `--dart-define`.
+- **Accès API** : `CatalogRepository` appelle `GET /api/plans`, lit les DTO Rust (options omises, champs de fonctionnalités nullables, prix en centimes) sans pagination ni Bearer. Base par défaut fournie par l'utilisateur : `https://api.histae.com/api/`, représentée en configuration par l'origine `https://api.histae.com`. En L3, cette configuration est déplacée vers `.env` (voir README).
 - **Socle** : `http` annulable, délai incluant la lecture du corps, UUID v4 `X-Request-ID`, erreurs par statut et `error.code`, `Retry-After` secondes/date et bouton bloqué jusqu'à l'échéance. Aucune relance automatique. Annulation au retour et à la suspension ; seule la lecture interrompue est reprise au retour au premier plan.
 - **Architecture** : `app`, `core`, `features/catalog/{data,application,presentation}`, `Navigator` et `ChangeNotifier`. Les gardes session/consentements appartiendront à L2 avec une vraie session.
 - **Sources vérifiées** : contrat HTTP, `src/catalog/{http,domain,service}.rs`, erreurs HTTP, routeur, tests `http_contract.rs`, `contract_harness.rs`, `catalog_postgres.rs`, requête publique `GET /api/plans` des collections Postman. Aucun test backend exécuté ; aucun changement backend.
@@ -90,7 +90,7 @@ Critère de sortie : connexion réelle et reprise d'onboarding sans jeton expos�
 - **Intégration réelle et fournisseur** : seul le catalogue est déjà vérifié sur la vraie API. Aucun SMS envoyé, aucun compte réel créé et aucun jeton réel récupéré pendant les tests. L2 reste à valider avec un numéro autorisé sur Android/iOS, puis par arrêt/reprise et coupure réseau. Compilation/signature iOS sur Mac encore ouverte.
 - **Limite backend à traiter séparément** : le PUT ne reçoit pas la version affichée ; la relecture mobile réduit le risque de document changé, sans contrôle atomique. Proposition de versions attendues et conflit serveur décrite dans le README, sans modifier l'API.
 
-Prochain petit lot : L3a, compléter l'inscription avec profil majeur et préférences (conservation explicite de sexe/bio), puis L3b traits/questions et L3c photo. Garder la validation SMS/appareil de L2 ouverte jusqu'à un essai réel.
+Suite réalisée en L3 : profil majeur, préférences, traits/questions et photo. Garder la validation SMS/appareil de L2 ouverte jusqu'à un essai réel.
 
 ## 6. L3 — profil, préférences et photo
 
@@ -104,6 +104,19 @@ Prochain petit lot : L3a, compléter l'inscription avec profil majeur et préfé
 - Ne pas reprendre un champ d'URL externe ni créer une galerie.
 
 Critère de sortie : profil et photo réels modifiables ; erreurs, modération, réponse perdue et URL expirée ont un comportement explicite.
+
+### Implémentation L3 — 16 octobre 2026
+
+- **Interface** : espace personnel éditorial et cinq parcours : présentation, préférences, traits, réponses ordonnées et photo unique. Prénom/date requis, majorité UTC et date stricte, limites UTF-8. Sexe/bio envoyés explicitement, quatre préférences ensemble. Questions et traits fournis par le serveur ; `traitId` exact, ordre conservé, maximum trois réponses et remplacement/effacement confirmés. Brouillon conservé en cas d'erreur, abandon confirmé.
+- **Photo/API** : JPEG local sans EXIF, réduction progressive sous 500 000 octets, fichier unique multipart, UUID v4 et octets immuables pour une reprise explicite pendant 24 h. Pas de retry après timeout ; une écriture incertaine impose une relecture, sauf reprise photo identique. Conflits consommé/en cours distincts, remplacement et retrait explicites, modération propriétaire. Retrait confirmé en `204`, sans annoncer le nettoyage distant achevé.
+- **Confidentialité** : aucun profil/brouillon/photo persisté ; sélection Android interrompue non réaffectée automatiquement. Nettoyage limité aux copies dans le cache privé de l'app. Aperçu du seul propriétaire, sans Bearer/redirection/cache disque au stockage ni URL dans les logs ; purge des octets du cache mémoire à la fermeture. Lien de 300 s renouvelé par relecture après quatre minutes et au retour au premier plan. Purge et fermeture des éditeurs lors d'un changement de consentements/session ; réponses tardives ignorées. Vie privée et logout accessibles sans profil prêt.
+- **Configuration** : `.env` ignoré dans le suivi, `.env.example` fourni, chargement avant initialisation des clients ; aucun hôte/environnement de secours dans le code Dart. Fichier public embarqué dans le paquet, sans secret ; origine validée et HTTPS hors debug local. Lire le README pour installation/CI.
+- **Sources** : contrat HTTP, profils/catalogue/media (routes, DTO, services), collections Postman et tests profils/catalogue/media/codec consultés. Aucun changement ni test backend exécuté.
+- **Validation restante** : aucun SMS, compte ou upload réel testé. Sélection/compression native, refus de permission, récupération après arrêt, HEIC et modération/S3 réels restent à essayer sur Android et iOS. Compilation/signature iOS sur Mac ouverte. Aucun feed construit avant L4.
+- **Contrôles exécutés** : suite complète de 107 tests réussie, puis 23 tests L3 ciblés réussis après les derniers ajouts (110 tests présents au total). Deux contrôles de rendu supplémentaires ont généré six aperçus inspectés, dont les trois nouveaux écrans L3. Compilation Android debug réussie, analyse sans problème et formatage sans changement. Les deux plist iOS sont des XML valides avec une seule déclaration photothèque chacun. Ne pas refaire systématiquement toute la suite : l'utilisateur demande désormais de cibler les contrôles indispensables.
+- **Dépendance native à suivre** : la compilation signale que `flutter_image_compress_common` applique encore KGP. La migration vers Kotlin intégré devra être suivie avant une future mise à jour de Flutter ; la compilation actuelle reste utilisable. Ce point ne remplace pas les essais de compression sur appareil.
+
+Prochain lot : L4, présence et diagnostic serveur puis feed sans photo, swipe haut pour passer et double appui pour liker.
 
 ## 7. L4 — localisation et découverte
 
@@ -196,7 +209,7 @@ Critère de sortie : chaque parcours activé a une preuve adaptée ; les fonctio
 
 ## 14. Matrice de couverture des routes mobiles
 
-Chemins complets, préfixe `/api` inclus. Les 56 routes restent suivies : catalogue intégré, sept routes L2 implémentées avec tests de contrat côté client, sans validation SMS/compte réel. Après chaque lot, associer la preuve adaptée. La lecture unitaire peut être couverte comme alternative à la lecture groupée sans créer un second écran.
+Chemins complets, préfixe `/api` inclus. Les 56 routes restent suivies : catalogue intégré, sept routes L2 et treize routes L3 implémentées avec tests côté client ; parcours privés à valider avec compte/appareil réels. Après chaque lot, associer la preuve adaptée. La lecture unitaire peut être couverte comme alternative à la lecture groupée sans créer un second écran.
 
 | Méthode | Route | Lot | Écran ou usage | État |
 | --- | --- | --- | --- | --- |
@@ -210,20 +223,20 @@ Chemins complets, préfixe `/api` inclus. Les 56 routes restent suivies : catalo
 | POST | `/api/auth/logout-all` | L7 | Déconnexion globale | À faire |
 | GET | `/api/users/me/consents` | L2 | État et documents requis | Implémenté ; quatre choix/versions/navigation testés ; réel à valider |
 | PUT | `/api/users/me/consents` | L2, L7 | Accepter et gérer les choix autorisés | Implémenté L2 ; choix et retraits confirmés testés ; réel à valider |
-| GET | `/api/users/me` | L3 | Profil propriétaire | À faire |
-| PATCH | `/api/users/me/profile` | L3 | Créer/modifier le profil | À faire |
-| GET | `/api/users/me/preferences` | L3 | Préférences courantes | À faire |
-| PATCH | `/api/users/me/preferences` | L3 | Modifier les préférences | À faire |
+| GET | `/api/users/me` | L3 | Profil propriétaire | Implémenté ; contrats/tests client ; compte et appareil à valider |
+| PATCH | `/api/users/me/profile` | L3 | Créer/modifier le profil | Implémenté ; contrats/tests client ; compte et appareil à valider |
+| GET | `/api/users/me/preferences` | L3 | Préférences courantes | Implémenté ; contrats/tests client ; compte et appareil à valider |
+| PATCH | `/api/users/me/preferences` | L3 | Modifier les préférences | Implémenté ; contrats/tests client ; compte et appareil à valider |
 | PATCH | `/api/users/me/presence` | L4 | Position ponctuelle | À faire |
-| PUT | `/api/users/me/photo` | L3 | Envoyer/remplacer la photo unique | À faire |
-| DELETE | `/api/users/me/photo` | L3 | Retirer la photo | À faire |
-| GET | `/api/traits` | L3 | Catalogue des traits | À faire |
-| GET | `/api/users/me/traits` | L3 | Traits sélectionnés | À faire |
-| POST | `/api/users/me/traits` | L3 | Ajouter un trait | À faire |
-| DELETE | `/api/users/me/traits/:traitId` | L3 | Retirer un trait | À faire |
-| GET | `/api/profile-questions` | L3 | Catalogue des questions | À faire |
-| GET | `/api/users/me/profile-answers` | L3 | Réponses propriétaires et modération | À faire |
-| PUT | `/api/users/me/profile-answers` | L3 | Remplacer la liste ordonnée des réponses | À faire |
+| PUT | `/api/users/me/photo` | L3 | Envoyer/remplacer la photo unique | Implémenté ; contrats/tests client ; compte et appareil à valider |
+| DELETE | `/api/users/me/photo` | L3 | Retirer la photo | Implémenté ; contrats/tests client ; compte et appareil à valider |
+| GET | `/api/traits` | L3 | Catalogue des traits | Implémenté ; contrats/tests client ; compte et appareil à valider |
+| GET | `/api/users/me/traits` | L3 | Traits sélectionnés | Implémenté ; contrats/tests client ; compte et appareil à valider |
+| POST | `/api/users/me/traits` | L3 | Ajouter un trait | Implémenté ; contrats/tests client ; compte et appareil à valider |
+| DELETE | `/api/users/me/traits/:traitId` | L3 | Retirer un trait | Implémenté ; contrats/tests client ; compte et appareil à valider |
+| GET | `/api/profile-questions` | L3 | Catalogue des questions | Implémenté ; contrats/tests client ; compte et appareil à valider |
+| GET | `/api/users/me/profile-answers` | L3 | Réponses propriétaires et modération | Implémenté ; contrats/tests client ; compte et appareil à valider |
+| PUT | `/api/users/me/profile-answers` | L3 | Remplacer la liste ordonnée des réponses | Implémenté ; contrats/tests client ; compte et appareil à valider |
 | GET | `/api/users/me/discovery-status` | L4 | Diagnostic de préparation | À faire |
 | GET | `/api/feed` | L4 | Découverte paginée | À faire |
 | POST | `/api/swipes` | L4 | Like/pass et résultat du match | À faire |

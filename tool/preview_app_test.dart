@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
 
 import '../test/support/auth_fixture.dart';
+import '../test/support/profile_fixture.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -75,6 +76,58 @@ void main() {
     await expectLater(
       find.byKey(preview),
       matchesGoldenFile('../build/previews/consents.png'),
+    );
+  });
+  testWidgets('preview L3 profile and identity with synthetic owner data', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final session = testSession(
+      (request) async => defaultProfileResponse(request),
+    );
+    await session.establish(testTokens);
+    const preview = Key('profile-preview');
+    await tester.pumpWidget(
+      RepaintBoundary(
+        key: preview,
+        child: HistaeApp(sessionController: session),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await expectLater(
+      find.byKey(preview),
+      matchesGoldenFile('../build/previews/profile.png'),
+    );
+    await tester.scrollUntilVisible(
+      find.text('Modifier ma présentation'),
+      180,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.text('Modifier ma présentation'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Modifier ma présentation'));
+    await tester.pumpAndSettle();
+    await expectLater(
+      find.byKey(preview),
+      matchesGoldenFile('../build/previews/profile-editor.png'),
+    );
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Écrire mes réponses'),
+      180,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.text('Écrire mes réponses'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Écrire mes réponses'));
+    await tester.pumpAndSettle();
+    await expectLater(
+      find.byKey(preview),
+      matchesGoldenFile('../build/previews/answers.png'),
     );
   });
 }

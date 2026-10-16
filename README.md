@@ -6,9 +6,9 @@ Mise à jour : 16 octobre 2026.
 
 ## État réel du dépôt
 
-L1 et l'implémentation de L2 sont présents : accueil, catalogue public, inscription/reconnexion par OTP, session sécurisée, restauration, déconnexion et consentements versionnés. Les entrées « Créer mon compte » et « J'ai déjà un compte » utilisent le même parcours prévu par le backend : l'OTP valide crée le compte s'il n'existe pas ou reconnecte son propriétaire. L'espace personnel attend une session authentifiée puis les consentements obligatoires retournés par le serveur. La création du profil et la vérification de majorité arrivent en L3 ; la découverte arrive en L4. Aucune découverte, notification, publicité ou vente n'est encore disponible.
+L1, L2 et L3 sont implémentés : accueil/catalogue public, inscription/reconnexion OTP, session sécurisée, consentements versionnés, profil majeur, préférences, traits, réponses ordonnées et photo unique. L'OTP valide crée le compte s'il n'existe pas ou reconnecte son propriétaire. L'espace personnel attend une session authentifiée puis les consentements obligatoires serveur. Le catalogue seul est vérifié en réseau réel ; L2/L3 utilisent les vrais contrats, avec tests simulés, sans validation compte/SMS/photo sur appareil. La découverte désigne le feed de profils sans photo, prévu en L4 ; aucun guide interactif n'est sous-entendu. Notifications, publicités et ventes restent à construire.
 
-Le manifeste conserve Dart `^3.13.1` et `cupertino_icons`. Aux dépendances L1 (`http`, `flutter_localizations`) s'ajoutent `flutter_secure_storage: ^11.2.0` et `url_launcher: ^6.3.2` (6.3.3 résolu). Navigation avec `Navigator` / `MaterialPageRoute`, état avec `ChangeNotifier` et dépendances injectées par constructeur. SDK vérifié : Flutter 3.47.7, Dart 3.13.5.
+Le manifeste conserve Dart `^3.13.1` et `cupertino_icons`. Aux dépendances L1/L2 s'ajoutent en L3 `image_picker: ^1.2.4`, `flutter_image_compress: ^2.5.1`, `http_parser: ^4.1.2` et `path_provider: ^2.1.6`. Navigation avec `Navigator` / `MaterialPageRoute`, état avec `ChangeNotifier`, dépendances injectées par constructeur. SDK vérifié : Flutter 3.47.7, Dart 3.13.5.
 
 ## Documentation et références
 
@@ -27,20 +27,28 @@ L'API actuelle est écrite en Rust avec Axum, Tokio et SQLx. PostgreSQL, Redis e
 
 ## Démarrage
 
-Installer un SDK Flutter compatible avec la contrainte Dart du manifeste et les outils de la plateforme ciblée, puis, depuis ce dépôt :
+Installer un SDK Flutter compatible avec la contrainte Dart du manifeste et les outils de la plateforme ciblée. À la première installation, copier `.env.example` vers `.env` (le fichier local a déjà été créé dans cet espace de travail), puis :
 
 ```bash
 flutter pub get
 flutter run
 ```
 
-L'API fournie pour les appels est **`https://api.histae.com/api/`**. Par défaut, `APP_ENV=production` et `API_BASE_URL=https://api.histae.com`. Le paramètre attend une **origine sans `/api`**, sans paramètres, fragment ni identifiants ; les dépôts de données ajoutent les chemins complets `/api/...` une seule fois. Aucun secret n'est nécessaire pour le catalogue.
+L'API fournie pour les appels est **`https://api.histae.com/api/`**. La configuration publique vient exclusivement du fichier `.env`, chargé comme asset avant de créer les clients HTTP. L'adresse et l'environnement ne sont plus des valeurs de secours dans le code Dart. Fichier initial :
 
-Pour un environnement de développement explicitement choisi, remplacer l'origine au lancement :
-
-```bash
-flutter run --dart-define=APP_ENV=development --dart-define=API_BASE_URL=http://10.0.2.2:8080
+```dotenv
+APP_ENV=production
+API_BASE_URL=https://api.histae.com
 ```
+
+`API_BASE_URL` attend une **origine sans `/api`**, paramètres, fragment ni identifiants ; les repositories ajoutent les chemins `/api/...` une seule fois. Pour un environnement local explicitement choisi, modifier `.env`, puis relancer l'application :
+
+```dotenv
+APP_ENV=development
+API_BASE_URL=http://10.0.2.2:8080
+```
+
+`.env` est ignoré dans le suivi des fichiers ; `.env.example` reste le modèle d'installation. Le fichier est embarqué dans le paquet mobile : **configuration publique uniquement, aucun secret**. Il n'y a plus de surcharge par `--dart-define`. Le lecteur accepte commentaires sur des lignes séparées et valeurs entre guillemets ; aucune interpolation ni variable supplémentaire. Clé manquante, doublon ou valeur invalide ferme l'intégration sans adresse de secours ni journalisation. En CI, fournir `.env` avant compilation.
 
 `10.0.2.2` rejoint l'ordinateur depuis l'émulateur Android standard. Pour un téléphone, utiliser l'IP LAN réelle de l'ordinateur, par exemple `http://192.168.1.10:8080`, sur le même réseau ; pour le simulateur iOS, l'adresse de l'hôte Mac. `localhost` sur un téléphone désigne le téléphone. Vérifier écoute et pare-feu du serveur ; la configuration Docker de développement de l'API écoute par défaut sur `127.0.0.1` (`HISTAE_API_BIND_IP` permet de choisir l'interface).
 
@@ -74,7 +82,7 @@ Références consultées pour les choix de L1 : [HTTP Dart et annulation](https:
 
 - L'envoi OTP garde en mémoire une intention UUID v4 et un téléphone normalisé. Reprendre une demande conserve ses paramètres ; un renvoi explicitement demandé crée une nouvelle intention. `202` signifie demande acceptée, pas SMS reçu. Un résultat de vérification incertain impose un nouveau code, sans rejeu automatique.
 - Seul le refresh est conservé dans le stockage sécurisé, avec l'origine API et l'état du cycle de rotation. L'access token, l'identité et les consentements restent en mémoire. Ni téléphone, OTP, profil ni jeton d'accès ne sont persistés.
-- Avant un refresh, une entrée `rotating` sans ancien token remplace l'entrée `ready`. La nouvelle entrée est écrite et relue avant publication du nouvel access token. Une réponse perdue ou un arrêt pendant cette rotation ferme la session plutôt que rejouer le prédécesseur. Les 401 concurrents attendent une seule rotation ; seuls les GET de L2 et le PUT de consentements identique peuvent être rejoués une fois. Une révocation ferme directement la session.
+- Avant un refresh, une entrée `rotating` sans ancien token remplace l'entrée `ready`. La nouvelle entrée est écrite et relue avant publication du nouvel access token. Une réponse perdue ou un arrêt pendant cette rotation ferme la session plutôt que rejouer le prédécesseur. Les 401 concurrents attendent une seule rotation ; en L2, les GET et le PUT de consentements identique peuvent être rejoués une fois ; L3 étend cette possibilité à ses requêtes après un 401 confirmé pour access token expiré, sans retry réseau. Une révocation ferme directement la session.
 - La déconnexion attend une rotation déjà lancée puis tente la révocation avec la paire actuelle. Elle purge toujours la mémoire et remplace l'entrée sécurisée par un marqueur sans jeton ; une révocation distante non confirmée est annoncée. Une erreur de stockage ferme l'accès et reste visible.
 - Les liens HTTPS juridiques et leurs versions viennent du serveur, sans Bearer transmis au navigateur. Aucun nouveau choix n'est précoché. Un accord existant est affiché comme tel. Les retraits sensible/localisation exigent une confirmation décrivant l'effacement ; les CGU et la notice n'ont pas de retrait. Le retour d'un document resynchronise les ressources et conserve les choix non enregistrés seulement si les versions restent identiques.
 
@@ -88,15 +96,28 @@ Références de dépendances : [stockage sécurisé](https://pub.dev/packages/fl
 
 L'app relit les versions juste avant le PUT et refuse un accord si elles diffèrent de celles présentées. Le contrat actuel n'accepte pourtant aucun champ de version client : une modification serveur entre ce GET et le PUT ne peut pas être détectée atomiquement par Flutter. Une évolution séparée de l'API pourrait accepter la version attendue par choix, la vérifier dans l'opération serveur et renvoyer un conflit si elle a changé. Aucun changement backend ni contournement client n'a été effectué.
 
+## L3 — profil et photo personnelle
+
+- **Interface et API** : espace personnel éditorial, création/modification d'un profil majeur, quatre préférences ensemble, traits issus du catalogue, zéro à trois réponses avec ordre modifiable et confirmation du remplacement complet. Les treize routes L3 sont reliées au client authentifié. `sex` et `bio` sont toujours envoyés explicitement, y compris `null` ; `traitId` respecte la casse du contrat. Les motifs et états de modération viennent du serveur.
+- **Photo** : sélection système d'une seule image, conversion locale JPEG, orientation corrigée, EXIF retiré et sortie plafonnée à 500 000 octets. Les sources locales de plus de 30 Mo sont refusées avant lecture, et une réduction progressive est tentée. Multipart `photo`, `photo.jpg`, `image/jpeg`. Même clé UUID v4 et mêmes octets pendant une reprise explicite, au plus 24 h. Aucun nouvel envoi automatique après une réponse perdue. Remplacement choisi explicitement et retrait confirmé ; un résultat consommé impose une relecture.
+- **Confidentialité et reprise** : profil, formulaires, réponses et intention photo restent en mémoire, purgés au changement de session/consentements. Les copies temporaires du sélecteur ne sont nettoyées que dans le cache privé de l'app, sans toucher aux originaux de la photothèque. Une sélection Android retrouvée après arrêt du processus doit être refaite, sans rattachement automatique à un compte. Les brouillons texte non enregistrés demandent confirmation avant abandon.
+- **URL et transport** : aperçu du seul propriétaire, sans Bearer au stockage, redirections ou cache disque ; octets d'image évincés du cache mémoire à la fermeture/purge. Ressource propriétaire relue après quatre minutes et au retour au premier plan pour renouveler le lien signé de 300 s. Aucune photo partenaire ni feed anticipé. Les mutations ne se rejouent qu'après un 401 d'expiration explicite, une fois après refresh ; jamais après timeout. Une écriture incertaine impose une relecture, sauf reprise photo identique. `Retry-After` bloque les nouvelles tentatives.
+- **Vérifications et limites** : tests majorité UTC/années bissextiles, nullabilité, UTF-8, préférences, `traitId`, ordre/remplacement des réponses, multipart, réponse perdue, purge et expiration du lien. Aperçus manuels profil, formulaire et questions inspectés. Aucun appel authentifié ni upload réel effectué. Sélection/compression/permissions, HEIC sur appareils Android/iOS, coupures réseau réelles et iOS sur Mac restent ouverts. Voir la livraison L3 dans la roadmap pour les contrôles exécutés.
+
+Sources : contrat HTTP Rust, DTO/routes/services profils, catalogue et média, tests `profiles_contract.rs`, `catalog_postgres.rs`, `media_integration.rs`, `photo_codec.rs` et collections Postman. Backend consulté uniquement, aucun changement ni test exécuté. Références de packages : [sélecteur Flutter](https://pub.dev/packages/image_picker), [compression native](https://pub.dev/packages/flutter_image_compress), [répertoires temporaires](https://pub.dev/packages/path_provider), [multipart HTTP annulable](https://pub.dev/documentation/http/latest/http/AbortableMultipartRequest-class.html).
+
+Prochain lot : **L4**, consentement et permission de localisation, présence fraîche, diagnostic de préparation et feed sans photo. Les validations réelles de L2/L3 restent ouvertes.
+
 ## Direction artistique
 
 La composition de [la référence fournie](pictures/exemple_feed.png) guide toute l'app : cartes généreuses, titres à empattements, séparateurs fins, icônes sobres et espacements aérés. À la demande de l'utilisateur, **aucune palette rose/corail** : ivoire `#FAF8F3`, papier `#FFFDF8`, vert forêt `#345647`, encre `#252C28`, sable `#E4DAC9`. Le mode sombre conserve cette identité. Les titres utilisent DM Serif Display embarquée, sans téléchargement de police au lancement ; les contrôles gardent la typographie système et les grandes polices restent autorisées.
 
-Les aperçus sont générés depuis les vrais widgets avec des données explicitement simulées, dans `build/previews/{welcome,registration,consents}.png`. Pour les régénérer, définir `FLUTTER_ROOT` vers le SDK puis lancer `flutter test tool/preview_app_test.dart --update-goldens`. Ils ont été inspectés visuellement ; ils ne constituent pas des captures d'appareil. Le feed sera réalisé en L4, sans photo, avec swipe vers le haut pour passer et double appui pour liker, sans retour vers le bas.
+Les aperçus sont générés depuis les vrais widgets avec des données explicitement simulées, dans `build/previews/{welcome,registration,consents,profile,profile-editor,answers}.png`. Pour les régénérer, définir `FLUTTER_ROOT` vers le SDK puis lancer `flutter test tool/preview_app_test.dart --update-goldens`. Ils ont été inspectés visuellement ; ils ne constituent pas des captures d'appareil. Le feed sera réalisé en L4, sans photo, avec swipe vers le haut pour passer et double appui pour liker, sans retour vers le bas.
 
 ## Principes de développement
 
 - Avancer par tranches fonctionnelles branchées sur l'API, avec des états de chargement, vide, erreur et reprise.
+- Préférence utilisateur : limiter les nouveaux tests aux contrôles indispensables (session, données sensibles, risque de perte et opérations réseau incertaines). Vérifications simples pour les retouches visuelles ou sans risque ; pas de suite systématique sur tout.
 - Garder le serveur comme autorité pour les consentements, matchs, quotas, récompenses et abonnements.
 - Ne pas intégrer d'administration ni appeler de route `/api/admin/*`.
 - Ne compiler aucun secret serveur dans l'app et ne pas journaliser de données privées.

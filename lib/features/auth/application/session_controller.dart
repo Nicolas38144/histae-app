@@ -34,6 +34,9 @@ class SessionController extends ChangeNotifier {
   Future<void>? _rotation;
   Future<void>? _logout;
   int _generation = 0;
+  int resourceRevision = 0;
+  String get resourceKey => '$_generation:$resourceRevision';
+  String? _consentFingerprint;
   bool _disposed = false;
   bool _loggingOut = false;
   bool _establishing = false;
@@ -153,12 +156,18 @@ class SessionController extends ChangeNotifier {
     }
   }
 
-  // Only L2's reads and identical consent PUTs are eligible for one replay.
+  // Repositories opt in only after a definitive expired-access 401. Never
+  // replay a mutation after a timeout or a lost response.
   // A revoked session (authentication_required) is closed, never refreshed.
   Future<Object?> _authorized(
     String method,
     String path, {
     Object? body,
+    List<int>? photo,
+    String? idempotencyKey,
+    int expectedStatus = 200,
+    bool replayAfterRefresh = true,
+    RequestCancellation? cancellation,
   }) async {
     final generation = _generation;
     if (_rotation case final pending?) await pending;
@@ -166,14 +175,27 @@ class SessionController extends ChangeNotifier {
     if (used == null || _loggingOut || _disposed || generation != _generation) {
       throw const ApiFailure(ApiFailureKind.unauthenticated);
     }
+    final scope = _scope;
+    final combined = RequestCancellation();
+    unawaited(
+      Future.any([
+        scope.whenCancelled,
+        if (cancellation != null) cancellation.whenCancelled,
+      ]).then((_) => combined.cancel()),
+    );
     Future<Object?> send(TokenPair tokens) async {
+      if (scope.isCancelled || (cancellation?.isCancelled ?? false)) {
+        throw const ApiFailure(ApiFailureKind.cancelled);
+      }
       final result = await repository.api.requestJson(
         method,
         path,
         body: body,
+        photo: photo,
+        idempotencyKey: idempotencyKey,
         bearer: tokens.accessToken,
-        cancellation: _scope,
-        expectedStatus: 200,
+        cancellation: combined,
+        expectedStatus: expectedStatus,
       );
       if (generation != _generation || _loggingOut || _disposed) {
         throw const ApiFailure(ApiFailureKind.cancelled);
@@ -186,7 +208,8 @@ class SessionController extends ChangeNotifier {
     } on ApiFailure catch (error) {
       if (_disposed || _loggingOut || generation != _generation) rethrow;
       if (error.statusCode == 401 &&
-          error.code == 'invalid_or_expired_access_token') {
+          error.code == 'invalid_or_expired_access_token' &&
+          replayAfterRefresh) {
         if (_tokens?.accessToken == used.accessToken) {
           await _rotate(used.refreshToken);
         }
@@ -207,6 +230,40 @@ class SessionController extends ChangeNotifier {
       }
       rethrow;
     }
+  }
+
+  Future<Object?> request(
+    String method,
+    String path, {
+    Object? body,
+    List<int>? photo,
+    String? idempotencyKey,
+    required int expectedStatus,
+    required bool replayAfterRefresh,
+    RequestCancellation? cancellation,
+  }) => _authorized(
+    method,
+    path,
+    body: body,
+    photo: photo,
+    idempotencyKey: idempotencyKey,
+    expectedStatus: expectedStatus,
+    replayAfterRefresh: replayAfterRefresh,
+    cancellation: cancellation,
+  );
+
+  void _acceptConsents(ConsentState state) {
+    final fingerprint = state.consents
+        .map(
+          (c) =>
+              '${c.type.name}:${c.granted}:${c.documentVersion}:${c.requiredVersion}',
+        )
+        .join('|');
+    if (_consentFingerprint != null && _consentFingerprint != fingerprint) {
+      resourceRevision++;
+    }
+    _consentFingerprint = fingerprint;
+    consents = state;
   }
 
   Future<void> synchronize() {
@@ -242,7 +299,7 @@ class SessionController extends ChangeNotifier {
       );
       if (generation != _generation || _loggingOut || _disposed) return;
       identity = me;
-      consents = state;
+      _acceptConsents(state);
       _applyConsentPhase(state);
     } on ApiFailure catch (error) {
       if (generation != _generation || _loggingOut || _disposed) return;
@@ -287,7 +344,7 @@ class SessionController extends ChangeNotifier {
                 .requiredVersion !=
             displayedVersions[type],
       )) {
-        consents = current;
+        _acceptConsents(current);
         _applyConsentPhase(current);
         _notify();
         throw const ApiFailure(
@@ -311,7 +368,7 @@ class SessionController extends ChangeNotifier {
       if (generation != _generation || _loggingOut || _disposed) {
         throw const ApiFailure(ApiFailureKind.cancelled);
       }
-      consents = state;
+      _acceptConsents(state);
       identity = MobileIdentity(identity!.userId, state.onboardingComplete);
       _applyConsentPhase(state);
       _notify();
@@ -333,6 +390,7 @@ class SessionController extends ChangeNotifier {
     _tokens = null;
     identity = null;
     consents = null;
+    _consentFingerprint = null;
     failure = reason;
     try {
       await _write('signed_out');
