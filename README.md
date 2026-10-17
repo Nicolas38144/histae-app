@@ -187,19 +187,19 @@ Suite prévue après L8 : L9, livré ci-dessous. L'activation push et les essais
 
 L'écran **Mon abonnement et les formules**, depuis le profil, charge le catalogue public et la projection privée `/api/users/me/subscription`. Plan effectif, accès, essai, dates, impayé et résiliation viennent de l'API. Une notification de facturation ouvre désormais cette lecture authentifiée. Les tarifs, devise, essai et fonctionnalités affichés viennent du catalogue ; aucun prix ou identifiant Stripe métier n'est envoyé par le client.
 
-Choix utilisateur : **Android distribué hors Play Store avec Stripe**, paiements **désactivés** tant que Stripe test et les pages HTTPS de retour ne sont pas configurés. Le `.env` local contient :
+Choix utilisateur : **Android distribué hors Play Store avec Stripe**, paiements **désactivés** avant publication des pages de retour et validation de Stripe test sur téléphone. Le `.env` local contient :
 
 ```dotenv
 BILLING_ENABLED=false
 BILLING_DISTRIBUTION=android_external
-BILLING_SUCCESS_URL=
-BILLING_CANCEL_URL=
-BILLING_PORTAL_RETURN_URL=
+BILLING_SUCCESS_URL=https://histae.com/fr/billing/success?session_id={CHECKOUT_SESSION_ID}
+BILLING_CANCEL_URL=https://histae.com/fr/billing/cancel
+BILLING_PORTAL_RETURN_URL=https://histae.com/fr/billing/return
 ```
 
 Ces trois valeurs sont publiques et doivent reproduire exactement `STRIPE_CHECKOUT_SUCCESS_URL`, `STRIPE_CHECKOUT_CANCEL_URL` et `STRIPE_PORTAL_RETURN_URL` du serveur. Le succès doit contenir le marqueur littéral `{CHECKOUT_SESSION_ID}`. Elles ne sont pas transmises à Checkout et ne remplacent pas la configuration serveur. Aucune clé Stripe secrète ni référence de prix ne doit entrer dans le `.env` embarqué. L'activation exige les trois liens HTTPS et la distribution choisie ; elle reste refusée sur iOS, Web et bureau. Aucun flag distant n'est supposé.
 
-Le navigateur système reçoit uniquement l'URL hébergée validée, sans Bearer. Les hôtes Stripe standards `checkout.stripe.com` et `billing.stripe.com` sont acceptés ; les domaines personnalisés sont bloqués jusqu'à configuration explicite dans un futur lot. Les pages HTTPS de retour devront être hébergées séparément. La reprise se fait en revenant dans l'application : relecture au premier plan, bouton de vérification, relecture après `subscription.updated` et reconnexion SSE. Après arrêt complet, rouvrir **Mon abonnement** restaure la tentative et relit les droits. Aucun lien universel/app link ni retour automatique vers l'app n'est revendiqué. Une URL de succès, un événement ou l'ouverture du navigateur n'accordent jamais Premium ; seule la projection de l'API le confirme. [Confirmation Stripe côté serveur](https://docs.stripe.com/payments/existing-customers?platform=web&ui=stripe-hosted).
+Le navigateur système reçoit uniquement l'URL hébergée validée, sans Bearer. Les hôtes Stripe standards `checkout.stripe.com` et `billing.stripe.com` sont acceptés ; les domaines personnalisés sont bloqués jusqu'à configuration explicite dans un futur lot. Les pages HTTPS de retour sont implémentées dans le dépôt `histae-site` aux chemins `/fr/billing/success`, `/fr/billing/cancel` et `/fr/billing/return` (également en `en`, `es`, `it`). Elles guident vers **Mon abonnement**, sans lire l'identifiant de session ni confirmer de paiement. Leur publication sur `histae.com`, le report des trois URL dans le `.env` API du serveur et une nouvelle compilation de l'app restent nécessaires avant activation. Les `.env` ne sont pas transférés par une mise à jour du code. La reprise se fait en revenant dans l'application : relecture au premier plan, bouton de vérification, relecture après `subscription.updated` et reconnexion SSE. Après arrêt complet, rouvrir **Mon abonnement** restaure la tentative et relit les droits. Aucun lien universel/app link ni retour automatique vers l'app n'est revendiqué. Une URL de succès, un événement ou l'ouverture du navigateur n'accordent jamais Premium ; seule la projection de l'API le confirme. [Confirmation Stripe côté serveur](https://docs.stripe.com/payments/existing-customers?platform=web&ui=stripe-hosted).
 
 Une nouvelle souscription nécessite la confirmation de la périodicité, du prix serveur et du renouvellement. L'intention UUID v4 et `monthly`/`annual` sont écrits puis vérifiés dans le stockage sécurisé **avant** le POST. Origine et propriétaire bornent la reprise après fermeture. Aucune URL de paiement, donnée bancaire ou permission Premium n'est persistée. Réponse perdue, panne ou double appui : reprise explicite avec la même clé et la même période. Une clé consommée exige une relecture des droits avant de libérer une nouvelle tentative ; aucun retry réseau automatique. Le portail exige aussi la disponibilité serveur. Suspension et déconnexion annulent les requêtes et ignorent leurs réponses tardives ; changement de compte purge les données privées et la tentative.
 
