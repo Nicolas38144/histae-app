@@ -1,7 +1,10 @@
+import '../../../core/models/public_profile_answer.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/json_fields.dart';
-import '../../discovery/data/discovery_models.dart' show FeedAnswer, wireTime;
+import '../../../core/text/whitespace.dart';
 import '../../profile/data/profile_models.dart';
+
+export '../../../core/network/json_fields.dart' show pageCursor;
 
 enum MatchStatus { active, awaitingContinuation, confirmed, expired, ended }
 
@@ -11,7 +14,7 @@ MatchStatus parseMatchStatus(String value) => switch (value) {
   'confirmed' => MatchStatus.confirmed,
   'expired' => MatchStatus.expired,
   'ended' => MatchStatus.ended,
-  _ => invalidProfile(),
+  _ => invalidResponse(),
 };
 
 class ChatMessage {
@@ -33,7 +36,7 @@ class ChatMessage {
     final sender = serverId(j, 'sender_id');
     if (!members.contains(sender) ||
         (!summary && serverId(j, 'match_id') != matchId)) {
-      invalidProfile();
+      invalidResponse();
     }
     return ChatMessage(
       serverId(j, 'id'),
@@ -50,16 +53,17 @@ class ChatMessage {
 }
 
 class MatchPartner {
-  const MatchPartner(
+  MatchPartner(
     this.id,
     this.firstname,
     this.age,
     this.sex,
     this.bio,
-    this.traits,
-    this.answers, {
+    List<String> traits,
+    List<PublicProfileAnswer> answers, {
     this.photo,
-  });
+  }) : traits = List.unmodifiable(traits),
+       answers = List.unmodifiable(answers);
   factory MatchPartner.fromJson(
     Object? value,
     String owner, {
@@ -74,10 +78,10 @@ class MatchPartner {
         age < 18 ||
         (sex != null && !['female', 'male', 'other'].contains(sex)) ||
         traits.any((t) => t is! String)) {
-      invalidProfile();
+      invalidResponse();
     }
     final photo = photosAllowed ? optionalText(j, 'photo') : null;
-    if (photo != null && !validPhotoUrl(photo)) invalidProfile();
+    if (photo != null && !validPhotoUrl(photo)) invalidResponse();
     return MatchPartner(
       id,
       jsonString(j, 'firstname'),
@@ -86,7 +90,10 @@ class MatchPartner {
       optionalText(j, 'bio'),
       List<String>.unmodifiable(traits),
       List.unmodifiable(
-        jsonField<List<dynamic>>(j, 'profile_answers').map(FeedAnswer.fromJson),
+        jsonField<List<dynamic>>(
+          j,
+          'profile_answers',
+        ).map(PublicProfileAnswer.fromJson),
       ),
       photo: photo,
     );
@@ -96,7 +103,7 @@ class MatchPartner {
   final String? sex, bio;
   final String? photo;
   final List<String> traits;
-  final List<FeedAnswer> answers;
+  final List<PublicProfileAnswer> answers;
 }
 
 class UserMatch {
@@ -126,7 +133,7 @@ class UserMatch {
           status != MatchStatus.expired,
     );
     final unread = jsonField<int>(j, 'unread_count');
-    if (unread < 0) invalidProfile();
+    if (unread < 0) invalidResponse();
     return UserMatch(
       id,
       status,
@@ -163,30 +170,20 @@ class UserMatch {
 }
 
 class MatchPage {
-  const MatchPage(this.items, this.cursor);
+  MatchPage(List<UserMatch> items, this.cursor)
+    : items = List.unmodifiable(items);
   final List<UserMatch> items;
   final String? cursor;
 }
 
 class MessagePage {
-  const MessagePage(this.items, this.cursor);
+  MessagePage(List<ChatMessage> items, this.cursor)
+    : items = List.unmodifiable(items);
   final List<ChatMessage> items;
   final String? cursor;
 }
 
-String? pageCursor(Map<String, dynamic> j) {
-  final cursor = optionalText(j, 'next_cursor');
-  if (cursor != null && (cursor.isEmpty || cursor.length > 512)) {
-    invalidProfile();
-  }
-  return cursor;
-}
-
-// Same outer whitespace set as ECMAScript/Rust, not Dart's additional NEL.
-final _edgeSpace = RegExp(
-  r'^[\u0009-\u000D\u0020\u00A0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]+|[\u0009-\u000D\u0020\u00A0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]+$',
-);
-String trimMessage(String value) => value.replaceAll(_edgeSpace, '');
+String trimMessage(String value) => trimOuterWhitespace(value);
 String? validateMessage(String value) {
   final content = trimMessage(value);
   if (content.isEmpty) return 'Écrivez quelques mots avant d’envoyer.';

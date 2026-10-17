@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
-import 'package:http/testing.dart';
 import 'package:histae_app/core/network/api_client.dart';
 import 'package:histae_app/core/network/api_failure.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 
 Matcher failureKind(ApiFailureKind kind) =>
     throwsA(isA<ApiFailure>().having((e) => e.kind, 'kind', kind));
@@ -52,7 +52,7 @@ void main() {
           return http.Response('{"plans":[]}', 200);
         }),
       );
-      expect(await client.getJson('/api/plans'), {'plans': []});
+      expect(await client.getJson('/api/plans'), {'plans': <Object?>[]});
       await client.getJson('/api/plans');
       expect(ids, hasLength(2));
     },

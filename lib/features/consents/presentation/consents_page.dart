@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-
-import '../../privacy/presentation/privacy_hub_page.dart';
-
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/editorial_card.dart';
-import '../../auth/application/session_controller.dart';
-import '../data/consent_state.dart';
+import '../../auth/domain/authenticated_session.dart';
+import '../../privacy/presentation/privacy_hub_page.dart';
+import '../domain/consent_state.dart';
+import 'consent_strings.dart';
 
 typedef DocumentOpener = Future<bool> Function(Uri url);
 
@@ -30,7 +29,7 @@ class ConsentsPage extends StatefulWidget {
     this.openDocument = openLegalDocument,
     this.onboarding = false,
   });
-  final SessionController session;
+  final AuthenticatedSession session;
   final DocumentOpener openDocument;
   final bool onboarding;
   @override

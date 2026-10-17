@@ -2,13 +2,13 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 import '../../../core/network/api_failure.dart';
+import '../../../core/network/signed_photo_loader.dart';
+import '../../../core/widgets/confirmation_dialog.dart';
 import '../application/profile_controller.dart';
 import '../data/photo_preparer.dart';
 import '../data/profile_models.dart';
-import 'profile_editors.dart';
 import 'profile_strings.dart';
 
 class PhotoPage extends StatefulWidget {
@@ -20,7 +20,7 @@ class PhotoPage extends StatefulWidget {
   });
   final ProfileController controller;
   final PhotoPreparer? preparer;
-  final http.Client Function()? photoClient;
+  final PhotoClientFactory? photoClient;
   @override
   State<PhotoPage> createState() => _PhotoPageState();
 }
@@ -32,7 +32,7 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
   Uint8List? _remote;
   String? _url, _message;
   DateTime? _readAt;
-  http.Client? _download;
+  SignedPhotoDownload? _download;
   Timer? _expiry;
   bool _choosing = false, _fetching = false, _active = true;
   int _downloadGeneration = 0;
@@ -63,7 +63,7 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
 
   void _purgeRemote() {
     _downloadGeneration++;
-    _download?.close();
+    _download?.cancel();
     _download = null;
     if (_remote case final bytes?) unawaited(MemoryImage(bytes).evict());
     _remote = null;
@@ -111,29 +111,12 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
   Future<void> _fetch(String url) async {
     if (!validPhotoUrl(url)) return;
     final generation = _downloadGeneration;
-    final client = widget.photoClient?.call() ?? http.Client();
-    _download = client;
+    final request = SignedPhotoLoader(clientFactory: widget.photoClient)
+        .load(url);
+    _download = request;
     _fetching = true;
     try {
-      // Signed storage request: no Bearer, redirects, disk cache or URL logs.
-      final task = () async {
-        final response = await client.send(
-          http.Request('GET', Uri.parse(url))..followRedirects = false,
-        );
-        if (response.statusCode != 200 ||
-            (response.contentLength ?? 0) > 5000000) {
-          throw const ApiFailure(ApiFailureKind.unavailable);
-        }
-        final builder = BytesBuilder(copy: false);
-        await for (final chunk in response.stream) {
-          if (builder.length + chunk.length > 5000000) {
-            throw const ApiFailure(ApiFailureKind.payloadTooLarge);
-          }
-          builder.add(chunk);
-        }
-        return builder.takeBytes();
-      }();
-      final bytes = await task.timeout(const Duration(seconds: 15));
+      final bytes = await request.bytes;
       if (mounted &&
           _active &&
           generation == _downloadGeneration &&
@@ -150,7 +133,7 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
         });
       }
     } finally {
-      client.close();
+      request.cancel();
       if (mounted && generation == _downloadGeneration) {
         setState(() {
           _fetching = false;
@@ -176,7 +159,7 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
   Future<void> _choose() async {
     if (_choosing || !c.canWrite) return;
     if (c.photoIntent != null &&
-        !await confirmProfileAction(
+        !await confirmAction(
           context,
           'Changer la sélection ?',
           'La demande photo en mémoire sera abandonnée.',
@@ -336,7 +319,7 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
                   onPressed: !c.canWrite || _choosing
                       ? null
                       : () async {
-                          if (!await confirmProfileAction(
+                          if (!await confirmAction(
                                 context,
                                 'Retirer votre photo ?',
                                 'La photo ne sera plus disponible. Le nettoyage du stockage se poursuivra en arrière-plan.',
@@ -346,11 +329,7 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
                             return;
                           }
                           try {
-                            await c.mutate(
-                              c.repository.removePhoto,
-                              photo: true,
-                            );
-                            c.setPhoto(null);
+                            await c.removePhoto();
                           } on ApiFailure catch (e) {
                             if (mounted) {
                               setState(() {

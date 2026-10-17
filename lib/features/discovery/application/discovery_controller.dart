@@ -4,8 +4,9 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
-import '../../auth/application/session_controller.dart';
-import '../../consents/data/consent_state.dart';
+import '../../../core/network/retry_after.dart';
+import '../../auth/domain/authenticated_session.dart';
+import '../../consents/domain/consent_state.dart';
 import '../data/device_location.dart';
 import '../data/discovery_models.dart';
 import '../data/discovery_repository.dart';
@@ -28,7 +29,7 @@ class DiscoveryController extends ChangeNotifier {
   final DiscoveryRepository repository;
   final LocationSource location;
   final DateTime Function() _now;
-  SessionController get session => repository.session;
+  AuthenticatedSession get session => repository.session;
   late String _resourceKey;
   RequestCancellation _scope = RequestCancellation();
   int _epoch = 0;
@@ -51,7 +52,13 @@ class DiscoveryController extends ChangeNotifier {
     if (!_disposed) notifyListeners();
   }
 
-  Timer? _expiryTimer, _retryTimer;
+  Timer? _expiryTimer;
+  late final RetryTicker _retryTimer = RetryTicker(
+    remaining: () => retrySeconds,
+    onTick: () {
+      if (!_disposed) notifyListeners();
+    },
+  );
   DateTime? _retryAt, _checkedExpiry;
   bool get accessible =>
       !_disposed && session.hasSession && session.phase == SessionPhase.ready;
@@ -79,10 +86,7 @@ class DiscoveryController extends ChangeNotifier {
       false;
   FeedProfile? get current =>
       pending?.profile ?? (_queue.isEmpty ? null : _queue.first);
-  int get retrySeconds {
-    final ms = _retryAt?.difference(_now()).inMilliseconds ?? 0;
-    return ms <= 0 ? 0 : (ms / 1000).ceil();
-  }
+  int get retrySeconds => retrySecondsUntil(_retryAt, now: _now());
 
   bool _alive(int epoch) => active && epoch == _epoch && !_scope.isCancelled;
   void _notify() {
@@ -107,7 +111,7 @@ class DiscoveryController extends ChangeNotifier {
     _cursor = null;
     _retryAt = null;
     _checkedExpiry = null;
-    _retryTimer?.cancel();
+    _retryTimer.cancel();
     _notify();
   }
 
@@ -143,11 +147,8 @@ class DiscoveryController extends ChangeNotifier {
       _retryAt = error.retryAt;
     }
     if (retrySeconds > 0) {
-      _retryTimer?.cancel();
-      _retryTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        if (retrySeconds == 0) timer.cancel();
-        _notify();
-      });
+      _retryTimer.cancel();
+      _retryTimer.restart();
     }
     if (error.kind == ApiFailureKind.consentRequired) {
       unawaited(session.synchronize());
@@ -435,7 +436,7 @@ class DiscoveryController extends ChangeNotifier {
     _epoch++;
     _scope.cancel();
     _expiryTimer?.cancel();
-    _retryTimer?.cancel();
+    _retryTimer.cancel();
     session.removeListener(_sessionChanged);
     _queue.clear();
     _seen.clear();

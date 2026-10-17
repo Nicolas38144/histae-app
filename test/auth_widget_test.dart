@@ -133,6 +133,8 @@ void main() {
         },
       ]);
       await revealAndTap(tester, find.text('Vos choix et votre vie privée'));
+      expect(find.text('Vie privée et sécurité'), findsOneWidget);
+      await revealAndTap(tester, find.text('Mes consentements'));
       expect(find.text('Vos consentements'), findsOneWidget);
       expect(find.textContaining('Accord enregistré'), findsNWidgets(2));
       await revealAndTap(tester, find.text('Se déconnecter'));

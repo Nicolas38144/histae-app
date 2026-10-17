@@ -4,9 +4,8 @@ import 'dart:math';
 
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
-import '../../auth/application/session_controller.dart';
-import '../../discovery/data/discovery_models.dart' show wireTime;
-import '../../profile/data/profile_models.dart';
+import '../../../core/network/json_fields.dart';
+import '../../auth/domain/authenticated_session.dart';
 
 class MobileSignal {
   const MobileSignal(
@@ -77,7 +76,7 @@ class MobileEventDecoder {
       if (!accepted.contains(event)) return null;
       try {
         final j = jsonDecode(data);
-        if (j is! Map<String, dynamic>) invalidProfile();
+        if (j is! Map<String, dynamic>) invalidResponse();
         if (event == 'connected' || event == 'heartbeat') {
           return MobileSignal(event, serverTime: wireTime(j['server_time']));
         }
@@ -99,14 +98,14 @@ class MobileEventDecoder {
     if (value.startsWith(' ')) value = value.substring(1);
     switch (field) {
       case 'event':
-        if (value.length > 100) invalidProfile();
+        if (value.length > 100) invalidResponse();
         _event = value;
       case 'id':
-        if (value.length > 128 || value.contains('\u0000')) invalidProfile();
+        if (value.length > 128 || value.contains('\u0000')) invalidResponse();
         _id = value;
       case 'data':
         _size += value.length;
-        if (_size > 65536) invalidProfile();
+        if (_size > 65536) invalidResponse();
         _data.add(value);
     }
     return null;
@@ -118,7 +117,7 @@ class RealtimeClient {
     this.session, {
     Future<ApiEventStream> Function(RequestCancellation)? open,
   }) : _open = open ?? session.openEvents;
-  final SessionController session;
+  final AuthenticatedSession session;
   final Future<ApiEventStream> Function(RequestCancellation) _open;
   final _recent = <String>{};
   RequestCancellation _life = RequestCancellation();

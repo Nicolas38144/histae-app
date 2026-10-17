@@ -1,8 +1,8 @@
 import 'package:http/http.dart' as http;
 
 import 'auth_fixture.dart';
-import 'matches_fixture.dart';
 import 'catalog_fixture.dart';
+import 'matches_fixture.dart';
 
 Map<String, dynamic> quotaJson({bool premium = false, int remaining = 2}) => {
   'plan': premium ? 'premium' : 'free',

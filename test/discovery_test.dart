@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
 import 'package:histae_app/app/theme.dart';
 import 'package:histae_app/features/consents/data/consent_state.dart';
 import 'package:histae_app/features/discovery/application/discovery_controller.dart';
@@ -11,6 +10,7 @@ import 'package:histae_app/features/discovery/data/device_location.dart';
 import 'package:histae_app/features/discovery/data/discovery_models.dart';
 import 'package:histae_app/features/discovery/data/discovery_repository.dart';
 import 'package:histae_app/features/discovery/presentation/feed_profile_card.dart';
+import 'package:http/http.dart' as http;
 
 import 'support/auth_fixture.dart';
 import 'support/discovery_fixture.dart';
@@ -298,8 +298,8 @@ void main() {
       var likes = 0, passes = 0;
       final p = FeedProfile.fromJson({
         ...candidateJson(candidateOne, bio: null),
-        'traits': [],
-        'profile_answers': [],
+        'traits': <Object?>[],
+        'profile_answers': <Object?>[],
         'photo': 'https://must-not-be-read.example/private',
       });
       await tester.pumpWidget(

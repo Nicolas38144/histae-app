@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../core/network/api_failure.dart';
+import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
-import '../../auth/application/session_controller.dart';
+import '../../auth/domain/authenticated_session.dart';
 import '../../privacy/presentation/privacy_strings.dart' show privacyDate;
-import '../../profile/presentation/profile_editors.dart';
 import '../application/devices_controller.dart';
 import '../application/push_controller.dart';
 import '../data/device_repository.dart';
@@ -21,7 +21,7 @@ String notificationFailure(ApiFailure e) => switch (e.kind) {
 
 class DevicesPage extends StatefulWidget {
   const DevicesPage({super.key, required this.session, this.push});
-  final SessionController session;
+  final AuthenticatedSession session;
   final PushController? push;
   @override
   State<DevicesPage> createState() => _DevicesPageState();
@@ -128,7 +128,7 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                       FilledButton(
                         onPressed: enabled && p!.retrySeconds == 0
                             ? () async {
-                                if (!await confirmProfileAction(
+                                if (!await confirmAction(
                                       context,
                                       'Recevoir des notifications ?',
                                       'Histae demandera l’autorisation du système puis enregistrera cet appareil auprès du service de notification. Vous pourrez le retirer ici.',
@@ -153,7 +153,7 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                       OutlinedButton(
                         onPressed: enabled
                             ? () async {
-                                if (await confirmProfileAction(
+                                if (await confirmAction(
                                       context,
                                       'Arrêter les notifications ici ?',
                                       'Cet appareil sera retiré du service de notification. Votre session de connexion reste ouverte.',
@@ -229,7 +229,7 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                                       (c.pendingRemoval == null ||
                                           c.pendingRemoval == device.id)
                                   ? () async {
-                                      if (!await confirmProfileAction(
+                                      if (!await confirmAction(
                                             context,
                                             'Retirer cet appareil ?',
                                             'Les futures notifications ne seront plus envoyées à cet enregistrement. Sa session de connexion restera ouverte.',

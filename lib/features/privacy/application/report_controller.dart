@@ -4,7 +4,8 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
-import '../../auth/application/session_controller.dart';
+import '../../../core/network/retry_after.dart';
+import '../../auth/domain/authenticated_session.dart';
 import '../data/privacy_models.dart';
 import '../data/privacy_repository.dart';
 
@@ -16,10 +17,15 @@ class ReportController extends ChangeNotifier {
   final PrivacyRepository repository;
   final String target;
   final String? matchId;
-  SessionController get session => repository.session;
+  AuthenticatedSession get session => repository.session;
   late final String _key;
   final _scope = RequestCancellation();
-  Timer? _timer;
+  late final RetryTicker _timer = RetryTicker(
+    remaining: () => retrySeconds,
+    onTick: () {
+      if (!_disposed) notifyListeners();
+    },
+  );
   DateTime? _retryAt;
   bool _disposed = false,
       sending = false,
@@ -33,10 +39,7 @@ class ReportController extends ChangeNotifier {
       session.phase == SessionPhase.ready &&
       session.resourceKey == _key &&
       session.identity?.userId != target;
-  int get retrySeconds {
-    final ms = _retryAt?.difference(DateTime.now()).inMilliseconds ?? 0;
-    return ms <= 0 ? 0 : (ms / 1000).ceil();
-  }
+  int get retrySeconds => retrySecondsUntil(_retryAt);
 
   void _notify() {
     if (!_disposed) notifyListeners();
@@ -48,7 +51,7 @@ class ReportController extends ChangeNotifier {
       pending = null;
       failure = null;
       validation = null;
-      _timer?.cancel();
+      _timer.cancel();
       _notify();
     }
   }
@@ -88,10 +91,7 @@ class ReportController extends ChangeNotifier {
         }
         _retryAt = e.retryAt;
         if (retrySeconds > 0) {
-          _timer = Timer.periodic(const Duration(seconds: 1), (t) {
-            if (retrySeconds == 0) t.cancel();
-            _notify();
-          });
+          _timer.restart();
         }
         if (e.kind == ApiFailureKind.consentRequired) {
           unawaited(session.synchronize());
@@ -107,7 +107,7 @@ class ReportController extends ChangeNotifier {
   void dispose() {
     _disposed = true;
     _scope.cancel();
-    _timer?.cancel();
+    _timer.cancel();
     pending = null;
     session.removeListener(_changed);
     super.dispose();

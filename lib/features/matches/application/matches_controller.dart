@@ -4,12 +4,14 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
-import '../../auth/application/session_controller.dart';
+import '../../../core/network/retry_after.dart';
+import '../../auth/domain/authenticated_session.dart';
+import '../../continuation/application/continuation_controller.dart';
+import '../../continuation/application/match_access.dart';
 import '../data/match_models.dart';
 import '../data/matches_repository.dart';
 import '../data/realtime_client.dart';
-import '../../continuation/application/match_access.dart';
-import '../../continuation/application/continuation_controller.dart';
+import 'message_outbox.dart';
 
 class MatchesController extends ChangeNotifier implements MatchAccess {
   MatchesController(
@@ -30,6 +32,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     };
   }
   final MatchesRepository repository;
+  String get ownerId => repository.owner;
   ContinuationController? _continuation;
   ContinuationController get continuation =>
       _continuation ??= ContinuationController(this);
@@ -52,7 +55,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   final DateTime Function() _now;
   final void Function(String)? onRemoved;
   @override
-  SessionController get session => repository.session;
+  AuthenticatedSession get session => repository.session;
   late String _key;
   bool _disposed = false, _active = false, _verified = false, _dirty = false;
   int _epoch = 0, _chatEpoch = 0, _listRevision = 0;
@@ -61,12 +64,18 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   RequestCancellation _scope = RequestCancellation(),
       _chatScope = RequestCancellation();
   Future<void>? _sync;
-  Timer? _debounce, _deadline, _cooldown;
+  Timer? _debounce, _deadline;
+  late final RetryTicker _cooldown = RetryTicker(
+    remaining: () => retrySeconds,
+    onTick: () {
+      if (!_disposed) notifyListeners();
+    },
+  );
   Duration _clockOffset = Duration.zero;
   final _checkedDeadlines = <String>{},
       _removed = <String>{},
       _readAttempted = <String>{};
-  final _drafts = <String, String>{}, _pending = <String, MessageIntent>{};
+  final _outbox = MessageOutbox();
   final _closures = <String, bool>{};
   final _items = <UserMatch>[];
   final _messages = <ChatMessage>[];
@@ -104,8 +113,8 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     return null;
   }
 
-  String draftFor(String id) => _pending[id]?.content ?? _drafts[id] ?? '';
-  MessageIntent? get pendingMessage => _pending[selectedId];
+  String draftFor(String id) => _outbox.draftFor(id);
+  MessageIntent? get pendingMessage => _outbox.pendingFor(selectedId);
   bool get canSend =>
       active &&
       _verified &&
@@ -119,10 +128,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       retrySeconds == 0;
   bool get canRead =>
       active && _verified && selected?.historyAllowed == true && !ending;
-  int get retrySeconds {
-    final ms = _retryAt?.difference(_now()).inMilliseconds ?? 0;
-    return ms <= 0 ? 0 : (ms / 1000).ceil();
-  }
+  int get retrySeconds => retrySecondsUntil(_retryAt, now: _now());
 
   bool _alive(int epoch) => active && epoch == _epoch;
   bool _chatAlive(int epoch, int chatEpoch, String id) =>
@@ -132,8 +138,8 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   }
 
   void setDraft(String id, String text) {
-    if (accessible && !_pending.containsKey(id) && !_removed.contains(id)) {
-      _drafts[id] = text;
+    if (accessible && !_outbox.hasPending(id) && !_removed.contains(id)) {
+      _outbox.setDraft(id, text);
     }
   }
 
@@ -144,8 +150,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     suspend();
     _items.clear();
     _messages.clear();
-    _pending.clear();
-    _drafts.clear();
+    _outbox.clear();
     _removed.clear();
     _readAttempted.clear();
     selectedId = null;
@@ -162,7 +167,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     notice = null;
     privateRevision++;
     _retryAt = null;
-    _cooldown?.cancel();
+    _cooldown.cancel();
     _notify();
   }
 
@@ -210,11 +215,8 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       _retryAt = error.retryAt;
     }
     if (retrySeconds > 0) {
-      _cooldown?.cancel();
-      _cooldown = Timer.periodic(const Duration(seconds: 1), (t) {
-        if (retrySeconds == 0) t.cancel();
-        _notify();
-      });
+      _cooldown.cancel();
+      _cooldown.restart();
     }
     if (error.kind == ApiFailureKind.consentRequired) {
       unawaited(session.synchronize());
@@ -223,8 +225,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
 
   void _purge(String id, {bool remove = false}) {
     _continuation?.forgetMatch(id);
-    _pending.remove(id);
-    _drafts.remove(id);
+    _outbox.forget(id);
     _readAttempted.removeWhere((key) => key.startsWith('$id:'));
     _closures.remove(id);
     if (selectedId == id) {
@@ -271,8 +272,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       reading = false;
       ending = false;
       for (final id in {
-        ..._drafts.keys,
-        ..._pending.keys,
+        ..._outbox.matchIds,
         ..._closures.keys,
         ..._items.map((m) => m.id),
       }) {
@@ -391,11 +391,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       readRevision++;
       readAt = _now().toUtc();
       if (cursor == null) {
-        for (final id in {
-          ..._pending.keys,
-          ..._drafts.keys,
-          ..._closures.keys,
-        }) {
+        for (final id in {..._outbox.matchIds, ..._closures.keys}) {
           if (!seen.contains(id)) _purge(id);
         }
       }
@@ -604,14 +600,13 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
 
   Future<void> send(String raw) async {
     final match = selected;
-    if (match == null || !canSend || _pending.containsKey(match.id)) return;
+    if (match == null || !canSend || _outbox.hasPending(match.id)) return;
     validation = validateMessage(raw);
     if (validation != null) {
       _notify();
       return;
     }
-    _pending[match.id] = MessageIntent(match.id, raw);
-    _drafts[match.id] = trimMessage(raw);
+    _outbox.prepare(match.id, raw);
     await resumeSend();
   }
 
@@ -629,15 +624,14 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       if (!_messages.any((m) => m.id == message.id)) {
         _messages.insert(0, message);
       }
-      _pending.remove(match.id);
-      _drafts.remove(match.id);
+      _outbox.forget(match.id);
       _schedule();
     } on ApiFailure catch (e) {
       if (_chatAlive(epoch, chatEpoch, match.id)) {
         _error(e, chat: true);
         if (e.code == 'invalid_message_request' ||
             e.code == 'invalid_message_payload') {
-          _pending.remove(match.id);
+          _outbox.forgetPending(match.id);
         }
         if (e.code == 'match_expired' ||
             e.code == 'match_not_found' ||
@@ -740,12 +734,11 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     _disposed = true;
     suspend();
     realtime.dispose();
-    _cooldown?.cancel();
+    _cooldown.cancel();
     session.removeListener(_sessionChanged);
     _items.clear();
     _messages.clear();
-    _drafts.clear();
-    _pending.clear();
+    _outbox.clear();
     _closures.clear();
     _readAttempted.clear();
     super.dispose();

@@ -1,12 +1,12 @@
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
-import 'package:http/testing.dart';
 import 'package:histae_app/core/network/api_client.dart';
 import 'package:histae_app/features/auth/application/session_controller.dart';
 import 'package:histae_app/features/auth/data/auth_repository.dart';
 import 'package:histae_app/features/auth/data/session_vault.dart';
 import 'package:histae_app/features/consents/data/consent_state.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 
 // Synthetic, test-only credentials; no real SMS or production account is used.
 const testTokens = TokenPair('test-access-old', 'test-refresh-old');
@@ -42,7 +42,7 @@ Map<String, dynamic> consentJson({
   ],
   'onboarding_complete': complete,
   'required_actions': complete
-      ? []
+      ? <Object?>[]
       : [ConsentType.terms.wireName, ConsentType.privacy.wireName],
 };
 Map<ConsentType, String> consentVersions([String version = 'v1']) => {

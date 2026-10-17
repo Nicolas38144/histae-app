@@ -1,6 +1,6 @@
 # Histae App — roadmap de développement
 
-Mise à jour : 17 octobre 2026.
+Mise à jour : 18 octobre 2026.
 
 [Accueil](README.md) · [Résumé d'intégration](resume.md) · [Contrat HTTP Rust](../histae-api-rust/docs/http-contract.md)
 
@@ -254,6 +254,14 @@ Critère de sortie : droits réellement projetés par l'API et vente activée se
 **Choix de distribution** : APK Android hors Play Store avec Stripe. `.env` : `BILLING_DISTRIBUTION=android_external`, `BILLING_ENABLED=false`, trois champs HTTPS renseignés : succès `https://www.histae.com/billing/success?session_id={CHECKOUT_SESSION_ID}`, annulation `https://www.histae.com/billing/cancel`, portail `https://www.histae.com/billing/return`, identiques aux URL locales API. iOS/Web/bureau restent fermés aux paiements. [Règles Play](https://support.google.com/googleplay/android-developer/answer/9858738) et [Apple 3.1](https://developer.apple.com/app-store/review/guidelines/#payments) consultées le 17 octobre 2026 ; pas d'autorisation supposée pour une distribution par les stores. Entrées HTTPS `/billing/success`, `/billing/cancel` et `/billing/return` implémentées dans `histae-site`, avec sélection de la première langue prise en charge du navigateur, français en secours et choix manuel sans JavaScript. Les paramètres sont conservés sans interprétation jusqu'aux pages localisées, sans confirmation de paiement. Restent à publier le site, reporter les URL dans le `.env` API du serveur et compiler l'app avant les essais ; retour manuel dans l'app suivi d'un GET authentifié ; aucun app link/lien universel automatique configuré. Voir les champs et les conditions dans [README](README.md#l9--offres-et-abonnement).
 
 **Vérifications et limites** : dix contrôles L9 ciblés réussis, plus treize contrôles existants de configuration et une régression de navigation push. Six aperçus inspectés avec données simulées, dont 320 px/texte 160 %. Formatage vérifié (110 fichiers), analyse sans problème et APK Android debug compilé. Contrats/DTO/service/tests/Postman backend consultés seulement. Prix, essais et états privés simulés, aucun paiement Stripe exécuté. Mode test fournisseur, SCA, refus, renouvellement, résiliation et retours sur téléphone après arrêt restent à valider avec le serveur configuré. Ventes et portail désactivés conformément au choix utilisateur ; catalogue et droits consultables. Prochain lot : **L10**.
+
+## Refactoring transversal avant L10
+
+Refonte demandée le 17 octobre 2026. Démarrage et composition des dépendances séparés ; navigation de notification isolée ; neuf interfaces de dépôts et implémentations API ; contrat `AuthenticatedSession` indépendant du contrôleur concret. Primitives JSON/flux/annulation, compteurs et opérations locales sérialisées communs. Brouillons/envois du chat isolés, collections exposées en lecture seule et DTO à listes protégées. Formulaires, confidentialité, profil partenaire et abonnement répartis en composants dédiés. Typage/analyse stricts, manifests nettoyés sans changement de dépendances. Aucun changement backend, commande Git ou suppression de fichier.
+
+La valeur mobile `BILLING_ENABLED=stripe` était invalide ; elle est remise à `false` sans activer les paiements. Push et vidéos restent désactivés. Les liens de retour existants sont conservés. Les règles de session, de rejeu et de droits serveur restent couvertes par les contrôles existants. Architecture et responsabilités : [ARCHITECTURE.md](ARCHITECTURE.md).
+
+Achevé le 18 octobre : commandes du profil appelées depuis les vues, téléchargement des photos de stockage signé isolé et partagé (5 Mo, quinze secondes, sans Bearer/redirection/cache disque). 166 contrôles globaux, puis 39 ciblés sur les derniers changements dont un nouveau contrôle photo : **167 contrôles distincts réussis**, trois nouveaux seulement. Analyse stricte sans problème, formatage vérifié sur 143 fichiers et APK Android debug compilé. Quatre scénarios d'aperçu, 22 images simulées, planche d'ensemble et écrans représentatifs inspectés. Les essais API privée/fournisseurs sur téléphones et la compilation iOS restent ouverts ; L10 n'est pas déclaré terminé.
 
 ## 13. L10 — qualité et bêta
 

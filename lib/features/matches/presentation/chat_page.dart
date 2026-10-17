@@ -2,14 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../privacy/presentation/report_page.dart';
-
+import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
-import '../../profile/presentation/profile_editors.dart';
-import '../application/matches_controller.dart';
 import '../../continuation/presentation/continuation_page.dart';
-import '../../continuation/presentation/partner_photo_page.dart';
+import '../../privacy/presentation/report_page.dart';
+import '../application/matches_controller.dart';
 import 'matches_strings.dart';
+import 'partner_page.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key, required this.controller, required this.matchId});
@@ -87,7 +86,7 @@ class _ChatPageState extends State<ChatPage> {
     if (view is! RenderBox || !view.attached || !view.hasSize) return;
     final bounds = view.localToGlobal(Offset.zero) & view.size;
     for (final message in c.messages) {
-      if (message.senderId == c.repository.owner || message.readAt != null) {
+      if (message.senderId == c.ownerId || message.readAt != null) {
         continue;
       }
       final box = _incoming[message.id]?.currentContext?.findRenderObject();
@@ -103,7 +102,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Future<void> _end({required bool block}) async {
-    if (!await confirmProfileAction(
+    if (!await confirmAction(
           context,
           block ? 'Bloquer cette personne ?' : 'Terminer cette rencontre ?',
           block
@@ -162,6 +161,7 @@ class _ChatPageState extends State<ChatPage> {
     if (!c.accessible || c.session.resourceKey != _key) {
       return const Scaffold(body: SizedBox.shrink());
     }
+    final messages = c.messages;
     final match = c.selectedId == widget.matchId ? c.selected : null;
     final unavailable = match == null || !match.historyAllowed;
     return Scaffold(
@@ -182,7 +182,7 @@ class _ChatPageState extends State<ChatPage> {
                   Navigator.of(context).push(
                     MaterialPageRoute<void>(
                       builder: (_) =>
-                          _PartnerPage(controller: c, id: widget.matchId),
+                          PartnerPage(controller: c, id: widget.matchId),
                     ),
                   );
                 }
@@ -305,9 +305,9 @@ class _ChatPageState extends State<ChatPage> {
                             controller: _scroll,
                             reverse: true,
                             padding: const EdgeInsets.all(16),
-                            itemCount: c.messages.length + 1,
+                            itemCount: messages.length + 1,
                             itemBuilder: (context, index) {
-                              if (index == c.messages.length) {
+                              if (index == messages.length) {
                                 return c.messageCursor != null
                                     ? TextButton(
                                         onPressed:
@@ -321,15 +321,15 @@ class _ChatPageState extends State<ChatPage> {
                                     : Padding(
                                         padding: const EdgeInsets.all(20),
                                         child: Text(
-                                          c.messages.isEmpty
+                                          messages.isEmpty
                                               ? 'Quelques mots pour commencer ?'
                                               : 'Le début de votre conversation',
                                           textAlign: TextAlign.center,
                                         ),
                                       );
                               }
-                              final m = c.messages[index];
-                              final own = m.senderId == c.repository.owner;
+                              final m = messages[index];
+                              final own = m.senderId == c.ownerId;
                               return Padding(
                                 key: own
                                     ? ValueKey(m.id)
@@ -487,87 +487,4 @@ class _ChatPageState extends State<ChatPage> {
       ),
     );
   }
-}
-
-class _PartnerPage extends StatelessWidget {
-  const _PartnerPage({required this.controller, required this.id});
-  final MatchesController controller;
-  final String id;
-  @override
-  Widget build(BuildContext context) => ListenableBuilder(
-    listenable: controller,
-    builder: (context, _) {
-      final match =
-          controller.selectedId == id &&
-              controller.accessible &&
-              controller.selected?.historyAllowed == true
-          ? controller.selected
-          : null;
-      return Scaffold(
-        appBar: AppBar(title: Text(match?.partner.firstname ?? 'Profil')),
-        body: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.all(24),
-            children: [
-              if (match == null)
-                const Text('Ce profil n’est plus disponible.')
-              else ...[
-                EditorialCard(
-                  title: '${match.partner.firstname}, ${match.partner.age}',
-                  body:
-                      match.partner.bio ??
-                      'Découvrez cette personne au fil de vos échanges.',
-                ),
-                const SizedBox(height: 24),
-                if (match.photosRevealed && match.partner.photo != null)
-                  OutlinedButton.icon(
-                    onPressed: !controller.verified
-                        ? null
-                        : () => Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (_) => PartnerPhotoPage(
-                                access: controller,
-                                matchId: id,
-                              ),
-                            ),
-                          ),
-                    icon: const Icon(Icons.photo_outlined),
-                    label: const Text('Voir sa photo'),
-                  ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => ReportPage(
-                        session: controller.session,
-                        target: match.partner.id,
-                        matchId: id,
-                        onBlock: () => controller.endCurrent(block: true),
-                      ),
-                    ),
-                  ),
-                  child: const Text('Signaler cette personne'),
-                ),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: match.partner.traits
-                      .map((t) => Chip(label: Text(t)))
-                      .toList(),
-                ),
-                for (final answer in match.partner.answers) ...[
-                  const EditorialDivider(),
-                  Text(
-                    answer.question,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(answer.answer),
-                ],
-              ],
-            ],
-          ),
-        ),
-      );
-    },
-  );
 }

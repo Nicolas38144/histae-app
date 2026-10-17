@@ -4,7 +4,8 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
-import '../../auth/application/session_controller.dart';
+import '../../../core/network/retry_after.dart';
+import '../../auth/domain/authenticated_session.dart';
 import '../data/device_repository.dart';
 import '../data/notification_models.dart';
 
@@ -14,25 +15,28 @@ class DevicesController extends ChangeNotifier {
     session.addListener(_changed);
   }
   final DeviceRepository repository;
-  SessionController get session => repository.session;
+  AuthenticatedSession get session => repository.session;
   late final String _key;
   RequestCancellation _scope = RequestCancellation();
   bool _disposed = false, _active = true;
   int _epoch = 0;
-  Timer? _timer;
-  final devices = <PushDevice>[];
+  late final RetryTicker _timer = RetryTicker(
+    remaining: () => retrySeconds,
+    onTick: () {
+      if (!_disposed) notifyListeners();
+    },
+  );
+  final _devices = <PushDevice>[];
   bool loading = false, removing = false;
   String? pendingRemoval, notice;
   ApiFailure? failure;
+  List<PushDevice> get devices => List.unmodifiable(_devices);
   bool get accessible =>
       !_disposed &&
       session.phase == SessionPhase.ready &&
       session.resourceKey == _key;
   bool get active => accessible && _active;
-  int get retrySeconds {
-    final ms = failure?.retryAt?.difference(DateTime.now()).inMilliseconds ?? 0;
-    return ms <= 0 ? 0 : (ms / 1000).ceil();
-  }
+  int get retrySeconds => retrySecondsUntil(failure?.retryAt);
 
   bool _alive(int epoch) => active && epoch == _epoch;
   void _notify() {
@@ -41,12 +45,9 @@ class DevicesController extends ChangeNotifier {
 
   void _error(ApiFailure e) {
     failure = e;
-    _timer?.cancel();
+    _timer.cancel();
     if (retrySeconds > 0) {
-      _timer = Timer.periodic(const Duration(seconds: 1), (t) {
-        if (retrySeconds == 0) t.cancel();
-        _notify();
-      });
+      _timer.restart();
     }
     if (e.kind == ApiFailureKind.consentRequired) {
       unawaited(session.synchronize());
@@ -56,7 +57,7 @@ class DevicesController extends ChangeNotifier {
   void _changed() {
     if (!accessible) {
       suspend();
-      devices.clear();
+      _devices.clear();
       pendingRemoval = null;
       notice = null;
       failure = null;
@@ -90,11 +91,11 @@ class DevicesController extends ChangeNotifier {
       final result = await repository.list(_scope);
       if (!_alive(epoch)) return;
       final ids = <String>{};
-      devices
+      _devices
         ..clear()
         ..addAll(result.where((d) => ids.add(d.id)));
       if (pendingRemoval != null &&
-          !devices.any((d) => d.id == pendingRemoval)) {
+          !_devices.any((d) => d.id == pendingRemoval)) {
         pendingRemoval = null;
         notice = 'device_removed';
       }
@@ -127,7 +128,7 @@ class DevicesController extends ChangeNotifier {
       await repository.remove(id, _scope);
       if (!_alive(epoch)) return false;
       pendingRemoval = null;
-      devices.removeWhere((d) => d.id == id);
+      _devices.removeWhere((d) => d.id == id);
       notice = 'device_removed';
     } on ApiFailure catch (e) {
       if (_alive(epoch)) {
@@ -156,9 +157,9 @@ class DevicesController extends ChangeNotifier {
   void dispose() {
     _disposed = true;
     suspend();
-    _timer?.cancel();
+    _timer.cancel();
     session.removeListener(_changed);
-    devices.clear();
+    _devices.clear();
     super.dispose();
   }
 }

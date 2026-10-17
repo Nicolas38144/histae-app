@@ -1,9 +1,7 @@
 import 'dart:convert';
 
 import '../../../core/network/json_fields.dart';
-import '../../discovery/data/discovery_models.dart' show wireTime;
-import '../../matches/data/match_models.dart' show trimMessage, pageCursor;
-import '../../profile/data/profile_models.dart';
+import '../../../core/text/whitespace.dart';
 
 enum DataRight {
   access,
@@ -41,7 +39,7 @@ class MobileSession {
     if (!RegExp(
       r'^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[89abAB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$',
     ).hasMatch(id)) {
-      invalidProfile();
+      invalidResponse();
     }
     return MobileSession(
       id,
@@ -88,16 +86,16 @@ class RightsRequest {
   );
   factory RightsRequest.fromJson(Object? value, String owner) {
     final j = jsonObject(value);
-    if (serverId(j, 'user_id') != owner) invalidProfile();
+    if (serverId(j, 'user_id') != owner) invalidResponse();
     final type = DataRight.values.where((t) => t.name == j['type']).firstOrNull;
     final status = switch (j['status']) {
       'pending' => RightStatus.pending,
       'in_progress' => RightStatus.inProgress,
       'completed' => RightStatus.completed,
       'rejected' => RightStatus.rejected,
-      _ => invalidProfile(),
+      _ => invalidResponse(),
     };
-    if (type == null) invalidProfile();
+    if (type == null) invalidResponse();
     return RightsRequest(
       serverId(j, 'id'),
       type,
@@ -123,7 +121,7 @@ class DeletionTicket {
     if (!RegExp(
       r'^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[89abAB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}:[A-Za-z0-9_-]{43}$',
     ).hasMatch(value)) {
-      invalidProfile();
+      invalidResponse();
     }
   }
   final String value;
@@ -134,7 +132,7 @@ class DeletionTicket {
 
 class ReportIntent {
   ReportIntent(this.target, this.matchId, this.reason, String description)
-    : description = trimMessage(description) {
+    : description = trimOuterWhitespace(description) {
     serverId({'id': target}, 'id');
     if (matchId != null) serverId({'id': matchId}, 'id');
   }

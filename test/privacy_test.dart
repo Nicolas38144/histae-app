@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
 import 'package:histae_app/core/network/api_client.dart';
 import 'package:histae_app/core/network/api_failure.dart';
 import 'package:histae_app/features/auth/application/session_controller.dart';
@@ -13,6 +12,7 @@ import 'package:histae_app/features/privacy/application/report_controller.dart';
 import 'package:histae_app/features/privacy/data/privacy_models.dart';
 import 'package:histae_app/features/privacy/data/privacy_repository.dart';
 import 'package:histae_app/features/privacy/data/private_export_store.dart';
+import 'package:http/http.dart' as http;
 
 import 'support/auth_fixture.dart';
 import 'support/discovery_fixture.dart';

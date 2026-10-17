@@ -6,25 +6,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
-
-import '../test/support/auth_fixture.dart';
-import '../test/support/profile_fixture.dart';
-import '../test/support/discovery_fixture.dart';
-import '../test/support/matches_fixture.dart';
-import '../test/support/continuation_fixture.dart';
-
-import 'package:histae_app/features/matches/presentation/chat_page.dart';
 import 'package:histae_app/app/theme.dart';
-import 'package:histae_app/features/privacy/presentation/privacy_hub_page.dart';
-import 'package:histae_app/features/privacy/presentation/report_page.dart';
-
-import '../test/support/privacy_fixture.dart';
-import '../test/support/notifications_fixture.dart';
-
+import 'package:histae_app/features/matches/presentation/chat_page.dart';
 import 'package:histae_app/features/notifications/application/push_controller.dart';
 import 'package:histae_app/features/notifications/data/device_repository.dart';
 import 'package:histae_app/features/notifications/data/notification_models.dart';
 import 'package:histae_app/features/notifications/data/push_vault.dart';
+import 'package:histae_app/features/privacy/presentation/privacy_hub_page.dart';
+import 'package:histae_app/features/privacy/presentation/report_page.dart';
+
+import '../test/support/auth_fixture.dart';
+import '../test/support/continuation_fixture.dart';
+import '../test/support/discovery_fixture.dart';
+import '../test/support/matches_fixture.dart';
+import '../test/support/notifications_fixture.dart';
+import '../test/support/privacy_fixture.dart';
+import '../test/support/profile_fixture.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

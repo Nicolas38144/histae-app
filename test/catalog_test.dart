@@ -2,13 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
-import 'package:http/testing.dart';
 import 'package:histae_app/core/network/api_client.dart';
 import 'package:histae_app/core/network/api_failure.dart';
 import 'package:histae_app/features/catalog/application/catalog_controller.dart';
 import 'package:histae_app/features/catalog/data/catalog_repository.dart';
 import 'package:histae_app/features/catalog/data/subscription_plan.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 
 import 'support/catalog_fixture.dart';
 
@@ -181,7 +181,7 @@ void main() {
     });
     final loading = controller.load();
     controller.dispose();
-    response.complete(http.Response(jsonEncode({'plans': []}), 200));
+    response.complete(http.Response(jsonEncode({'plans': <Object?>[]}), 200));
     await loading;
     expect(notifications, 1);
   });

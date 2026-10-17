@@ -16,9 +16,9 @@ Map<String, dynamic> ownerJson({
   'sex': ?sex,
   'bio': ?bio,
   'photo': ?photo,
-  'profile_answers': [],
+  'profile_answers': <Object?>[],
   'moderation': {
-    'bio': {'status': 'approved', 'reasons': []},
+    'bio': {'status': 'approved', 'reasons': <Object?>[]},
     'photo': null,
   },
 };
@@ -43,7 +43,7 @@ Map<String, dynamic> answerJson(String id, String text, int position) => {
   'answer': text,
   'position': position,
   'moderation_status': 'pending',
-  'moderation_reasons': [],
+  'moderation_reasons': <Object?>[],
 };
 http.Response defaultProfileResponse(http.Request request) =>
     switch (request.url.path) {
@@ -67,7 +67,7 @@ http.Response defaultProfileResponse(http.Request request) =>
           questionJson(questionTwo, 'Ce qui vous fait sourire ?', 2),
         ],
       }),
-      '/api/users/me/profile-answers' => jsonResponse({'answers': []}),
+      '/api/users/me/profile-answers' => jsonResponse({'answers': <Object?>[]}),
       '/api/users/me/photo' =>
         request.method == 'DELETE'
             ? http.Response('', 204)
@@ -75,7 +75,7 @@ http.Response defaultProfileResponse(http.Request request) =>
                 'message': 'photo updated',
                 'photo': 'https://storage.example/owner?signature=synthetic',
                 'moderation_status': 'pending',
-                'moderation_reasons': [],
+                'moderation_reasons': <Object?>[],
               }),
       _ when request.url.path.startsWith('/api/users/me/traits/') =>
         http.Response('', 204),

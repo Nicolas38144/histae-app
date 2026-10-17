@@ -7,12 +7,13 @@ import '../../../core/widgets/editorial_card.dart';
 import '../../catalog/application/catalog_controller.dart';
 import '../../catalog/data/catalog_repository.dart';
 import '../../catalog/data/subscription_plan.dart';
-import '../../catalog/presentation/catalog_page.dart';
 import '../../notifications/application/push_controller.dart';
 import '../../notifications/presentation/push_scope.dart';
 import '../application/billing_controller.dart';
 import '../data/billing_models.dart';
 import 'billing_strings.dart';
+import 'subscription_plans.dart';
+import 'subscription_summary.dart';
 
 class SubscriptionPage extends StatefulWidget {
   const SubscriptionPage({
@@ -158,7 +159,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                         semanticsLabel: 'Vérification de votre abonnement',
                       ),
                     if (c.subscription case final state?)
-                      _state(context, state),
+                      SubscriptionSummary(state: state),
                     if (!c.fresh && c.subscription != null)
                       const Text(
                         'Dernière situation connue. Actualisez pour confirmer vos droits actuels.',
@@ -236,7 +237,14 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                   if (_catalog case final catalog?)
                     ListenableBuilder(
                       listenable: catalog,
-                      builder: (context, _) => _plans(context, catalog),
+                      builder: (context, _) => SubscriptionPlans(
+                        catalog: catalog,
+                        paymentsAvailable: c.paymentsAvailable,
+                        canSubscribe: c.subscription?.accessGranted == false,
+                        hasPending: c.pending != null,
+                        canAct: _canAct,
+                        onChoose: _choose,
+                      ),
                     ),
                 ],
               ),
@@ -248,108 +256,4 @@ class _SubscriptionPageState extends State<SubscriptionPage>
   );
   bool get _canAct =>
       c.active && c.fresh && !c.busy && !c.loading && c.retrySeconds == 0;
-  Widget _state(BuildContext context, SubscriptionState state) => Card(
-    child: Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            state.plan == 'premium' ? 'Histae Premium' : 'Histae Gratuit',
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          const SizedBox(height: 12),
-          Text(BillingStrings.status(state.status)),
-          Text(
-            state.accessGranted
-                ? 'Accès Premium confirmé lors de la dernière vérification.'
-                : 'Votre accès actuel correspond à la formule gratuite.',
-          ),
-          if (state.billingPeriod != null)
-            Text(
-              state.billingPeriod == BillingPeriod.monthly
-                  ? 'Rythme mensuel'
-                  : 'Rythme annuel',
-            ),
-          if (state.trialEnd != null)
-            Text('Fin de l’essai : ${BillingStrings.date(state.trialEnd!)}'),
-          if (state.periodStart != null)
-            Text(
-              'Début de période : ${BillingStrings.date(state.periodStart!)}',
-            ),
-          if (state.periodEnd != null)
-            Text('Fin de période : ${BillingStrings.date(state.periodEnd!)}'),
-          if (state.cancelAtPeriodEnd)
-            const Text('Résiliation prévue à la fin de la période en cours.'),
-          if (state.canceledAt != null)
-            Text(
-              'Résiliation enregistrée le ${BillingStrings.date(state.canceledAt!)}',
-            ),
-          if (state.status == 'past_due')
-            const Text(
-              'Votre paiement demande une régularisation. Les droits affichés sont ceux confirmés par Histae.',
-            ),
-        ],
-      ),
-    ),
-  );
-  Widget _plans(BuildContext context, CatalogController catalog) {
-    if (catalog.status == CatalogStatus.loading ||
-        catalog.status == CatalogStatus.idle) {
-      return const LinearProgressIndicator(
-        semanticsLabel: 'Chargement des formules',
-      );
-    }
-    if (catalog.failure != null || catalog.plans.isEmpty) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            catalog.failure == null
-                ? 'Aucune formule disponible.'
-                : 'Les formules ne sont pas disponibles pour le moment.',
-          ),
-          OutlinedButton(
-            onPressed: catalog.retrySeconds > 0 ? null : catalog.load,
-            child: Text(
-              catalog.retrySeconds > 0
-                  ? AppStrings.of(context).retryIn(catalog.retrySeconds)
-                  : 'Actualiser les formules',
-            ),
-          ),
-        ],
-      );
-    }
-    return Column(
-      children: [
-        for (final plan in catalog.plans)
-          PlanCard(
-            plan: plan,
-            action:
-                plan.code == 'premium' &&
-                    c.paymentsAvailable &&
-                    c.subscription?.accessGranted == false &&
-                    c.pending == null
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      FilledButton(
-                        onPressed: _canAct
-                            ? () => _choose(plan, BillingPeriod.monthly)
-                            : null,
-                        child: const Text('Choisir le rythme mensuel'),
-                      ),
-                      OutlinedButton(
-                        onPressed: _canAct
-                            ? () => _choose(plan, BillingPeriod.annual)
-                            : null,
-                        child: const Text('Choisir le rythme annuel'),
-                      ),
-                    ],
-                  )
-                : null,
-          ),
-      ],
-    );
-  }
 }

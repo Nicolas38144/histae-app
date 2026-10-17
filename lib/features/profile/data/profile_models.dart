@@ -1,29 +1,15 @@
 import 'dart:convert';
 
-import '../../../core/network/api_failure.dart';
 import '../../../core/network/json_fields.dart';
 
-Never invalidProfile() =>
-    throw const ApiFailure(ApiFailureKind.invalidResponse);
+export '../../../core/network/json_fields.dart' show optionalText, serverId;
 
-String? optionalText(Map<String, dynamic> json, String key) {
-  final value = json[key];
-  if (value != null && value is! String) invalidProfile();
-  return value as String?;
-}
-
-String serverId(Map<String, dynamic> json, String key) {
-  final id = jsonString(json, key);
-  if (!RegExp(
-    r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
-  ).hasMatch(id)) {
-    invalidProfile();
-  }
-  return id;
-}
+// Compatibility for existing callers; new code uses the transport-level name.
+Never invalidProfile() => invalidResponse();
 
 class Moderation {
-  Moderation(this.status, this.reasons);
+  Moderation(this.status, List<String> reasons)
+    : reasons = List.unmodifiable(reasons);
   factory Moderation.fromJson(Object? value) {
     final j = jsonObject(value);
     return Moderation.parse(jsonString(j, 'status'), j['reasons']);

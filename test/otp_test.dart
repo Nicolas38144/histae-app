@@ -2,11 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
 import 'package:histae_app/core/network/api_failure.dart';
 import 'package:histae_app/features/auth/application/otp_controller.dart';
 import 'package:histae_app/features/auth/application/session_controller.dart';
 import 'package:histae_app/features/auth/data/auth_repository.dart';
+import 'package:http/http.dart' as http;
 
 import 'support/auth_fixture.dart';
 

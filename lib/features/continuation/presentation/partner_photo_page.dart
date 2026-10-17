@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+
+import '../../../core/network/signed_photo_loader.dart';
 
 import '../../profile/data/profile_models.dart';
 import '../application/match_access.dart';
@@ -16,7 +16,7 @@ class PartnerPhotoPage extends StatefulWidget {
   });
   final MatchAccess access;
   final String matchId;
-  final http.Client Function()? photoClient;
+  final PhotoClientFactory? photoClient;
   @override
   State<PartnerPhotoPage> createState() => _PartnerPhotoPageState();
 }
@@ -27,7 +27,7 @@ class _PartnerPhotoPageState extends State<PartnerPhotoPage>
   late final _key = c.session.resourceKey;
   ImageProvider? _image;
   String? _url, _error;
-  http.Client? _client;
+  SignedPhotoDownload? _download;
   Timer? _expiry;
   int _epoch = 0;
   bool _foreground = true, _loading = false;
@@ -59,8 +59,8 @@ class _PartnerPhotoPageState extends State<PartnerPhotoPage>
 
   void _purge() {
     _epoch++;
-    _client?.close();
-    _client = null;
+    _download?.cancel();
+    _download = null;
     _expiry?.cancel();
     if (_image case final image?) unawaited(image.evict());
     _image = null;
@@ -89,30 +89,15 @@ class _PartnerPhotoPageState extends State<PartnerPhotoPage>
 
   Future<void> _fetch(String url) async {
     if (!validPhotoUrl(url) || !_allowed) return;
-    final epoch = _epoch, client = widget.photoClient?.call() ?? http.Client();
-    _client = client;
+    final epoch = _epoch;
+    final request = SignedPhotoLoader(clientFactory: widget.photoClient)
+        .load(url);
+    _download = request;
     setState(() {
       _loading = true;
     });
     try {
-      final task = () async {
-        final response = await client.send(
-          http.Request('GET', Uri.parse(url))..followRedirects = false,
-        );
-        if (response.statusCode != 200 ||
-            (response.contentLength ?? 0) > 5000000) {
-          throw const FormatException('Unavailable photo');
-        }
-        final bytes = BytesBuilder(copy: false);
-        await for (final chunk in response.stream) {
-          if (bytes.length + chunk.length > 5000000) {
-            throw const FormatException('Invalid photo');
-          }
-          bytes.add(chunk);
-        }
-        return bytes.takeBytes();
-      }();
-      final bytes = await task.timeout(const Duration(seconds: 15));
+      final bytes = await request.bytes;
       if (mounted && epoch == _epoch && _allowed && _url == url) {
         setState(() {
           _image = ResizeImage(MemoryImage(bytes), width: 1024);
@@ -125,7 +110,7 @@ class _PartnerPhotoPageState extends State<PartnerPhotoPage>
         });
       }
     } finally {
-      client.close();
+      request.cancel();
       if (mounted && epoch == _epoch) {
         setState(() {
           _loading = false;

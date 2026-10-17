@@ -4,33 +4,33 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/editorial_card.dart';
-import '../../auth/application/session_controller.dart';
+import '../../auth/domain/authenticated_session.dart';
+import '../../billing/presentation/billing_scope.dart';
+import '../../billing/presentation/subscription_page.dart';
 import '../../catalog/data/catalog_repository.dart';
 import '../../catalog/presentation/catalog_page.dart';
 import '../../consents/presentation/consents_page.dart';
-import '../../privacy/presentation/privacy_hub_page.dart';
+import '../../continuation/presentation/credits_page.dart';
 import '../../discovery/application/discovery_controller.dart';
-import '../../discovery/data/discovery_repository.dart';
 import '../../discovery/data/device_location.dart';
+import '../../discovery/data/discovery_repository.dart';
 import '../../discovery/presentation/discovery_page.dart';
 import '../../matches/application/matches_controller.dart';
 import '../../matches/data/matches_repository.dart';
 import '../../matches/presentation/matches_page.dart';
-import '../../continuation/presentation/credits_page.dart';
+import '../../notifications/application/push_controller.dart';
+import '../../notifications/presentation/devices_page.dart';
+import '../../notifications/presentation/push_scope.dart';
+import '../../privacy/presentation/privacy_hub_page.dart';
 import '../application/profile_controller.dart';
 import '../data/profile_repository.dart';
-import 'profile_editors.dart';
 import 'photo_page.dart';
+import 'profile_editors.dart';
 import 'profile_strings.dart';
-import '../../notifications/application/push_controller.dart';
-import '../../notifications/presentation/push_scope.dart';
-import '../../notifications/presentation/devices_page.dart';
-import '../../billing/presentation/billing_scope.dart';
-import '../../billing/presentation/subscription_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key, required this.session, this.catalog});
-  final SessionController session;
+  final AuthenticatedSession session;
   final CatalogRepository? catalog;
   @override
   State<ProfilePage> createState() => _ProfilePageState();

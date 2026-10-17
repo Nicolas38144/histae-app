@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
-import '../../auth/application/session_controller.dart';
+import '../../auth/domain/authenticated_session.dart';
 import '../data/continuation_models.dart';
 import '../data/continuation_repository.dart';
 

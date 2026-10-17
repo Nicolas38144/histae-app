@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import '../../../core/async/serial_executor.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
-import '../../auth/application/session_controller.dart';
+import '../../../core/network/retry_after.dart';
+import '../../auth/domain/authenticated_session.dart';
 import '../data/device_repository.dart';
 import '../data/notification_models.dart';
 import '../data/push_gateway.dart';
@@ -29,13 +31,13 @@ class PushController extends ChangeNotifier {
   final PushGateway gateway;
   final PushVault vault;
   final Future<String?> Function() _appVersion;
-  SessionController get session => repository.session;
+  AuthenticatedSession get session => repository.session;
   final _subscriptions = <StreamSubscription<dynamic>>[];
   final _presented = <String>{};
   final _opened = <String>[];
   final _obsolete = <String>{};
   RequestCancellation _scope = RequestCancellation();
-  Future<void> _tail = Future<void>.value();
+  final _queue = SerialExecutor();
   Future<void>? _start;
   Future<void>? _gatewayPreparation;
   PushRecord? _saved;
@@ -49,7 +51,12 @@ class PushController extends ChangeNotifier {
   ApiFailure? failure;
   PushIntent? foreground, pendingOpen;
   String? _pendingOwner;
-  Timer? _timer;
+  late final RetryTicker _timer = RetryTicker(
+    remaining: () => retrySeconds,
+    onTick: () {
+      if (!_disposed) notifyListeners();
+    },
+  );
   bool get configured => gateway.configured;
   bool get stopping => _saved?.optedIn == false;
   bool get accessible =>
@@ -57,12 +64,9 @@ class PushController extends ChangeNotifier {
       session.phase == SessionPhase.ready &&
       session.identity != null;
   bool get active => accessible && _foreground;
-  int get retrySeconds {
-    final ms = failure?.retryAt?.difference(DateTime.now()).inMilliseconds ?? 0;
-    return ms <= 0 ? 0 : (ms / 1000).ceil();
-  }
+  int get retrySeconds => retrySecondsUntil(failure?.retryAt);
 
-  String get _origin => session.repository.api.origin.toString();
+  String get _origin => session.apiOrigin.toString();
   bool _alive(int epoch) => active && epoch == _epoch;
   void _notify() {
     if (!_disposed) notifyListeners();
@@ -75,30 +79,25 @@ class PushController extends ChangeNotifier {
             ApiFailureKind.unavailable,
             code: 'push_unavailable',
           );
-    _timer?.cancel();
+    _timer.cancel();
     if (retrySeconds > 0) {
-      _timer = Timer.periodic(const Duration(seconds: 1), (t) {
-        if (retrySeconds == 0) t.cancel();
-        _notify();
-      });
+      _timer.restart();
     }
     if (failure?.kind == ApiFailureKind.consentRequired) {
       unawaited(session.synchronize());
     }
   }
 
-  Future<void> _enqueue(Future<void> Function() action) {
-    final task = _tail.then((_) async {
-      if (!_disposed) await action();
-    });
-    _tail = task.catchError((Object error) {
-      if (!_disposed) {
-        _error(error);
-        _notify();
-      }
-    });
-    return _tail;
-  }
+  Future<void> _enqueue(Future<void> Function() action) => _queue
+      .run(() async {
+        if (!_disposed) await action();
+      })
+      .catchError((Object error) {
+        if (!_disposed) {
+          _error(error);
+          _notify();
+        }
+      });
 
   Future<void> start() => _start ??= _initialize();
   Future<void> _initialize() async {
@@ -184,7 +183,7 @@ class PushController extends ChangeNotifier {
         failure = null;
         notice = null;
         permission = PushPermission.unavailable;
-        _timer?.cancel();
+        _timer.cancel();
         enabled = false;
         deviceId = null;
         pending = null;
@@ -611,7 +610,7 @@ class PushController extends ChangeNotifier {
     _disposed = true;
     _epoch++;
     _scope.cancel();
-    _timer?.cancel();
+    _timer.cancel();
     for (final s in _subscriptions) {
       unawaited(s.cancel());
     }

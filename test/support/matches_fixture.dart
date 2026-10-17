@@ -1,5 +1,5 @@
-import 'package:http/http.dart' as http;
 import 'package:histae_app/features/matches/data/realtime_client.dart';
+import 'package:http/http.dart' as http;
 
 import 'auth_fixture.dart';
 import 'discovery_fixture.dart';

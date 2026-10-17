@@ -2,10 +2,17 @@ import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
 import 'subscription_plan.dart';
 
-class CatalogRepository {
-  CatalogRepository(this._api);
+abstract interface class CatalogRepository {
+  factory CatalogRepository(ApiClient api) = ApiCatalogRepository;
+  Future<List<SubscriptionPlan>> load(RequestCancellation cancellation);
+  void close();
+}
+
+final class ApiCatalogRepository implements CatalogRepository {
+  ApiCatalogRepository(this._api);
   final ApiClient _api;
 
+  @override
   Future<List<SubscriptionPlan>> load(RequestCancellation cancellation) async {
     final body = await _api.getJson('/api/plans', cancellation: cancellation);
     try {
@@ -20,5 +27,6 @@ class CatalogRepository {
     }
   }
 
+  @override
   void close() => _api.close();
 }

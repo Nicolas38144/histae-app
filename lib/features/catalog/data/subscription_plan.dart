@@ -22,7 +22,7 @@ class PlanFeature {
 }
 
 class SubscriptionPlan {
-  const SubscriptionPlan({
+  SubscriptionPlan({
     required this.code,
     required this.displayName,
     required this.monthlyPriceCents,
@@ -34,8 +34,8 @@ class SubscriptionPlan {
     required this.advertisingCreditStockLimit,
     required this.adsRemoved,
     required this.rewardedAdvertisingEnabled,
-    required this.features,
-  });
+    required List<PlanFeature> features,
+  }) : features = List.unmodifiable(features);
 
   factory SubscriptionPlan.fromJson(Object? value) {
     final json = _object(value);

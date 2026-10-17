@@ -1,6 +1,6 @@
 # Histae App — résumé technique et fonctionnel
 
-Mise à jour : 17 octobre 2026.
+Mise à jour : 18 octobre 2026.
 
 [Accueil](README.md) · [Roadmap et routes mobiles](roadmap.md) · [Contrat HTTP Rust](../histae-api-rust/docs/http-contract.md)
 
@@ -225,6 +225,14 @@ Choix L1 après consultation des documentations officielles : `http` pour les re
 La navigation distingue restauration, inscription/connexion, synchronisation, consentements requis, espace personnel et erreur de session/stockage. Aucune session n'est simulée dans l'app. Une découverte non prête ne verrouillera pas les fonctions autorisées ; les liens entrants nécessiteront session et ressource accessibles.
 
 La DA reprend la composition de `pictures/exemple_feed.png` : arrondis, titres à empattements, séparateurs fins et espaces aérés. La palette rose/corail est remplacée à la demande de l'utilisateur par ivoire `#FAF8F3`, papier `#FFFDF8`, forêt `#345647`, encre `#252C28` et sable `#E4DAC9`, avec adaptation sombre. DM Serif Display est embarquée avec sa licence SIL OFL ; le code reste propriétaire. Les aperçus de profil et du feed ont été inspectés (`tool/preview_app_test.dart`, données simulées). L4 applique cette DA au feed sans photo : geste haut en fin de lecture pour passer, double appui pour liker, aucun retour à un profil précédent.
+
+## Refactoring transversal avant L10
+
+Le 17 octobre 2026, refonte de l'app par responsabilité : `bootstrap` et `AppDependencies`, accueil/état de session, coordinateur de notification et bandeau séparés ; neuf interfaces de dépôts avec implémentations API. Les autres fonctionnalités utilisent le contrat `AuthenticatedSession`, sans dépendre de son contrôleur concret. `core` ne dépend plus des fonctionnalités ; parseurs, modèles publics communs, annulation et types de flux y sont regroupés. `SerialExecutor` ordonne stockage, purge et export sans retry ; `RetryTicker` centralise uniquement le rafraîchissement des délais. `MessageOutbox` possède les brouillons et intentions stables. Collections des contrôleurs et listes des principaux DTO protégées contre les mutations externes.
+
+Les formulaires de profil, détails de confidentialité, profil partenaire, carte de formule et composants d'abonnement sont extraits. Les exports d'origine restent disponibles ; aucun fichier source supprimé. Analyse avec casts/inférence/types bruts stricts, règles d'imports et de ressources asynchrones. Dépendances et plateformes natives conservées, aucune migration d'outil imposée. Configuration mobile invalide `BILLING_ENABLED=stripe` corrigée en `false` ; aucune fonction fournisseur activée. Voir [architecture](ARCHITECTURE.md) pour les règles de maintenance. L10 et les essais réels restent à effectuer.
+
+Refonte achevée le 18 octobre 2026 : plus de mutation de dépôt directement depuis les formulaires, service de chargement photo partagé et annulable (5 Mo, quinze secondes, sans Bearer/redirection/cache disque). Vérifications : 166 contrôles globaux puis 39 ciblés, dont le troisième nouveau contrôle ; 167 contrôles distincts réussis. Analyse sans problème, 143 fichiers formatés, APK Android debug compilé. Quatre scénarios visuels, 22 aperçus simulés, planche d'ensemble et vues représentatives inspectées. Ces contrôles ne valident pas un fournisseur réel ou iOS sur Mac.
 
 ## 16. Stockage et validation
 

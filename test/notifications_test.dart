@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
 import 'package:histae_app/core/config/app_config.dart';
 import 'package:histae_app/core/config/push_config.dart';
 import 'package:histae_app/features/auth/data/session_vault.dart';
@@ -13,10 +12,11 @@ import 'package:histae_app/features/notifications/data/device_repository.dart';
 import 'package:histae_app/features/notifications/data/notification_models.dart';
 import 'package:histae_app/features/notifications/data/push_gateway.dart';
 import 'package:histae_app/features/notifications/data/push_vault.dart';
+import 'package:http/http.dart' as http;
 
 import 'support/auth_fixture.dart';
-import 'support/notifications_fixture.dart';
 import 'support/matches_fixture.dart';
+import 'support/notifications_fixture.dart';
 
 void main() {
   test('public Firebase configuration defaults off, rejects secrets and inconsistent sender IDs', () {
@@ -216,7 +216,7 @@ void main() {
       final session = testSession((r) async {
         if (r.method == 'POST' && r.url.path.endsWith('/devices')) posts++;
         if (r.url.path.endsWith('/devices') && r.method == 'GET') {
-          return jsonResponse({'devices': []});
+          return jsonResponse({'devices': <Object?>[]});
         }
         return defaultNotificationsResponse(r);
       });

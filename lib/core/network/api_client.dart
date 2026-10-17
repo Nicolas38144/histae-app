@@ -7,26 +7,11 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
 import 'api_failure.dart';
+import 'api_stream.dart';
+import 'request_cancellation.dart';
 
-class RequestCancellation {
-  final _completer = Completer<void>();
-  Future<void> get whenCancelled => _completer.future;
-  bool get isCancelled => _completer.isCompleted;
-  void cancel() {
-    if (!_completer.isCompleted) _completer.complete();
-  }
-}
-
-class ApiEventStream {
-  ApiEventStream(this.bytes, this.close);
-  final Stream<List<int>> bytes;
-  final void Function() close;
-}
-
-class ApiDownload extends ApiEventStream {
-  ApiDownload(super.bytes, super.close, this.contentLength);
-  final int contentLength;
-}
+export 'api_stream.dart';
+export 'request_cancellation.dart';
 
 class ApiClient {
   ApiClient({

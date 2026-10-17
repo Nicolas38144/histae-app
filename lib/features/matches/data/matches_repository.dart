@@ -1,13 +1,40 @@
 import '../../../core/network/api_client.dart';
 import '../../../core/network/json_fields.dart';
-import '../../auth/application/session_controller.dart';
-import '../../profile/data/profile_models.dart';
+import '../../auth/domain/authenticated_session.dart';
 import 'match_models.dart';
 
-class MatchesRepository {
-  MatchesRepository(this.session);
-  final SessionController session;
-  String get owner => session.identity?.userId ?? invalidProfile();
+abstract interface class MatchesRepository {
+  factory MatchesRepository(AuthenticatedSession session) =
+      ApiMatchesRepository;
+  AuthenticatedSession get session;
+  String get owner;
+  Future<MatchPage> matches(RequestCancellation scope, {String? cursor});
+  Future<MessagePage> messages(
+    UserMatch match,
+    RequestCancellation scope, {
+    String? cursor,
+  });
+  Future<ChatMessage> send(
+    UserMatch match,
+    MessageIntent intent,
+    RequestCancellation scope,
+  );
+  Future<void> readThrough(
+    String id,
+    String messageId,
+    RequestCancellation scope,
+  );
+  Future<void> readOne(String id, String messageId, RequestCancellation scope);
+  Future<void> end(String id, RequestCancellation scope);
+  Future<void> block(String partnerId, RequestCancellation scope);
+}
+
+final class ApiMatchesRepository implements MatchesRepository {
+  ApiMatchesRepository(this.session);
+  @override
+  final AuthenticatedSession session;
+  @override
+  String get owner => session.identity?.userId ?? invalidResponse();
   Future<Object?> _request(
     String method,
     String path,
@@ -26,6 +53,7 @@ class MatchesRepository {
     replayAfterRefresh: true,
     cancellation: scope,
   );
+  @override
   Future<MatchPage> matches(RequestCancellation scope, {String? cursor}) async {
     final j = jsonObject(
       await _request(
@@ -51,6 +79,7 @@ class MatchesRepository {
     return '/api/matches/$id';
   }
 
+  @override
   Future<MessagePage> messages(
     UserMatch match,
     RequestCancellation scope, {
@@ -74,13 +103,14 @@ class MatchesRepository {
     );
   }
 
+  @override
   Future<ChatMessage> send(
     UserMatch match,
     MessageIntent intent,
     RequestCancellation scope,
   ) async {
     if (intent.matchId != match.id || validateMessage(intent.content) != null) {
-      invalidProfile();
+      invalidResponse();
     }
     final message = ChatMessage.fromJson(
       await _request(
@@ -95,11 +125,12 @@ class MatchesRepository {
       {owner, match.partner.id},
     );
     if (message.senderId != owner || message.content != intent.content) {
-      invalidProfile();
+      invalidResponse();
     }
     return message;
   }
 
+  @override
   Future<void> readThrough(
     String id,
     String messageId,
@@ -116,10 +147,11 @@ class MatchesRepository {
     );
     if (serverId(j, 'read_through_message_id') != messageId ||
         jsonField<int>(j, 'updated_count') < 0) {
-      invalidProfile();
+      invalidResponse();
     }
   }
 
+  @override
   Future<void> readOne(
     String id,
     String messageId,
@@ -129,11 +161,13 @@ class MatchesRepository {
     await _request('PATCH', '${_path(id)}/messages/$messageId/read', scope);
   }
 
+  @override
   Future<void> end(String id, RequestCancellation scope) async {
     final j = jsonObject(await _request('PATCH', '${_path(id)}/end', scope));
-    if (jsonString(j, 'status') != 'ended') invalidProfile();
+    if (jsonString(j, 'status') != 'ended') invalidResponse();
   }
 
+  @override
   Future<void> block(String partnerId, RequestCancellation scope) async {
     serverId({'id': partnerId}, 'id');
     await _request(

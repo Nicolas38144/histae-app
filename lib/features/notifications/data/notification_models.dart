@@ -1,6 +1,4 @@
 import '../../../core/network/json_fields.dart';
-import '../../discovery/data/discovery_models.dart' show wireTime;
-import '../../profile/data/profile_models.dart';
 
 class PushDevice {
   PushDevice.fromJson(Object? value) : this._(jsonObject(value));
@@ -13,7 +11,7 @@ class PushDevice {
       lastUsedAt = j['last_used_at'] == null
           ? null
           : wireTime(j['last_used_at']) {
-    if (!['android', 'ios'].contains(platform)) invalidProfile();
+    if (!['android', 'ios'].contains(platform)) invalidResponse();
   }
   final String id, platform;
   final String? sessionId, version;
@@ -64,7 +62,7 @@ class DeviceRegistration {
         token.length > 4096 ||
         !['android', 'ios'].contains(platform) ||
         (version?.length ?? 0) > 50) {
-      invalidProfile();
+      invalidResponse();
     }
   }
   final String token, platform;

@@ -5,26 +5,23 @@ import 'package:flutter/foundation.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/network/json_fields.dart';
-import '../../consents/data/consent_state.dart';
+import '../../../core/network/retry_after.dart';
+import '../../consents/domain/consent_state.dart';
 import '../data/auth_repository.dart';
 import '../data/session_vault.dart';
+import '../domain/authenticated_session.dart';
 
-enum SessionPhase {
-  restoring,
-  signedOut,
-  synchronizing,
-  needsConsents,
-  ready,
-  unavailable,
-  storageFailure,
-}
+export '../domain/authenticated_session.dart' show SessionPhase;
 
-class SessionController extends ChangeNotifier {
+class SessionController extends ChangeNotifier implements AuthenticatedSession {
   SessionController(this.repository, this._vault);
   final AuthRepository repository;
   final SessionVault _vault;
+  @override
   SessionPhase phase = SessionPhase.restoring;
+  @override
   MobileIdentity? identity;
+  @override
   ConsentState? consents;
   ApiFailure? failure;
   String? notice;
@@ -37,6 +34,7 @@ class SessionController extends ChangeNotifier {
   Future<void>? _terminal;
   int _generation = 0;
   int resourceRevision = 0;
+  @override
   String get resourceKey => '$_generation:$resourceRevision';
   String? _consentFingerprint;
   bool _disposed = false;
@@ -45,26 +43,34 @@ class SessionController extends ChangeNotifier {
   bool _saving = false;
   bool get isSaving => _saving;
   bool _synchronizing = false;
+  @override
   bool get isSynchronizing => _synchronizing;
-  Timer? _retryTimer;
-  int get retrySeconds {
-    final milliseconds =
-        failure?.retryAt?.difference(DateTime.now()).inMilliseconds ?? 0;
-    return milliseconds <= 0 ? 0 : (milliseconds / 1000).ceil();
-  }
+  late final RetryTicker _retryTimer = RetryTicker(
+    remaining: () => retrySeconds,
+    onTick: () {
+      if (!_disposed) notifyListeners();
+    },
+  );
+  @override
+  int get retrySeconds => retrySecondsUntil(failure?.retryAt);
 
   void _setFailure(ApiFailure error) {
     failure = error;
-    _retryTimer?.cancel();
+    _retryTimer.cancel();
     if (retrySeconds > 0) {
-      _retryTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        if (retrySeconds == 0) timer.cancel();
-        _notify();
-      });
+      _retryTimer.restart();
     }
   }
 
-  String get _origin => repository.api.origin.toString();
+  @override
+  Uri get apiOrigin => repository.api.origin;
+  String get _origin => apiOrigin.toString();
+  @override
+  Future<Object?> publicJson(
+    String path, {
+    RequestCancellation? cancellation,
+  }) => repository.api.getJson(path, cancellation: cancellation);
+  @override
   bool get hasSession => _tokens != null && !_loggingOut;
   void _notify() {
     if (!_disposed) notifyListeners();
@@ -252,6 +258,7 @@ class SessionController extends ChangeNotifier {
     }
   }
 
+  @override
   Future<Object?> request(
     String method,
     String path, {
@@ -274,6 +281,7 @@ class SessionController extends ChangeNotifier {
     cancellation: cancellation,
   );
 
+  @override
   Future<ApiEventStream> openEvents(RequestCancellation cancellation) async =>
       await _authorized(
         'GET',
@@ -282,6 +290,7 @@ class SessionController extends ChangeNotifier {
         cancellation: cancellation,
       ) as ApiEventStream;
 
+  @override
   Future<ApiDownload> openDataExport(RequestCancellation cancellation) async =>
       await _authorized(
         'GET',
@@ -294,9 +303,12 @@ class SessionController extends ChangeNotifier {
   // refresh from durable storage, then cross the barrier that purges all UI.
   // The single request uses the latest access token, with no replay/rotation
   // after the barrier. A lost response never becomes an authentication probe.
+  @override
   Future<void> eraseAccount(String confirmationToken) =>
       _closeRemote('erasure', confirmationToken: confirmationToken);
+  @override
   Future<void> logoutEverywhere() => _closeRemote('all');
+  @override
   Future<void> revokeCurrentSession(String id) =>
       _closeRemote('current', sessionId: id);
   Future<void> _closeRemote(
@@ -443,6 +455,7 @@ class SessionController extends ChangeNotifier {
     consents = state;
   }
 
+  @override
   Future<void> synchronize() {
     if (_sync case final pending?) return pending;
     final task = _synchronize();
@@ -497,6 +510,7 @@ class SessionController extends ChangeNotifier {
         : SessionPhase.needsConsents;
   }
 
+  @override
   Future<void> saveConsents(
     Map<ConsentType, bool> changes,
     Map<ConsentType, String> displayedVersions,
@@ -579,6 +593,7 @@ class SessionController extends ChangeNotifier {
     _notify();
   }
 
+  @override
   Future<void> logout() =>
       _terminal ??
       (_logout ??= _performLogout().whenComplete(() {
@@ -617,7 +632,7 @@ class SessionController extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
-    _retryTimer?.cancel();
+    _retryTimer.cancel();
     _scope.cancel();
     repository.api.close();
     super.dispose();

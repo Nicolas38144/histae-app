@@ -1,6 +1,5 @@
 import '../../../core/network/api_failure.dart';
 import '../../../core/network/json_fields.dart';
-import '../../discovery/data/discovery_models.dart' show wireTime;
 
 enum BillingPeriod { monthly, annual }
 

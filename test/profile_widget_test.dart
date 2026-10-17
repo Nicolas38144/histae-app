@@ -3,8 +3,6 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
-import 'package:http/testing.dart';
 import 'package:histae_app/app/app.dart';
 import 'package:histae_app/app/theme.dart';
 import 'package:histae_app/features/consents/data/consent_state.dart';
@@ -13,6 +11,8 @@ import 'package:histae_app/features/profile/data/photo_preparer.dart';
 import 'package:histae_app/features/profile/data/profile_repository.dart';
 import 'package:histae_app/features/profile/presentation/photo_page.dart';
 import 'package:histae_app/features/profile/presentation/profile_editors.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 
 import 'support/auth_fixture.dart';
 import 'support/profile_fixture.dart';
@@ -48,7 +48,7 @@ void main() {
               : jsonResponse({
                   ...profile!,
                   'user_id': testUser,
-                  'profile_answers': [],
+                  'profile_answers': <Object?>[],
                   'moderation': {'bio': null, 'photo': null},
                 });
         }
@@ -160,7 +160,7 @@ void main() {
         if (r.url.path.endsWith('profile-answers')) {
           if (r.method == 'PUT') {
             saved = jsonDecode(r.body)['answers'] as List<dynamic>;
-            return jsonResponse({'answers': []});
+            return jsonResponse({'answers': <Object?>[]});
           }
           return jsonResponse({
             'answers': [
@@ -218,7 +218,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       await tapVisible(tester, find.text('Vos choix et votre vie privée'));
-      expect(find.text('Vos consentements'), findsOneWidget);
+      expect(find.text('Vie privée et sécurité'), findsOneWidget);
       await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();
       await tapVisible(tester, find.text('Se déconnecter'));

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/testing.dart';
 import 'package:histae_app/app/app.dart';
 import 'package:histae_app/app/theme.dart';
 import 'package:histae_app/core/network/api_client.dart';
@@ -12,6 +11,7 @@ import 'package:histae_app/features/notifications/application/push_controller.da
 import 'package:histae_app/features/notifications/data/device_repository.dart';
 import 'package:histae_app/features/notifications/data/notification_models.dart';
 import 'package:histae_app/features/notifications/data/push_vault.dart';
+import 'package:http/testing.dart';
 
 import 'support/auth_fixture.dart';
 import 'support/billing_fixture.dart';

@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../../../core/async/serial_executor.dart';
 import '../../../core/config/billing_config.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
-import '../../auth/application/session_controller.dart';
+import '../../../core/network/retry_after.dart';
+import '../../auth/domain/authenticated_session.dart';
 import '../../matches/data/realtime_client.dart';
 import '../data/billing_gateway.dart';
 import '../data/billing_models.dart';
@@ -38,7 +40,7 @@ class BillingController extends ChangeNotifier {
   final BillingConfig config;
   final CheckoutVault vault;
   final BillingGateway gateway;
-  SessionController get session => repository.session;
+  AuthenticatedSession get session => repository.session;
   late final RealtimeClient _realtime;
   String? _owner, _key;
   bool _disposed = false, _active = false, restored = false;
@@ -46,9 +48,15 @@ class BillingController extends ChangeNotifier {
   bool _invalidated = false;
   int _epoch = 0;
   RequestCancellation _scope = RequestCancellation();
-  Future<void> _storage = Future.value();
+  final _storage = SerialExecutor();
   Future<void>? _restore;
-  Timer? _timer, _expiry;
+  Timer? _expiry;
+  late final RetryTicker _timer = RetryTicker(
+    remaining: () => retrySeconds,
+    onTick: () {
+      if (!_disposed) notifyListeners();
+    },
+  );
   SubscriptionState? subscription;
   CheckoutAttempt? pending;
   ApiFailure? failure;
@@ -60,10 +68,7 @@ class BillingController extends ChangeNotifier {
       session.identity?.userId == _owner;
   bool get active => accessible && _active && restored;
   bool get paymentsAvailable => config.available;
-  int get retrySeconds {
-    final ms = failure?.retryAt?.difference(DateTime.now()).inMilliseconds ?? 0;
-    return ms <= 0 ? 0 : (ms / 1000).ceil();
-  }
+  int get retrySeconds => retrySecondsUntil(failure?.retryAt);
 
   bool _alive(int epoch) => active && epoch == _epoch;
   void _notify() {
@@ -72,20 +77,13 @@ class BillingController extends ChangeNotifier {
 
   // Serialize every storage operation, including logout and owner changes, so
   // a late write cannot resurrect an old owner's pending intent.
-  Future<T> _stored<T>(Future<T> Function() action) {
-    final result = _storage.then((_) => action());
-    _storage = result.then<void>((_) {}, onError: (Object _, StackTrace _) {});
-    return result;
-  }
+  Future<T> _stored<T>(Future<T> Function() action) => _storage.run(action);
 
   void _error(ApiFailure e) {
     failure = e;
-    _timer?.cancel();
+    _timer.cancel();
     if (retrySeconds > 0) {
-      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        if (retrySeconds == 0) timer.cancel();
-        _notify();
-      });
+      _timer.restart();
     }
     if (e.kind == ApiFailureKind.consentRequired) {
       unawaited(session.synchronize());
@@ -133,7 +131,7 @@ class BillingController extends ChangeNotifier {
       if (_disposed || epoch != _epoch || !accessible) return;
       if (record != null &&
           record.owner == _owner &&
-          record.origin == session.repository.api.origin.toString()) {
+          record.origin == session.apiOrigin.toString()) {
         pending = record;
       } else if (record != null) {
         await _stored(() => vault.write(null));
@@ -257,7 +255,7 @@ class BillingController extends ChangeNotifier {
     failure = null;
     notice = null;
     pending ??= CheckoutAttempt.create(
-      session.repository.api.origin.toString(),
+      session.apiOrigin.toString(),
       _owner!,
       period,
     );
@@ -363,7 +361,7 @@ class BillingController extends ChangeNotifier {
   void dispose() {
     _disposed = true;
     suspend();
-    _timer?.cancel();
+    _timer.cancel();
     session.removeListener(_changed);
     _realtime.dispose();
     subscription = null;

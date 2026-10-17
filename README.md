@@ -2,7 +2,7 @@
 
 Client Flutter Android et iOS de Histae, application de rencontre fondée sur la découverte sans photo dans le feed, la révélation mutuelle des photos et la décision réciproque de poursuivre une conversation.
 
-Mise à jour : 17 octobre 2026.
+Mise à jour : 18 octobre 2026.
 
 ## État réel du dépôt
 
@@ -16,6 +16,7 @@ Le manifeste conserve Dart `^3.13.1` et `cupertino_icons`. Aux dépendances L1/L
 | --- | --- |
 | [Résumé technique et fonctionnel](resume.md) | Fonctionnement du produit, précautions d'intégration et architecture proposée |
 | [Roadmap et matrice de couverture](roadmap.md) | Lots progressifs, routes mobiles, état d'avancement et critères de validation |
+| [Architecture Flutter](ARCHITECTURE.md) | Responsabilités, injection des dépendances, contrats et règles du refactoring transversal |
 | [Contrat HTTP Rust](../histae-api-rust/docs/http-contract.md) | Référence des routes, DTO, autorisations, erreurs et règles de rejeu |
 | [Documentation API](../histae-api-rust/docs/README.md) | Architecture, développement et configuration du backend |
 | [Collections Postman](../histae-api-rust/postman/README.md) | Exemples de requêtes et parcours d'intégration |
@@ -208,6 +209,14 @@ La configuration retenue ne doit pas servir à une distribution Play Store ou Ap
 Vérifications L9 : dix contrôles ciblés de configuration, droits, stockage, idempotence, navigation, portail et notifications ; treize contrôles existants de configuration et une régression de navigation push également réussis. Analyse sans problème, 110 fichiers formatés et APK Android debug compilé. Six aperçus simulés dans `build/previews/subscription-*.png`, dont écran 320 px avec texte à 160 %. Génération manuelle : `flutter test tool/preview_billing_test.dart --update-goldens` avec `FLUTTER_ROOT` défini. Les essais Stripe test (SCA, refus, essai, renouvellement, résiliation, webhooks retardés et fermeture réelle de l'app) restent à effectuer après configuration. Aucun achat réel ou de test fournisseur n'a été lancé ; aucun fichier backend modifié. Contrat HTTP, DTO, service, tests de contrat et Postman consultés seulement.
 
 Prochain lot : **L10**, qualité et préparation bêta. L'activation des paiements, push et vidéos reste suivie séparément.
+
+## Refactoring transversal avant L10
+
+Refonte achevée le 18 octobre 2026 : démarrage et dépendances explicites, neuf contrats de dépôts, session abstraite pour les autres fonctionnalités, composants de présentation séparés, listes protégées, brouillons/envois isolés et primitives asynchrones partagées. Les formulaires passent par les commandes du contrôleur ; les téléchargements de photos privées utilisent un service commun borné et annulable, sans Bearer, redirection ou cache disque. Les imports historiques restent disponibles lorsque les classes ont été extraites. Aucun fichier source supprimé, aucune nouvelle dépendance ou modification backend. Détails et règles de maintenance dans [ARCHITECTURE.md](ARCHITECTURE.md).
+
+Vérifications : 166 tests lors du contrôle global, puis 39 contrôles ciblés profil/messages/photos comprenant le troisième et dernier nouveau test ; **167 contrôles distincts réussis**. Trois nouveaux contrôles seulement, consacrés à la sérialisation après échec, à l'annulation du compteur et au transport sécurisé des photos. Analyse stricte sans problème, formatage de 143 fichiers vérifié, APK Android debug final compilé. Quatre scénarios visuels ont généré 22 aperçus simulés ; planche d'ensemble et écrans représentatifs inspectés. Aucune validation fournisseur réelle ou compilation iOS revendiquée.
+
+La configuration mobile invalide `BILLING_ENABLED=stripe` a été corrigée en `false`. Les autres réglages et liens de retour sont conservés. Les paiements, push et vidéos restent désactivés. Les avertissements de compatibilité future KGP des dépendances Firebase/image sont toujours présents ; ils n'empêchent pas la compilation actuelle. L10 et les validations sur appareils restent à effectuer.
 
 ## Direction artistique
 

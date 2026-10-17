@@ -1,7 +1,7 @@
-import 'package:http/http.dart' as http;
 import 'package:histae_app/core/network/api_client.dart';
 import 'package:histae_app/features/consents/data/consent_state.dart';
 import 'package:histae_app/features/discovery/data/device_location.dart';
+import 'package:http/http.dart' as http;
 
 import 'auth_fixture.dart';
 import 'profile_fixture.dart';
@@ -14,7 +14,7 @@ Map<String, dynamic> discoveryStatusJson({
   DateTime? expiresAt,
 }) => {
   'ready': ready,
-  'required_actions': ready ? [] : ['fresh_presence'],
+  'required_actions': ready ? <Object?>[] : ['fresh_presence'],
   'presence_expires_at':
       (expiresAt ??
               (ready

@@ -4,7 +4,8 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
-import '../../auth/application/session_controller.dart';
+import '../../../core/network/retry_after.dart';
+import '../../auth/domain/authenticated_session.dart';
 import '../data/privacy_models.dart';
 import '../data/privacy_repository.dart';
 import '../data/private_export_store.dart';
@@ -19,17 +20,22 @@ class PrivacyController extends ChangeNotifier {
   }
   final PrivacyRepository repository;
   final PrivateExportStore exportStore;
-  SessionController get session => repository.session;
+  AuthenticatedSession get session => repository.session;
   late String _key;
   bool _disposed = false, _active = true;
   int _epoch = 0;
   RequestCancellation _scope = RequestCancellation();
-  Timer? _cooldown;
+  late final RetryTicker _cooldown = RetryTicker(
+    remaining: () => retrySeconds,
+    onTick: () {
+      if (!_disposed) notifyListeners();
+    },
+  );
   DateTime? _retryAt;
   PrivacySection? section;
-  final sessions = <MobileSession>[],
-      blocks = <BlockedPerson>[],
-      rights = <RightsRequest>[];
+  final _sessions = <MobileSession>[],
+      _blocks = <BlockedPerson>[],
+      _rights = <RightsRequest>[];
   String? cursor, pendingRevoke, pendingUnblock, exportPath;
   DataRight? pendingRight;
   bool loading = false,
@@ -39,16 +45,16 @@ class PrivacyController extends ChangeNotifier {
       _sharePendingCleanup = false;
   ApiFailure? failure;
   String? notice;
+  List<MobileSession> get sessions => List.unmodifiable(_sessions);
+  List<BlockedPerson> get blocks => List.unmodifiable(_blocks);
+  List<RightsRequest> get rights => List.unmodifiable(_rights);
   bool get accessible =>
       !_disposed &&
       session.hasSession &&
       [SessionPhase.ready, SessionPhase.needsConsents].contains(session.phase);
   bool get onboarded => accessible && session.phase == SessionPhase.ready;
   bool get active => accessible && _active;
-  int get retrySeconds {
-    final ms = _retryAt?.difference(DateTime.now()).inMilliseconds ?? 0;
-    return ms <= 0 ? 0 : (ms / 1000).ceil();
-  }
+  int get retrySeconds => retrySecondsUntil(_retryAt);
 
   bool _alive(int epoch) => active && epoch == _epoch;
   void _notify() {
@@ -59,9 +65,9 @@ class PrivacyController extends ChangeNotifier {
     if (accessible && _key == session.resourceKey) return;
     _key = session.resourceKey;
     suspend(notify: false, forceClean: true);
-    sessions.clear();
-    blocks.clear();
-    rights.clear();
+    _sessions.clear();
+    _blocks.clear();
+    _rights.clear();
     cursor = null;
     pendingRevoke = null;
     pendingUnblock = null;
@@ -69,7 +75,7 @@ class PrivacyController extends ChangeNotifier {
     failure = null;
     notice = null;
     _retryAt = null;
-    _cooldown?.cancel();
+    _cooldown.cancel();
     _notify();
   }
 
@@ -80,11 +86,8 @@ class PrivacyController extends ChangeNotifier {
       _retryAt = e.retryAt;
     }
     if (retrySeconds > 0) {
-      _cooldown?.cancel();
-      _cooldown = Timer.periodic(const Duration(seconds: 1), (t) {
-        if (retrySeconds == 0) t.cancel();
-        _notify();
-      });
+      _cooldown.cancel();
+      _cooldown.restart();
     }
     if (e.kind == ApiFailureKind.consentRequired) {
       unawaited(session.synchronize());
@@ -205,9 +208,9 @@ class PrivacyController extends ChangeNotifier {
             pendingRevoke != null &&
             !seen.contains(pendingRevoke) &&
             next != null);
-        if (!more) sessions.clear();
-        final ids = sessions.map((s) => s.id).toSet();
-        sessions.addAll(result.where((s) => ids.add(s.id)));
+        if (!more) _sessions.clear();
+        final ids = _sessions.map((s) => s.id).toSet();
+        _sessions.addAll(result.where((s) => ids.add(s.id)));
         cursor = next;
         if (pendingRevoke != null &&
             (seen.contains(pendingRevoke) == false && next == null)) {
@@ -216,21 +219,21 @@ class PrivacyController extends ChangeNotifier {
       } else if (current == PrivacySection.blocks) {
         final list = await repository.blocks(_scope);
         if (!_alive(epoch) || section != current) return;
-        blocks
+        _blocks
           ..clear()
           ..addAll(list);
         if (pendingUnblock != null &&
-            !blocks.any((b) => b.id == pendingUnblock)) {
+            !_blocks.any((b) => b.id == pendingUnblock)) {
           pendingUnblock = null;
         }
       } else {
         final list = await repository.rights(_scope);
         if (!_alive(epoch) || section != current) return;
-        rights
+        _rights
           ..clear()
           ..addAll(list);
         if (pendingRight != null &&
-            rights.any((r) => r.type == pendingRight && r.open)) {
+            _rights.any((r) => r.type == pendingRight && r.open)) {
           pendingRight = null;
         }
       }
@@ -239,7 +242,7 @@ class PrivacyController extends ChangeNotifier {
         _error(e);
         if (e.code == 'invalid_cursor') {
           cursor = null;
-          sessions.clear();
+          _sessions.clear();
         }
       }
     } finally {
@@ -293,7 +296,7 @@ class PrivacyController extends ChangeNotifier {
         (pendingRight != null && pendingRight != type)) {
       return;
     }
-    if (rights.any((r) => r.type == type && r.open)) {
+    if (_rights.any((r) => r.type == type && r.open)) {
       notice = 'request_open';
       _notify();
       return;
@@ -431,11 +434,11 @@ class PrivacyController extends ChangeNotifier {
   void dispose() {
     _disposed = true;
     suspend(notify: false, forceClean: true);
-    _cooldown?.cancel();
+    _cooldown.cancel();
     session.removeListener(_sessionChanged);
-    sessions.clear();
-    blocks.clear();
-    rights.clear();
+    _sessions.clear();
+    _blocks.clear();
+    _rights.clear();
     super.dispose();
   }
 }

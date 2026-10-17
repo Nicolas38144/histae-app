@@ -1,12 +1,8 @@
+import '../../../core/models/public_profile_answer.dart';
 import '../../../core/network/json_fields.dart';
-import '../../profile/data/profile_models.dart';
 
-DateTime wireTime(Object? value) {
-  if (value is! String || !RegExp(r'(Z|[+-]\d{2}:\d{2})$').hasMatch(value)) {
-    invalidProfile();
-  }
-  return DateTime.tryParse(value)?.toUtc() ?? invalidProfile();
-}
+export '../../../core/models/public_profile_answer.dart';
+export '../../../core/network/json_fields.dart' show wireTime;
 
 enum DiscoveryAction {
   profile('profile'),
@@ -19,7 +15,7 @@ enum DiscoveryAction {
   const DiscoveryAction(this.wireName);
   final String wireName;
   static DiscoveryAction parse(Object? value) =>
-      values.firstWhere((a) => a.wireName == value, orElse: invalidProfile);
+      values.firstWhere((a) => a.wireName == value, orElse: invalidResponse);
 }
 
 class DiscoveryStatus {
@@ -41,7 +37,7 @@ class DiscoveryStatus {
     if (ready != actions.isEmpty ||
         actions.toSet().length != actions.length ||
         (ready && expires == null)) {
-      invalidProfile();
+      invalidResponse();
     }
     return DiscoveryStatus(ready, List.unmodifiable(actions), expires);
   }
@@ -50,33 +46,18 @@ class DiscoveryStatus {
   final DateTime? presenceExpiresAt;
 }
 
-class FeedAnswer {
-  const FeedAnswer(this.questionId, this.question, this.answer, this.position);
-  factory FeedAnswer.fromJson(Object? value) {
-    final j = jsonObject(value);
-    jsonString(j, 'code');
-    return FeedAnswer(
-      serverId(j, 'question_id'),
-      jsonString(j, 'question'),
-      jsonString(j, 'answer'),
-      jsonField<int>(j, 'position'),
-    );
-  }
-  final String questionId, question, answer;
-  final int position;
-}
-
 class FeedProfile {
-  const FeedProfile(
+  FeedProfile(
     this.id,
     this.firstname,
     this.age,
     this.sex,
     this.bio,
     this.distance,
-    this.traits,
-    this.answers,
-  );
+    List<String> traits,
+    List<PublicProfileAnswer> answers,
+  ) : traits = List.unmodifiable(traits),
+      answers = List.unmodifiable(answers);
   factory FeedProfile.fromJson(Object? value) {
     final j = jsonObject(value);
     final age = jsonField<int>(j, 'age');
@@ -88,7 +69,7 @@ class FeedProfile {
         distance < 0 ||
         !['male', 'female', 'other'].contains(sex) ||
         traits.any((t) => t is! String)) {
-      invalidProfile();
+      invalidResponse();
     }
     // Deliberately no photo, signed URL, coordinates or fabricated city field.
     return FeedProfile(
@@ -100,7 +81,10 @@ class FeedProfile {
       distance,
       List<String>.unmodifiable(traits),
       List.unmodifiable(
-        jsonField<List<dynamic>>(j, 'profile_answers').map(FeedAnswer.fromJson),
+        jsonField<List<dynamic>>(
+          j,
+          'profile_answers',
+        ).map(PublicProfileAnswer.fromJson),
       ),
     );
   }
@@ -109,16 +93,17 @@ class FeedProfile {
   final String? bio;
   final double distance;
   final List<String> traits;
-  final List<FeedAnswer> answers;
+  final List<PublicProfileAnswer> answers;
 }
 
 class FeedPage {
-  const FeedPage(this.profiles, this.nextCursor);
+  FeedPage(List<FeedProfile> profiles, this.nextCursor)
+    : profiles = List.unmodifiable(profiles);
   factory FeedPage.fromJson(Object? value) {
     final j = jsonObject(value);
     final cursor = optionalText(j, 'next_cursor');
     if (cursor != null && (cursor.isEmpty || cursor.length > 512)) {
-      invalidProfile();
+      invalidResponse();
     }
     return FeedPage(
       List.unmodifiable(
@@ -157,7 +142,7 @@ class ReceivedMatch {
           'expired',
           'ended',
         ].contains(status)) {
-      invalidProfile();
+      invalidResponse();
     }
     return ReceivedMatch(
       serverId(j, 'id'),
@@ -183,7 +168,7 @@ class SwipeResult {
     if (decision != intent.action.name ||
         matched != (j['match'] != null) ||
         (matched && decision != 'like')) {
-      invalidProfile();
+      invalidResponse();
     }
     return SwipeResult(
       SwipeDecision.values.byName(decision),
@@ -195,3 +180,6 @@ class SwipeResult {
   final SwipeDecision decision;
   final ReceivedMatch? match;
 }
+
+// Compatibility with the original public feed model name.
+typedef FeedAnswer = PublicProfileAnswer;

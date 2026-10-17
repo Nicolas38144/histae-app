@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/network/retry_after.dart';
 import '../data/auth_repository.dart';
 import 'session_controller.dart';
 
@@ -20,14 +21,16 @@ class OtpController extends ChangeNotifier {
   String? notice;
   ApiFailure? failure;
   DateTime? _retryAt;
-  Timer? _timer;
+  late final RetryTicker _timer = RetryTicker(
+    remaining: () => retrySeconds,
+    onTick: () {
+      if (!_disposed) notifyListeners();
+    },
+  );
   RequestCancellation? _request;
   bool _disposed = false;
 
-  int get retrySeconds {
-    final remaining = _retryAt?.difference(_now()).inMilliseconds ?? 0;
-    return remaining <= 0 ? 0 : (remaining / 1000).ceil();
-  }
+  int get retrySeconds => retrySecondsUntil(_retryAt, now: _now());
 
   bool get canResume => _key != null;
 
@@ -123,12 +126,9 @@ class OtpController extends ChangeNotifier {
           requested = true; // The original code may still arrive.
         }
         _retryAt = error.retryAt;
-        _timer?.cancel();
+        _timer.cancel();
         if (retrySeconds > 0) {
-          _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-            if (retrySeconds == 0) timer.cancel();
-            if (!_disposed) notifyListeners();
-          });
+          _timer.restart();
         }
       }
     } finally {
@@ -155,7 +155,7 @@ class OtpController extends ChangeNotifier {
   void dispose() {
     _disposed = true;
     _request?.cancel();
-    _timer?.cancel();
+    _timer.cancel();
     _phone = null;
     _key = null;
     super.dispose();

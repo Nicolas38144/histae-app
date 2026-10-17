@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:http/http.dart' as http;
+import 'package:histae_app/features/notifications/data/notification_models.dart';
 import 'package:histae_app/features/notifications/data/push_gateway.dart';
 import 'package:histae_app/features/notifications/data/push_vault.dart';
-import 'package:histae_app/features/notifications/data/notification_models.dart';
+import 'package:http/http.dart' as http;
 
 import 'auth_fixture.dart';
 import 'matches_fixture.dart';

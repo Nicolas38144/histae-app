@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 
-import '../../auth/application/session_controller.dart';
+import '../../auth/domain/authenticated_session.dart';
 import '../../matches/data/match_models.dart';
 
 abstract interface class MatchAccess implements Listenable {
-  SessionController get session;
+  AuthenticatedSession get session;
   bool get active;
   bool get verified;
   bool get ending;

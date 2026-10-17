@@ -1,11 +1,27 @@
 import '../../../core/network/api_client.dart';
-import '../../auth/application/session_controller.dart';
-import '../../profile/data/profile_models.dart';
+import '../../../core/network/json_fields.dart';
+import '../../auth/domain/authenticated_session.dart';
 import 'discovery_models.dart';
 
-class DiscoveryRepository {
-  DiscoveryRepository(this.session);
-  final SessionController session;
+abstract interface class DiscoveryRepository {
+  factory DiscoveryRepository(AuthenticatedSession session) =
+      ApiDiscoveryRepository;
+  AuthenticatedSession get session;
+  Future<DiscoveryStatus> status(RequestCancellation scope);
+  Future<FeedPage> feed(String? cursor, RequestCancellation scope);
+  Future<void> presence(
+    double latitude,
+    double longitude,
+    RequestCancellation scope,
+  );
+  Future<SwipeResult> swipe(PendingChoice intent, RequestCancellation scope);
+  Future<void> block(PendingChoice intent, RequestCancellation scope);
+}
+
+final class ApiDiscoveryRepository implements DiscoveryRepository {
+  ApiDiscoveryRepository(this.session);
+  @override
+  final AuthenticatedSession session;
   Future<Object?> _request(
     String method,
     String path,
@@ -22,10 +38,12 @@ class DiscoveryRepository {
     replayAfterRefresh: true,
     cancellation: scope,
   );
+  @override
   Future<DiscoveryStatus> status(RequestCancellation scope) async =>
       DiscoveryStatus.fromJson(
         await _request('GET', '/api/users/me/discovery-status', scope),
       );
+  @override
   Future<FeedPage> feed(String? cursor, RequestCancellation scope) async =>
       FeedPage.fromJson(
         await _request(
@@ -35,6 +53,7 @@ class DiscoveryRepository {
           query: {'limit': '20', 'cursor': ?cursor},
         ),
       );
+  @override
   Future<void> presence(
     double latitude,
     double longitude,
@@ -48,12 +67,13 @@ class DiscoveryRepository {
     );
   }
 
+  @override
   Future<SwipeResult> swipe(
     PendingChoice intent,
     RequestCancellation scope,
   ) async {
     final owner = session.identity?.userId;
-    if (owner == null) invalidProfile();
+    if (owner == null) invalidResponse();
     return SwipeResult.fromJson(
       await _request(
         'POST',
@@ -70,6 +90,7 @@ class DiscoveryRepository {
     );
   }
 
+  @override
   Future<void> block(PendingChoice intent, RequestCancellation scope) async {
     serverId({'id': intent.profile.id}, 'id');
     await _request(

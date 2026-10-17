@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 
+import '../../../core/async/serial_executor.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
 
@@ -12,12 +13,8 @@ class PrivateExportStore {
   final Future<Directory> Function() _temporaryDirectory;
   final _name = RegExp(r'^histae-export-[a-f0-9-]{36}\.json(?:\.part)?$');
   static const maxBytes = 512 * 1024 * 1024;
-  Future<void> _tail = Future<void>.value();
-  Future<T> _serialized<T>(Future<T> Function() action) {
-    final result = _tail.then((_) => action());
-    _tail = result.then<void>((_) {}, onError: (Object _, StackTrace _) {});
-    return result;
-  }
+  final _queue = SerialExecutor();
+  Future<T> _serialized<T>(Future<T> Function() action) => _queue.run(action);
 
   Future<Directory> _cache() async =>
       Directory(await (await _temporaryDirectory()).resolveSymbolicLinks());

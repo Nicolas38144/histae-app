@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
-import 'package:http/testing.dart';
 import 'package:histae_app/app/app.dart';
 import 'package:histae_app/core/network/api_client.dart';
 import 'package:histae_app/features/catalog/data/catalog_repository.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 
 import 'support/catalog_fixture.dart';
 
@@ -63,7 +63,7 @@ void main() {
       expect(find.text('Messaging'), findsNothing);
       expect(
         find.text(
-          'La souscription n’est pas encore disponible dans l’application.',
+          'Retrouvez votre abonnement et les possibilités de souscription depuis votre profil.',
         ),
         findsOneWidget,
       );

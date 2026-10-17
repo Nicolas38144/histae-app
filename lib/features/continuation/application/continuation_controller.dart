@@ -4,7 +4,8 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
-import '../../auth/application/session_controller.dart';
+import '../../../core/network/retry_after.dart';
+import '../../auth/domain/authenticated_session.dart';
 import '../../catalog/data/subscription_plan.dart';
 import '../../matches/data/match_models.dart';
 import '../data/continuation_models.dart';
@@ -37,7 +38,12 @@ class ContinuationController extends ChangeNotifier {
   int _epoch = 0;
   RequestCancellation _scope = RequestCancellation();
   Future<void>? _load;
-  Timer? _retryTimer;
+  late final RetryTicker _retryTimer = RetryTicker(
+    remaining: () => retrySeconds,
+    onTick: () {
+      if (!_disposed) notifyListeners();
+    },
+  );
   DateTime? _retryAt;
   ContinuationQuota? quota;
   DateTime? quotaReadAt;
@@ -87,10 +93,7 @@ class ContinuationController extends ChangeNotifier {
     );
   }
 
-  int get retrySeconds {
-    final ms = _retryAt?.difference(_now()).inMilliseconds ?? 0;
-    return ms <= 0 ? 0 : (ms / 1000).ceil();
-  }
+  int get retrySeconds => retrySecondsUntil(_retryAt, now: _now());
 
   void _notify() {
     if (!_disposed) notifyListeners();
@@ -114,7 +117,7 @@ class ContinuationController extends ChangeNotifier {
       _continued.clear();
       _revealed.clear();
       _retryAt = null;
-      _retryTimer?.cancel();
+      _retryTimer.cancel();
     }
     for (final id in {
       ..._pendingContinue.keys,
@@ -198,11 +201,8 @@ class ContinuationController extends ChangeNotifier {
       _retryAt = e.retryAt;
     }
     if (retrySeconds > 0) {
-      _retryTimer?.cancel();
-      _retryTimer = Timer.periodic(const Duration(seconds: 1), (t) {
-        if (retrySeconds == 0) t.cancel();
-        _notify();
-      });
+      _retryTimer.cancel();
+      _retryTimer.restart();
     }
     if (e.kind == ApiFailureKind.consentRequired) {
       unawaited(access.session.synchronize());
@@ -392,7 +392,7 @@ class ContinuationController extends ChangeNotifier {
     _rewards?.dispose();
     _disposed = true;
     suspend(notify: false);
-    _retryTimer?.cancel();
+    _retryTimer.cancel();
     access.removeListener(_changed);
     access.session.removeListener(_changed);
     _pendingContinue.clear();

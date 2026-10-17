@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../core/widgets/editorial_card.dart';
+import '../../continuation/presentation/credits_page.dart';
+import '../../notifications/presentation/push_scope.dart';
 import '../application/matches_controller.dart';
 import 'chat_page.dart';
 import 'matches_strings.dart';
-import '../../continuation/presentation/credits_page.dart';
-import '../../notifications/presentation/push_scope.dart';
 
 class MatchesPage extends StatefulWidget {
   const MatchesPage({
@@ -174,7 +174,7 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
                             if (match.lastMessage case final last?) ...[
                               const SizedBox(height: 12),
                               Text(
-                                '${last.senderId == c.repository.owner ? 'Vous : ' : ''}${last.content}',
+                                '${last.senderId == c.ownerId ? 'Vous : ' : ''}${last.content}',
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),

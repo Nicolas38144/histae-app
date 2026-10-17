@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/network/retry_after.dart';
 import '../data/catalog_repository.dart';
 import '../data/subscription_plan.dart';
 
@@ -19,21 +20,21 @@ class CatalogController extends ChangeNotifier {
   List<SubscriptionPlan> plans = const [];
   ApiFailure? failure;
   RequestCancellation? _pending;
-  Timer? _cooldown;
+  late final RetryTicker _cooldown = RetryTicker(
+    remaining: () => retrySeconds,
+    onTick: () {
+      if (!_disposed) notifyListeners();
+    },
+  );
   bool _disposed = false;
 
-  int get retrySeconds {
-    final deadline = failure?.retryAt;
-    if (deadline == null) return 0;
-    final milliseconds = deadline.difference(_now()).inMilliseconds;
-    return milliseconds <= 0 ? 0 : (milliseconds / 1000).ceil();
-  }
+  int get retrySeconds => retrySecondsUntil(failure?.retryAt, now: _now());
 
   Future<void> load() async {
     if (_disposed || status == CatalogStatus.loading || retrySeconds > 0) {
       return;
     }
-    _cooldown?.cancel();
+    _cooldown.cancel();
     final request = RequestCancellation();
     _pending = request;
     status = CatalogStatus.loading;
@@ -49,10 +50,7 @@ class CatalogController extends ChangeNotifier {
       failure = error;
       status = CatalogStatus.failure;
       if (retrySeconds > 0) {
-        _cooldown = Timer.periodic(const Duration(seconds: 1), (timer) {
-          if (retrySeconds == 0) timer.cancel();
-          notifyListeners();
-        });
+        _cooldown.restart();
       }
     } finally {
       if (identical(_pending, request)) _pending = null;
@@ -73,7 +71,7 @@ class CatalogController extends ChangeNotifier {
   void dispose() {
     _disposed = true;
     _pending?.cancel();
-    _cooldown?.cancel();
+    _cooldown.cancel();
     super.dispose();
   }
 }

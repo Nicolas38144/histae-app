@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../privacy/presentation/report_page.dart';
-
+import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
-import '../../profile/presentation/profile_editors.dart';
+import '../../privacy/presentation/report_page.dart';
 import '../application/discovery_controller.dart';
 
 class EncounterPage extends StatelessWidget {
@@ -77,7 +76,7 @@ class EncounterPage extends StatelessWidget {
                 onPressed: controller.busy
                     ? null
                     : () async {
-                        if (!await confirmProfileAction(
+                        if (!await confirmAction(
                               context,
                               'Bloquer cette personne ?',
                               'Votre rencontre sera terminée et vous ne pourrez plus échanger.',

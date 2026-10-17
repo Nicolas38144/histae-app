@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../matches/data/match_models.dart';
 import '../../matches/presentation/matches_strings.dart';
-import '../../profile/presentation/profile_editors.dart';
 import '../application/continuation_controller.dart';
 import 'continuation_strings.dart';
 import 'credits_page.dart';
@@ -60,7 +60,7 @@ class _ContinuationPageState extends State<ContinuationPage>
   Future<void> _continue() async {
     final offer = await c.prepareContinuation();
     if (!mounted || offer == null) return;
-    final accepted = await confirmProfileAction(
+    final accepted = await confirmAction(
       context,
       'Poursuivre cette rencontre ?',
       offer.cost == 0
@@ -74,7 +74,7 @@ class _ContinuationPageState extends State<ContinuationPage>
   }
 
   Future<void> _reveal() async {
-    if (await confirmProfileAction(
+    if (await confirmAction(
           context,
           'Révéler vos photos ?',
           'Votre photo pourra être visible dans cette rencontre après un accord mutuel. Ce choix est indépendant de la continuation et ne rend pas votre photo visible dans le feed.',

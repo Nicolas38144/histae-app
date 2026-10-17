@@ -1,76 +1,17 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'app/app.dart';
-import 'core/config/app_config.dart';
-import 'core/network/api_client.dart';
-import 'features/catalog/data/catalog_repository.dart';
-import 'features/auth/data/auth_repository.dart';
-import 'features/auth/data/session_vault.dart';
-import 'features/auth/application/session_controller.dart';
-import 'features/privacy/data/private_export_store.dart';
-import 'features/notifications/application/push_controller.dart';
-import 'features/notifications/data/device_repository.dart';
-import 'features/notifications/data/push_gateway.dart';
-import 'features/notifications/data/push_vault.dart';
-import 'features/billing/application/billing_controller.dart';
-import 'features/billing/data/billing_repository.dart';
-import 'features/billing/data/billing_gateway.dart';
-import 'features/billing/data/checkout_vault.dart';
+import 'app/bootstrap.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Only bounded, app-owned private cache files from an interrupted export.
-  try {
-    await PrivateExportStore().clean();
-  } catch (_) {
-    /* Retry in privacy hub. */
-  }
-  LicenseRegistry.addLicense(() async* {
-    yield LicenseEntryWithLineBreaks([
-      'DM Serif Display',
-    ], await rootBundle.loadString('assets/fonts/dm_serif_display/OFL.txt'));
-  });
-  AppConfig? config;
-  try {
-    config = AppConfig.fromDotEnv(
-      await rootBundle.loadString('.env'),
-      isDebug: kDebugMode,
-    );
-  } on FormatException {
-    // Do not log invalid configuration: it might contain credentials.
-  } on FlutterError {
-    // A missing asset leaves integration unavailable, with no fallback host.
-  }
-  final session = config == null
-      ? null
-      : SessionController(
-          AuthRepository(ApiClient(origin: config.apiOrigin)),
-          SecureSessionVault(),
-        );
-  final push = session == null
-      ? null
-      : PushController(
-          DeviceRepository(session),
-          FirebasePushGateway(config!.push),
-          SecurePushVault(),
-        );
+  final dependencies = await bootstrap();
   runApp(
     HistaeApp(
-      catalogRepository: config == null
-          ? null
-          : CatalogRepository(ApiClient(origin: config.apiOrigin)),
-      sessionController: session,
-      pushController: push,
-      billingController: session == null
-          ? null
-          : BillingController(
-              BillingRepository(session),
-              config!.billing,
-              SecureCheckoutVault(),
-              ExternalBillingGateway(),
-            ),
+      catalogRepository: dependencies.catalog,
+      sessionController: dependencies.session,
+      pushController: dependencies.push,
+      billingController: dependencies.billing,
     ),
   );
 }

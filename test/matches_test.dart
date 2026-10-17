@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
 import 'package:histae_app/app/theme.dart';
 import 'package:histae_app/core/network/api_failure.dart';
 import 'package:histae_app/features/matches/application/matches_controller.dart';
@@ -11,6 +10,7 @@ import 'package:histae_app/features/matches/data/match_models.dart';
 import 'package:histae_app/features/matches/data/matches_repository.dart';
 import 'package:histae_app/features/matches/data/realtime_client.dart';
 import 'package:histae_app/features/matches/presentation/chat_page.dart';
+import 'package:http/http.dart' as http;
 
 import 'support/auth_fixture.dart';
 import 'support/discovery_fixture.dart';

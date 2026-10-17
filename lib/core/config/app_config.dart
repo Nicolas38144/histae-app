@@ -1,5 +1,6 @@
-import 'push_config.dart';
 import 'billing_config.dart';
+import 'public_env.dart';
+import 'push_config.dart';
 
 enum AppEnvironment { development, staging, production }
 
@@ -15,37 +16,19 @@ class AppConfig {
     this.billing,
   );
   factory AppConfig.fromDotEnv(String source, {required bool isDebug}) {
-    final values = <String, String>{};
-    for (final raw in source.replaceFirst('\uFEFF', '').split('\n')) {
-      final line = raw.trim();
-      if (line.isEmpty || line.startsWith('#')) continue;
-      final separator = line.indexOf('=');
-      if (separator < 1) {
-        throw const FormatException('Invalid public configuration');
-      }
-      final key = line.substring(0, separator).trim();
-      var value = line.substring(separator + 1).trim();
-      if (![
-            'APP_ENV',
-            'API_BASE_URL',
-            'ADMOB_ANDROID_APP_ID',
-            'ADMOB_IOS_APP_ID',
-            'ADMOB_ANDROID_REWARDED_AD_UNIT',
-            'ADMOB_IOS_REWARDED_AD_UNIT',
-            ...PushConfig.keys,
-            ...BillingConfig.keys,
-          ].contains(key) ||
-          values.containsKey(key)) {
-        throw const FormatException('Invalid public configuration');
-      }
-      if (value.startsWith('"') || value.startsWith("'")) {
-        if (value.length < 2 || !value.endsWith(value[0])) {
-          throw const FormatException('Invalid public configuration');
-        }
-        value = value.substring(1, value.length - 1);
-      }
-      values[key] = value;
-    }
+    final values = parsePublicEnv(
+      source,
+      allowedKeys: {
+        'APP_ENV',
+        'API_BASE_URL',
+        'ADMOB_ANDROID_APP_ID',
+        'ADMOB_IOS_APP_ID',
+        'ADMOB_ANDROID_REWARDED_AD_UNIT',
+        'ADMOB_IOS_REWARDED_AD_UNIT',
+        ...PushConfig.keys,
+        ...BillingConfig.keys,
+      },
+    );
     return AppConfig.fromValues(
       environment: values['APP_ENV'] ?? '',
       apiBaseUrl: values['API_BASE_URL'] ?? '',

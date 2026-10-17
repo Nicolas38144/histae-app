@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
-import '../../auth/application/session_controller.dart';
-import '../../profile/presentation/profile_editors.dart';
+import '../../auth/domain/authenticated_session.dart';
 import '../application/report_controller.dart';
 import '../data/privacy_models.dart';
 import '../data/privacy_repository.dart';
-import 'privacy_strings.dart';
 import 'privacy_choice.dart';
+import 'privacy_strings.dart';
 
 class ReportPage extends StatefulWidget {
   const ReportPage({
@@ -17,7 +17,7 @@ class ReportPage extends StatefulWidget {
     this.matchId,
     this.onBlock,
   });
-  final SessionController session;
+  final AuthenticatedSession session;
   final String target;
   final String? matchId;
   final Future<void> Function()? onBlock;
@@ -132,7 +132,7 @@ class _ReportPageState extends State<ReportPage> {
                     if (widget.onBlock != null)
                       OutlinedButton(
                         onPressed: () async {
-                          if (!await confirmProfileAction(
+                          if (!await confirmAction(
                                 context,
                                 'Bloquer cette personne ?',
                                 'Les échanges seront terminés. Vos anciennes rencontres ne seront pas rétablies après un déblocage.',

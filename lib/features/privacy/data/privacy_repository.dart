@@ -1,13 +1,29 @@
 import '../../../core/network/api_client.dart';
 import '../../../core/network/json_fields.dart';
-import '../../auth/application/session_controller.dart';
-import '../../profile/data/profile_models.dart';
+import '../../auth/domain/authenticated_session.dart';
 import 'privacy_models.dart';
 
-class PrivacyRepository {
-  PrivacyRepository(this.session);
-  final SessionController session;
-  String get owner => session.identity?.userId ?? invalidProfile();
+abstract interface class PrivacyRepository {
+  factory PrivacyRepository(AuthenticatedSession session) =
+      ApiPrivacyRepository;
+  AuthenticatedSession get session;
+  String get owner;
+  Future<SessionPage> sessions(RequestCancellation scope, {String? cursor});
+  Future<void> revoke(String id, RequestCancellation scope);
+  Future<List<BlockedPerson>> blocks(RequestCancellation scope);
+  Future<void> block(String id, bool blocked, RequestCancellation scope);
+  Future<List<RightsRequest>> rights(RequestCancellation scope);
+  Future<RightsRequest> requestRight(DataRight type, RequestCancellation scope);
+  Future<void> report(ReportIntent intent, RequestCancellation scope);
+  Future<DeletionTicket> deletionTicket(RequestCancellation scope);
+}
+
+final class ApiPrivacyRepository implements PrivacyRepository {
+  ApiPrivacyRepository(this.session);
+  @override
+  final AuthenticatedSession session;
+  @override
+  String get owner => session.identity?.userId ?? invalidResponse();
   Future<Object?> _request(
     String method,
     String path,
@@ -24,6 +40,7 @@ class PrivacyRepository {
     cancellation: scope,
     query: query,
   );
+  @override
   Future<SessionPage> sessions(
     RequestCancellation scope, {
     String? cursor,
@@ -37,11 +54,13 @@ class PrivacyRepository {
       ),
     ),
   );
+  @override
   Future<void> revoke(String id, RequestCancellation scope) async {
     serverId({'id': id}, 'id');
     await _request('DELETE', '/api/auth/sessions/$id', scope, status: 204);
   }
 
+  @override
   Future<List<BlockedPerson>> blocks(RequestCancellation scope) async =>
       List.unmodifiable(
         jsonField<List<dynamic>>(
@@ -49,6 +68,7 @@ class PrivacyRepository {
           'blocks',
         ).map(BlockedPerson.fromJson),
       );
+  @override
   Future<void> block(String id, bool blocked, RequestCancellation scope) async {
     serverId({'id': id}, 'id');
     await _request(
@@ -59,6 +79,7 @@ class PrivacyRepository {
     );
   }
 
+  @override
   Future<List<RightsRequest>> rights(RequestCancellation scope) async =>
       List.unmodifiable(
         jsonField<List<dynamic>>(
@@ -68,6 +89,7 @@ class PrivacyRepository {
           'requests',
         ).map((v) => RightsRequest.fromJson(v, owner)),
       );
+  @override
   Future<RightsRequest> requestRight(
     DataRight type,
     RequestCancellation scope,
@@ -81,9 +103,10 @@ class PrivacyRepository {
     ),
     owner,
   );
+  @override
   Future<void> report(ReportIntent intent, RequestCancellation scope) async {
     if (intent.target == owner || validateReport(intent.description) != null) {
-      invalidProfile();
+      invalidResponse();
     }
     final j = jsonObject(
       await _request(
@@ -99,11 +122,12 @@ class PrivacyRepository {
         j['reason'] != intent.reason.wire ||
         optionalText(j, 'match_id') != intent.matchId ||
         !['pending', 'reviewed', 'dismissed'].contains(j['status'])) {
-      invalidProfile();
+      invalidResponse();
     }
     serverId(j, 'id');
   }
 
+  @override
   Future<DeletionTicket> deletionTicket(RequestCancellation scope) async =>
       DeletionTicket.fromJson(
         await _request(

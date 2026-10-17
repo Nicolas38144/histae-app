@@ -1,5 +1,5 @@
-import 'package:http/http.dart' as http;
 import 'package:histae_app/features/privacy/data/private_export_store.dart';
+import 'package:http/http.dart' as http;
 
 import 'auth_fixture.dart';
 import 'discovery_fixture.dart';

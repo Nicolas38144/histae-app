@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/testing.dart';
 import 'package:histae_app/app/theme.dart';
 import 'package:histae_app/core/config/billing_config.dart';
 import 'package:histae_app/core/network/api_client.dart';
@@ -12,6 +11,7 @@ import 'package:histae_app/features/billing/application/billing_controller.dart'
 import 'package:histae_app/features/billing/data/billing_repository.dart';
 import 'package:histae_app/features/billing/presentation/subscription_page.dart';
 import 'package:histae_app/features/catalog/data/catalog_repository.dart';
+import 'package:http/testing.dart';
 
 import '../test/support/auth_fixture.dart';
 import '../test/support/billing_fixture.dart';

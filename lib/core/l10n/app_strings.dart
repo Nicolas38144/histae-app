@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 
 import '../network/api_failure.dart';
-import '../../features/consents/data/consent_state.dart';
 
 // Centralized French copy; add locales and a delegate when a second language
 // is introduced. Material's built-in labels are localized separately.
@@ -72,25 +71,6 @@ class AppStrings {
   String get privacyScope =>
       'Vous pouvez consulter vos documents, gérer vos consentements '
       'ou vous déconnecter ici, même si votre parcours n’est pas terminé.';
-  String consentLabel(ConsentType type) => switch (type) {
-    ConsentType.terms => 'J’accepte les conditions d’utilisation',
-    ConsentType.privacy =>
-      'J’ai pris connaissance de la notice de confidentialité',
-    ConsentType.sensitive => 'J’accepte le traitement de mes données sensibles',
-    ConsentType.location => 'J’accepte le traitement de ma localisation',
-  };
-  String consentTitle(ConsentType type) => switch (type) {
-    ConsentType.terms => 'Conditions d’utilisation',
-    ConsentType.privacy => 'Notice de confidentialité',
-    ConsentType.sensitive => 'Données sensibles',
-    ConsentType.location => 'Localisation',
-  };
-  String withdrawalMessage(ConsentType type) => type == ConsentType.sensitive
-      ? 'Ce retrait efface votre sexe et vos préférences sur le serveur. '
-            'La découverte pourra devenir indisponible. Confirmer ce retrait ?'
-      : 'Ce retrait efface votre présence sur le serveur. '
-            'La découverte pourra devenir indisponible. Il ne change pas la permission système. Confirmer ce retrait ?';
-
   String authFailure(ApiFailure error) => switch (error.code) {
     'invalid_phone_number' =>
       'Saisissez un numéro français valide au format +33.',

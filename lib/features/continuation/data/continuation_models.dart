@@ -1,6 +1,4 @@
 import '../../../core/network/json_fields.dart';
-import '../../discovery/data/discovery_models.dart' show wireTime;
-import '../../profile/data/profile_models.dart';
 
 class ContinuationQuota {
   const ContinuationQuota(
@@ -19,19 +17,19 @@ class ContinuationQuota {
     final j = jsonObject(value);
     int count(String key) {
       final n = jsonField<int>(j, key);
-      if (n < 0) invalidProfile();
+      if (n < 0) invalidResponse();
       return n;
     }
 
     final plan = jsonString(j, 'plan');
-    if (!['free', 'premium'].contains(plan)) invalidProfile();
+    if (!['free', 'premium'].contains(plan)) invalidResponse();
     final limit = j['weekly_limit'] == null ? null : count('weekly_limit');
     final remaining = j['remaining'] == null ? null : count('remaining');
     if (plan == 'free' && (limit == null || remaining == null)) {
-      invalidProfile();
+      invalidResponse();
     }
     if (plan == 'premium' && (limit != null || remaining != null)) {
-      invalidProfile();
+      invalidResponse();
     }
     return ContinuationQuota(
       plan,
@@ -79,14 +77,14 @@ class RewardIntent {
     if (custom != id ||
         !RegExp(r'^ca-app-pub-\d+/\d+$').hasMatch(unit) ||
         credits <= 0) {
-      invalidProfile();
+      invalidResponse();
     }
     final status = switch (jsonString(j, 'status')) {
       'pending' => RewardStatus.pending,
       'credited' => RewardStatus.credited,
       'expired' => RewardStatus.expired,
       'cancelled' => RewardStatus.cancelled,
-      _ => invalidProfile(),
+      _ => invalidResponse(),
     };
     return RewardIntent(
       id,

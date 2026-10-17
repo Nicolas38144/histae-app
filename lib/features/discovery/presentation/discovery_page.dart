@@ -2,19 +2,19 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../privacy/presentation/report_page.dart';
-import '../../notifications/presentation/push_scope.dart';
-
+import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../consents/presentation/consents_page.dart';
+import '../../notifications/presentation/push_scope.dart';
+import '../../privacy/presentation/report_page.dart';
 import '../../profile/application/profile_controller.dart';
 import '../../profile/presentation/profile_editors.dart';
 import '../application/discovery_controller.dart';
 import '../data/device_location.dart';
 import '../data/discovery_models.dart';
 import 'discovery_strings.dart';
-import 'feed_profile_card.dart';
 import 'encounter_page.dart';
+import 'feed_profile_card.dart';
 
 class DiscoveryPage extends StatefulWidget {
   const DiscoveryPage({
@@ -126,7 +126,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
       await _open(ConsentsPage(session: c.session));
       return;
     }
-    if (!await confirmProfileAction(
+    if (!await confirmAction(
           context,
           'Utiliser votre position ?',
           'Histae utilisera une mesure ponctuelle pour les rencontres à proximité. Aucun suivi en arrière-plan. Votre position exacte ne sera pas montrée aux autres personnes.',
@@ -167,7 +167,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
   Future<void> _block() async {
     final profile = c.current;
     if (profile == null || c.busy) return;
-    if (!await confirmProfileAction(
+    if (!await confirmAction(
           context,
           'Bloquer ce profil ?',
           'Vous ne pourrez plus vous découvrir ni échanger. Toute rencontre déjà créée avec cette personne sera terminée.',

@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
 import 'package:histae_app/core/config/app_config.dart';
 import 'package:histae_app/core/config/billing_config.dart';
 import 'package:histae_app/core/network/api_failure.dart';
@@ -13,6 +12,7 @@ import 'package:histae_app/features/billing/data/billing_models.dart';
 import 'package:histae_app/features/billing/data/billing_repository.dart';
 import 'package:histae_app/features/billing/data/checkout_vault.dart';
 import 'package:histae_app/features/matches/data/realtime_client.dart';
+import 'package:http/http.dart' as http;
 
 import 'support/auth_fixture.dart';
 import 'support/billing_fixture.dart';

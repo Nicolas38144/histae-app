@@ -2,13 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
 import 'package:histae_app/core/network/api_client.dart';
 import 'package:histae_app/core/network/api_failure.dart';
 import 'package:histae_app/features/consents/data/consent_state.dart';
 import 'package:histae_app/features/profile/application/profile_controller.dart';
 import 'package:histae_app/features/profile/data/profile_models.dart';
 import 'package:histae_app/features/profile/data/profile_repository.dart';
+import 'package:http/http.dart' as http;
 
 import 'support/auth_fixture.dart';
 import 'support/profile_fixture.dart';
@@ -153,7 +153,7 @@ void main() {
         {'question_id': questionTwo, 'answer': 'La lumière du matin'},
         {'question_id': questionOne, 'answer': 'Une longue promenade'},
       ]);
-      expect(jsonDecode(writes[5].body), {'answers': []});
+      expect(jsonDecode(writes[5].body), {'answers': <Object?>[]});
       expect(writes[6].method, 'DELETE');
       expect(
         writes.every(

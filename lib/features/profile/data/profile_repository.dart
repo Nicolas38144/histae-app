@@ -3,12 +3,31 @@ import 'dart:typed_data';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/network/json_fields.dart';
-import '../../auth/application/session_controller.dart';
+import '../../auth/domain/authenticated_session.dart';
 import 'profile_models.dart';
 
-class ProfileRepository {
-  ProfileRepository(this.session);
-  final SessionController session;
+abstract interface class ProfileRepository {
+  factory ProfileRepository(AuthenticatedSession session) =
+      ApiProfileRepository;
+  AuthenticatedSession get session;
+  Future<OwnerProfile?> profile(RequestCancellation scope);
+  Future<Preferences?> preferences(RequestCancellation scope);
+  Future<List<ProfileTrait>> traits(RequestCancellation scope);
+  Future<List<ProfileTrait>> selectedTraits(RequestCancellation scope);
+  Future<List<ProfileQuestion>> questions(RequestCancellation scope);
+  Future<List<ProfileAnswer>> answers(RequestCancellation scope);
+  Future<void> saveProfile(ProfileDraft draft);
+  Future<void> savePreferences(Preferences preferences);
+  Future<void> setTrait(String id, bool selected);
+  Future<void> saveAnswers(List<AnswerDraft> answers);
+  Future<void> upload(PhotoIntent intent);
+  Future<void> removePhoto();
+}
+
+final class ApiProfileRepository implements ProfileRepository {
+  ApiProfileRepository(this.session);
+  @override
+  final AuthenticatedSession session;
   Future<Object?> _request(
     String method,
     String path, {
@@ -29,12 +48,13 @@ class ProfileRepository {
   );
   // An expired-access 401 is a definitive rejection before mutation. This is the
   // only automatic replay; lost responses always return control to the user.
+  @override
   Future<OwnerProfile?> profile(RequestCancellation scope) async {
     try {
       final p = OwnerProfile.fromJson(
         await _request('GET', '/api/users/me', cancellation: scope),
       );
-      if (p.userId != session.identity?.userId) invalidProfile();
+      if (p.userId != session.identity?.userId) invalidResponse();
       return p;
     } on ApiFailure catch (e) {
       if (e.statusCode == 404 && e.code == 'profile_not_found') return null;
@@ -42,13 +62,14 @@ class ProfileRepository {
     }
   }
 
+  @override
   Future<Preferences?> preferences(RequestCancellation scope) async {
     try {
       final value = jsonObject(
         await _request('GET', '/api/users/me/preferences', cancellation: scope),
       );
       if (serverId(value, 'user_id') != session.identity?.userId) {
-        invalidProfile();
+        invalidResponse();
       }
       return Preferences.fromJson(value);
     } on ApiFailure catch (e) {
@@ -68,18 +89,23 @@ class ProfileRepository {
       field,
     ).map(parse),
   );
+  @override
   Future<List<ProfileTrait>> traits(RequestCancellation s) =>
       _list('/api/traits', 'traits', ProfileTrait.fromJson, s);
+  @override
   Future<List<ProfileTrait>> selectedTraits(RequestCancellation s) =>
       _list('/api/users/me/traits', 'traits', ProfileTrait.fromJson, s);
+  @override
   Future<List<ProfileQuestion>> questions(RequestCancellation s) =>
       _list('/api/profile-questions', 'questions', ProfileQuestion.fromJson, s);
+  @override
   Future<List<ProfileAnswer>> answers(RequestCancellation s) => _list(
     '/api/users/me/profile-answers',
     'answers',
     ProfileAnswer.fromJson,
     s,
   );
+  @override
   Future<void> saveProfile(ProfileDraft draft) async {
     if (draft.validate(DateTime.now()) != null) {
       throw const ApiFailure(ApiFailureKind.validation);
@@ -87,11 +113,13 @@ class ProfileRepository {
     await _request('PATCH', '/api/users/me/profile', body: draft.toJson());
   }
 
+  @override
   Future<void> savePreferences(Preferences p) async {
     if (p.validate() != null) throw const ApiFailure(ApiFailureKind.validation);
     await _request('PATCH', '/api/users/me/preferences', body: p.toJson());
   }
 
+  @override
   Future<void> setTrait(String id, bool selected) async {
     serverId({'id': id}, 'id');
     await _request(
@@ -102,6 +130,7 @@ class ProfileRepository {
     );
   }
 
+  @override
   Future<void> saveAnswers(List<AnswerDraft> answers) async {
     if (answers.length > 3 ||
         answers.map((a) => a.questionId).toSet().length != answers.length ||
@@ -121,6 +150,7 @@ class ProfileRepository {
     jsonField<List<dynamic>>(j, 'answers').map(ProfileAnswer.fromJson).toList();
   }
 
+  @override
   Future<void> upload(PhotoIntent intent) async {
     if (intent.expired) throw const ApiFailure(ApiFailureKind.expired);
     final j = jsonObject(
@@ -131,13 +161,14 @@ class ProfileRepository {
         key: intent.key,
       ),
     );
-    if (!validPhotoUrl(jsonString(j, 'photo'))) invalidProfile();
+    if (!validPhotoUrl(jsonString(j, 'photo'))) invalidResponse();
     Moderation.parse(
       jsonString(j, 'moderation_status'),
       j['moderation_reasons'],
     );
   }
 
+  @override
   Future<void> removePhoto() async {
     await _request('DELETE', '/api/users/me/photo', status: 204);
   }

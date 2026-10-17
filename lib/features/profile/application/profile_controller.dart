@@ -5,8 +5,9 @@ import 'package:flutter/painting.dart';
 
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
-import '../../auth/application/session_controller.dart';
-import '../../consents/data/consent_state.dart';
+import '../../../core/network/retry_after.dart';
+import '../../auth/domain/authenticated_session.dart';
+import '../../consents/domain/consent_state.dart';
 import '../data/profile_models.dart';
 import '../data/profile_repository.dart';
 
@@ -16,19 +17,24 @@ class ProfileController extends ChangeNotifier {
     session.addListener(_sessionChanged);
   }
   final ProfileRepository repository;
-  SessionController get session => repository.session;
+  AuthenticatedSession get session => repository.session;
   OwnerProfile? profile;
   Preferences? preferences;
-  List<ProfileTrait> traits = [], selectedTraits = [];
-  List<ProfileQuestion> questions = [];
-  List<ProfileAnswer> answers = [];
-  final errors = <String, ApiFailure>{};
+  List<ProfileTrait> _traits = [], _selectedTraits = [];
+  List<ProfileQuestion> _questions = [];
+  List<ProfileAnswer> _answers = [];
+  final _errors = <String, ApiFailure>{};
   bool loading = false, saving = false, uncertain = false;
   bool _disposed = false;
   int _generation = 0;
   late String _key;
   RequestCancellation _scope = RequestCancellation();
-  Timer? _timer;
+  late final RetryTicker _timer = RetryTicker(
+    remaining: () => retrySeconds,
+    onTick: () {
+      if (!_disposed) notifyListeners();
+    },
+  );
   PhotoIntent? photoIntent;
   DateTime? photoReadAt;
   bool get sensitiveAllowed =>
@@ -36,15 +42,17 @@ class ProfileController extends ChangeNotifier {
         (c) => c.type == ConsentType.sensitive && c.current,
       ) ??
       false;
+  List<ProfileTrait> get traits => List.unmodifiable(_traits);
+  List<ProfileTrait> get selectedTraits => List.unmodifiable(_selectedTraits);
+  List<ProfileQuestion> get questions => List.unmodifiable(_questions);
+  List<ProfileAnswer> get answers => List.unmodifiable(_answers);
+  Map<String, ApiFailure> get errors => Map.unmodifiable(_errors);
   bool get accessible =>
       !_disposed && session.hasSession && session.phase == SessionPhase.ready;
   bool get canWrite =>
       accessible && !saving && !loading && !uncertain && retrySeconds == 0;
   DateTime? retryAt;
-  int get retrySeconds {
-    final ms = retryAt?.difference(DateTime.now()).inMilliseconds ?? 0;
-    return ms <= 0 ? 0 : (ms / 1000).ceil();
-  }
+  int get retrySeconds => retrySecondsUntil(retryAt);
 
   void _notify() {
     if (!_disposed) notifyListeners();
@@ -58,18 +66,18 @@ class ProfileController extends ChangeNotifier {
     _scope = RequestCancellation();
     profile = null;
     preferences = null;
-    traits = [];
-    selectedTraits = [];
-    questions = [];
-    answers = [];
+    _traits = [];
+    _selectedTraits = [];
+    _questions = [];
+    _answers = [];
     _discardIntent();
     photoReadAt = null;
-    errors.clear();
+    _errors.clear();
     loading = false;
     saving = false;
     uncertain = false;
     retryAt = null;
-    _timer?.cancel();
+    _timer.cancel();
     _notify();
     if (accessible) unawaited(load());
   }
@@ -80,11 +88,8 @@ class ProfileController extends ChangeNotifier {
       retryAt = e.retryAt;
     }
     if (retrySeconds > 0) {
-      _timer?.cancel();
-      _timer = Timer.periodic(const Duration(seconds: 1), (t) {
-        if (retrySeconds == 0) t.cancel();
-        _notify();
-      });
+      _timer.cancel();
+      _timer.restart();
     }
   }
 
@@ -105,10 +110,10 @@ class ProfileController extends ChangeNotifier {
         final result = await fetch();
         if (_disposed || generation != _generation || scope.isCancelled) return;
         assign(result);
-        errors.remove(section);
+        _errors.remove(section);
       } on ApiFailure catch (e) {
         if (_disposed || generation != _generation) return;
-        errors[section] = e;
+        _errors[section] = e;
         _cooldown(e);
         if (e.kind == ApiFailureKind.consentRequired) {
           unawaited(session.synchronize());
@@ -126,23 +131,36 @@ class ProfileController extends ChangeNotifier {
         () => repository.preferences(scope),
         (p) => preferences = p,
       ),
-      read('traits', () => repository.traits(scope), (v) => traits = v),
+      read('traits', () => repository.traits(scope), (v) => _traits = v),
       read(
         'selectedTraits',
         () => repository.selectedTraits(scope),
-        (v) => selectedTraits = v,
+        (v) => _selectedTraits = v,
       ),
       read(
         'questions',
         () => repository.questions(scope),
-        (v) => questions = v,
+        (v) => _questions = v,
       ),
-      read('answers', () => repository.answers(scope), (v) => answers = v),
+      read('answers', () => repository.answers(scope), (v) => _answers = v),
     ]);
     if (_disposed || generation != _generation) return;
     loading = false;
-    if (errors.isEmpty) uncertain = false;
+    if (_errors.isEmpty) uncertain = false;
     _notify();
+  }
+
+  Future<void> saveIdentity(ProfileDraft draft) =>
+      mutate(() => repository.saveProfile(draft));
+  Future<void> savePreferences(Preferences preferences) =>
+      mutate(() => repository.savePreferences(preferences));
+  Future<void> setTrait(String id, bool selected) =>
+      mutate(() => repository.setTrait(id, selected));
+  Future<void> saveAnswers(List<AnswerDraft> drafts) =>
+      mutate(() => repository.saveAnswers(drafts));
+  Future<void> removePhoto() async {
+    await mutate(repository.removePhoto, photo: true);
+    setPhoto(null);
   }
 
   Future<void> mutate(
@@ -228,14 +246,14 @@ class ProfileController extends ChangeNotifier {
     _disposed = true;
     _generation++;
     _scope.cancel();
-    _timer?.cancel();
+    _timer.cancel();
     session.removeListener(_sessionChanged);
     profile = null;
     preferences = null;
-    traits = [];
-    selectedTraits = [];
-    questions = [];
-    answers = [];
+    _traits = [];
+    _selectedTraits = [];
+    _questions = [];
+    _answers = [];
     _discardIntent();
     super.dispose();
   }
