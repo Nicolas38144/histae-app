@@ -6,7 +6,7 @@ Mise à jour : 17 octobre 2026.
 
 ## 1. État de départ et suivi
 
-L1 à L5, le cœur de L6, L7 et la gestion des appareils L8 sont implémentés. Les flux push L8 sont préparés mais désactivés, sans projet Firebase, conformément au choix utilisateur. L7 couvre sûreté, sessions, droits, export et suppression. Contrôles privés simulés uniquement ; comptes et appareils réels restent à valider. Vidéos désactivées, dépendance Google présente mais intégration native/UMP et fournisseur ouverts. IDs Android dans `.env`, iOS vides. L9 et L10 restent à construire. DA en mode nuit ; aucun fichier modèle `.env` ne doit être recréé.
+L1 à L5, le cœur de L6, L7 et la gestion des appareils L8 sont implémentés. Les flux push L8 sont préparés mais désactivés, sans projet Firebase, conformément au choix utilisateur. L7 couvre sûreté, sessions, droits, export et suppression. Contrôles privés simulés uniquement ; comptes et appareils réels restent à valider. Vidéos désactivées, dépendance Google présente mais intégration native/UMP et fournisseur ouverts. IDs Android dans `.env`, iOS vides. L9 ajoute le suivi de l’abonnement et prépare Checkout/portail ; ventes désactivées en attendant Stripe test et les retours HTTPS. L10 reste à construire. DA en mode nuit ; aucun fichier modèle `.env` ne doit être recréé.
 
 Cette roadmap couvre toutes les capacités utilisateur de l'API actuelle. Elle exclut l'administration, les webhooks fournisseur, la supervision et les opérations internes. Elle ne dépend pas des anciens dépôts NestJS ou d'un endpoint OpenAPI.
 
@@ -25,7 +25,7 @@ Les états doivent distinguer : `À faire`, `En cours`, `Implémenté`, `Intégr
 | L6 | Révélation, continuation, crédits et récompenses volontaires | Cœur implémenté ; huit contrôles ciblés ; vidéos désactivées par choix utilisateur, SDK/UMP et fournisseur en attente |
 | L7 | Sûreté, paramètres de confidentialité, sessions, export et suppression | Implémenté ; neuf contrôles ciblés, dix-huit régressions session/SSE ; comptes et appareils réels à valider |
 | L8 | Appareils, notifications push et ouverture depuis notification | Appareils implémentés, flux push préparés ; dix contrôles ciblés ; Firebase/push désactivés par choix utilisateur, réel/iOS en attente |
-| L9 | Offres, abonnement, Checkout et portail selon la distribution retenue | À faire |
+| L9 | Offres, abonnement, Checkout et portail selon la distribution retenue | Abonnement implémenté, Checkout/portail préparés ; dix contrôles ciblés ; Stripe test et retours HTTPS non configurés, ventes désactivées par choix utilisateur |
 | L10 | Robustesse, accessibilité, appareils réels et préparation bêta | À faire |
 
 Ces lots peuvent être divisés en interventions plus petites. Introduire les mécanismes nécessaires au bon moment : sécurité des jetons dès L2, blocage dès qu'une interaction est utilisable, contrôle d'état des matchs dès L5. Ne pas attendre L10 pour tester les risques métier.
@@ -231,10 +231,10 @@ Critère de sortie : essais documentés sur Android et iOS réels, ou limites d'
 - Firebase absent : choix utilisateur explicite de laisser les push désactivés. Huit champs publics dans le `.env` ignoré, `PUSH_ENABLED=false`, aucune permission ni initialisation Firebase Dart dans cette configuration, aucun fichier modèle recréé.
 - Dépendances `firebase_core ^5.0.0`, `firebase_messaging ^17.0.0`, `package_info_plus ^10.2.2` ; options explicites et ressources Android natives conditionnelles depuis `.env`, auto-init/Analytics désactivés. SDK 17 : identifiant d'installation FCM dans le champ `push_token`, version réelle installée. iOS : délégation UIScene, bridge APNs et deux plist préparés, capacité/signature `aps-environment` et clé APNs restant à configurer sur Mac.
 - Permission contextuelle, enregistrement/rotation sérialisés, corps immuable en cas d'incertitude, pas de rejeu automatique après timeout. Préférence sécurisée liée à l'origine/propriétaire, UUID courant et jusqu'à 64 IDs d'ouvertures ; aucun identifiant fournisseur copié dans ce stockage. Retrait distant/réinstallation sans préférence = pas de réactivation implicite. Marqueur d'arrêt durable si le nettoyage échoue, puis reprise sans nouvel enregistrement.
-- Premier plan : bandeau générique, déduplication 128 IDs en mémoire. Ouverture à froid/reprise : seuls types et UUID contractuels conservés, textes/liens distants ignorés ; session puis matchs/historique relus avant chat. Notification périmée n'ouvre pas un match inaccessible. Parcours de notification unique, brouillons conservés et autres flux SSE suspendus temporairement. Facturation : catalogue courant, détails L9. Handler arrière-plan sans HTTP privé ni navigation ; les doublons OS déjà affichés ne sont pas supprimés par Dart et aucun rattrapage offline n'est supposé.
+- Premier plan : bandeau générique, déduplication 128 IDs en mémoire. Ouverture à froid/reprise : seuls types et UUID contractuels conservés, textes/liens distants ignorés ; session puis matchs/historique relus avant chat. Notification périmée n'ouvre pas un match inaccessible. Parcours de notification unique, brouillons conservés et autres flux SSE suspendus temporairement. Facturation : état d’abonnement authentifié depuis L9. Handler arrière-plan sans HTTP privé ni navigation ; les doublons OS déjà affichés ne sont pas supprimés par Dart et aucun rattrapage offline n'est supposé.
 - Sources : contrat HTTP, DTO/routes/services/stockage/publication Rust, tests `notifications_contract.rs`, Postman et documentation officielle Firebase/Flutter consultés. Aucun test ni changement backend. Dix contrôles L8 + treize contrôles existants de configuration réussis ; sept aperçus simulés inspectés, analyse/formatage et APK Android debug vérifiés. Réception FCM/APNs, permissions sur téléphones, arrêt/reprise natifs et compilation iOS encore à valider. SDK publicitaire toujours désactivé.
 
-Prochain lot : **L9**, offres et abonnement. L'activation Firebase reste une étape indépendante en attente de projet/configuration et d'essais réels.
+Suite prévue après L8 : L9, livré ci-dessous. L'activation Firebase reste une étape indépendante en attente de projet/configuration et d'essais réels.
 
 ## 12. L9 — offres et abonnement
 
@@ -248,6 +248,12 @@ Prochain lot : **L9**, offres et abonnement. L'activation Firebase reste une ét
 - Valider essai, SCA, échec, renouvellement, annulation, retour après arrêt de l'app et état de paiement incertain en environnement Stripe test.
 
 Critère de sortie : droits réellement projetés par l'API et vente activée seulement pour une distribution vérifiée ; sinon catalogue/état utilisables et paiement explicitement en attente.
+
+**Livré côté mobile** : écran d'abonnement depuis profil et notifications de facturation, catalogue dynamique, plan effectif/`access_granted`, dates et huit états Stripe. Lectures au retour du navigateur, reconnexion/événement SSE et réouverture après arrêt. Intention Checkout `monthly`/`annual` sauvegardée avant POST, UUID v4 stable, reprise explicite après résultat incertain et blocage de la seconde période. Prix/essai/renouvellement confirmés avant navigation. Liens Stripe standards validés, portail conditionné à la disponibilité serveur, erreurs françaises et `Retry-After`, requêtes annulées et données purgées au changement de compte. Aucun statut Premium attribué localement.
+
+**Choix de distribution** : APK Android hors Play Store avec Stripe. `.env` : `BILLING_DISTRIBUTION=android_external`, `BILLING_ENABLED=false`, trois champs HTTPS vides à compléter selon la configuration serveur. iOS/Web/bureau restent fermés aux paiements. [Règles Play](https://support.google.com/googleplay/android-developer/answer/9858738) et [Apple 3.1](https://developer.apple.com/app-store/review/guidelines/#payments) consultées le 17 octobre 2026 ; pas d'autorisation supposée pour une distribution par les stores. Pages de retour HTTPS à héberger hors dépôt, retour manuel dans l'app suivi d'un GET authentifié ; aucun app link/lien universel automatique configuré. Voir les champs et les conditions dans [README](README.md#l9--offres-et-abonnement).
+
+**Vérifications et limites** : dix contrôles L9 ciblés réussis, plus treize contrôles existants de configuration et une régression de navigation push. Six aperçus inspectés avec données simulées, dont 320 px/texte 160 %. Formatage vérifié (110 fichiers), analyse sans problème et APK Android debug compilé. Contrats/DTO/service/tests/Postman backend consultés seulement. Prix, essais et états privés simulés, aucun paiement Stripe exécuté. Mode test fournisseur, SCA, refus, renouvellement, résiliation et retours sur téléphone après arrêt restent à valider avec le serveur configuré. Ventes et portail désactivés conformément au choix utilisateur ; catalogue et droits consultables. Prochain lot : **L10**.
 
 ## 13. L10 — qualité et bêta
 
@@ -310,10 +316,10 @@ Chemins complets, préfixe `/api` inclus. Les 56 routes restent suivies : catalo
 | POST | `/api/users/me/devices` | L8 | Enregistrer/rafraîchir le token push | Contrat/SDK/permission/rotation/reprises préparés et simulés ; push désactivés en attente Firebase et appareils |
 | DELETE | `/api/users/me/devices/:id` | L8 | Retirer un appareil | Implémenté ; confirmation, réponse perdue et arrêt courant contrôlés ; réel à valider |
 | GET | `/api/users/me/events` | L5 | SSE authentifié | Implémenté ; Bearer/refresh/connexion unique contrôlés ; réseau/appareils à valider |
-| GET | `/api/plans` | L1, L6, L9 | Catalogue, tarifs et disponibilité publicitaire | Intégré API L1 ; lecture L6 branchée, vidéos maintenues désactivées ; L9/appareils en attente |
-| GET | `/api/users/me/subscription` | L9 | Abonnement et droits effectifs | À faire |
-| POST | `/api/users/me/subscription/checkout` | L9 | Achat hébergé si distribution compatible | À faire |
-| POST | `/api/users/me/subscription/portal` | L9 | Gestion de l'abonnement | À faire |
+| GET | `/api/plans` | L1, L6, L9 | Catalogue, tarifs et disponibilité publicitaire | Intégré API L1 ; lecture L6 branchée, vidéos maintenues désactivées ; affichage L9 branché ; appareils en attente |
+| GET | `/api/users/me/subscription` | L9 | Abonnement et droits effectifs | Implémenté ; accès/dates/états contrôlés côté client ; compte et appareil réels à valider |
+| POST | `/api/users/me/subscription/checkout` | L9 | Achat hébergé si distribution compatible | Préparé ; intention durable, reprise et navigation contrôlées ; désactivé, Stripe test/retours HTTPS en attente |
+| POST | `/api/users/me/subscription/portal` | L9 | Gestion de l'abonnement | Préparé ; disponibilité serveur et navigateur contrôlés ; désactivé, fournisseur/retours en attente |
 | GET | `/api/users/me/blocks` | L7 | Comptes bloqués | Implémenté ; liste sans photo ; réel à valider |
 | POST | `/api/users/me/blocks/:userId` | L4, L7 | Bloquer un compte depuis feed ou reçu | Implémenté L4 ; confirmation et reprise ciblées ; réel à valider |
 | DELETE | `/api/users/me/blocks/:userId` | L7 | Débloquer un compte | Implémenté ; relecture, sans restauration ; réel à valider |

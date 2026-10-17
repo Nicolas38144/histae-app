@@ -101,7 +101,7 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
         children: [
           Text(strings.catalogIntro),
           const SizedBox(height: 16),
-          for (final plan in controller.plans) _PlanCard(plan: plan),
+          for (final plan in controller.plans) PlanCard(plan: plan),
           const SizedBox(height: 16),
           Text(strings.catalogReadOnly),
           const SizedBox(height: 16),
@@ -135,9 +135,10 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
   }
 }
 
-class _PlanCard extends StatelessWidget {
-  const _PlanCard({required this.plan});
+class PlanCard extends StatelessWidget {
+  const PlanCard({super.key, required this.plan, this.action});
   final SubscriptionPlan plan;
+  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
@@ -159,6 +160,10 @@ class _PlanCard extends StatelessWidget {
             Text(strings.monthly(plan.monthlyPriceCents, plan.currency)),
             Text(strings.annual(plan.annualPriceCents, plan.currency)),
             Text(strings.trial(plan.trialDays)),
+            if (plan.trialDays > 0)
+              const Text(
+                'Selon votre éligibilité, confirmée lors de la souscription.',
+              ),
             const Divider(height: 32),
             if (plan.weeklyIncludedCredits case final credits?)
               Text(strings.weeklyCredits(credits)),
@@ -184,6 +189,7 @@ class _PlanCard extends StatelessWidget {
                     case final description?)
                   Text(description),
               ],
+            if (action != null) ...[const SizedBox(height: 20), action!],
           ],
         ),
       ),

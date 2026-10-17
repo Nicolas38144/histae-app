@@ -14,6 +14,10 @@ import 'features/notifications/application/push_controller.dart';
 import 'features/notifications/data/device_repository.dart';
 import 'features/notifications/data/push_gateway.dart';
 import 'features/notifications/data/push_vault.dart';
+import 'features/billing/application/billing_controller.dart';
+import 'features/billing/data/billing_repository.dart';
+import 'features/billing/data/billing_gateway.dart';
+import 'features/billing/data/checkout_vault.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -59,6 +63,14 @@ Future<void> main() async {
           : CatalogRepository(ApiClient(origin: config.apiOrigin)),
       sessionController: session,
       pushController: push,
+      billingController: session == null
+          ? null
+          : BillingController(
+              BillingRepository(session),
+              config!.billing,
+              SecureCheckoutVault(),
+              ExternalBillingGateway(),
+            ),
     ),
   );
 }

@@ -19,6 +19,9 @@ import '../features/notifications/presentation/push_scope.dart';
 import '../features/matches/application/matches_controller.dart';
 import '../features/matches/data/matches_repository.dart';
 import '../features/matches/presentation/matches_page.dart';
+import '../features/billing/application/billing_controller.dart';
+import '../features/billing/presentation/billing_scope.dart';
+import '../features/billing/presentation/subscription_page.dart';
 
 class HistaeApp extends StatefulWidget {
   const HistaeApp({
@@ -26,11 +29,13 @@ class HistaeApp extends StatefulWidget {
     this.catalogRepository,
     this.sessionController,
     this.pushController,
+    this.billingController,
   });
   // Ownership is transferred to the app; requests close when it is disposed.
   final CatalogRepository? catalogRepository;
   final SessionController? sessionController;
   final PushController? pushController;
+  final BillingController? billingController;
 
   @override
   State<HistaeApp> createState() => _HistaeAppState();
@@ -109,10 +114,15 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
           ),
         );
       } else {
-        // A billing push cannot prove a payment state. The current public
-        // catalogue is safe; account/subscription details belong to L9.
+        // A notification only opens an authenticated server re-read.
         _pushRoute = MaterialPageRoute<void>(
-          builder: (_) => CatalogPage(repository: widget.catalogRepository),
+          builder: (_) => widget.billingController == null
+              ? CatalogPage(repository: widget.catalogRepository)
+              : SubscriptionPage(
+                  controller: widget.billingController!,
+                  catalog: widget.catalogRepository,
+                  notificationFlow: true,
+                ),
         );
       }
       final route = _pushRoute!;
@@ -183,6 +193,7 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
     widget.sessionController?.removeListener(_sessionChanged);
     widget.pushController?.removeListener(_pushChanged);
     widget.pushController?.dispose();
+    widget.billingController?.dispose();
     _pushMatches?.dispose();
     widget.sessionController?.dispose();
     widget.catalogRepository?.close();
@@ -200,54 +211,59 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
     locale: const Locale('fr'),
     supportedLocales: const [Locale('fr')],
     localizationsDelegates: GlobalMaterialLocalizations.delegates,
-    builder: (context, child) => PushScope(
-      controller: widget.pushController,
-      child: widget.pushController == null
-          ? child!
-          : ListenableBuilder(
-              listenable: widget.pushController!,
-              builder: (context, _) => Column(
-                children: [
-                  if (widget.pushController!.foreground != null &&
-                      widget.pushController!.active)
-                    Material(
-                      color: Theme.of(context).colorScheme.surfaceContainerHigh,
-                      child: SafeArea(
-                        bottom: false,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 12,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              const Text(
-                                'Une mise à jour Histae est disponible.',
-                              ),
-                              Wrap(
-                                spacing: 12,
-                                children: [
-                                  TextButton(
-                                    onPressed:
-                                        widget.pushController!.openForeground,
-                                    child: const Text('Consulter'),
-                                  ),
-                                  TextButton(
-                                    onPressed: widget.pushController!.dismiss,
-                                    child: const Text('Plus tard'),
-                                  ),
-                                ],
-                              ),
-                            ],
+    builder: (context, child) => BillingScope(
+      controller: widget.billingController,
+      child: PushScope(
+        controller: widget.pushController,
+        child: widget.pushController == null
+            ? child!
+            : ListenableBuilder(
+                listenable: widget.pushController!,
+                builder: (context, _) => Column(
+                  children: [
+                    if (widget.pushController!.foreground != null &&
+                        widget.pushController!.active)
+                      Material(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHigh,
+                        child: SafeArea(
+                          bottom: false,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 12,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                const Text(
+                                  'Une mise à jour Histae est disponible.',
+                                ),
+                                Wrap(
+                                  spacing: 12,
+                                  children: [
+                                    TextButton(
+                                      onPressed:
+                                          widget.pushController!.openForeground,
+                                      child: const Text('Consulter'),
+                                    ),
+                                    TextButton(
+                                      onPressed: widget.pushController!.dismiss,
+                                      child: const Text('Plus tard'),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  Expanded(child: child!),
-                ],
+                    Expanded(child: child!),
+                  ],
+                ),
               ),
-            ),
+      ),
     ),
     home: widget.sessionController == null
         ? _WelcomePage(repository: widget.catalogRepository)

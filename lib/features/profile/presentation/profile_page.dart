@@ -25,6 +25,8 @@ import 'profile_strings.dart';
 import '../../notifications/application/push_controller.dart';
 import '../../notifications/presentation/push_scope.dart';
 import '../../notifications/presentation/devices_page.dart';
+import '../../billing/presentation/billing_scope.dart';
+import '../../billing/presentation/subscription_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key, required this.session, this.catalog});
@@ -292,9 +294,18 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                 ),
                 const EditorialDivider(),
                 OutlinedButton(
-                  onPressed: () =>
-                      _open(CatalogPage(repository: widget.catalog)),
-                  child: Text(strings.catalogAction),
+                  onPressed: () {
+                    final billing = BillingScope.maybeOf(context);
+                    _open(
+                      billing == null
+                          ? CatalogPage(repository: widget.catalog)
+                          : SubscriptionPage(
+                              controller: billing,
+                              catalog: widget.catalog,
+                            ),
+                    );
+                  },
+                  child: const Text('Mon abonnement et les formules'),
                 ),
                 TextButton(
                   onPressed: widget.session.logout,

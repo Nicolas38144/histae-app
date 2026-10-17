@@ -115,7 +115,7 @@ class AppStrings {
       'Consultez les formules et leurs conditions. '
       'La révélation des photos demande toujours votre accord mutuel.';
   String get catalogReadOnly =>
-      'La souscription n’est pas encore disponible dans l’application.';
+      'Retrouvez votre abonnement et les possibilités de souscription depuis votre profil.';
   String get loading => 'Chargement des formules…';
   String get emptyTitle => 'Aucune formule disponible';
   String get emptyBody =>
