@@ -10,6 +10,8 @@ L1 à L5, le cœur de L6, L7 et la gestion des appareils L8 sont implémentés. 
 
 Le manifeste conserve Dart `^3.13.1` et `cupertino_icons`. Aux dépendances L1/L2 s'ajoutent en L3 `image_picker: ^1.2.4`, `flutter_image_compress: ^2.5.1`, `http_parser: ^4.1.2` et `path_provider: ^2.1.6`. Navigation avec `Navigator` / `MaterialPageRoute`, état avec `ChangeNotifier`, dépendances injectées par constructeur. SDK vérifié : Flutter 3.47.7, Dart 3.13.5.
 
+Après connexion et validation des consentements obligatoires, l'application s'ouvre sur le feed. Une barre arrondie commune donne accès à **Feed**, **Matchs** et **Profil**, dans les tons verts du mode nuit et selon la référence `pictures/exemple_feed.png`. Les formulaires, conversations et réglages s'ouvrent au-dessus de ces onglets. Le profil conserve les accès aux crédits, à la vie privée, aux appareils et à l'abonnement.
+
 ## Documentation et références
 
 | Document | Utilité |
@@ -117,7 +119,7 @@ Suite livrée en L4 ci-dessous. Les validations réelles de L2/L3 restent ouvert
 
 ## L4 — découverte sans photo
 
-- **Parcours** : « Découvrir les profils » depuis votre espace personnel ; retour au profil et aux choix de vie privée toujours disponible. Le diagnostic serveur ouvre les étapes profil/sexe, préférences et consentements, sans déduire une éligibilité locale.
+- **Parcours** : onglet « Feed » affiché après connexion ; onglet Profil et choix de vie privée toujours accessibles. Le diagnostic serveur ouvre les étapes profil/sexe, préférences et consentements, sans déduire une éligibilité locale.
 - **Localisation** : `geolocator: ^14.1.1`, accord métier courant puis explication et permission système. Une seule mesure, abonnement natif annulé après acquisition ou sortie/arrière-plan/retrait/logout. Pas de dernière position connue, de suivi de fond, de persistance ni de journalisation des coordonnées. Les positions approximatives sont acceptées ; refus, refus permanent, services désactivés, délai et mesure ancienne/invalide sont distincts. Le PATCH n'envoie que latitude/longitude. Après réponse perdue, relecture du diagnostic, aucun renvoi automatique. L'expiration `presence_expires_at` provoque une relecture, sans déclencher le GPS.
 - **Feed** : composition ivoire/forêt inspirée de la référence, prénom/âge, distance reçue, bio, traits et réponses approuvées. Aucune photo ni URL partenaire dans le modèle ou les téléchargements. Aucune ville/catégorie inventée. Curseur opaque encodé, limite conservée, déduplication, reprise sans curseur après `invalid_cursor` et arrêt à `null`. Modification des préférences ou reprise au premier plan relit les ressources.
 - **Choix** : double appui pour aimer ; geste vers le haut en fin de lecture pour passer, boutons accessibles en complément. Un geste servant à lire un profil long ne le passe pas : un autre geste depuis le bas est nécessaire. Aucun retour au profil précédent par geste vers le bas. Pendant un résultat incertain, seule la même cible/décision peut être reprise explicitement. Intention en mémoire dans la session, y compris après retour au profil ; aucune file durable ni retry universel. Quotas temporels respectés via `Retry-After`.
@@ -128,7 +130,7 @@ Android déclare les permissions de position approximative/précise, sans permis
 
 ## L5 — rencontres, chat et temps réel
 
-- **Parcours** : « Vos rencontres » depuis le profil, onglet du feed et ouverture depuis le reçu réciproque. Liste paginée, dernier message, non-lus serveur, profil textuel du partenaire et historique paginé. Aucun appel au GET administratif `/api/matches/:userId` : une rencontre demandée est recherchée dans la collection mobile autorisée. Curseurs opaques conservés, déduplication par ID, ordre serveur et reprise sans curseur invalide.
+- **Parcours** : onglet « Matchs » de la barre principale et ouverture depuis le reçu réciproque. Liste paginée, dernier message, non-lus serveur, profil textuel du partenaire et historique paginé. Aucun appel au GET administratif `/api/matches/:userId` : une rencontre demandée est recherchée dans la collection mobile autorisée. Curseurs opaques conservés, déduplication par ID, ordre serveur et reprise sans curseur invalide.
 - **Envoi** : texte normalisé avec les espaces ECMAScript, maximum 2 000 points de code Unicode. Une intention garde les mêmes mots et UUID v4 après une réponse perdue, y compris après retour à la liste ; reprise explicite seulement. Aucun nouvel envoi implicite ni stockage disque des brouillons/messages. Les accusés « Envoyé »/« Lu » viennent des réponses serveur.
 - **États** : `active` et `confirmed` autorisent l'envoi ; `awaiting_continuation` garde l'historique et suspend la composition. Les dates serveur sont affichées ; l'échéance déclenche une relecture et fige l'envoi, sans fabriquer la période suivante. Une conversation confirmée n'expire pas selon son ancienne date. Clôture et blocage confirmés ; réponse perdue = relecture et reprise de la même action. Données retirées après refus définitif, invalidation, retrait de consentement ou logout ; réponses tardives ignorées.
 - **Lecture** : PATCH groupé ancré sur un message reçu réellement visible dans la conversation au premier plan. Aucun marquage sur simple événement, notification, écran couvert ou app suspendue. La route unitaire reste disponible au repository sans requête par bulle.

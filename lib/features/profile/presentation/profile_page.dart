@@ -4,81 +4,37 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/editorial_card.dart';
-import '../../auth/domain/authenticated_session.dart';
 import '../../billing/presentation/billing_scope.dart';
 import '../../billing/presentation/subscription_page.dart';
 import '../../catalog/data/catalog_repository.dart';
 import '../../catalog/presentation/catalog_page.dart';
 import '../../consents/presentation/consents_page.dart';
+import '../../continuation/application/continuation_controller.dart';
 import '../../continuation/presentation/credits_page.dart';
-import '../../discovery/application/discovery_controller.dart';
-import '../../discovery/data/device_location.dart';
-import '../../discovery/data/discovery_repository.dart';
-import '../../discovery/presentation/discovery_page.dart';
-import '../../matches/application/matches_controller.dart';
-import '../../matches/data/matches_repository.dart';
-import '../../matches/presentation/matches_page.dart';
-import '../../notifications/application/push_controller.dart';
 import '../../notifications/presentation/devices_page.dart';
 import '../../notifications/presentation/push_scope.dart';
 import '../../privacy/presentation/privacy_hub_page.dart';
 import '../application/profile_controller.dart';
-import '../data/profile_repository.dart';
 import 'photo_page.dart';
 import 'profile_editors.dart';
 import 'profile_strings.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key, required this.session, this.catalog});
-  final AuthenticatedSession session;
+  const ProfilePage({
+    super.key,
+    required this.controller,
+    required this.continuation,
+    this.catalog,
+  });
+  final ProfileController controller;
+  final ContinuationController continuation;
   final CatalogRepository? catalog;
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
-  late final controller = ProfileController(ProfileRepository(widget.session));
-  late final discovery = DiscoveryController(
-    DiscoveryRepository(widget.session),
-    DeviceLocation(),
-  );
-  late final matches = MatchesController(
-    MatchesRepository(widget.session),
-    onRemoved: discovery.forgetEncounter,
-  );
-
-  Future<void> _matches([String? id]) =>
-      _open(MatchesPage(controller: matches, initialMatchId: id));
-  PushController? _push;
-  bool _covered = false, _resumeMatches = false, _resumeDiscovery = false;
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final next = PushScope.maybeOf(context);
-    if (next != _push) {
-      _push?.removeListener(_pushRouteChanged);
-      _push = next;
-      _push?.addListener(_pushRouteChanged);
-    }
-  }
-
-  void _pushRouteChanged() {
-    final covered = _push?.coversMainFlow == true;
-    if (covered == _covered) return;
-    _covered = covered;
-    if (covered) {
-      _resumeMatches = matches.active;
-      _resumeDiscovery = discovery.active;
-      matches.suspend();
-      discovery.deactivate();
-    } else {
-      if (_resumeMatches && matches.accessible) unawaited(matches.activate());
-      if (_resumeDiscovery && discovery.accessible) {
-        unawaited(discovery.activate());
-      }
-    }
-  }
-
+  ProfileController get controller => widget.controller;
   @override
   void initState() {
     super.initState();
@@ -97,10 +53,6 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _push?.removeListener(_pushRouteChanged);
-    controller.dispose();
-    matches.dispose();
-    discovery.dispose();
     super.dispose();
   }
 
@@ -161,36 +113,23 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                   body: 'Une façon de vous raconter, avant de vous rencontrer. Votre photo restera absente du feed.',
                 ),
                 const SizedBox(height: 16),
-                FilledButton.icon(
-                  onPressed: () => _open(
-                    DiscoveryPage(
-                      controller: discovery,
-                      profile: controller,
-                      openMatches: _matches,
-                    ),
-                  ),
-                  icon: const Icon(Icons.explore_outlined),
-                  label: const Text('Découvrir les profils'),
-                ),
-                const SizedBox(height: 12),
-                OutlinedButton.icon(
-                  onPressed: _matches,
-                  icon: const Icon(Icons.forum_outlined),
-                  label: const Text('Vos rencontres'),
-                ),
                 TextButton(
                   onPressed: () =>
-                      _open(CreditsPage(controller: matches.continuation)),
+                      _open(CreditsPage(controller: widget.continuation)),
                   child: const Text('Mes crédits de continuation'),
                 ),
                 TextButton(
                   onPressed: () =>
-                      _open(PrivacyHubPage(session: widget.session)),
+                      _open(PrivacyHubPage(session: controller.session)),
                   child: Text(strings.privacyTitle),
                 ),
                 TextButton.icon(
-                  onPressed: () =>
-                      _open(DevicesPage(session: widget.session, push: _push)),
+                  onPressed: () => _open(
+                    DevicesPage(
+                      session: controller.session,
+                      push: PushScope.maybeOf(context),
+                    ),
+                  ),
                   icon: const Icon(Icons.notifications_none),
                   label: const Text('Appareils et notifications'),
                 ),
@@ -248,7 +187,7 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                       ? () => _open(
                           c.sensitiveAllowed
                               ? PreferencesEditor(controller: c)
-                              : ConsentsPage(session: widget.session),
+                              : ConsentsPage(session: controller.session),
                         )
                       : null,
                   Icons.tune,
@@ -308,7 +247,7 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                   child: const Text('Mon abonnement et les formules'),
                 ),
                 TextButton(
-                  onPressed: widget.session.logout,
+                  onPressed: controller.session.logout,
                   child: Text(strings.logout),
                 ),
               ],

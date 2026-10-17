@@ -58,13 +58,7 @@ class EncounterPage extends StatelessWidget {
               const SizedBox(height: 24),
               if (openMatch != null)
                 FilledButton.icon(
-                  onPressed: () async {
-                    controller.deactivate();
-                    await openMatch!();
-                    if (context.mounted && controller.accessible) {
-                      await controller.activate();
-                    }
-                  },
+                  onPressed: openMatch,
                   icon: const Icon(Icons.forum_outlined),
                   label: const Text('Ouvrir la conversation'),
                 ),

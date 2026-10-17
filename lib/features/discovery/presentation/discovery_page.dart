@@ -70,7 +70,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    c.deactivate();
+    c.deactivate(notify: false);
     super.dispose();
   }
 
@@ -471,35 +471,6 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                   padding: const EdgeInsets.all(24),
                   children: statusBody,
                 ),
-        ),
-        bottomNavigationBar: NavigationBar(
-          selectedIndex: 0,
-          onDestinationSelected: (index) {
-            if (index == 1 && widget.openMatches != null) {
-              c.deactivate();
-              unawaited(
-                widget.openMatches!().then((_) {
-                  if (mounted) return _resume();
-                }),
-              );
-            }
-            if (index == 2) Navigator.of(context).pop();
-          },
-          destinations: const [
-            NavigationDestination(
-              icon: Icon(Icons.explore_outlined),
-              selectedIcon: Icon(Icons.explore),
-              label: 'Découvrir',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.forum_outlined),
-              label: 'Rencontres',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.person_outline),
-              label: 'Profil',
-            ),
-          ],
         ),
       );
     },

@@ -98,6 +98,8 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('main-tab-profile')));
+      await tester.pumpAndSettle();
       await tester.scrollUntilVisible(
         find.text('Appareils et notifications'),
         180,
@@ -431,8 +433,8 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('Vos rencontres'));
-      await tester.tap(find.text('Vos rencontres'));
+      await tester.ensureVisible(find.byKey(const Key('main-tab-matches')));
+      await tester.tap(find.byKey(const Key('main-tab-matches')));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Léa, 27'));
       await tester.pumpAndSettle();
@@ -530,8 +532,8 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('Vos rencontres'));
-    await tester.tap(find.text('Vos rencontres'));
+    await tester.ensureVisible(find.byKey(const Key('main-tab-matches')));
+    await tester.tap(find.byKey(const Key('main-tab-matches')));
     await tester.pumpAndSettle();
     await expectLater(
       find.byKey(preview),
@@ -586,15 +588,6 @@ void main() {
         child: HistaeApp(sessionController: session),
       ),
     );
-    await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(
-      find.text('Découvrir les profils'),
-      180,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.ensureVisible(find.text('Découvrir les profils'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Découvrir les profils'));
     await tester.pumpAndSettle();
     await expectLater(
       find.byKey(preview),
@@ -664,6 +657,8 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('main-tab-profile')));
+    await tester.pumpAndSettle();
     await expectLater(
       find.byKey(preview),
       matchesGoldenFile('../build/previews/profile.png'),
@@ -696,5 +691,39 @@ void main() {
       find.byKey(preview),
       matchesGoldenFile('../build/previews/answers.png'),
     );
+  });
+  testWidgets('preview main bottom navigation in dark mode', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    final session = testSession((r) async => defaultMatchesResponse(r));
+    await session.establish(testTokens);
+    const preview = Key('main-navigation-preview');
+    await tester.pumpWidget(
+      RepaintBoundary(
+        key: preview,
+        child: HistaeApp(sessionController: session),
+      ),
+    );
+    await tester.pumpAndSettle();
+    for (final tab in ['discovery', 'matches', 'profile']) {
+      await tester.tap(find.byKey(Key('main-tab-$tab')));
+      await tester.pumpAndSettle();
+      await expectLater(
+        find.byKey(preview),
+        matchesGoldenFile('../build/previews/main-$tab.png'),
+      );
+    }
+    tester.view.physicalSize = const Size(320, 568);
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    await expectLater(
+      find.byKey(preview),
+      matchesGoldenFile('../build/previews/main-navigation-large-text.png'),
+    );
+    await tester.pumpWidget(const SizedBox.shrink());
   });
 }

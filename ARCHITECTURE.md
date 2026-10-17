@@ -12,6 +12,7 @@ L'application conserve son organisation par fonctionnalité, ses contrôleurs `C
 | `lib/app/app_dependencies.dart` | Construction explicite des clients, dépôts, session et services de notification/facturation |
 | `lib/app/app.dart` | Thème, localisation, cycle de vie global et invalidation de la navigation privée |
 | `lib/app/session_gate.dart`, `welcome_page.dart` | Affichage lié à l'état de session et accueil public |
+| `lib/app/main_shell.dart`, `main_navigation_bar.dart` | Trois onglets privés, barre commune et propriété des contrôleurs de profil, découverte et matchs |
 | `lib/app/notification_navigation.dart`, `notification_overlay.dart` | Parcours temporaire d'une notification et bandeau générique |
 | `lib/core` | Configuration, primitives réseau, opérations sérialisées, modèles réellement partagés et composants visuels communs |
 | `features/*/domain` | Contrats ou modèles purs qui doivent être partagés sans dépendre d'un contrôleur ou d'un accès HTTP |
@@ -30,6 +31,8 @@ L'interface observe un contrôleur et déclenche ses méthodes. Les règles d'au
 `HistaeApp` reste propriétaire des dépendances qui lui sont confiées. Il détache les observateurs, ferme le coordinateur de notifications, puis dispose les contrôleurs avant la session et le client du catalogue. Chaque page reste responsable du contrôleur qu'elle crée ; un contrôleur reçu d'un parent n'est pas détruit par la page. Les abonnements SDK, connexions SSE et minuteries sont libérés par leur propriétaire.
 
 Les formulaires de profil sont répartis en quatre pages. Le socle `ProfileEditorState` garde les comportements de brouillon, de sortie confirmée et de perte d'accès. Les confirmations communes utilisent une boîte de dialogue défilable. Le hub de confidentialité, son détail, le profil du partenaire, la carte de formule, le résumé et le choix de formule d'abonnement sont des composants distincts.
+
+Depuis le complément de navigation du 18 octobre, `MainShell` possède les contrôleurs de profil, découverte et matchs. `ProfilePage` les reçoit via son contrôleur et celui de continuation, sans les détruire. Seul l'onglet visible est monté : un écran caché ne reçoit donc plus les reprises du cycle de vie. Les positions de défilement utilisent `PageStorage`, les brouillons de chat restent dans le contrôleur de matchs, et le feed relit sa préparation lors de sa réouverture. La couverture par une notification suspend et démonte l'onglet principal jusqu'au retour. La destruction du feed suspend son contrôleur sans notifier les routes de rencontre en cours de destruction. Le passage d'une rencontre à son chat sélectionne l'onglet Matchs puis vérifie l'appartenance et l'accès à l'historique via le contrôleur existant.
 
 Le chat conserve une seule copie de la liste des messages par reconstruction d'écran. `MessageOutbox` possède les brouillons et les intentions d'envoi : la clé et le contenu d'un message en attente ne peuvent pas changer. La purge de la conversation ou du compte efface ces deux catégories de données.
 

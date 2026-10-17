@@ -14,6 +14,10 @@ Les états doivent distinguer : `À faire`, `En cours`, `Implémenté`, `Intégr
 
 ## 2. Ordre des lots
 
+Complément de navigation du 18 octobre 2026 : barre commune **Feed / Matchs / Profil**, feed à l'ouverture de l'espace authentifié, retrait des anciens raccourcis du profil et de la barre propre au feed. Le changement d'onglet suspend les lectures et le temps réel de l'écran quitté ; les contrôleurs restent liés à la session. Deux contrôles ciblés ajoutés couvrent la navigation, le texte à 200 %, la déconnexion et le passage d'une rencontre réciproque à une conversation autorisée. Avec les régressions concernées, 27 contrôles passent ; quatre scénarios d'aperçu ont été exécutés et les trois onglets inspectés visuellement. L10 reste le prochain lot fonctionnel.
+
+Validation de ce complément : formatage sans changement restant, analyse Flutter sans problème et APK Android debug compilé. Les aperçus et contrôles utilisent uniquement des données simulées.
+
 | Lot | Objectif | État |
 | --- | --- | --- |
 | L0 | Vérifier le contrat, l'inventaire, les parcours et l'environnement mobile | Vérifié pour L1 : SDK, catalogue, erreurs, routes/DTO/services, tests et Postman consultés ; approfondir par lot |
@@ -133,7 +137,7 @@ Critère de sortie : deux comptes de développement peuvent se découvrir et cr�
 
 ### Implémentation L4 — 16 octobre 2026
 
-- **Parcours/API** : accès depuis l'espace personnel, étapes `discovery-status` réparables par les écrans existants, localisation ponctuelle et feed sans photo ; les quatre routes L4 sont utilisées. Date d'expiration serveur relue à l'échéance et au retour au premier plan. Aucun calcul local d'éligibilité.
+- **Parcours/API** : accès par l'onglet Feed, étapes `discovery-status` réparables par les écrans existants, localisation ponctuelle et feed sans photo ; les quatre routes L4 sont utilisées. Date d'expiration serveur relue à l'échéance et au retour au premier plan. Aucun calcul local d'éligibilité.
 - **Permission/confidentialité** : `geolocator 14.1.1`, consentement courant avant permission et avant envoi. Une mesure récente, précision réduite admise, erreurs natives distinctes et liens vers les réglages ; abonnement arrêté après mesure/sortie/arrière-plan. Pas de coordonnée en stockage/logs, ni de position connue réutilisée. Annulation/purge sur changement de consentements/session, réponses tardives ignorées. Android coarse/fine et iOS when-in-use déclarés ; pas de suivi de fond. Flag SPM iOS et essais Mac/appareils décrits au README, encore ouverts.
 - **Feed/gestes** : titre serif, distance arrondie reçue, bio/traits/réponses serveur, sans photo ni ville/catégorie fabriquée. Double appui = like ; geste haut depuis la fin de lecture = pass ; lecture longue protégée et boutons accessibles. Aucun retour vers un précédent profil. Curseur opaque encodé, limite stable, déduplication, reprise unique sans curseur expiré et fin explicite ; aucun filtre client inventé.
 - **Résultat perdu/match** : cible et décision conservées en mémoire entre visites du feed ; une seule demande en cours, reprise explicite du même choix et `Retry-After`, aucun stockage durable. Candidat indisponible/choix déjà enregistré retiré sans envoyer l'opposé. Seul le match retourné par le serveur avec les bons membres ouvre un récapitulatif ; chat et liste persistante restent L5, sans déduire de droit courant depuis ce reçu.

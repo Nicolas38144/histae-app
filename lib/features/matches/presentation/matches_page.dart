@@ -14,10 +14,12 @@ class MatchesPage extends StatefulWidget {
     super.key,
     required this.controller,
     this.initialMatchId,
+    this.onInitialMatchHandled,
     this.notificationFlow = false,
   });
   final MatchesController controller;
   final String? initialMatchId;
+  final VoidCallback? onInitialMatchHandled;
   final bool notificationFlow;
   @override
   State<MatchesPage> createState() => _MatchesPageState();
@@ -35,9 +37,11 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
   }
 
   Future<void> _start() async {
+    final initialMatchId = widget.initialMatchId;
+    widget.onInitialMatchHandled?.call();
     await c.activate();
-    if (mounted && widget.initialMatchId != null && c.accessible) {
-      await _open(widget.initialMatchId!);
+    if (mounted && initialMatchId != null && c.accessible) {
+      await _open(initialMatchId);
     }
   }
 

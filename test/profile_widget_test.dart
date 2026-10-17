@@ -61,6 +61,8 @@ void main() {
       await session.establish(testTokens);
       await tester.pumpWidget(HistaeApp(sessionController: session));
       await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('main-tab-profile')));
+      await tester.pumpAndSettle();
       await tapVisible(tester, find.text('Créer mon profil'));
       await tester.enterText(find.widgetWithText(TextField, 'Prénom'), 'Alex');
       await tester.enterText(
@@ -92,6 +94,8 @@ void main() {
     });
     await session.establish(testTokens);
     await tester.pumpWidget(HistaeApp(sessionController: session));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('main-tab-profile')));
     await tester.pumpAndSettle();
     await tapVisible(tester, find.text('Modifier ma présentation'));
     await tester.enterText(find.widgetWithText(TextField, 'Prénom'), 'Alex');
@@ -217,6 +221,8 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('main-tab-profile')));
+      await tester.pumpAndSettle();
       await tapVisible(tester, find.text('Vos choix et votre vie privée'));
       expect(find.text('Vie privée et sécurité'), findsOneWidget);
       await tester.tap(find.byType(BackButton));
@@ -248,6 +254,8 @@ void main() {
       });
       await session.establish(testTokens);
       await tester.pumpWidget(HistaeApp(sessionController: session));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('main-tab-profile')));
       await tester.pumpAndSettle();
       await tapVisible(tester, find.text('Modifier ma présentation'));
       await tester.enterText(

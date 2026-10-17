@@ -123,6 +123,8 @@ void main() {
       await revealAndTap(tester, find.byKey(Key(ConsentType.terms.wireName)));
       await revealAndTap(tester, find.byKey(Key(ConsentType.privacy.wireName)));
       await revealAndTap(tester, find.text('Enregistrer mes choix'));
+      await tester.tap(find.byKey(const Key('main-tab-profile')));
+      await tester.pumpAndSettle();
       expect(find.text('Votre espace Histae'), findsOneWidget);
       expect(puts, [
         {

@@ -122,7 +122,7 @@ class DiscoveryController extends ChangeNotifier {
     await refresh();
   }
 
-  void deactivate() {
+  void deactivate({bool notify = true}) {
     _active = false;
     _epoch++;
     _scope.cancel();
@@ -137,7 +137,7 @@ class DiscoveryController extends ChangeNotifier {
     status = null;
     exhausted = false;
     // Keep only a pending immutable choice and receipt within this session.
-    _notify();
+    if (notify) _notify();
   }
 
   void _error(ApiFailure error) {

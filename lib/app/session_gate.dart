@@ -6,7 +6,7 @@ import '../features/auth/application/session_controller.dart';
 import '../features/catalog/data/catalog_repository.dart';
 import '../features/consents/presentation/consents_page.dart';
 import '../features/privacy/presentation/privacy_strings.dart';
-import '../features/profile/presentation/profile_page.dart';
+import 'main_shell.dart';
 import 'welcome_page.dart';
 
 class SessionGate extends StatelessWidget {
@@ -22,7 +22,7 @@ class SessionGate extends StatelessWidget {
       case SessionPhase.needsConsents:
         return ConsentsPage(session: session, onboarding: true);
       case SessionPhase.ready:
-        return ProfilePage(session: session, catalog: catalog);
+        return MainShell(session: session, catalog: catalog);
       case SessionPhase.restoring:
       case SessionPhase.synchronizing:
         return Scaffold(
