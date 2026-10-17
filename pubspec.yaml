@@ -40,7 +40,29 @@ flutter:
   assets:
     - .env
     - assets/fonts/dm_serif_display/OFL.txt
+    - assets/fonts/inter/OFL.txt
+    - assets/fonts/source_serif_4/OFL.txt
   fonts:
     - family: DMSerifDisplay
       fonts:
         - asset: assets/fonts/dm_serif_display/DMSerifDisplay-Regular.ttf
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/inter/Inter-Variable.ttf
+          weight: 400
+        - asset: assets/fonts/inter/Inter-Variable.ttf
+          weight: 500
+        - asset: assets/fonts/inter/Inter-Variable.ttf
+          weight: 600
+        - asset: assets/fonts/inter/Inter-Variable.ttf
+          weight: 700
+    - family: SourceSerif4
+      fonts:
+        - asset: assets/fonts/source_serif_4/SourceSerif4-Variable.ttf
+          weight: 400
+        - asset: assets/fonts/source_serif_4/SourceSerif4-Variable.ttf
+          weight: 500
+        - asset: assets/fonts/source_serif_4/SourceSerif4-Variable.ttf
+          weight: 600
+        - asset: assets/fonts/source_serif_4/SourceSerif4-Variable.ttf
+          weight: 700

@@ -1,84 +1,129 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-// Editorial direction from pictures/exemple_feed.png: paper, ink, serif titles,
-// generous cards. Forest and sand replace the reference's coral/pink palette.
-class HistaePalette {
-  static const ivory = Color(0xfffaf8f3);
-  static const paper = Color(0xfffffdf8);
-  static const ink = Color(0xff252c28);
-  static const forest = Color(0xff345647);
-  static const sand = Color(0xffe4dac9);
-}
+import '../core/theme/histae_tokens.dart';
 
 ThemeData histaeTheme(Brightness brightness) {
   final dark = brightness == Brightness.dark;
-  final base = ColorScheme.fromSeed(
-    seedColor: HistaePalette.forest,
-    brightness: brightness,
-  );
-  final colors = base.copyWith(
-    primary: dark ? const Color(0xffb1cbbb) : HistaePalette.forest,
-    onPrimary: dark ? const Color(0xff182c22) : Colors.white,
-    surface: dark ? const Color(0xff1d2420) : HistaePalette.ivory,
-    onSurface: dark ? const Color(0xfff2eee4) : HistaePalette.ink,
-    onSurfaceVariant: dark ? const Color(0xffc6cec5) : const Color(0xff5a625a),
-    surfaceContainerLow: dark ? const Color(0xff272f28) : HistaePalette.paper,
-    surfaceContainerHighest: dark
-        ? const Color(0xff394238)
-        : const Color(0xfff0eade),
-    outline: dark ? const Color(0xff8c988b) : const Color(0xff7c8578),
-    outlineVariant: dark ? const Color(0xff465144) : HistaePalette.sand,
-  );
-  final baseTheme = ThemeData(useMaterial3: true, colorScheme: colors);
-  TextStyle editorial(TextStyle? style, double size) =>
-      (style ?? const TextStyle()).copyWith(
-        fontFamily: 'DMSerifDisplay',
-        fontWeight: FontWeight.w400,
-        fontSize: size,
-        height: 1.16,
-        letterSpacing: -0.4,
+  final colors =
+      ColorScheme.fromSeed(
+        seedColor: HistaeTokens.lavender,
+        brightness: brightness,
+      ).copyWith(
+        primary: dark ? HistaeTokens.lavender : const Color(0xff63429c),
+        onPrimary: dark ? HistaeTokens.night : Colors.white,
+        primaryContainer: dark
+            ? const Color(0xff332b4b)
+            : const Color(0xffeae0ff),
+        onPrimaryContainer: dark ? HistaeTokens.ink : const Color(0xff291947),
+        secondary: dark ? HistaeTokens.coral : const Color(0xff954a39),
+        onSecondary: dark ? HistaeTokens.night : Colors.white,
+        secondaryContainer: dark ? HistaeTokens.plum : const Color(0xfff7e6df),
+        onSecondaryContainer: dark ? HistaeTokens.ink : const Color(0xff47242c),
+        surface: dark ? HistaeTokens.night : const Color(0xfffaf8fc),
+        onSurface: dark ? HistaeTokens.ink : const Color(0xff1c2030),
+        onSurfaceVariant: dark ? HistaeTokens.muted : const Color(0xff5e576d),
+        surfaceContainerLowest: dark ? const Color(0xff0b111c) : Colors.white,
+        surfaceContainerLow: dark ? HistaeTokens.panel : Colors.white,
+        surfaceContainer: dark
+            ? HistaeTokens.nightSoft
+            : const Color(0xfff0ebf6),
+        surfaceContainerHigh: dark
+            ? const Color(0xff20283a)
+            : const Color(0xffece5f4),
+        surfaceContainerHighest: dark
+            ? const Color(0xff303247)
+            : const Color(0xffe6ddef),
+        outline: dark ? const Color(0xff8e879e) : const Color(0xff7d738a),
+        outlineVariant: dark ? HistaeTokens.line : const Color(0xffdbd3e5),
+        error: dark ? const Color(0xffffb4a5) : const Color(0xffa13229),
+        onError: dark ? const Color(0xff48130e) : Colors.white,
       );
-  final text = baseTheme.textTheme;
-  final shape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(28));
-  return baseTheme.copyWith(
-    scaffoldBackgroundColor: colors.surface,
-    textTheme: text.copyWith(
-      headlineLarge: editorial(text.headlineLarge, 38),
-      headlineMedium: editorial(text.headlineMedium, 32),
-      headlineSmall: editorial(text.headlineSmall, 28),
-      titleLarge: editorial(text.titleLarge, 25),
-      bodyLarge: text.bodyLarge?.copyWith(fontSize: 17, height: 1.55),
-      bodyMedium: text.bodyMedium?.copyWith(fontSize: 16, height: 1.5),
-      bodySmall: text.bodySmall?.copyWith(fontSize: 13, height: 1.45),
-      labelLarge: text.labelLarge?.copyWith(
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
-      ),
+  final base = ThemeData(
+    useMaterial3: true,
+    colorScheme: colors,
+    fontFamily: HistaeTokens.sans,
+  );
+  TextStyle serif(
+    TextStyle? style,
+    double size, {
+    FontWeight weight = FontWeight.w400,
+  }) => (style ?? const TextStyle()).copyWith(
+    fontFamily: HistaeTokens.serif,
+    fontSize: size,
+    fontWeight: weight,
+    height: 1.1,
+    letterSpacing: -size * 0.04,
+    fontVariations: const [FontVariation('opsz', 40)],
+  );
+  final text = base.textTheme;
+  final textTheme = text.copyWith(
+    displayLarge: serif(text.displayLarge, 54),
+    displayMedium: serif(text.displayMedium, 46),
+    displaySmall: serif(text.displaySmall, 42),
+    headlineLarge: serif(text.headlineLarge, 38),
+    headlineMedium: serif(text.headlineMedium, 32),
+    headlineSmall: serif(text.headlineSmall, 28),
+    titleLarge: serif(text.titleLarge, 25, weight: FontWeight.w500),
+    titleMedium: text.titleMedium?.copyWith(
+      fontSize: 16,
+      fontWeight: FontWeight.w600,
     ),
+    bodyLarge: text.bodyLarge?.copyWith(fontSize: 17, height: 1.55),
+    bodyMedium: text.bodyMedium?.copyWith(fontSize: 15, height: 1.55),
+    bodySmall: text.bodySmall?.copyWith(fontSize: 13, height: 1.5),
+    labelLarge: text.labelLarge?.copyWith(
+      fontSize: 14,
+      fontWeight: FontWeight.w700,
+    ),
+    labelMedium: text.labelMedium?.copyWith(
+      fontSize: 12,
+      fontWeight: FontWeight.w600,
+    ),
+    labelSmall: text.labelSmall?.copyWith(
+      fontSize: 11,
+      fontWeight: FontWeight.w700,
+      letterSpacing: 1.3,
+    ),
+  );
+  final panelShape = RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(HistaeTokens.panelRadius),
+    side: BorderSide(color: colors.outlineVariant),
+  );
+  const pill = StadiumBorder();
+  return base.copyWith(
+    textTheme: textTheme,
+    scaffoldBackgroundColor: colors.surface,
     appBarTheme: AppBarTheme(
-      backgroundColor: colors.surface,
-      foregroundColor: colors.primary,
+      systemOverlayStyle: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: dark ? Brightness.light : Brightness.dark,
+        statusBarBrightness: brightness,
+        systemNavigationBarColor: colors.surface,
+        systemNavigationBarIconBrightness: dark
+            ? Brightness.light
+            : Brightness.dark,
+      ),
+      backgroundColor: Colors.transparent,
+      foregroundColor: colors.onSurface,
       surfaceTintColor: Colors.transparent,
+      elevation: 0,
       scrolledUnderElevation: 0,
       titleSpacing: 24,
-      titleTextStyle: TextStyle(
-        fontFamily: text.titleLarge?.fontFamily,
-        color: colors.primary,
-        fontSize: 22,
-        fontWeight: FontWeight.w600,
-        letterSpacing: -0.7,
+      toolbarHeight: 64,
+      titleTextStyle: textTheme.titleMedium?.copyWith(
+        color: colors.onSurface,
+        fontSize: 18,
       ),
+      iconTheme: IconThemeData(color: colors.onSurfaceVariant, size: 22),
     ),
     cardTheme: CardThemeData(
       color: colors.surfaceContainerLow,
       surfaceTintColor: Colors.transparent,
-      elevation: 0.8,
-      shadowColor: colors.onSurface.withValues(alpha: 0.07),
+      elevation: 0,
       margin: const EdgeInsets.symmetric(vertical: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(28),
-        side: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.65)),
-      ),
+      shape: panelShape,
+      clipBehavior: Clip.antiAlias,
     ),
     dividerTheme: DividerThemeData(
       color: colors.outlineVariant,
@@ -87,47 +132,106 @@ ThemeData histaeTheme(Brightness brightness) {
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        minimumSize: const Size(48, 56),
-        shape: shape,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 17),
+        minimumSize: const Size(48, 52),
+        shape: pill,
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+        textStyle: textTheme.labelLarge,
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        minimumSize: const Size(48, 56),
-        shape: shape,
-        side: BorderSide(color: colors.outlineVariant),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 17),
+        foregroundColor: colors.onSurface,
+        minimumSize: const Size(48, 52),
+        shape: pill,
+        side: BorderSide(color: colors.outline),
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+        textStyle: textTheme.labelLarge,
       ),
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
+        foregroundColor: colors.primary,
         minimumSize: const Size(48, 48),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        textStyle: textTheme.labelLarge,
       ),
     ),
     inputDecorationTheme: InputDecorationThemeData(
       filled: true,
       fillColor: colors.surfaceContainerLow,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: BorderSide(color: colors.outlineVariant),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+      helperStyle: textTheme.bodySmall?.copyWith(
+        color: colors.onSurfaceVariant,
       ),
+      hintStyle: textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: BorderSide(color: colors.outlineVariant),
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(color: colors.outline),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide(color: colors.primary, width: 2),
       ),
     ),
-    chipTheme: baseTheme.chipTheme.copyWith(
-      backgroundColor: colors.surfaceContainerLow,
-      side: BorderSide(color: colors.outlineVariant),
-      shape: const StadiumBorder(),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+    chipTheme: base.chipTheme.copyWith(
+      backgroundColor: colors.primary.withValues(alpha: dark ? 0.08 : 0.05),
+      side: BorderSide(color: colors.primary.withValues(alpha: 0.25)),
+      labelStyle: textTheme.bodySmall?.copyWith(color: colors.onSurface),
+      shape: pill,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+    ),
+    listTileTheme: ListTileThemeData(
+      iconColor: colors.primary,
+      titleTextStyle: textTheme.titleMedium?.copyWith(color: colors.onSurface),
+      subtitleTextStyle: textTheme.bodySmall?.copyWith(
+        color: colors.onSurfaceVariant,
+      ),
+      minVerticalPadding: 12,
+    ),
+    dialogTheme: DialogThemeData(
+      backgroundColor: colors.surfaceContainer,
+      surfaceTintColor: Colors.transparent,
+      shape: panelShape,
+      titleTextStyle: textTheme.headlineSmall?.copyWith(
+        color: colors.onSurface,
+      ),
+      contentTextStyle: textTheme.bodyMedium?.copyWith(
+        color: colors.onSurfaceVariant,
+      ),
+    ),
+    bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor: colors.surfaceContainer,
+      surfaceTintColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+    ),
+    popupMenuTheme: PopupMenuThemeData(
+      color: colors.surfaceContainer,
+      surfaceTintColor: Colors.transparent,
+      shape: panelShape,
+      textStyle: textTheme.bodyMedium,
+    ),
+    snackBarTheme: SnackBarThemeData(
+      backgroundColor: colors.surfaceContainerHigh,
+      contentTextStyle: textTheme.bodyMedium?.copyWith(color: colors.onSurface),
+      actionTextColor: colors.primary,
+      behavior: SnackBarBehavior.floating,
+      shape: panelShape,
+    ),
+    progressIndicatorTheme: ProgressIndicatorThemeData(
+      color: colors.primary,
+      linearTrackColor: colors.outlineVariant,
+      borderRadius: BorderRadius.circular(4),
+    ),
+    textSelectionTheme: TextSelectionThemeData(
+      cursorColor: colors.primary,
+      selectionColor: colors.primary.withValues(alpha: 0.3),
+      selectionHandleColor: colors.primary,
+    ),
+    iconButtonTheme: IconButtonThemeData(
+      style: IconButton.styleFrom(minimumSize: const Size(48, 48)),
     ),
   );
 }

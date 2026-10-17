@@ -10,7 +10,9 @@ L1 à L5, le cœur de L6, L7 et la gestion des appareils L8 sont implémentés. 
 
 Le manifeste conserve Dart `^3.13.1` et `cupertino_icons`. Aux dépendances L1/L2 s'ajoutent en L3 `image_picker: ^1.2.4`, `flutter_image_compress: ^2.5.1`, `http_parser: ^4.1.2` et `path_provider: ^2.1.6`. Navigation avec `Navigator` / `MaterialPageRoute`, état avec `ChangeNotifier`, dépendances injectées par constructeur. SDK vérifié : Flutter 3.47.7, Dart 3.13.5.
 
-Après connexion et validation des consentements obligatoires, l'application s'ouvre sur le feed. Une barre arrondie commune donne accès à **Feed**, **Matchs** et **Profil**, dans les tons verts du mode nuit et selon la référence `pictures/exemple_feed.png`. Les formulaires, conversations et réglages s'ouvrent au-dessus de ces onglets. Le profil conserve les accès aux crédits, à la vie privée, aux appareils et à l'abonnement.
+Après connexion et validation des consentements obligatoires, l'application s'ouvre sur le feed. Une barre arrondie commune donne accès à **Feed**, **Matchs** et **Profil**. Les formulaires, conversations et réglages s'ouvrent au-dessus de ces onglets. Le profil conserve les accès aux crédits, à la vie privée, aux appareils et à l'abonnement.
+
+La refonte visuelle du 18 octobre aligne tous les parcours sur [le site Histae](https://www.histae.com/fr/) et son dépôt `histae-site` : bleu nuit, lavande, touches abricot, titres à empattements, boutons dégradés et panneaux à bordure fine. L'accueil reprend le mot-symbole et le motif de rencontre du site. Le feed, le profil, les matchs, le chat et le catalogue ont une composition adaptée au mobile. Inter et Source Serif 4 sont embarquées avec leurs licences ; le mode nuit reste appliqué par défaut. Voir le [système visuel](DESIGN_SYSTEM.md).
 
 ## Documentation et références
 
@@ -19,12 +21,13 @@ Après connexion et validation des consentements obligatoires, l'application s'o
 | [Résumé technique et fonctionnel](resume.md) | Fonctionnement du produit, précautions d'intégration et architecture proposée |
 | [Roadmap et matrice de couverture](roadmap.md) | Lots progressifs, routes mobiles, état d'avancement et critères de validation |
 | [Architecture Flutter](ARCHITECTURE.md) | Responsabilités, injection des dépendances, contrats et règles du refactoring transversal |
+| [Système visuel](DESIGN_SYSTEM.md) | Identité commune au site, couleurs, typographies, composants et adaptations mobiles |
 | [Contrat HTTP Rust](../histae-api-rust/docs/http-contract.md) | Référence des routes, DTO, autorisations, erreurs et règles de rejeu |
 | [Documentation API](../histae-api-rust/docs/README.md) | Architecture, développement et configuration du backend |
 | [Collections Postman](../histae-api-rust/postman/README.md) | Exemples de requêtes et parcours d'intégration |
 | [Préparation production de l'API](../histae-api-rust/roadmap-production.md) | Validations fournisseur et exploitation encore nécessaires |
 
-Le projet de travail mobile nécessite uniquement les dépôts voisins `histae-app` et `histae-api-rust`. Le site et le dashboard ne sont pas des dépendances de développement du mobile.
+Le mobile utilise `histae-api-rust` comme référence des contrats. Le dépôt voisin `histae-site` sert désormais de référence graphique ; il n'est pas une dépendance d'exécution de l'app. Le dashboard n'est pas nécessaire au développement mobile.
 
 L'API actuelle est écrite en Rust avec Axum, Tokio et SQLx. PostgreSQL, Redis et un stockage S3 privé portent les données et services nécessaires. Le contrat HTTP est manuel et vérifié par les tests du backend : aucun endpoint OpenAPI/Swagger n'est exposé. Les anciens contrats de l'API NestJS ne doivent pas servir de référence.
 
@@ -121,7 +124,7 @@ Suite livrée en L4 ci-dessous. Les validations réelles de L2/L3 restent ouvert
 
 - **Parcours** : onglet « Feed » affiché après connexion ; onglet Profil et choix de vie privée toujours accessibles. Le diagnostic serveur ouvre les étapes profil/sexe, préférences et consentements, sans déduire une éligibilité locale.
 - **Localisation** : `geolocator: ^14.1.1`, accord métier courant puis explication et permission système. Une seule mesure, abonnement natif annulé après acquisition ou sortie/arrière-plan/retrait/logout. Pas de dernière position connue, de suivi de fond, de persistance ni de journalisation des coordonnées. Les positions approximatives sont acceptées ; refus, refus permanent, services désactivés, délai et mesure ancienne/invalide sont distincts. Le PATCH n'envoie que latitude/longitude. Après réponse perdue, relecture du diagnostic, aucun renvoi automatique. L'expiration `presence_expires_at` provoque une relecture, sans déclencher le GPS.
-- **Feed** : composition ivoire/forêt inspirée de la référence, prénom/âge, distance reçue, bio, traits et réponses approuvées. Aucune photo ni URL partenaire dans le modèle ou les téléchargements. Aucune ville/catégorie inventée. Curseur opaque encodé, limite conservée, déduplication, reprise sans curseur après `invalid_cursor` et arrêt à `null`. Modification des préférences ou reprise au premier plan relit les ressources.
+- **Feed** : composition bleu nuit/lavande alignée sur le site, prénom/âge, distance reçue, bio, traits et réponses approuvées. Aucune photo ni URL partenaire dans le modèle ou les téléchargements. Aucune ville/catégorie inventée. Curseur opaque encodé, limite conservée, déduplication, reprise sans curseur après `invalid_cursor` et arrêt à `null`. Modification des préférences ou reprise au premier plan relit les ressources.
 - **Choix** : double appui pour aimer ; geste vers le haut en fin de lecture pour passer, boutons accessibles en complément. Un geste servant à lire un profil long ne le passe pas : un autre geste depuis le bas est nécessaire. Aucun retour au profil précédent par geste vers le bas. Pendant un résultat incertain, seule la même cible/décision peut être reprise explicitement. Intention en mémoire dans la session, y compris après retour au profil ; aucune file durable ni retry universel. Quotas temporels respectés via `Retry-After`.
 - **Match et sûreté** : seule la réponse `201` réciproque, avec membres vérifiés, ouvre le récapitulatif. Celui-ci confirme la rencontre créée ; son accès au chat livré en L5 relit d'abord la collection autorisée. Blocage confirmé via `POST /api/users/me/blocks/:userId` (`204`), disponible même pour remplacer une intention like/pass incertaine ; aucun choix opposé n'est envoyé. Gestion complète des blocages et signalements livrée en L7.
 - **Contrôles exécutés** : huit contrôles L4 ciblés réussis ; configuration existante vérifiée après retrait du fichier modèle. Vérification supplémentaire ciblée du geste de lecture longue, deux aperçus de feed inspectés, compilation Android debug réussie. Aucun essai authentifié entre deux comptes réels ni permission/GPS sur appareil. Aucun test backend exécuté et aucun changement backend.
@@ -222,7 +225,7 @@ La configuration mobile invalide `BILLING_ENABLED=stripe` a été corrigée en `
 
 ## Direction artistique
 
-La composition de [la référence fournie](pictures/exemple_feed.png) guide toute l'app : cartes généreuses, titres à empattements, séparateurs fins, icônes sobres et espacements aérés. À la demande de l'utilisateur, **aucune palette rose/corail** : ivoire `#FAF8F3`, papier `#FFFDF8`, vert forêt `#345647`, encre `#252C28`, sable `#E4DAC9`. Le mode nuit est appliqué par défaut à toute l'app, indépendamment du réglage système ; le thème clair reste défini. Les titres utilisent DM Serif Display embarquée, sans téléchargement de police au lancement ; les contrôles gardent la typographie système et les grandes polices restent autorisées.
+La référence artistique courante est [le site Histae](https://www.histae.com/fr/) et son dépôt `histae-site`. La palette, les polices et les composants communs sont détaillés dans [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md). Le mode nuit reste appliqué par défaut ; une variante claire cohérente reste définie. Le visuel initial `pictures/exemple_feed.png` conserve son rôle de référence pour les gestes et la navigation, avec la nouvelle identité du site.
 
 Les aperçus proviennent des vrais widgets avec des données simulées, sous `build/previews/`. L6 ajoute `continuation`, `continuation-cost`, `continuation-recorded`, `credits` et `credits-videos-disabled` (`.png`). Définir `FLUTTER_ROOT` puis utiliser `flutter test tool/preview_app_test.dart --plain-name 'preview L6' --update-goldens` pour ce lot. Ils ne sont pas des captures d'appareil. L5/L6 sont en mode nuit ; les anciens aperçus L1–L4 gardent leur rendu historique clair.
 
@@ -250,6 +253,6 @@ Copyright © 2026 Nicolas GERMANI. Tous droits réservés.
 
 Le code est propriétaire, consultable et auditable ; sa publication ne donne pas de droit de modification ou de réutilisation. Voir [LICENSE.md](LICENSE.md). Ne pas présenter le projet comme un logiciel open source.
 
-La police tierce DM Serif Display conserve sa [licence SIL OFL](assets/fonts/dm_serif_display/OFL.txt), embarquée et enregistrée dans le registre des licences Flutter. Elle ne change pas la licence propriétaire du code. Source : [dépôt officiel Google Fonts](https://github.com/google/fonts/tree/main/ofl/dmserifdisplay).
+Les polices tierces Inter et Source Serif 4 sont embarquées avec leurs licences SIL OFL, enregistrées dans Flutter. La police historique DM Serif Display et sa licence sont conservées. Ces licences ne changent pas la licence propriétaire du code. Sources et fichiers : [système visuel](DESIGN_SYSTEM.md).
 
 

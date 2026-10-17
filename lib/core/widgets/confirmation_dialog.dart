@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'histae_button.dart';
+
 Future<bool> confirmAction(
   BuildContext context,
   String title,
@@ -16,7 +18,7 @@ Future<bool> confirmAction(
             onPressed: () => Navigator.pop(context, false),
             child: const Text('Annuler'),
           ),
-          FilledButton(
+          HistaeButton(
             onPressed: () => Navigator.pop(context, true),
             child: Text(action),
           ),

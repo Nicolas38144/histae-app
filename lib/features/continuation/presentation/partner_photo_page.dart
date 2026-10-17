@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../core/network/signed_photo_loader.dart';
-
+import '../../../core/widgets/histae_scaffold.dart';
 import '../../profile/data/profile_models.dart';
 import '../application/match_access.dart';
 
@@ -138,7 +138,7 @@ class _PartnerPhotoPageState extends State<PartnerPhotoPage>
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) => HistaeScaffold(
     appBar: AppBar(title: const Text('Une photo, à deux')),
     body: SafeArea(
       child: ListView(

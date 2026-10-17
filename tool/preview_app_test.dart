@@ -33,6 +33,14 @@ void main() {
         ),
       );
     await serif.load();
+    for (final font in [
+      ('Inter', 'inter/Inter-Variable.ttf'),
+      ('SourceSerif4', 'source_serif_4/SourceSerif4-Variable.ttf'),
+    ]) {
+      await (FontLoader(
+        font.$1,
+      )..addFont(rootBundle.load('assets/fonts/${font.$2}'))).load();
+    }
     final flutterRoot = Platform.environment['FLUTTER_ROOT'];
     if (flutterRoot == null) {
       throw StateError('Set FLUTTER_ROOT to render preview fonts.');
@@ -564,6 +572,14 @@ void main() {
       find.byKey(preview),
       matchesGoldenFile('../build/previews/chat-accessible.png'),
     );
+    await tester.tap(find.byTooltip('État de la conversation'));
+    await tester.pumpAndSettle();
+    await expectLater(
+      find.byKey(preview),
+      matchesGoldenFile('../build/previews/chat-state-details.png'),
+    );
+    await tester.tap(find.text('Fermer'));
+    await tester.pumpAndSettle();
     // Closing the conversation also checks parent navigation after cancellation.
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();

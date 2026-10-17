@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_button.dart';
+import '../../../core/widgets/histae_scaffold.dart';
 import '../../auth/domain/authenticated_session.dart';
 import '../application/report_controller.dart';
 import '../data/privacy_models.dart';
@@ -55,9 +57,9 @@ class _ReportPageState extends State<ReportPage> {
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: c,
     builder: (context, _) {
-      if (!c.accessible) return const Scaffold(body: SizedBox.shrink());
+      if (!c.accessible) return const HistaeScaffold(body: SizedBox.shrink());
       final editable = !c.sending && c.pending == null && !c.submitted;
-      return Scaffold(
+      return HistaeScaffold(
         appBar: AppBar(title: const Text('Signaler un profil')),
         body: SafeArea(
           child: Center(
@@ -108,7 +110,7 @@ class _ReportPageState extends State<ReportPage> {
                     if (c.retrySeconds > 0)
                       Text('Nouvel essai possible dans ${c.retrySeconds} s'),
                     const SizedBox(height: 20),
-                    FilledButton(
+                    HistaeButton(
                       onPressed: c.sending || c.retrySeconds > 0
                           ? null
                           : () => c.submit(_reason, _text.text),

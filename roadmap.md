@@ -14,7 +14,11 @@ Les états doivent distinguer : `À faire`, `En cours`, `Implémenté`, `Intégr
 
 ## 2. Ordre des lots
 
+Refonte visuelle du 18 octobre 2026 : tous les parcours reprennent l'identité de `histae-site` et de [histae.com](https://www.histae.com/fr/), selon [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md). Le thème bleu nuit/lavande, les polices Inter et Source Serif 4, les boutons dégradés et les bordures fines remplacent la palette précédente. L'accueil, le feed, le profil, les matchs, le chat et le catalogue sont recomposés ; les autres pages utilisent les mêmes composants. L'en-tête du chat et son détail d'état s'adaptent au clavier et aux grandes polices. Les fonds de lancement natifs reprennent le bleu nuit. Aucun parcours métier ni fournisseur n'est ajouté ou activé. Les 52 contrôles existants ciblés et les dix scénarios visuels passent ; aucun test de simple décoration n'est ajouté.
+
 Complément de navigation du 18 octobre 2026 : barre commune **Feed / Matchs / Profil**, feed à l'ouverture de l'espace authentifié, retrait des anciens raccourcis du profil et de la barre propre au feed. Le changement d'onglet suspend les lectures et le temps réel de l'écran quitté ; les contrôleurs restent liés à la session. Deux contrôles ciblés ajoutés couvrent la navigation, le texte à 200 %, la déconnexion et le passage d'une rencontre réciproque à une conversation autorisée. Avec les régressions concernées, 27 contrôles passent ; quatre scénarios d'aperçu ont été exécutés et les trois onglets inspectés visuellement. L10 reste le prochain lot fonctionnel.
+
+Validation finale de la refonte graphique : 44 aperçus inspectés, analyse Flutter sans problème, formatage vérifié et APK Android debug compilé. Le rendu iOS et les essais réels sur appareils restent à valider dans L10.
 
 Validation de ce complément : formatage sans changement restant, analyse Flutter sans problème et APK Android debug compilé. Les aperçus et contrôles utilisent uniquement des données simulées.
 
@@ -88,7 +92,7 @@ Critère de sortie : connexion réelle et reprise d'onboarding sans jeton expos�
 - **Interface** : « Créer mon compte » et « J'ai déjà un compte », téléphone français, OTP, envoi accepté/incertain, reprise d'une intention, renvoi explicite, erreurs et `Retry-After`. Le compte est créé par le serveur lors de la vérification OTP. Le profil, la majorité et ses préférences restent en L3 ; aucun feed n'est exposé avant les prérequis serveur de L4.
 - **Session** : refresh sécurisé, access token en mémoire, restauration unique, rotation sérialisée, marqueur durable avant envoi, relecture de stockage avant publication, aucune reprise aveugle après réponse perdue. Fermeture après révocation/deuxième 401, déconnexion même hors ligne, annulation et purge des ressources de l'ancien compte.
 - **Consentements** : quatre types et documents versionnés serveur, aucun nouveau choix précoché, reprise après lecture d'un document, vérification des versions avant PUT, champs exacts `{ consent_type, granted }`. Confirmation des retraits sensible/localisation ; aucun retrait CGU/notice. Accès aux documents et à la déconnexion pendant l'onboarding ; export/demandes/suppression livrés en L7.
-- **DA commune** : composition éditoriale issue de la référence utilisateur ; ivoire, forêt, encre et sable, titres DM Serif Display, cartes arrondies et séparateurs discrets. Licence de police conservée ; adaptation sombre et grand texte. Aucun feed construit en avance.
+- **DA commune** : depuis la refonte du 18 octobre, identité de `histae-site`, bleu nuit/lavande, Inter et Source Serif 4 embarquées, boutons dégradés et panneaux à bordure fine. Adaptations aux grandes polices et au clavier ; détails dans [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md).
 - **Sources** : contrat HTTP ; `src/identity/mobile/{http,service,account,tokens}.rs`, service OTP ; `src/profiles/{http,domain,service}.rs` ; tests `mobile_auth_contract.rs`, `otp_sweego_contract.rs`, `profiles_contract.rs` et exemples Postman. Sources consultées, tests backend non exécutés, backend non modifié.
 - **Vérification automatique** : 85 tests Flutter, analyse et formatage ; compilation Android debug avec stockage sécurisé et police. Un rendu manuel supplémentaire produit trois aperçus inspectés, avec des données simulées identifiées. Les réglages XML natifs sont vérifiés ; cela ne prouve pas le comportement Keychain/Keystore sur appareil.
 - **Intégration réelle et fournisseur** : seul le catalogue est déjà vérifié sur la vraie API. Aucun SMS envoyé, aucun compte réel créé et aucun jeton réel récupéré pendant les tests. L2 reste à valider avec un numéro autorisé sur Android/iOS, puis par arrêt/reprise et coupure réseau. Compilation/signature iOS sur Mac encore ouverte.
@@ -128,7 +132,7 @@ Prochain lot : L4, présence et diagnostic serveur puis feed sans photo, swipe h
 - Envoyer une présence fraîche et traiter permission refusée, services désactivés et précision insuffisante si pertinente.
 - Guider par `discovery-status` : profil, sexe, préférences, consentements et présence.
 - Afficher feed et profils sans photo, avec bio, traits et réponses autorisés.
-- Appliquer la DA éditoriale de `pictures/exemple_feed.png` avec la palette forêt/ivoire. Swipe vers le haut pour passer, double appui pour liker, aucun retour par swipe vers le bas.
+- Appliquer la DA de `histae-site` selon [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md), avec les gestes de `pictures/exemple_feed.png` : swipe vers le haut pour passer, double appui pour liker, aucun retour par swipe vers le bas.
 - Paginer avec curseurs opaques, dédupliquer et reprendre après curseur invalide.
 - Envoyer like/pass ; rejouer seulement le même choix en cas d'incertitude, sans annulation ni file durable hors ligne.
 - Ouvrir le match reçu après réciprocité.

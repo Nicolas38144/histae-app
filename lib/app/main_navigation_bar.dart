@@ -37,10 +37,10 @@ class MainNavigationBar extends StatelessWidget {
       top: false,
       minimum: const EdgeInsets.fromLTRB(16, 8, 16, 12),
       child: Material(
-        color: colors.surfaceContainerLow,
+        color: colors.surfaceContainer,
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(24),
           side: BorderSide(color: colors.outlineVariant),
         ),
         child: Row(
@@ -61,13 +61,24 @@ class MainNavigationBar extends StatelessWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            index == selectedIndex
-                                ? destinations[index].selected
-                                : destinations[index].icon,
-                            color: index == selectedIndex
-                                ? colors.primary
-                                : colors.onSurfaceVariant,
+                          Container(
+                            width: 48,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              color: index == selectedIndex
+                                  ? colors.primary.withValues(alpha: 0.12)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Icon(
+                              index == selectedIndex
+                                  ? destinations[index].selected
+                                  : destinations[index].icon,
+                              size: 22,
+                              color: index == selectedIndex
+                                  ? colors.primary
+                                  : colors.onSurfaceVariant,
+                            ),
                           ),
                           const SizedBox(height: 5),
                           Text(

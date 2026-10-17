@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/widgets/histae_button.dart';
 import '../../catalog/application/catalog_controller.dart';
 import '../../catalog/data/subscription_plan.dart';
 import '../../catalog/presentation/plan_card.dart';
@@ -61,7 +62,7 @@ class SubscriptionPlans extends StatelessWidget {
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      FilledButton(
+                      HistaeButton(
                         onPressed: canAct
                             ? () => onChoose(plan, BillingPeriod.monthly)
                             : null,

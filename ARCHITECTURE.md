@@ -15,6 +15,7 @@ L'application conserve son organisation par fonctionnalité, ses contrôleurs `C
 | `lib/app/main_shell.dart`, `main_navigation_bar.dart` | Trois onglets privés, barre commune et propriété des contrôleurs de profil, découverte et matchs |
 | `lib/app/notification_navigation.dart`, `notification_overlay.dart` | Parcours temporaire d'une notification et bandeau générique |
 | `lib/core` | Configuration, primitives réseau, opérations sérialisées, modèles réellement partagés et composants visuels communs |
+| `lib/core/theme/histae_tokens.dart`, `lib/core/widgets/histae_*.dart` | Valeurs du site, fond commun, mot-symbole et actions accessibles |
 | `features/*/domain` | Contrats ou modèles purs qui doivent être partagés sans dépendre d'un contrôleur ou d'un accès HTTP |
 | `features/*/data` | Contrats de dépôts, implémentations `Api…Repository`, décodage et services natifs/stockage |
 | `features/*/application` | État des parcours, commandes utilisateur, suspension, annulation et rejet des réponses périmées |
@@ -51,6 +52,8 @@ Les écrans ne déclenchent plus directement les mutations des dépôts du profi
 Les anciens fichiers de modèles et le point d'entrée `profile_editors.dart` restent des exports de compatibilité lorsque leur contenu a été extrait. Aucun fichier source n'est supprimé et aucun fichier modèle `.env` n'est recréé.
 
 ## Contrôles et évolution
+
+La refonte graphique du 18 octobre est décrite dans [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md). Le thème et les composants communs portent l'identité de `histae-site`, sans dépendance Flutter supplémentaire. `HistaeScaffold` compose un `Scaffold` standard et son décor ; `HistaeButton` compose un `FilledButton` standard et son dégradé. Les contrôleurs et les contrats HTTP ne portent aucune décision décorative. Les cartes de matchs et l'en-tête adaptatif du chat sont des composants de présentation distincts. Le registre de licences comprend les deux nouvelles polices embarquées. Les fonds natifs Android/iOS ont été adaptés au bleu nuit ; leur validation sur iOS reste à réaliser sur Mac.
 
 L'analyse active `strict-casts`, `strict-inference`, `strict-raw-types`, l'ordre des imports et la surveillance des opérations asynchrones, abonnements et flux. Les versions de dépendances, la contrainte Dart et les fichiers natifs ne sont pas changés pour imposer une migration de bibliothèque.
 

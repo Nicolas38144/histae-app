@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_button.dart';
+import '../../../core/widgets/histae_scaffold.dart';
 import '../../catalog/application/catalog_controller.dart';
 import '../../catalog/data/catalog_repository.dart';
 import '../../catalog/data/subscription_plan.dart';
@@ -111,7 +113,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
             onPressed: () => Navigator.pop(context, false),
             child: const Text('Plus tard'),
           ),
-          FilledButton(
+          HistaeButton(
             onPressed: () => Navigator.pop(context, true),
             child: const Text('Continuer dans le navigateur'),
           ),
@@ -130,7 +132,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) => HistaeScaffold(
     appBar: AppBar(title: const Text('Mon abonnement')),
     body: SafeArea(
       child: Center(

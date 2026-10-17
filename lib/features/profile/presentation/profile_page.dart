@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_scaffold.dart';
 import '../../billing/presentation/billing_scope.dart';
 import '../../billing/presentation/subscription_page.dart';
 import '../../catalog/data/catalog_repository.dart';
@@ -81,15 +82,39 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Icon(
-                icon,
-                color: Theme.of(context).colorScheme.primary,
-                size: 28,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary
+                          .withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      icon,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 21,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
-              Text(title, style: Theme.of(context).textTheme.headlineMedium),
               const SizedBox(height: 12),
-              Text(body),
+              Text(
+                body,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
               const SizedBox(height: 20),
               OutlinedButton(onPressed: onTap, child: Text(action)),
             ],
@@ -97,7 +122,7 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
         ),
       );
       final editable = !c.loading && !c.saving && !c.uncertain;
-      return Scaffold(
+      return HistaeScaffold(
         appBar: AppBar(title: Text(strings.accountTitle)),
         body: SafeArea(
           child: RefreshIndicator(
@@ -113,26 +138,6 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                   body: 'Une façon de vous raconter, avant de vous rencontrer. Votre photo restera absente du feed.',
                 ),
                 const SizedBox(height: 16),
-                TextButton(
-                  onPressed: () =>
-                      _open(CreditsPage(controller: widget.continuation)),
-                  child: const Text('Mes crédits de continuation'),
-                ),
-                TextButton(
-                  onPressed: () =>
-                      _open(PrivacyHubPage(session: controller.session)),
-                  child: Text(strings.privacyTitle),
-                ),
-                TextButton.icon(
-                  onPressed: () => _open(
-                    DevicesPage(
-                      session: controller.session,
-                      push: PushScope.maybeOf(context),
-                    ),
-                  ),
-                  icon: const Icon(Icons.notifications_none),
-                  label: const Text('Appareils et notifications'),
-                ),
                 if (c.loading)
                   const LinearProgressIndicator(
                     semanticsLabel: 'Chargement du profil',
@@ -232,6 +237,31 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                   Icons.photo_outlined,
                 ),
                 const EditorialDivider(),
+                Text(
+                  'Votre compte',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () =>
+                      _open(CreditsPage(controller: widget.continuation)),
+                  child: const Text('Mes crédits de continuation'),
+                ),
+                TextButton(
+                  onPressed: () =>
+                      _open(PrivacyHubPage(session: controller.session)),
+                  child: Text(strings.privacyTitle),
+                ),
+                TextButton.icon(
+                  onPressed: () => _open(
+                    DevicesPage(
+                      session: controller.session,
+                      push: PushScope.maybeOf(context),
+                    ),
+                  ),
+                  icon: const Icon(Icons.notifications_none),
+                  label: const Text('Appareils et notifications'),
+                ),
                 OutlinedButton(
                   onPressed: () {
                     final billing = BillingScope.maybeOf(context);

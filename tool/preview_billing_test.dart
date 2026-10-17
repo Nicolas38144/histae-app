@@ -26,6 +26,14 @@ void main() {
           ),
         ))
         .load();
+    for (final font in [
+      ('Inter', 'inter/Inter-Variable.ttf'),
+      ('SourceSerif4', 'source_serif_4/SourceSerif4-Variable.ttf'),
+    ]) {
+      await (FontLoader(
+        font.$1,
+      )..addFont(rootBundle.load('assets/fonts/${font.$2}'))).load();
+    }
     final flutterRoot = Platform.environment['FLUTTER_ROOT'];
     final sans = FontLoader('Roboto');
     for (final weight in ['regular', 'medium', 'bold']) {

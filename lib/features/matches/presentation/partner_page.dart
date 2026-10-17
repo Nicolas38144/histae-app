@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_scaffold.dart';
 import '../../continuation/presentation/partner_photo_page.dart';
 import '../../privacy/presentation/report_page.dart';
 import '../application/matches_controller.dart';
@@ -19,7 +20,7 @@ class PartnerPage extends StatelessWidget {
               controller.selected?.historyAllowed == true
           ? controller.selected
           : null;
-      return Scaffold(
+      return HistaeScaffold(
         appBar: AppBar(title: Text(match?.partner.firstname ?? 'Profil')),
         body: SafeArea(
           child: ListView(

@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_button.dart';
+import '../../../core/widgets/histae_scaffold.dart';
 import '../../continuation/presentation/continuation_page.dart';
 import '../../privacy/presentation/report_page.dart';
 import '../application/matches_controller.dart';
+import 'conversation_header.dart';
 import 'matches_strings.dart';
 import 'partner_page.dart';
 
@@ -159,12 +162,12 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     if (!c.accessible || c.session.resourceKey != _key) {
-      return const Scaffold(body: SizedBox.shrink());
+      return const HistaeScaffold(body: SizedBox.shrink());
     }
     final messages = c.messages;
     final match = c.selectedId == widget.matchId ? c.selected : null;
     final unavailable = match == null || !match.historyAllowed;
-    return Scaffold(
+    return HistaeScaffold(
       appBar: AppBar(
         title: Text(match?.partner.firstname ?? 'Votre rencontre'),
         actions: [
@@ -243,55 +246,14 @@ class _ChatPageState extends State<ChatPage> {
             : LayoutBuilder(
                 builder: (context, layout) => Column(
                   children: [
-                    ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxHeight: layout.maxHeight * .25,
-                      ),
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text(
-                              MatchesStrings.status(match.status),
-                              style: layout.maxHeight < 480
-                                  ? Theme.of(context).textTheme.bodyMedium
-                                        ?.copyWith(
-                                          fontSize: 14,
-                                          height: 1.15,
-                                          fontWeight: FontWeight.w600,
-                                        )
-                                  : Theme.of(context).textTheme.titleLarge,
-                            ),
-                            Text(
-                              MatchesStrings.stateBody(match),
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: TextButton.icon(
-                                onPressed: _decisions,
-                                icon: const Icon(Icons.auto_awesome_outlined),
-                                label: Text(
-                                  match.status.name == 'awaitingContinuation'
-                                      ? 'Choisir la suite'
-                                      : 'Photos et continuation',
-                                ),
-                              ),
-                            ),
-                            if (!c.realtimeConnected)
-                              const Text(
-                                'Connexion en reprise · actualisation manuelle disponible.',
-                                style: TextStyle(fontSize: 12),
-                              ),
-                            if (c.listLoading || c.historyLoading)
-                              const LinearProgressIndicator(
-                                semanticsLabel:
-                                    'Synchronisation de la conversation',
-                              ),
-                          ],
-                        ),
-                      ),
+                    ConversationHeader(
+                      match: match,
+                      compact:
+                          layout.maxHeight < 480 ||
+                          MediaQuery.textScalerOf(context).scale(1) > 1.4,
+                      connected: c.realtimeConnected,
+                      loading: c.listLoading || c.historyLoading,
+                      onDecisions: _decisions,
                     ),
                     Expanded(
                       child: SizedBox(
@@ -355,7 +317,7 @@ class _ChatPageState extends State<ChatPage> {
                                           color: own
                                               ? Theme.of(context)
                                                     .colorScheme
-                                                    .surfaceContainerHighest
+                                                    .primaryContainer
                                               : Theme.of(context)
                                                     .colorScheme
                                                     .surfaceContainerLow,
@@ -364,21 +326,48 @@ class _ChatPageState extends State<ChatPage> {
                                                 .colorScheme
                                                 .outlineVariant,
                                           ),
-                                          borderRadius: BorderRadius.circular(
-                                            24,
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: const Radius.circular(20),
+                                            topRight: const Radius.circular(20),
+                                            bottomLeft: Radius.circular(
+                                              own ? 20 : 6,
+                                            ),
+                                            bottomRight: Radius.circular(
+                                              own ? 6 : 20,
+                                            ),
                                           ),
                                         ),
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            SelectableText(m.content),
+                                            SelectableText(
+                                              m.content,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.copyWith(
+                                                    color: own
+                                                        ? Theme.of(context)
+                                                              .colorScheme
+                                                              .onPrimaryContainer
+                                                        : Theme.of(context)
+                                                              .colorScheme
+                                                              .onSurface,
+                                                  ),
+                                            ),
                                             const SizedBox(height: 8),
                                             Text(
                                               '${MatchesStrings.date(m.createdAt)}${own ? (m.readAt == null ? ' · Envoyé' : ' · Lu') : ''}',
                                               style: Theme.of(context)
                                                   .textTheme
-                                                  .bodySmall,
+                                                  .bodySmall
+                                                  ?.copyWith(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .onSurfaceVariant,
+                                                    fontSize: 11,
+                                                  ),
                                             ),
                                           ],
                                         ),
@@ -440,7 +429,7 @@ class _ChatPageState extends State<ChatPage> {
                               const Text(
                                 'Cet envoi attend sa confirmation. Reprendre conserve exactement les mêmes mots et la même demande.',
                               ),
-                              FilledButton(
+                              HistaeButton(
                                 onPressed: c.canSend ? c.resumeSend : null,
                                 child: Text(
                                   c.sending
@@ -469,7 +458,7 @@ class _ChatPageState extends State<ChatPage> {
                             if (match.sendAllowed && c.pendingMessage == null)
                               Padding(
                                 padding: const EdgeInsets.only(top: 10),
-                                child: FilledButton.icon(
+                                child: HistaeButton.icon(
                                   onPressed: c.canSend
                                       ? () => c.send(_text.text)
                                       : null,

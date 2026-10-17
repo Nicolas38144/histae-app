@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_scaffold.dart';
 import '../../continuation/presentation/credits_page.dart';
 import '../../notifications/presentation/push_scope.dart';
 import '../application/matches_controller.dart';
 import 'chat_page.dart';
+import 'match_preview_card.dart';
 import 'matches_strings.dart';
 
 class MatchesPage extends StatefulWidget {
@@ -94,9 +96,9 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
     listenable: c,
     builder: (context, _) {
       if (!c.accessible || c.session.resourceKey != _key) {
-        return const Scaffold(body: SizedBox.shrink());
+        return const HistaeScaffold(body: SizedBox.shrink());
       }
-      return Scaffold(
+      return HistaeScaffold(
         appBar: AppBar(
           title: const Text('Vos rencontres'),
           actions: [
@@ -160,46 +162,10 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
                     ),
                   ),
                 for (final match in c.items)
-                  Card(
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(28),
-                      onTap: _opening ? null : () => _open(match.id),
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text(
-                              '${match.partner.firstname}, ${match.partner.age}',
-                              style: Theme.of(context).textTheme.headlineSmall,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(MatchesStrings.status(match.status)),
-                            if (match.lastMessage case final last?) ...[
-                              const SizedBox(height: 12),
-                              Text(
-                                '${last.senderId == c.ownerId ? 'Vous : ' : ''}${last.content}',
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                            if (match.unreadCount > 0)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 12),
-                                child: Text(
-                                  '${match.unreadCount} ${match.unreadCount == 1 ? 'message non lu' : 'messages non lus'}',
-                                  style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .primary,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
+                  MatchPreviewCard(
+                    match: match,
+                    ownerId: c.ownerId,
+                    onTap: _opening ? null : () => _open(match.id),
                   ),
                 if (c.retrySeconds > 0)
                   Text('Nouvel essai possible dans ${c.retrySeconds} s'),

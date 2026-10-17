@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_button.dart';
+import '../../../core/widgets/histae_scaffold.dart';
+import '../../../core/widgets/histae_wordmark.dart';
 import '../../consents/presentation/consents_page.dart';
 import '../../notifications/presentation/push_scope.dart';
 import '../../privacy/presentation/report_page.dart';
@@ -202,7 +205,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
     listenable: c,
     builder: (context, _) {
       if (!c.accessible || c.session.resourceKey != _key) {
-        return const Scaffold(body: SizedBox.shrink());
+        return const HistaeScaffold(body: SizedBox.shrink());
       }
       final profile = c.current;
       final required = c.status?.requiredActions ?? const <DiscoveryAction>[];
@@ -278,7 +281,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                         : 'Votre demande attend sa confirmation. Aucun autre choix ne sera envoyé pour ce profil.',
                   ),
                   const SizedBox(height: 20),
-                  FilledButton(
+                  HistaeButton(
                     onPressed: c.canResume ? _retry : null,
                     child: Text(DiscoveryStrings.pending(intent.action)),
                   ),
@@ -374,9 +377,9 @@ class _DiscoveryPageState extends State<DiscoveryPage>
           child: const Text('Se déconnecter'),
         ),
       ];
-      return Scaffold(
+      return HistaeScaffold(
         appBar: AppBar(
-          title: const Text('Histae'),
+          title: const HistaeWordmark(),
           actions: [
             IconButton(
               tooltip: 'Vos préférences',

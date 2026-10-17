@@ -5,6 +5,8 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_button.dart';
+import '../../../core/widgets/histae_scaffold.dart';
 import '../application/privacy_controller.dart';
 import '../data/privacy_models.dart';
 import 'privacy_choice.dart';
@@ -52,7 +54,7 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: c,
     builder: (context, _) {
-      if (!c.accessible) return const Scaffold(body: SizedBox.shrink());
+      if (!c.accessible) return const HistaeScaffold(body: SizedBox.shrink());
       final title = switch (widget.section) {
         PrivacySection.sessions => 'Mes sessions',
         PrivacySection.blocks => 'Personnes bloquées',
@@ -256,7 +258,7 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
           'La réponse reste à confirmer. Actualisez le suivi avant de reprendre cette même démarche.',
         ),
       ),
-    FilledButton(
+    HistaeButton(
       onPressed: enabled
           ? () async {
               final type = c.pendingRight ?? _type;
@@ -308,7 +310,7 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
       'La préparation peut prendre quelques minutes. Le fichier temporaire est nettoyé à la sortie ou en arrière-plan. Pendant un partage, il est conservé jusqu’au retour dans Histae. Une copie enregistrée par la destination dépend de celle-ci.',
     ),
     const SizedBox(height: 20),
-    FilledButton.icon(
+    HistaeButton.icon(
       onPressed: enabled ? c.downloadExport : null,
       icon: const Icon(Icons.download_outlined),
       label: Text(
@@ -376,7 +378,7 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
       onChanged: (_) => setState(() {}),
     ),
     const SizedBox(height: 20),
-    FilledButton(
+    HistaeButton(
       onPressed: enabled && _confirmation.text == 'SUPPRIMER'
           ? () async {
               if (await _confirm(

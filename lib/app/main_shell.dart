@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../core/widgets/histae_scaffold.dart';
+
 import '../features/auth/domain/authenticated_session.dart';
 import '../features/catalog/data/catalog_repository.dart';
 import '../features/discovery/application/discovery_controller.dart';
@@ -100,7 +102,7 @@ class _MainShellState extends State<MainShell> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) => HistaeScaffold(
     body: PageStorage(
       bucket: _pageStorage,
       child: _covered

@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_button.dart';
+import '../../../core/widgets/histae_scaffold.dart';
 import '../application/otp_controller.dart';
 import '../application/session_controller.dart';
 
@@ -32,7 +34,7 @@ class _OtpPageState extends State<OtpPage> {
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
-    return Scaffold(
+    return HistaeScaffold(
       appBar: AppBar(
         title: Text(
           widget.registration ? strings.createAccount : strings.signIn,
@@ -110,7 +112,7 @@ class _OtpPageState extends State<OtpPage> {
                             labelText: strings.otpLabel,
                           ),
                         ),
-                        FilledButton(
+                        HistaeButton(
                           onPressed: enabled
                               ? () async {
                                   final code = _otp.text;
@@ -124,19 +126,26 @@ class _OtpPageState extends State<OtpPage> {
                       ],
                       if (controller.retrySeconds > 0)
                         Text(strings.retryIn(controller.retrySeconds)),
-                      OutlinedButton(
-                        onPressed: enabled
-                            ? () {
-                                _otp.clear();
-                                controller.send(_phone.text);
-                              }
-                            : null,
-                        child: Text(
-                          controller.canResume
-                              ? strings.resendOtp
-                              : strings.sendOtp,
+                      if (!controller.canResume)
+                        HistaeButton(
+                          onPressed: enabled
+                              ? () {
+                                  _otp.clear();
+                                  controller.send(_phone.text);
+                                }
+                              : null,
+                          child: Text(strings.sendOtp),
+                        )
+                      else
+                        OutlinedButton(
+                          onPressed: enabled
+                              ? () {
+                                  _otp.clear();
+                                  controller.send(_phone.text);
+                                }
+                              : null,
+                          child: Text(strings.resendOtp),
                         ),
-                      ),
                       if (controller.canResume && controller.failure != null)
                         OutlinedButton(
                           onPressed: enabled

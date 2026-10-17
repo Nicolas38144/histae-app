@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../core/l10n/app_strings.dart';
-import '../core/widgets/editorial_card.dart';
+import '../core/widgets/connection_artwork.dart';
+import '../core/widgets/histae_button.dart';
+import '../core/widgets/histae_scaffold.dart';
+import '../core/widgets/histae_wordmark.dart';
 import '../features/auth/application/session_controller.dart';
 import '../features/auth/presentation/otp_page.dart';
 import '../features/catalog/data/catalog_repository.dart';
@@ -16,8 +19,8 @@ class WelcomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
-    return Scaffold(
-      appBar: AppBar(title: Text(strings.appName)),
+    return HistaeScaffold(
+      appBar: AppBar(title: const HistaeWordmark()),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -25,13 +28,28 @@ class WelcomePage extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.all(24),
               children: [
-                const SizedBox(height: 20),
-                EditorialCard(
-                  title: strings.welcomeTitle,
-                  body: strings.welcomeBody,
-                  eyebrow: strings.wordsFirst,
+                const SizedBox(height: 12),
+                Text(
+                  'UNE AUTRE FAÇON DE SE RENCONTRER',
+                  style: Theme.of(context).textTheme.labelSmall
+                      ?.copyWith(color: Theme.of(context).colorScheme.primary),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
+                Semantics(
+                  header: true,
+                  child: Text(
+                    strings.welcomeTitle,
+                    style: Theme.of(context).textTheme.displayMedium,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  strings.welcomeBody,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 28),
                 if (session case final auth?) ...[
                   if (auth.notice != null)
                     Semantics(
@@ -40,7 +58,7 @@ class WelcomePage extends StatelessWidget {
                     ),
                   if (auth.failure case final failure?)
                     Text(strings.authFailure(failure)),
-                  FilledButton(
+                  HistaeButton(
                     onPressed: () => Navigator.of(context).push(
                       MaterialPageRoute<void>(
                         builder: (_) =>
@@ -69,6 +87,17 @@ class WelcomePage extends StatelessWidget {
                   ),
                   child: Text(strings.catalogAction),
                 ),
+                const SizedBox(height: 28),
+                const ConnectionArtwork(),
+                const SizedBox(height: 20),
+                Text(
+                  'Le temps. La réciprocité. Le consentement.',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 12),
               ],
             ),
           ),

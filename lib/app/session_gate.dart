@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/l10n/app_strings.dart';
+import '../core/widgets/histae_scaffold.dart';
 import '../core/widgets/status_view.dart';
 import '../features/auth/application/session_controller.dart';
 import '../features/catalog/data/catalog_repository.dart';
@@ -25,7 +26,7 @@ class SessionGate extends StatelessWidget {
         return MainShell(session: session, catalog: catalog);
       case SessionPhase.restoring:
       case SessionPhase.synchronizing:
-        return Scaffold(
+        return HistaeScaffold(
           appBar: AppBar(title: Text(strings.appName)),
           body: SafeArea(
             child: ListView(
@@ -45,7 +46,7 @@ class SessionGate extends StatelessWidget {
         );
       case SessionPhase.unavailable:
       case SessionPhase.storageFailure:
-        return Scaffold(
+        return HistaeScaffold(
           appBar: AppBar(title: Text(strings.appName)),
           body: SafeArea(
             child: ListView(

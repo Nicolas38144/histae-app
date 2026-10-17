@@ -20,14 +20,32 @@ class StatusView extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      Icon(icon, size: 40, color: Theme.of(context).colorScheme.primary),
+      Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Icon(
+            icon,
+            size: 28,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+      ),
       const SizedBox(height: 20),
       Semantics(
         header: true,
         child: Text(title, style: Theme.of(context).textTheme.headlineSmall),
       ),
       const SizedBox(height: 12),
-      Text(message),
+      Text(
+        message,
+        style: Theme.of(context).textTheme.bodyMedium
+            ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+      ),
       if (action != null) ...[const SizedBox(height: 24), action!],
       if (reference != null) ...[
         const SizedBox(height: 24),

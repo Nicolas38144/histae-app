@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/network/signed_photo_loader.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
+import '../../../core/widgets/histae_button.dart';
+import '../../../core/widgets/histae_scaffold.dart';
 import '../application/profile_controller.dart';
 import '../data/photo_preparer.dart';
 import '../data/profile_models.dart';
@@ -226,11 +228,11 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
     listenable: c,
     builder: (context, _) {
       if (!c.accessible || c.session.resourceKey != _ownerScope) {
-        return const Scaffold(body: SizedBox.shrink());
+        return const HistaeScaffold(body: SizedBox.shrink());
       }
       final intent = c.photoIntent;
       final preview = intent == null ? _remote : intent.bytes;
-      return Scaffold(
+      return HistaeScaffold(
         appBar: AppBar(title: const Text('Votre photo')),
         body: SafeArea(
           child: ListView(
@@ -296,7 +298,7 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
               ),
               if (intent != null) ...[
                 const SizedBox(height: 12),
-                FilledButton(
+                HistaeButton(
                   onPressed:
                       _choosing || c.saving || c.loading || c.retrySeconds > 0
                       ? null

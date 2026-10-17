@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_scaffold.dart';
 import '../../../core/widgets/status_view.dart';
 import '../application/catalog_controller.dart';
 import '../data/catalog_repository.dart';
-
 import 'plan_card.dart';
+
 export 'plan_card.dart' show PlanCard;
 
 class CatalogPage extends StatefulWidget {
@@ -53,7 +55,7 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
-    return Scaffold(
+    return HistaeScaffold(
       appBar: AppBar(title: Text(strings.catalogTitle)),
       body: SafeArea(
         child: Center(
@@ -101,7 +103,11 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
       CatalogStatus.ready => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(strings.catalogIntro),
+          EditorialCard(
+            eyebrow: 'DES FORMULES SIMPLES',
+            title: 'À votre rythme. Au prix juste.',
+            body: strings.catalogIntro,
+          ),
           const SizedBox(height: 16),
           for (final plan in controller.plans) PlanCard(plan: plan),
           const SizedBox(height: 16),

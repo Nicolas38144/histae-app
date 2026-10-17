@@ -85,7 +85,7 @@ class AppStrings {
     'legal_documents_changed' => documentsChanged,
     _ => failureMessage(error.kind),
   };
-  String get welcomeTitle => 'D’abord les mots.\nPuis la rencontre.';
+  String get welcomeTitle => 'Prendre le temps de se rencontrer.';
   String get welcomeBody =>
       'Découvrez une personne à travers ses mots. '
       'Les photos se révèlent lorsque vous le choisissez tous les deux.';

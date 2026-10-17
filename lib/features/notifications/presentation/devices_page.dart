@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_button.dart';
+import '../../../core/widgets/histae_scaffold.dart';
 import '../../auth/domain/authenticated_session.dart';
 import '../../privacy/presentation/privacy_strings.dart' show privacyDate;
 import '../application/devices_controller.dart';
@@ -63,14 +65,14 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: Listenable.merge([c, ?p]),
     builder: (context, _) {
-      if (!c.accessible) return const Scaffold(body: SizedBox.shrink());
+      if (!c.accessible) return const HistaeScaffold(body: SizedBox.shrink());
       final enabled =
           c.active &&
           !c.loading &&
           !c.removing &&
           c.retrySeconds == 0 &&
           p?.busy != true;
-      return Scaffold(
+      return HistaeScaffold(
         appBar: AppBar(title: const Text('Appareils et notifications')),
         body: SafeArea(
           child: Center(
@@ -125,7 +127,7 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                             p!.deviceId == null ||
                             p!.failure != null) &&
                         !p!.stopping)
-                      FilledButton(
+                      HistaeButton(
                         onPressed: enabled && p!.retrySeconds == 0
                             ? () async {
                                 if (!await confirmAction(

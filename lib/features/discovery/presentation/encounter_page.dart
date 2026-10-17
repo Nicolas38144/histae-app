@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_button.dart';
+import '../../../core/widgets/histae_scaffold.dart';
 import '../../privacy/presentation/report_page.dart';
 import '../application/discovery_controller.dart';
 
@@ -21,7 +23,7 @@ class EncounterPage extends StatelessWidget {
     builder: (context, _) {
       if (!controller.accessible ||
           controller.encounter?.match.id != receipt.match.id) {
-        return Scaffold(
+        return HistaeScaffold(
           appBar: AppBar(title: const Text('Votre rencontre')),
           body: const Center(
             child: Text('Cette rencontre n’est plus disponible ici.'),
@@ -31,7 +33,7 @@ class EncounterPage extends StatelessWidget {
       final created = receipt.match.createdAt.toLocal();
       // This screen acknowledges the server-created match. It does not infer
       // live chat access, continuation or photo revelation from this snapshot.
-      return Scaffold(
+      return HistaeScaffold(
         appBar: AppBar(title: const Text('Une rencontre')),
         body: SafeArea(
           child: ListView(
@@ -57,7 +59,7 @@ class EncounterPage extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               if (openMatch != null)
-                FilledButton.icon(
+                HistaeButton.icon(
                   onPressed: openMatch,
                   icon: const Icon(Icons.forum_outlined),
                   label: const Text('Ouvrir la conversation'),

@@ -3,47 +3,16 @@ import 'package:flutter/material.dart';
 class EditorialDivider extends StatelessWidget {
   const EditorialDivider({super.key});
   @override
-  Widget build(BuildContext context) => ExcludeSemantics(
+  Widget build(BuildContext context) => const ExcludeSemantics(
     child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24),
-      child: Row(
-        children: [
-          const Expanded(child: Divider(height: 1)),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: CustomPaint(
-              size: const Size(12, 20),
-              painter: _SparklePainter(Theme.of(context).colorScheme.primary),
-            ),
-          ),
-          const Expanded(child: Divider(height: 1)),
-        ],
-      ),
+      padding: EdgeInsets.symmetric(vertical: 22),
+      child: Divider(height: 1),
     ),
   );
 }
 
-class _SparklePainter extends CustomPainter {
-  const _SparklePainter(this.color);
-  final Color color;
-  @override
-  void paint(Canvas canvas, Size size) {
-    final w = size.width;
-    final h = size.height;
-    final path = Path()
-      ..moveTo(w / 2, 0)
-      ..quadraticBezierTo(w / 2, h / 2, w, h / 2)
-      ..quadraticBezierTo(w / 2, h / 2, w / 2, h)
-      ..quadraticBezierTo(w / 2, h / 2, 0, h / 2)
-      ..quadraticBezierTo(w / 2, h / 2, w / 2, 0)
-      ..close();
-    canvas.drawPath(path, Paint()..color = color);
-  }
-
-  @override
-  bool shouldRepaint(_SparklePainter oldDelegate) => color != oldDelegate.color;
-}
-
+/// Shared section heading, with the same hierarchy as the website's intros.
+/// The legacy name remains available to existing feature pages.
 class EditorialCard extends StatelessWidget {
   const EditorialCard({
     super.key,
@@ -56,33 +25,38 @@ class EditorialCard extends StatelessWidget {
   final String? eyebrow;
 
   @override
-  Widget build(BuildContext context) => Card(
-    child: Padding(
-      padding: const EdgeInsets.all(26),
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (eyebrow != null) ...[
             Text(
               eyebrow!,
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-                letterSpacing: 2,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.primary,
               ),
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 16),
           ],
           Semantics(
             header: true,
             child: Text(
-              title,
-              style: Theme.of(context).textTheme.headlineLarge,
+              title.replaceAll('\n', ' '),
+              style: theme.textTheme.headlineLarge,
             ),
           ),
-          const EditorialDivider(),
-          Text(body, style: Theme.of(context).textTheme.bodyLarge),
+          const SizedBox(height: 18),
+          Text(
+            body,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
         ],
       ),
-    ),
-  );
+    );
+  }
 }

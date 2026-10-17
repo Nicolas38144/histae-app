@@ -4,6 +4,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_button.dart';
+import '../../../core/widgets/histae_scaffold.dart';
 import '../../auth/domain/authenticated_session.dart';
 import '../../privacy/presentation/privacy_hub_page.dart';
 import '../domain/consent_state.dart';
@@ -86,7 +88,7 @@ class _ConsentsPageState extends State<ConsentsPage> {
             onPressed: () => Navigator.pop(context, false),
             child: Text(strings.cancel),
           ),
-          FilledButton(
+          HistaeButton(
             onPressed: () => Navigator.pop(context, true),
             child: Text(strings.confirmWithdrawal),
           ),
@@ -113,7 +115,7 @@ class _ConsentsPageState extends State<ConsentsPage> {
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
-    return Scaffold(
+    return HistaeScaffold(
       appBar: AppBar(title: Text(strings.consentsTitle)),
       body: SafeArea(
         child: Center(
@@ -217,7 +219,7 @@ class _ConsentsPageState extends State<ConsentsPage> {
                     if (_message != null)
                       Semantics(liveRegion: true, child: Text(_message!)),
                     const SizedBox(height: 16),
-                    FilledButton(
+                    HistaeButton(
                       onPressed: blocked || changes.isEmpty
                           ? null
                           : () => _save(changes, state),

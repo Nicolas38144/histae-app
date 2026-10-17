@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_scaffold.dart';
 import '../../auth/domain/authenticated_session.dart';
 import '../../consents/presentation/consents_page.dart';
 import '../../notifications/presentation/devices_page.dart';
@@ -70,7 +71,7 @@ class _PrivacyHubPageState extends State<PrivacyHubPage>
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: c,
     builder: (context, _) {
-      if (!c.accessible) return const Scaffold(body: SizedBox.shrink());
+      if (!c.accessible) return const HistaeScaffold(body: SizedBox.shrink());
       return PrivacyFrame(
         title: 'Vie privée et sécurité',
         children: [

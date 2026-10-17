@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
+import '../../../core/widgets/histae_button.dart';
+import '../../../core/widgets/histae_scaffold.dart';
 import '../application/profile_controller.dart';
 import 'profile_strings.dart';
 
@@ -54,7 +56,7 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
     builder: (context, _) {
       if (!controller.accessible ||
           controller.session.resourceKey != _resourceKey) {
-        return const Scaffold(body: SizedBox.shrink());
+        return const HistaeScaffold(body: SizedBox.shrink());
       }
       return PopScope(
         canPop: leaving || (!dirty && !busy),
@@ -74,7 +76,7 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
             Navigator.pop(context);
           }
         },
-        child: Scaffold(
+        child: HistaeScaffold(
           appBar: AppBar(title: Text(title)),
           body: SafeArea(
             child: ListView(
@@ -106,7 +108,7 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
                   ),
                 const SizedBox(height: 24),
                 if (save != null)
-                  FilledButton(
+                  HistaeButton(
                     onPressed: busy || !controller.canWrite ? null : save,
                     child: Text(
                       controller.retrySeconds > 0

@@ -6,7 +6,9 @@ Mise à jour : 18 octobre 2026.
 
 ## 1. Périmètre et état actuel
 
-La navigation principale reprend la barre arrondie de `pictures/exemple_feed.png`, adaptée au vert et au mode nuit : **Feed**, **Matchs**, **Profil**. Le feed est affiché après l'onboarding juridique. La barre reste présente sur les trois espaces principaux ; les conversations, formulaires et réglages utilisent des pages de détail. Le choix d'un onglet suspend l'activité réseau de l'écran quitté, conserve les contrôleurs dans la session et relit les autorisations au retour. Les parcours de notification gardent leur navigation temporaire et suspendent le parcours principal pendant leur consultation.
+Refonte visuelle du 18 octobre : 52 contrôles ciblés existants réussis, dix scénarios visuels et 44 aperçus inspectés, analyse sans problème, formatage vérifié et APK Android debug compilé. Validation iOS sur Mac et appareils réels encore prévue dans L10.
+
+La navigation principale conserve trois onglets : **Feed**, **Matchs**, **Profil**. Le feed est affiché après l'onboarding juridique. La barre reste présente sur les trois espaces principaux ; conversations, formulaires et réglages utilisent des pages de détail. Le changement d'onglet suspend l'activité de l'écran quitté. Les contrôleurs restent liés à la session ; les notifications suspendent temporairement le parcours principal.
 
 `histae-app` est le futur client Flutter Android/iOS des utilisateurs de Histae. Le backend de référence est `histae-api-rust`, écrit en Rust avec Axum, Tokio et SQLx. PostgreSQL contient les données transactionnelles ; Redis sert notamment aux limites de débit et au relais temps réel ; les photos sont privées dans un stockage compatible S3. L'API, l'outbox et la maintenance ont des cycles de vie distincts.
 
@@ -226,7 +228,7 @@ Choix L1 après consultation des documentations officielles : `http` pour les re
 
 La navigation distingue restauration, inscription/connexion, synchronisation, consentements requis, espace personnel et erreur de session/stockage. Aucune session n'est simulée dans l'app. Une découverte non prête ne verrouillera pas les fonctions autorisées ; les liens entrants nécessiteront session et ressource accessibles.
 
-La DA reprend la composition de `pictures/exemple_feed.png` : arrondis, titres à empattements, séparateurs fins et espaces aérés. La palette rose/corail est remplacée à la demande de l'utilisateur par ivoire `#FAF8F3`, papier `#FFFDF8`, forêt `#345647`, encre `#252C28` et sable `#E4DAC9`, avec adaptation sombre. DM Serif Display est embarquée avec sa licence SIL OFL ; le code reste propriétaire. Les aperçus de profil et du feed ont été inspectés (`tool/preview_app_test.dart`, données simulées). L4 applique cette DA au feed sans photo : geste haut en fin de lecture pour passer, double appui pour liker, aucun retour à un profil précédent.
+La DA suit désormais [le site Histae](https://www.histae.com/fr/) et les sources de `histae-site` : bleu nuit `#0D1421`, lavande `#B69CFF`, texte ivoire `#F9F7F2`, touches abricot `#F09A82`, halos discrets, boutons dégradés et panneaux fins. Le mot-symbole et les deux lignes qui se rejoignent sont adaptés au mobile. Inter et Source Serif 4 sont embarquées sous SIL OFL ; cette dernière transpose l'esprit des titres Georgia du site. Les anciens fichiers de police sont conservés. L'ensemble des pages partage le thème et le fond commun ; accueil, feed, profil, matchs, chat et catalogue ont une composition revue. Les gestes du feed et les contrôles métier restent ceux des lots précédents. Voir [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md).
 
 ## Refactoring transversal avant L10
 

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_button.dart';
+import '../../../core/widgets/histae_scaffold.dart';
 import '../../matches/data/match_models.dart';
 import '../../matches/presentation/matches_strings.dart';
 import '../application/continuation_controller.dart';
@@ -94,7 +96,7 @@ class _ContinuationPageState extends State<ContinuationPage>
           c.accessible &&
           c.access.session.resourceKey == _key &&
           m?.historyAllowed == true;
-      return Scaffold(
+      return HistaeScaffold(
         appBar: AppBar(title: const Text('Votre rencontre')),
         body: SafeArea(
           child: ListView(
@@ -143,7 +145,7 @@ class _ContinuationPageState extends State<ContinuationPage>
                   if (m.partner.photo == null)
                     const Text('La photo n’est pas disponible actuellement.')
                   else
-                    FilledButton.icon(
+                    HistaeButton.icon(
                       onPressed: !c.access.verified
                           ? null
                           : () => Navigator.of(context).push(
@@ -198,7 +200,7 @@ class _ContinuationPageState extends State<ContinuationPage>
                     Text(
                       'Cette demande reste à confirmer, avec un coût maximal accepté de $cost crédit${cost == 1 ? '' : 's'}. Aucun nouvel accord avec un autre coût ne sera envoyé.',
                     ),
-                    FilledButton(
+                    HistaeButton(
                       onPressed: c.canContinue ? c.resumeContinuation : null,
                       child: const Text('Reprendre le même accord'),
                     ),
@@ -209,7 +211,7 @@ class _ContinuationPageState extends State<ContinuationPage>
                             ? 'Votre formule actuelle : aucun crédit nécessaire pour votre accord.'
                             : '${q.remaining} nouvelle(s) continuation(s) disponible(s). Votre accord coûte au maximum 1 crédit.',
                       ),
-                    FilledButton(
+                    HistaeButton(
                       onPressed:
                           c.canContinue &&
                               c.quota?.canStart == true &&

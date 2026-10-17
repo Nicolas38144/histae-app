@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_button.dart';
+import '../../../core/widgets/histae_scaffold.dart';
 import '../application/continuation_controller.dart';
 import '../data/continuation_models.dart';
 import 'continuation_strings.dart';
@@ -57,10 +59,10 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
     listenable: Listenable.merge([c, c.rewards]),
     builder: (context, _) {
       if (!c.accessible || c.access.session.resourceKey != _key) {
-        return const Scaffold(body: SizedBox.shrink());
+        return const HistaeScaffold(body: SizedBox.shrink());
       }
       final q = c.quota, reward = c.rewards;
-      return Scaffold(
+      return HistaeScaffold(
         appBar: AppBar(title: const Text('Vos crédits')),
         body: SafeArea(
           child: RefreshIndicator(
@@ -184,7 +186,7 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
                                           Navigator.pop(context, false),
                                       child: const Text('Conserver'),
                                     ),
-                                    FilledButton(
+                                    HistaeButton(
                                       onPressed: () =>
                                           Navigator.pop(context, true),
                                       child: const Text('Annuler la demande'),

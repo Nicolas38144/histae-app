@@ -16,6 +16,16 @@ Future<AppDependencies> bootstrap() async {
       'DM Serif Display',
     ], await rootBundle.loadString('assets/fonts/dm_serif_display/OFL.txt'));
   });
+  LicenseRegistry.addLicense(() async* {
+    for (final font in [
+      ('Inter', 'assets/fonts/inter/OFL.txt'),
+      ('Source Serif 4', 'assets/fonts/source_serif_4/OFL.txt'),
+    ]) {
+      yield LicenseEntryWithLineBreaks([
+        font.$1,
+      ], await rootBundle.loadString(font.$2));
+    }
+  });
   try {
     return AppDependencies.fromConfig(
       AppConfig.fromDotEnv(
