@@ -10,6 +10,7 @@ import '../features/auth/application/session_controller.dart';
 import '../features/auth/presentation/otp_page.dart';
 import '../features/consents/presentation/consents_page.dart';
 import '../features/profile/presentation/profile_page.dart';
+import '../features/privacy/presentation/privacy_strings.dart';
 import '../core/widgets/status_view.dart';
 import '../core/widgets/editorial_card.dart';
 import 'theme.dart';
@@ -158,6 +159,7 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
                     ),
                   ),
                 ),
+                if (session.notice != null) Text(sessionNotice(session.notice)),
                 if (session.hasSession)
                   TextButton(
                     onPressed: session.logout,
@@ -199,11 +201,7 @@ class _WelcomePage extends StatelessWidget {
                   if (auth.notice != null)
                     Semantics(
                       liveRegion: true,
-                      child: Text(
-                        auth.notice == 'logout_confirmed'
-                            ? strings.logoutConfirmed
-                            : strings.logoutUnconfirmed,
-                      ),
+                      child: Text(sessionNotice(auth.notice)),
                     ),
                   if (auth.failure case final failure?)
                     Text(strings.authFailure(failure)),

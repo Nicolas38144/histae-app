@@ -14,6 +14,11 @@ import '../test/support/matches_fixture.dart';
 import '../test/support/continuation_fixture.dart';
 
 import 'package:histae_app/features/matches/presentation/chat_page.dart';
+import 'package:histae_app/app/theme.dart';
+import 'package:histae_app/features/privacy/presentation/privacy_hub_page.dart';
+import 'package:histae_app/features/privacy/presentation/report_page.dart';
+
+import '../test/support/privacy_fixture.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -48,6 +53,192 @@ void main() {
       );
     await icons.load();
   });
+  testWidgets(
+    'preview L7 privacy before onboarding, navigation, deletion and report',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final session = testSession((r) async {
+        if (r.method == 'DELETE' && r.url.path == '/api/users/me') {
+          return jsonResponse({
+            'request_id': privacyId,
+            'status': 'in_progress',
+          }, 202);
+        }
+        return defaultPrivacyResponse(r, complete: false);
+      });
+      await session.establish(testTokens);
+      const preview = Key('privacy-preview');
+      Future<void> tapText(String label) async {
+        await tester.ensureVisible(find.text(label));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(label));
+        await tester.pumpAndSettle();
+      }
+
+      await tester.pumpWidget(
+        RepaintBoundary(
+          key: preview,
+          child: HistaeApp(sessionController: session),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('Sessions, données et suppression du compte'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tapText('Sessions, données et suppression du compte');
+      expect(find.byType(PrivacyHubPage), findsOneWidget);
+      await expectLater(
+        find.byKey(preview),
+        matchesGoldenFile('../build/previews/privacy-hub.png'),
+      );
+      await tapText('Mes sessions');
+      await expectLater(
+        find.byKey(preview),
+        matchesGoldenFile('../build/previews/privacy-sessions.png'),
+      );
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('Mes demandes de données'),
+        180,
+        scrollable: find.byType(Scrollable).last,
+      );
+      await tapText('Mes demandes de données');
+      expect(find.textContaining('Reçue ·'), findsOneWidget);
+      await expectLater(
+        find.byKey(preview),
+        matchesGoldenFile('../build/previews/privacy-rights.png'),
+      );
+      tester.view.physicalSize = const Size(320, 640);
+      tester.platformDispatcher.textScaleFactorTestValue = 2;
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('privacy-right-choice')),
+        220,
+        scrollable: find.byType(Scrollable).last,
+      );
+      await tester.ensureVisible(find.byKey(const Key('privacy-right-choice')));
+      await tester.pumpAndSettle();
+      await expectLater(
+        find.byKey(preview),
+        matchesGoldenFile('../build/previews/privacy-accessible.png'),
+      );
+      tester.view.physicalSize = const Size(390, 844);
+      tester.platformDispatcher.clearTextScaleFactorTestValue();
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('Exporter mes données'),
+        160,
+        scrollable: find.byType(Scrollable).last,
+      );
+      await tapText('Exporter mes données');
+      await expectLater(
+        find.byKey(preview),
+        matchesGoldenFile('../build/previews/privacy-export.png'),
+      );
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('Supprimer mon compte'),
+        160,
+        scrollable: find.byType(Scrollable).last,
+      );
+      await tapText('Supprimer mon compte');
+      await tester.scrollUntilVisible(
+        find.text('Supprimer définitivement mon compte'),
+        140,
+        scrollable: find.byType(Scrollable).last,
+      );
+      await tester.ensureVisible(
+        find.text('Supprimer définitivement mon compte'),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        tester
+            .widget<FilledButton>(
+              find.widgetWithText(
+                FilledButton,
+                'Supprimer définitivement mon compte',
+              ),
+            )
+            .onPressed,
+        isNull,
+      );
+      await tester.enterText(find.byType(TextField), 'SUPPRIMER');
+      await tester.pumpAndSettle();
+      await expectLater(
+        find.byKey(preview),
+        matchesGoldenFile('../build/previews/privacy-deletion.png'),
+      );
+      await tester.tap(find.text('Supprimer définitivement mon compte'));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.widgetWithText(FilledButton, 'Supprimer mon compte'),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(PrivacyHubPage), findsNothing);
+      expect(
+        find.textContaining('le nettoyage de vos données continue'),
+        findsOneWidget,
+      );
+      await expectLater(
+        find.byKey(preview),
+        matchesGoldenFile('../build/previews/privacy-deletion-accepted.png'),
+      );
+      await tester.pumpWidget(const SizedBox.shrink());
+      final ready = testSession((r) async => defaultPrivacyResponse(r));
+      await ready.establish(testTokens);
+      await tester.pumpWidget(
+        RepaintBoundary(
+          key: preview,
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: histaeTheme(Brightness.dark),
+            home: ReportPage(session: ready, target: candidateOne),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await expectLater(
+        find.byKey(preview),
+        matchesGoldenFile('../build/previews/report.png'),
+      );
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpWidget(
+        RepaintBoundary(
+          key: preview,
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: histaeTheme(Brightness.dark),
+            home: PrivacyHubPage(
+              session: ready,
+              exportStore: PreviewExportStore(),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('Personnes bloquées'),
+        180,
+        scrollable: find.byType(Scrollable).last,
+      );
+      await tapText('Personnes bloquées');
+      await expectLater(
+        find.byKey(preview),
+        matchesGoldenFile('../build/previews/privacy-blocks.png'),
+      );
+      await tester.pumpWidget(const SizedBox.shrink());
+      ready.dispose();
+    },
+  );
   testWidgets(
     'preview L6 continuation, cost consent and credits with synthetic responses',
     (tester) async {

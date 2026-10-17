@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/network/json_fields.dart';
 import '../../consents/data/consent_state.dart';
 import '../data/auth_repository.dart';
 import '../data/session_vault.dart';
@@ -33,6 +34,7 @@ class SessionController extends ChangeNotifier {
   Future<void>? _sync;
   Future<void>? _rotation;
   Future<void>? _logout;
+  Future<void>? _terminal;
   int _generation = 0;
   int resourceRevision = 0;
   String get resourceKey => '$_generation:$resourceRevision';
@@ -83,6 +85,9 @@ class SessionController extends ChangeNotifier {
       if (_disposed) return;
       if (record == null || record.phase == 'signed_out') {
         phase = SessionPhase.signedOut;
+      } else if (record.origin == _origin && record.phase == 'closing') {
+        await _invalidate(const ApiFailure(ApiFailureKind.sessionUncertain));
+        notice = 'closure_unconfirmed';
       } else if (record.origin != _origin || record.phase != 'ready') {
         await _invalidate(const ApiFailure(ApiFailureKind.sessionUncertain));
       } else {
@@ -164,6 +169,7 @@ class SessionController extends ChangeNotifier {
     String path, {
     Object? body,
     bool events = false,
+    bool download = false,
     Map<String, String>? query,
     List<int>? photo,
     String? idempotencyKey,
@@ -189,7 +195,12 @@ class SessionController extends ChangeNotifier {
       if (scope.isCancelled || (cancellation?.isCancelled ?? false)) {
         throw const ApiFailure(ApiFailureKind.cancelled);
       }
-      final result = events
+      final result = download
+          ? await repository.api.openDataExport(
+              bearer: tokens.accessToken,
+              cancellation: combined,
+            )
+          : events
           ? await repository.api.openEvents(
               bearer: tokens.accessToken,
               cancellation: combined,
@@ -270,6 +281,153 @@ class SessionController extends ChangeNotifier {
         events: true,
         cancellation: cancellation,
       ) as ApiEventStream;
+
+  Future<ApiDownload> openDataExport(RequestCancellation cancellation) async =>
+      await _authorized(
+        'GET',
+        '/api/users/me/data-export',
+        download: true,
+        cancellation: cancellation,
+      ) as ApiDownload;
+
+  // These operations revoke this very session. First remove the reusable
+  // refresh from durable storage, then cross the barrier that purges all UI.
+  // The single request uses the latest access token, with no replay/rotation
+  // after the barrier. A lost response never becomes an authentication probe.
+  Future<void> eraseAccount(String confirmationToken) =>
+      _closeRemote('erasure', confirmationToken: confirmationToken);
+  Future<void> logoutEverywhere() => _closeRemote('all');
+  Future<void> revokeCurrentSession(String id) =>
+      _closeRemote('current', sessionId: id);
+  Future<void> _closeRemote(
+    String action, {
+    String? confirmationToken,
+    String? sessionId,
+  }) {
+    if (_terminal case final pending?) return pending;
+    final task = _performRemoteClosure(
+      action,
+      confirmationToken: confirmationToken,
+      sessionId: sessionId,
+    );
+    _terminal = task;
+    return task.whenComplete(() {
+      if (identical(_terminal, task)) _terminal = null;
+    });
+  }
+
+  Future<void> _performRemoteClosure(
+    String action, {
+    String? confirmationToken,
+    String? sessionId,
+  }) async {
+    if (!hasSession || _disposed) return;
+    if (action == 'erasure' &&
+        (confirmationToken == null ||
+            !RegExp(r'^[a-fA-F0-9-]{36}:[A-Za-z0-9_-]{43}$')
+                .hasMatch(confirmationToken))) {
+      throw const ApiFailure(ApiFailureKind.invalidResponse);
+    }
+    if (action == 'current' &&
+        (sessionId == null ||
+            !RegExp(
+              r'^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[89abAB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$',
+            ).hasMatch(sessionId))) {
+      throw const ApiFailure(ApiFailureKind.invalidResponse);
+    }
+    _loggingOut = true;
+    _scope.cancel();
+    try {
+      await _rotation;
+    } on ApiFailure {
+      /* Rotation already closed the session. */
+    }
+    if (_tokens == null || _disposed) {
+      _loggingOut = false;
+      return;
+    }
+    final used = _tokens!, generation = _generation;
+    try {
+      await _write('closing');
+    } on ApiFailure catch (e) {
+      _generation++;
+      _tokens = null;
+      identity = null;
+      consents = null;
+      _loggingOut = false;
+      phase = SessionPhase.storageFailure;
+      _setFailure(e);
+      _notify();
+      return;
+    }
+    if (_disposed || generation != _generation) {
+      _loggingOut = false;
+      return;
+    }
+    phase = SessionPhase.synchronizing;
+    resourceRevision++;
+    _notify();
+    var resultNotice = action == 'erasure'
+        ? 'erasure_unconfirmed'
+        : 'logout_unconfirmed';
+    try {
+      final result = await repository.api.requestJson(
+        action == 'all' ? 'POST' : 'DELETE',
+        action == 'erasure'
+            ? '/api/users/me'
+            : action == 'all'
+            ? '/api/auth/logout-all'
+            : '/api/auth/sessions/$sessionId',
+        bearer: used.accessToken,
+        expectedStatus: action == 'erasure'
+            ? 202
+            : action == 'all'
+            ? 200
+            : 204,
+        body: action == 'erasure'
+            ? {'confirmation_token': confirmationToken}
+            : action == 'all'
+            ? {'confirm': true}
+            : null,
+      );
+      if (action == 'erasure') {
+        final j = jsonObject(result);
+        final id = jsonString(j, 'request_id');
+        if (!RegExp(r'^[a-fA-F0-9-]{36}$').hasMatch(id) ||
+            j['status'] != 'in_progress') {
+          throw const ApiFailure(ApiFailureKind.invalidResponse);
+        }
+        resultNotice = 'erasure_accepted';
+      } else {
+        if (action == 'all' &&
+            jsonField<int>(jsonObject(result), 'revoked_sessions') < 0) {
+          throw const ApiFailure(ApiFailureKind.invalidResponse);
+        }
+        resultNotice = action == 'all'
+            ? 'logout_all_confirmed'
+            : 'logout_confirmed';
+      }
+    } on ApiFailure catch (e) {
+      if (action == 'erasure' &&
+          [
+            'invalid_or_expired_deletion_token',
+            'invalid_account_deletion_payload',
+            'account_deletion_unavailable',
+            'account_not_found',
+          ].contains(e.code)) {
+        resultNotice = 'erasure_not_accepted';
+      }
+    } catch (_) {
+      /* Result remains unknown, never retry a terminal mutation. */
+    }
+    if (!_disposed && generation == _generation) {
+      await _invalidate(const ApiFailure(ApiFailureKind.unauthenticated));
+      notice = resultNotice;
+      if (phase == SessionPhase.signedOut) failure = null;
+    }
+    _loggingOut = false;
+    _notify();
+  }
 
   void _acceptConsents(ConsentState state) {
     final fingerprint = state.consents
@@ -421,9 +579,11 @@ class SessionController extends ChangeNotifier {
     _notify();
   }
 
-  Future<void> logout() => _logout ??= _performLogout().whenComplete(() {
-    _logout = null;
-  });
+  Future<void> logout() =>
+      _terminal ??
+      (_logout ??= _performLogout().whenComplete(() {
+        _logout = null;
+      }));
   Future<void> _performLogout() async {
     _loggingOut = true;
     _scope.cancel();

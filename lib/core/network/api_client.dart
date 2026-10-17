@@ -23,6 +23,11 @@ class ApiEventStream {
   final void Function() close;
 }
 
+class ApiDownload extends ApiEventStream {
+  ApiDownload(super.bytes, super.close, this.contentLength);
+  final int contentLength;
+}
+
 class ApiClient {
   ApiClient({
     required this.origin,
@@ -45,6 +50,25 @@ class ApiClient {
   Future<ApiEventStream> openEvents({
     required String bearer,
     required RequestCancellation cancellation,
+  }) => _openAuthenticatedStream(
+    bearer: bearer,
+    cancellation: cancellation,
+    dataExport: false,
+  );
+
+  Future<ApiDownload> openDataExport({
+    required String bearer,
+    required RequestCancellation cancellation,
+  }) async => await _openAuthenticatedStream(
+    bearer: bearer,
+    cancellation: cancellation,
+    dataExport: true,
+  ) as ApiDownload;
+
+  Future<ApiEventStream> _openAuthenticatedStream({
+    required String bearer,
+    required RequestCancellation cancellation,
+    required bool dataExport,
   }) async {
     if (_closed || cancellation.isCancelled) {
       throw const ApiFailure(ApiFailureKind.cancelled);
@@ -60,7 +84,9 @@ class ApiClient {
     final request =
         http.AbortableRequest(
             'GET',
-            origin.resolve('/api/users/me/events'),
+            origin.resolve(
+              dataExport ? '/api/users/me/data-export' : '/api/users/me/events',
+            ),
             abortTrigger: Future.any([
               abort.whenCancelled,
               cancellation.whenCancelled,
@@ -68,12 +94,15 @@ class ApiClient {
           )
           ..followRedirects = false
           ..headers.addAll({
-            'Accept': 'text/event-stream',
+            'Accept': dataExport ? 'application/json' : 'text/event-stream',
+            if (dataExport) 'Accept-Encoding': 'identity',
             'Authorization': 'Bearer $bearer',
             'X-Request-ID': id,
           });
     try {
-      final response = await _client.send(request).timeout(timeout);
+      final response = await _client
+          .send(request)
+          .timeout(dataExport ? const Duration(minutes: 2) : timeout);
       if (response.statusCode != 200) {
         final data = <int>[];
         await for (final part in response.stream.timeout(timeout)) {
@@ -105,12 +134,14 @@ class ApiClient {
               .first
               .trim()
               .toLowerCase() !=
-          'text/event-stream') {
+          (dataExport ? 'application/json' : 'text/event-stream')) {
         throw const ApiFailure(ApiFailureKind.invalidResponse);
       }
       Stream<List<int>> bytes() async* {
         try {
-          yield* response.stream.timeout(const Duration(seconds: 70));
+          yield* response.stream.timeout(
+            Duration(seconds: dataExport ? 30 : 70),
+          );
         } on http.RequestAbortedException {
           throw const ApiFailure(ApiFailureKind.cancelled);
         } on TimeoutException {
@@ -122,6 +153,21 @@ class ApiClient {
         }
       }
 
+      if (dataExport) {
+        // Dart may decompress gzip without changing Content-Length. Request
+        // identity so the on-disk byte count can be checked against that header.
+        final encoding = response.headers['content-encoding']
+            ?.trim()
+            .toLowerCase();
+        if (encoding != null && encoding != 'identity') {
+          throw const ApiFailure(ApiFailureKind.invalidResponse);
+        }
+        final length = int.tryParse(response.headers['content-length'] ?? '');
+        if (length == null || length < 2) {
+          throw const ApiFailure(ApiFailureKind.invalidResponse);
+        }
+        return ApiDownload(bytes(), close, length);
+      }
       return ApiEventStream(bytes(), close);
     } on ApiFailure {
       close();

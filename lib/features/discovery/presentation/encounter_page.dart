@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../privacy/presentation/report_page.dart';
+
 import '../../../core/widgets/editorial_card.dart';
 import '../../profile/presentation/profile_editors.dart';
 import '../application/discovery_controller.dart';
@@ -91,6 +93,26 @@ class EncounterPage extends StatelessWidget {
                         }
                       },
                 child: const Text('Bloquer cette personne'),
+              ),
+              TextButton(
+                onPressed: controller.busy
+                    ? null
+                    : () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => ReportPage(
+                            session: controller.session,
+                            target: receipt.profile.id,
+                            matchId: receipt.match.id,
+                            onBlock: () async {
+                              if (!controller.active) {
+                                await controller.activate();
+                              }
+                              await controller.blockProfile(receipt.profile);
+                            },
+                          ),
+                        ),
+                      ),
+                child: const Text('Signaler cette personne'),
               ),
             ],
           ),

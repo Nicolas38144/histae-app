@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../privacy/presentation/report_page.dart';
+
 import '../../../core/widgets/editorial_card.dart';
 import '../../consents/presentation/consents_page.dart';
 import '../../profile/application/profile_controller.dart';
@@ -173,6 +175,24 @@ class _DiscoveryPageState extends State<DiscoveryPage>
       return;
     }
     await c.blockProfile(profile);
+  }
+
+  Future<void> _report() async {
+    final profile = c.current;
+    if (profile == null || c.busy) return;
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ReportPage(
+          session: c.session,
+          target: profile.id,
+          onBlock: () async {
+            if (!c.active) await c.activate();
+            await c.blockProfile(profile);
+          },
+        ),
+      ),
+    );
+    if (mounted) await _resume();
   }
 
   @override
@@ -369,6 +389,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                 if (value == 'refresh') unawaited(c.refresh());
                 if (value == 'location') unawaited(_locate());
                 if (value == 'block') unawaited(_block());
+                if (value == 'report') unawaited(_report());
               },
               itemBuilder: (_) => [
                 PopupMenuItem(
@@ -381,6 +402,12 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                   enabled: enabled,
                   child: const Text('Actualiser ma position'),
                 ),
+                if (profile != null)
+                  PopupMenuItem(
+                    value: 'report',
+                    enabled: enabled,
+                    child: const Text('Signaler ce profil'),
+                  ),
                 if (profile != null)
                   PopupMenuItem(
                     value: 'block',

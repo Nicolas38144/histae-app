@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import '../../privacy/presentation/privacy_hub_page.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/l10n/app_strings.dart';
@@ -232,6 +235,20 @@ class _ConsentsPageState extends State<ConsentsPage> {
                     ),
                     const SizedBox(height: 20),
                     Text(strings.privacyScope),
+                    if (widget.onboarding)
+                      OutlinedButton(
+                        onPressed: blocked
+                            ? null
+                            : () => Navigator.of(context).push(
+                                MaterialPageRoute<void>(
+                                  builder: (_) =>
+                                      PrivacyHubPage(session: widget.session),
+                                ),
+                              ),
+                        child: const Text(
+                          'Sessions, données et suppression du compte',
+                        ),
+                      ),
                     const SizedBox(height: 12),
                     TextButton(
                       onPressed: widget.session.logout,

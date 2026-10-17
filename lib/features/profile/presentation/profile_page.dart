@@ -8,6 +8,7 @@ import '../../auth/application/session_controller.dart';
 import '../../catalog/data/catalog_repository.dart';
 import '../../catalog/presentation/catalog_page.dart';
 import '../../consents/presentation/consents_page.dart';
+import '../../privacy/presentation/privacy_hub_page.dart';
 import '../../discovery/application/discovery_controller.dart';
 import '../../discovery/data/discovery_repository.dart';
 import '../../discovery/data/device_location.dart';
@@ -147,7 +148,8 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                   child: const Text('Mes crédits de continuation'),
                 ),
                 TextButton(
-                  onPressed: () => _open(ConsentsPage(session: widget.session)),
+                  onPressed: () =>
+                      _open(PrivacyHubPage(session: widget.session)),
                   child: Text(strings.privacyTitle),
                 ),
                 if (c.loading)

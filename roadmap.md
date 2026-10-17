@@ -6,7 +6,7 @@ Mise à jour : 16 octobre 2026.
 
 ## 1. État de départ et suivi
 
-L1 à L5 et le cœur de L6 sont implémentés : catalogue, session/consentements, profil/photo, découverte, chat/SSE, révélation, continuation et crédits. Les récompenses ont leurs contrats/suivi préparés, mais les vidéos restent désactivées sur demande utilisateur ; SDK/UMP et validation fournisseur ouverts. Les identifiants Android fournis sont dans `.env`, champs iOS vides. Contrôles privés simulés uniquement : deux comptes et appareils restent à valider. L7 à L10 restent à construire, avec le blocage déjà amorcé. DA éditoriale en mode nuit par défaut ; aucun fichier modèle `.env` ne doit être recréé.
+L1 à L5, le cœur de L6 et L7 sont implémentés. L7 couvre sûreté, sessions, droits, export et suppression. Contrôles privés simulés uniquement ; comptes et appareils réels restent à valider. Vidéos désactivées, dépendance Google présente mais intégration native/UMP et fournisseur ouverts. IDs Android dans `.env`, iOS vides. L8 à L10 restent à construire. DA en mode nuit ; aucun fichier modèle `.env` ne doit être recréé.
 
 Cette roadmap couvre toutes les capacités utilisateur de l'API actuelle. Elle exclut l'administration, les webhooks fournisseur, la supervision et les opérations internes. Elle ne dépend pas des anciens dépôts NestJS ou d'un endpoint OpenAPI.
 
@@ -23,7 +23,7 @@ Les états doivent distinguer : `À faire`, `En cours`, `Implémenté`, `Intégr
 | L4 | Présence, diagnostic de préparation, découverte et swipes | Implémenté sur quatre routes + blocage ; huit contrôles ciblés ; deux comptes et appareils à valider |
 | L5 | Matchs, chat, lecture et synchronisation SSE | Implémenté sur sept routes ; neuf tests ciblés, analyse et APK Android ; deux comptes/appareils à valider |
 | L6 | Révélation, continuation, crédits et récompenses volontaires | Cœur implémenté ; huit contrôles ciblés ; vidéos désactivées par choix utilisateur, SDK/UMP et fournisseur en attente |
-| L7 | Sûreté, paramètres de confidentialité, sessions, export et suppression | À faire |
+| L7 | Sûreté, paramètres de confidentialité, sessions, export et suppression | Implémenté ; neuf contrôles ciblés, dix-huit régressions session/SSE ; comptes et appareils réels à valider |
 | L8 | Appareils, notifications push et ouverture depuis notification | À faire |
 | L9 | Offres, abonnement, Checkout et portail selon la distribution retenue | À faire |
 | L10 | Robustesse, accessibilité, appareils réels et préparation bêta | À faire |
@@ -83,7 +83,7 @@ Critère de sortie : connexion réelle et reprise d'onboarding sans jeton expos�
 
 - **Interface** : « Créer mon compte » et « J'ai déjà un compte », téléphone français, OTP, envoi accepté/incertain, reprise d'une intention, renvoi explicite, erreurs et `Retry-After`. Le compte est créé par le serveur lors de la vérification OTP. Le profil, la majorité et ses préférences restent en L3 ; aucun feed n'est exposé avant les prérequis serveur de L4.
 - **Session** : refresh sécurisé, access token en mémoire, restauration unique, rotation sérialisée, marqueur durable avant envoi, relecture de stockage avant publication, aucune reprise aveugle après réponse perdue. Fermeture après révocation/deuxième 401, déconnexion même hors ligne, annulation et purge des ressources de l'ancien compte.
-- **Consentements** : quatre types et documents versionnés serveur, aucun nouveau choix précoché, reprise après lecture d'un document, vérification des versions avant PUT, champs exacts `{ consent_type, granted }`. Confirmation des retraits sensible/localisation ; aucun retrait CGU/notice. Accès aux documents et à la déconnexion pendant l'onboarding ; export/demandes/suppression restent en L7.
+- **Consentements** : quatre types et documents versionnés serveur, aucun nouveau choix précoché, reprise après lecture d'un document, vérification des versions avant PUT, champs exacts `{ consent_type, granted }`. Confirmation des retraits sensible/localisation ; aucun retrait CGU/notice. Accès aux documents et à la déconnexion pendant l'onboarding ; export/demandes/suppression livrés en L7.
 - **DA commune** : composition éditoriale issue de la référence utilisateur ; ivoire, forêt, encre et sable, titres DM Serif Display, cartes arrondies et séparateurs discrets. Licence de police conservée ; adaptation sombre et grand texte. Aucun feed construit en avance.
 - **Sources** : contrat HTTP ; `src/identity/mobile/{http,service,account,tokens}.rs`, service OTP ; `src/profiles/{http,domain,service}.rs` ; tests `mobile_auth_contract.rs`, `otp_sweego_contract.rs`, `profiles_contract.rs` et exemples Postman. Sources consultées, tests backend non exécutés, backend non modifié.
 - **Vérification automatique** : 85 tests Flutter, analyse et formatage ; compilation Android debug avec stockage sécurisé et police. Un rendu manuel supplémentaire produit trois aperçus inspectés, avec des données simulées identifiées. Les réglages XML natifs sont vérifiés ; cela ne prouve pas le comportement Keychain/Keystore sur appareil.
@@ -137,7 +137,7 @@ Critère de sortie : deux comptes de développement peuvent se découvrir et cr�
 - **Permission/confidentialité** : `geolocator 14.1.1`, consentement courant avant permission et avant envoi. Une mesure récente, précision réduite admise, erreurs natives distinctes et liens vers les réglages ; abonnement arrêté après mesure/sortie/arrière-plan. Pas de coordonnée en stockage/logs, ni de position connue réutilisée. Annulation/purge sur changement de consentements/session, réponses tardives ignorées. Android coarse/fine et iOS when-in-use déclarés ; pas de suivi de fond. Flag SPM iOS et essais Mac/appareils décrits au README, encore ouverts.
 - **Feed/gestes** : titre serif, distance arrondie reçue, bio/traits/réponses serveur, sans photo ni ville/catégorie fabriquée. Double appui = like ; geste haut depuis la fin de lecture = pass ; lecture longue protégée et boutons accessibles. Aucun retour vers un précédent profil. Curseur opaque encodé, limite stable, déduplication, reprise unique sans curseur expiré et fin explicite ; aucun filtre client inventé.
 - **Résultat perdu/match** : cible et décision conservées en mémoire entre visites du feed ; une seule demande en cours, reprise explicite du même choix et `Retry-After`, aucun stockage durable. Candidat indisponible/choix déjà enregistré retiré sans envoyer l'opposé. Seul le match retourné par le serveur avec les bons membres ouvre un récapitulatif ; chat et liste persistante restent L5, sans déduire de droit courant depuis ce reçu.
-- **Sûreté anticipée** : blocage confirmé depuis le feed ou le reçu, POST sans corps → `204`, reprise à l'identique en cas d'incertitude. Le blocage peut remplacer explicitement une intention like/pass perdue et purge le reçu local concerné. Liste/déblocage/signalement restent L7.
+- **Sûreté anticipée** : blocage confirmé depuis le feed ou le reçu, POST sans corps → `204`, reprise à l'identique en cas d'incertitude. Le blocage peut remplacer explicitement une intention like/pass perdue et purge le reçu local concerné. Liste/déblocage/signalement livrés en L7.
 - **Contrôles exécutés** : huit tests L4 ciblés réussis, puis vérification du geste de lecture longue après son ajustement. Treize vérifications existantes de configuration réussies après retrait de la dépendance au fichier modèle. Deux aperçus de feed avec données simulées générés et inspectés. Compilation Android debug réussie ; pas de nouvelle suite globale lancée. Analyse sans erreur, formatage et XML vérifiés : coarse/fine Android, when-in-use dans les deux plist, aucune localisation en arrière-plan.
 - **Sources/limites** : HTTP/DTO/services/cursor Rust découverte, présence et confidentialité, tests `discovery_contract.rs`, `discovery_postgres.rs` et Postman consultés. Aucun changement ni test backend. Aucun SMS ou compte réel utilisé : le critère deux comptes et les permissions/GPS natifs Android/iOS restent non validés, de même que les anciens essais fournisseur L2/L3. Le warning Kotlin du compresseur L3 reste à suivre.
 
@@ -187,7 +187,7 @@ Critère de sortie : règles Free/Premium et confidentialité des choix respect�
 - **Configuration** : `.env` local conserve l'origine API et reçoit quatre champs publics AdMob facultatifs. Android renseigné avec les valeurs utilisateur ; iOS vide. IDs d'application `~` et unités `/` validés distinctement. Valeurs réservées pour le futur SDK, sans remplacer l'unité/`custom_data` de l'intention API. Aucun ID en dur dans Dart/manifestes, aucun fichier modèle recréé, backend inchangé.
 - **Sources et contrôles** : DTO/routes/services/stockage et tests Rust matchs/publicité, guide continuations/récompenses et Postman consultés, sans exécution backend. Documentation officielle Google [initialisation](https://developers.google.com/admob/flutter/quick-start), [vidéo/SSV](https://developers.google.com/admob/flutter/rewarded), [UMP](https://developers.google.com/admob/flutter/privacy). Huit contrôles L6, treize contrôles existants de configuration et sept contrôles existants du chat réussis ; cinq aperçus simulés en mode nuit inspectés, petit écran/grand texte et navigation vérifiés. Formatage et analyse sans problème ; essais entre deux comptes, photo/native et iOS ouverts. Aucun nouveau passage de toute la suite.
 
-Prochain lot : **L7**, sûreté, sessions et vie privée. L'activation des vidéos reste une étape suivie séparément.
+La suite L7 est livrée ci-dessous ; l'activation des vidéos reste une étape suivie séparément.
 
 ## 10. L7 — sûreté, paramètres et vie privée
 
@@ -202,6 +202,17 @@ Prochain lot : **L7**, sûreté, sessions et vie privée. L'activation des vidé
 - Traiter une réponse de suppression perdue sans réutiliser le Bearer invalide comme suivi public.
 
 Critère de sortie : droits accessibles même quand l'onboarding est incomplet si l'API l'autorise, purge locale cohérente et absence de promesse d'effacement prématurée.
+
+### Livraison L7 — 16 octobre 2026
+
+- Espace de confidentialité depuis profil et consentements avant onboarding. Sessions paginées et révocation unitaire/courante/globale ; demandes de droits non paginées, six types et états serveur. Après mutation incertaine, relecture et reprise explicite de la même cible/type. Déblocage sans restaurer d'ancien match ; consentements existants conservés.
+- Signalement feed/reçu/chat/profil partenaire : motifs fermés, limite brute 2 000 octets UTF-8, intention immuable en mémoire de l'écran, `409` déjà en attente et `Retry-After`. Blocage séparé confirmé ; aucune photo dans sa liste.
+- Export sur disque privé : flux authentifié sans redirection, maximum 512 Mio, longueur exacte vérifiée ; en-têtes 2 min, inactivité 30 s et transfert 10 min. `share_plus ^13.3.1`, partage explicite sans statut de livraison inventé. Nettoyage sérialisé de ses seuls temporaires et copies de partage au démarrage/sortie/suspension/purge, différé au retour d'un partage actif. Aucun JSON complet en mémoire ni original utilisateur effacé.
+- Suppression après saisie et confirmation, jeton dédié sans persistance. Barrière durable `closing` sans refresh avant l'unique DELETE ; aucun rejeu ni sonde d'authentification après un résultat incertain. `202` = compte inaccessible et nettoyage en cours. Même barrière pour session courante/logout global ; échec de stockage avant barrière = aucune requête terminale.
+- Sources : contrat HTTP, DTO/routes/services droits/effacement/export/signalements/sessions, tests de contrat et Postman consultés. Backend en lecture seule, jamais lancé ni testé. Neuf contrôles L7 + dix-huit contrôles existants session/SSE réussis, neuf aperçus simulés inspectés, analyse/formatage et APK Android debug vérifiés. Partage/export et suppression réels, interruptions/stockage natifs et iOS restent ouverts.
+- Dépendance Google déjà présente conservée, fournisseur Android automatique exclu pour garder les vidéos désactivées jusqu'au raccordement IDs natifs/UMP. IDs réels uniquement dans `.env`. Aucun Git ni fichier modèle recréé.
+
+Prochain lot : **L8**, appareils et notifications push ; configuration Firebase et validations sur téléphones à préparer.
 
 ## 11. L8 — appareils et push
 
@@ -250,9 +261,9 @@ Chemins complets, préfixe `/api` inclus. Les 56 routes restent suivies : catalo
 | POST | `/api/auth/refresh` | L2 | Rotation de session sérialisée | Implémenté ; concurrence, panne et redémarrage testés ; appareil à valider |
 | GET | `/api/auth/me` | L2 | Bootstrap authentifié | Implémenté ; navigation et révocation testées ; compte réel à valider |
 | POST | `/api/auth/logout` | L2 | Déconnexion courante | Implémenté ; rotation concurrente/purge/hors ligne testés ; réel à valider |
-| GET | `/api/auth/sessions` | L7 | Liste des sessions | À faire |
-| DELETE | `/api/auth/sessions/:id` | L7 | Révoquer une session | À faire |
-| POST | `/api/auth/logout-all` | L7 | Déconnexion globale | À faire |
+| GET | `/api/auth/sessions` | L7 | Liste des sessions | Implémenté ; curseurs opaques contrôlés ; réel à valider |
+| DELETE | `/api/auth/sessions/:id` | L7 | Révoquer une session | Implémenté ; actuelle/autre, relecture et purge contrôlées ; réel à valider |
+| POST | `/api/auth/logout-all` | L7 | Déconnexion globale | Implémenté ; barrière sécurisée/purge contrôlées ; réel à valider |
 | GET | `/api/users/me/consents` | L2 | État et documents requis | Implémenté ; quatre choix/versions/navigation testés ; réel à valider |
 | PUT | `/api/users/me/consents` | L2, L7 | Accepter et gérer les choix autorisés | Implémenté L2 ; choix et retraits confirmés testés ; réel à valider |
 | GET | `/api/users/me` | L3 | Profil propriétaire | Implémenté ; contrats/tests client ; compte et appareil à valider |
@@ -292,15 +303,15 @@ Chemins complets, préfixe `/api` inclus. Les 56 routes restent suivies : catalo
 | GET | `/api/users/me/subscription` | L9 | Abonnement et droits effectifs | À faire |
 | POST | `/api/users/me/subscription/checkout` | L9 | Achat hébergé si distribution compatible | À faire |
 | POST | `/api/users/me/subscription/portal` | L9 | Gestion de l'abonnement | À faire |
-| GET | `/api/users/me/blocks` | L7 | Comptes bloqués | À faire |
+| GET | `/api/users/me/blocks` | L7 | Comptes bloqués | Implémenté ; liste sans photo ; réel à valider |
 | POST | `/api/users/me/blocks/:userId` | L4, L7 | Bloquer un compte depuis feed ou reçu | Implémenté L4 ; confirmation et reprise ciblées ; réel à valider |
-| DELETE | `/api/users/me/blocks/:userId` | L7 | Débloquer un compte | À faire |
-| POST | `/api/reports` | L7 | Signaler un compte/contenu | À faire |
-| POST | `/api/users/me/data-subject-requests` | L7 | Déposer une demande RGPD | À faire |
-| GET | `/api/users/me/data-subject-requests` | L7 | Suivi des demandes | À faire |
-| GET | `/api/users/me/data-export` | L7 | Export JSON privé | À faire |
-| POST | `/api/users/me/deletion-token` | L7 | Préparer la confirmation de suppression | À faire |
-| DELETE | `/api/users/me` | L7 | Accepter la suppression, fermer la session sur 202 | À faire |
+| DELETE | `/api/users/me/blocks/:userId` | L7 | Débloquer un compte | Implémenté ; relecture, sans restauration ; réel à valider |
+| POST | `/api/reports` | L7 | Signaler un compte/contenu | Implémenté ; UTF-8, intention stable, 201/409/429/purge contrôlés ; réel à valider |
+| POST | `/api/users/me/data-subject-requests` | L7 | Déposer une demande RGPD | Implémenté ; types, doublon/relecture et onboarding ; réel à valider |
+| GET | `/api/users/me/data-subject-requests` | L7 | Suivi des demandes | Implémenté ; statuts et liste non paginée ; réel à valider |
+| GET | `/api/users/me/data-export` | L7 | Export JSON privé | Implémenté ; flux/refresh/troncature/nettoyage contrôlés ; natif à valider |
+| POST | `/api/users/me/deletion-token` | L7 | Préparer la confirmation de suppression | Implémenté ; jeton mémoire après confirmation ; réel à valider |
+| DELETE | `/api/users/me` | L7 | Accepter la suppression, fermer la session sur 202 | Implémenté ; barrière, 202 et réponse perdue contrôlés ; réel à valider |
 
 Le webhook AdMob figure dans la section récompenses du contrat API, mais il est appelé par le fournisseur, jamais par Flutter. Il en va de même pour les webhooks Stripe et Sweego. Les routes de santé peuvent servir au diagnostic de développement, sans être un parcours utilisateur ou remplacer les erreurs des appels métier.
 

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../privacy/presentation/report_page.dart';
+
 import '../../../core/widgets/editorial_card.dart';
 import '../../profile/presentation/profile_editors.dart';
 import '../application/matches_controller.dart';
@@ -128,6 +130,22 @@ class _ChatPageState extends State<ChatPage> {
     if (mounted && c.active) unawaited(c.refresh());
   }
 
+  Future<void> _report() async {
+    final match = c.selected;
+    if (match == null) return;
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ReportPage(
+          session: c.session,
+          target: match.partner.id,
+          matchId: widget.matchId,
+          onBlock: () => c.endCurrent(block: true),
+        ),
+      ),
+    );
+    if (mounted && c.active) unawaited(c.refresh());
+  }
+
   @override
   void dispose() {
     _readTimer?.cancel();
@@ -170,6 +188,7 @@ class _ChatPageState extends State<ChatPage> {
                 }
                 if (value == 'end') unawaited(_end(block: false));
                 if (value == 'block') unawaited(_end(block: true));
+                if (value == 'report') unawaited(_report());
               },
               itemBuilder: (_) => [
                 const PopupMenuItem(
@@ -179,6 +198,10 @@ class _ChatPageState extends State<ChatPage> {
                 const PopupMenuItem(
                   value: 'profile',
                   child: Text('Voir son profil'),
+                ),
+                const PopupMenuItem(
+                  value: 'report',
+                  child: Text('Signaler cette personne'),
                 ),
                 PopupMenuItem(
                   value: 'end',
@@ -511,6 +534,19 @@ class _PartnerPage extends StatelessWidget {
                     icon: const Icon(Icons.photo_outlined),
                     label: const Text('Voir sa photo'),
                   ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => ReportPage(
+                        session: controller.session,
+                        target: match.partner.id,
+                        matchId: id,
+                        onBlock: () => controller.endCurrent(block: true),
+                      ),
+                    ),
+                  ),
+                  child: const Text('Signaler cette personne'),
+                ),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,

@@ -9,9 +9,16 @@ import 'features/catalog/data/catalog_repository.dart';
 import 'features/auth/data/auth_repository.dart';
 import 'features/auth/data/session_vault.dart';
 import 'features/auth/application/session_controller.dart';
+import 'features/privacy/data/private_export_store.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Only bounded, app-owned private cache files from an interrupted export.
+  try {
+    await PrivateExportStore().clean();
+  } catch (_) {
+    /* Retry in privacy hub. */
+  }
   LicenseRegistry.addLicense(() async* {
     yield LicenseEntryWithLineBreaks([
       'DM Serif Display',
