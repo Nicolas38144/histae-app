@@ -1,3 +1,5 @@
+import 'push_config.dart';
+
 enum AppEnvironment { development, staging, production }
 
 class AppConfig {
@@ -8,6 +10,7 @@ class AppConfig {
     this.admobIosAppId,
     this.admobAndroidRewardedAdUnit,
     this.admobIosRewardedAdUnit,
+    this.push,
   );
   factory AppConfig.fromDotEnv(String source, {required bool isDebug}) {
     final values = <String, String>{};
@@ -27,6 +30,7 @@ class AppConfig {
             'ADMOB_IOS_APP_ID',
             'ADMOB_ANDROID_REWARDED_AD_UNIT',
             'ADMOB_IOS_REWARDED_AD_UNIT',
+            ...PushConfig.keys,
           ].contains(key) ||
           values.containsKey(key)) {
         throw const FormatException('Invalid public configuration');
@@ -48,6 +52,7 @@ class AppConfig {
       admobAndroidRewardedAdUnit:
           values['ADMOB_ANDROID_REWARDED_AD_UNIT'] ?? '',
       admobIosRewardedAdUnit: values['ADMOB_IOS_REWARDED_AD_UNIT'] ?? '',
+      push: PushConfig.fromValues(values),
     );
   }
 
@@ -59,6 +64,7 @@ class AppConfig {
     String admobIosAppId = '',
     String admobAndroidRewardedAdUnit = '',
     String admobIosRewardedAdUnit = '',
+    PushConfig push = const PushConfig(),
   }) {
     final env = AppEnvironment.values.where((e) => e.name == environment);
     final uri = Uri.tryParse(apiBaseUrl);
@@ -102,12 +108,14 @@ class AppConfig {
       appId(admobIosAppId),
       adUnit(admobAndroidRewardedAdUnit),
       adUnit(admobIosRewardedAdUnit),
+      push,
     );
   }
 
   final AppEnvironment environment;
   // Origin only; repositories supply full paths including /api.
   final Uri apiOrigin;
+  final PushConfig push;
   // Public IDs reserved for a future native SDK installation. Empty fields do
   // not enable videos, initialize advertising, or provide an ad unit fallback.
   final String? admobAndroidAppId, admobIosAppId;

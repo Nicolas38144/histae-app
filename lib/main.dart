@@ -10,6 +10,10 @@ import 'features/auth/data/auth_repository.dart';
 import 'features/auth/data/session_vault.dart';
 import 'features/auth/application/session_controller.dart';
 import 'features/privacy/data/private_export_store.dart';
+import 'features/notifications/application/push_controller.dart';
+import 'features/notifications/data/device_repository.dart';
+import 'features/notifications/data/push_gateway.dart';
+import 'features/notifications/data/push_vault.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,17 +39,26 @@ Future<void> main() async {
   } on FlutterError {
     // A missing asset leaves integration unavailable, with no fallback host.
   }
+  final session = config == null
+      ? null
+      : SessionController(
+          AuthRepository(ApiClient(origin: config.apiOrigin)),
+          SecureSessionVault(),
+        );
+  final push = session == null
+      ? null
+      : PushController(
+          DeviceRepository(session),
+          FirebasePushGateway(config!.push),
+          SecurePushVault(),
+        );
   runApp(
     HistaeApp(
       catalogRepository: config == null
           ? null
           : CatalogRepository(ApiClient(origin: config.apiOrigin)),
-      sessionController: config == null
-          ? null
-          : SessionController(
-              AuthRepository(ApiClient(origin: config.apiOrigin)),
-              SecureSessionVault(),
-            ),
+      sessionController: session,
+      pushController: push,
     ),
   );
 }

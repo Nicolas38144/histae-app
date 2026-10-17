@@ -7,11 +7,18 @@ import '../application/matches_controller.dart';
 import 'chat_page.dart';
 import 'matches_strings.dart';
 import '../../continuation/presentation/credits_page.dart';
+import '../../notifications/presentation/push_scope.dart';
 
 class MatchesPage extends StatefulWidget {
-  const MatchesPage({super.key, required this.controller, this.initialMatchId});
+  const MatchesPage({
+    super.key,
+    required this.controller,
+    this.initialMatchId,
+    this.notificationFlow = false,
+  });
   final MatchesController controller;
   final String? initialMatchId;
+  final bool notificationFlow;
   @override
   State<MatchesPage> createState() => _MatchesPageState();
 }
@@ -40,6 +47,7 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
     try {
       await c.openChat(id);
       if (!mounted || !c.accessible || c.session.resourceKey != _key) return;
+      if (c.selected?.id != id || c.selected?.historyAllowed != true) return;
       await Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (_) => ChatPage(controller: c, matchId: id),
@@ -62,6 +70,10 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
   }
 
   Future<void> _resume() async {
+    if (!widget.notificationFlow &&
+        PushScope.maybeOf(context)?.coversMainFlow == true) {
+      return;
+    }
     await c.session.synchronize();
     if (mounted && c.session.resourceKey == _key) await c.activate();
   }

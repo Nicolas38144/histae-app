@@ -13,6 +13,8 @@ import '../data/privacy_repository.dart';
 import '../data/private_export_store.dart';
 import 'privacy_strings.dart';
 import 'privacy_choice.dart';
+import '../../notifications/presentation/devices_page.dart';
+import '../../notifications/presentation/push_scope.dart';
 
 class PrivacyHubPage extends StatefulWidget {
   const PrivacyHubPage({super.key, required this.session, this.exportStore});
@@ -95,6 +97,20 @@ class _PrivacyHubPageState extends State<PrivacyHubPage>
             'Consulter et révoquer les accès',
             () => _open(PrivacySection.sessions),
           ),
+          if (c.onboarded)
+            _tile(
+              Icons.notifications_none,
+              'Appareils et notifications',
+              'Choisir les alertes et gérer les appareils',
+              () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => DevicesPage(
+                    session: widget.session,
+                    push: PushScope.maybeOf(context),
+                  ),
+                ),
+              ),
+            ),
           if (c.onboarded)
             _tile(
               Icons.person_off_outlined,

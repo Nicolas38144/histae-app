@@ -22,6 +22,9 @@ import '../data/profile_repository.dart';
 import 'profile_editors.dart';
 import 'photo_page.dart';
 import 'profile_strings.dart';
+import '../../notifications/application/push_controller.dart';
+import '../../notifications/presentation/push_scope.dart';
+import '../../notifications/presentation/devices_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key, required this.session, this.catalog});
@@ -44,6 +47,36 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
 
   Future<void> _matches([String? id]) =>
       _open(MatchesPage(controller: matches, initialMatchId: id));
+  PushController? _push;
+  bool _covered = false, _resumeMatches = false, _resumeDiscovery = false;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final next = PushScope.maybeOf(context);
+    if (next != _push) {
+      _push?.removeListener(_pushRouteChanged);
+      _push = next;
+      _push?.addListener(_pushRouteChanged);
+    }
+  }
+
+  void _pushRouteChanged() {
+    final covered = _push?.coversMainFlow == true;
+    if (covered == _covered) return;
+    _covered = covered;
+    if (covered) {
+      _resumeMatches = matches.active;
+      _resumeDiscovery = discovery.active;
+      matches.suspend();
+      discovery.deactivate();
+    } else {
+      if (_resumeMatches && matches.accessible) unawaited(matches.activate());
+      if (_resumeDiscovery && discovery.accessible) {
+        unawaited(discovery.activate());
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -62,6 +95,7 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _push?.removeListener(_pushRouteChanged);
     controller.dispose();
     matches.dispose();
     discovery.dispose();
@@ -151,6 +185,12 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                   onPressed: () =>
                       _open(PrivacyHubPage(session: widget.session)),
                   child: Text(strings.privacyTitle),
+                ),
+                TextButton.icon(
+                  onPressed: () =>
+                      _open(DevicesPage(session: widget.session, push: _push)),
+                  icon: const Icon(Icons.notifications_none),
+                  label: const Text('Appareils et notifications'),
                 ),
                 if (c.loading)
                   const LinearProgressIndicator(

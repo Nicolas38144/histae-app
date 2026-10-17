@@ -4,7 +4,22 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Public client configuration only. Native resources let Firebase receive a
+// cold-start message too. No service account or fallback project is bundled.
+val histaePublicEnv = rootProject.file("../.env").takeIf { it.exists() }
+    ?.readLines()?.mapNotNull { raw ->
+        val line = raw.trim().removePrefix("\uFEFF")
+        val at = line.indexOf('=')
+        if (line.startsWith("#") || at < 1) null else
+            line.substring(0, at).trim() to line.substring(at + 1).trim()
+                .removeSurrounding("\"").removeSurrounding("'")
+    }?.toMap().orEmpty()
+val histaeAndroidPush = histaePublicEnv["PUSH_ENABLED"] == "true" &&
+    listOf("FIREBASE_PROJECT_ID", "FIREBASE_MESSAGING_SENDER_ID", "FIREBASE_ANDROID_API_KEY", "FIREBASE_ANDROID_APP_ID")
+        .all { !histaePublicEnv[it].isNullOrBlank() }
+
 android {
+    buildFeatures { resValues = true }
     namespace = "com.histae.histae_app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
@@ -27,6 +42,11 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        if (histaeAndroidPush) {
+            mapOf("google_app_id" to "FIREBASE_ANDROID_APP_ID", "google_api_key" to "FIREBASE_ANDROID_API_KEY",
+                "gcm_defaultSenderId" to "FIREBASE_MESSAGING_SENDER_ID", "project_id" to "FIREBASE_PROJECT_ID")
+                .forEach { (resource, key) -> resValue("string", resource, histaePublicEnv.getValue(key)) }
+        }
     }
 
     buildTypes {

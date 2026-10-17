@@ -2,11 +2,11 @@
 
 Client Flutter Android et iOS de Histae, application de rencontre fondée sur la découverte sans photo dans le feed, la révélation mutuelle des photos et la décision réciproque de poursuivre une conversation.
 
-Mise à jour : 16 octobre 2026.
+Mise à jour : 17 octobre 2026.
 
 ## État réel du dépôt
 
-L1 à L5, le cœur de L6 et L7 sont implémentés. L7 ajoute signalement, blocages, sessions, demandes de données, export et suppression du compte. Le mode nuit reste appliqué par défaut. Les vidéos restent désactivées : dépendance Google présente, intégration native/UMP et essais fournisseur encore ouverts. Les identifiants publics Android restent dans le seul `.env` local ; champs iOS à compléter. Seul le catalogue est vérifié en réseau réel ; les parcours privés sont vérifiés avec des réponses simulées. L8 à L10 restent à construire.
+L1 à L5, le cœur de L6, L7 et la gestion des appareils L8 sont implémentés. Les flux push L8 sont préparés mais désactivés, sans projet Firebase, conformément au choix utilisateur. L7 ajoute signalement, blocages, sessions, demandes de données, export et suppression du compte. Le mode nuit reste appliqué par défaut. Les vidéos restent désactivées : dépendance Google présente, intégration native/UMP et essais fournisseur encore ouverts. Les identifiants publics Android restent dans le seul `.env` local ; champs iOS à compléter. Seul le catalogue est vérifié en réseau réel ; les parcours privés sont vérifiés avec des réponses simulées. L9 et L10 restent à construire.
 
 Le manifeste conserve Dart `^3.13.1` et `cupertino_icons`. Aux dépendances L1/L2 s'ajoutent en L3 `image_picker: ^1.2.4`, `flutter_image_compress: ^2.5.1`, `http_parser: ^4.1.2` et `path_provider: ^2.1.6`. Navigation avec `Navigator` / `MaterialPageRoute`, état avec `ChangeNotifier`, dépendances injectées par constructeur. SDK vérifié : Flutter 3.47.7, Dart 3.13.5.
 
@@ -52,7 +52,7 @@ APP_ENV=development
 API_BASE_URL=http://10.0.2.2:8080
 ```
 
-`.env` est ignoré dans le suivi des fichiers. À la demande de l'utilisateur, aucun fichier d'exemple ne doit être recréé. Il est embarqué : **configuration publique uniquement, aucun secret**. Le lecteur accepte les deux clés API obligatoires et les quatre clés AdMob facultatives ci-dessus, commentaires et valeurs entre guillemets, sans interpolation ni surcharge `--dart-define`. Les champs AdMob vides sont autorisés : IDs d'application avec `~`, unités récompensées avec `/`. Les valeurs Android reçues ont été renseignées localement ; iOS reste vide. Une clé inconnue, un doublon, une valeur invalide ou une clé API manquante ferme l'intégration sans repli ni journalisation. En CI, fournir `.env` avant compilation.
+`.env` est ignoré dans le suivi des fichiers. À la demande de l'utilisateur, aucun fichier d'exemple ne doit être recréé. Il est embarqué : **configuration publique uniquement, aucun secret**. Le lecteur accepte les deux clés API obligatoires, les quatre clés AdMob facultatives et les champs Firebase décrits en L8, commentaires et valeurs entre guillemets, sans interpolation ni surcharge `--dart-define`. Les champs AdMob vides sont autorisés : IDs d'application avec `~`, unités récompensées avec `/`. Les valeurs Android reçues ont été renseignées localement ; iOS reste vide. Une clé inconnue, un doublon, une valeur invalide ou une clé API manquante ferme l'intégration sans repli ni journalisation. En CI, fournir `.env` avant compilation.
 
 Ces champs AdMob réservent la configuration du futur SDK ; les remplir n'active aucune publicité et aucun identifiant n'est codé en dur dans Dart ou les manifestes. Le futur SDK utilisera `ad_unit` et `custom_data` de l'intention API, sans identifiant Histae personnel. L'unité Android fournie devra aussi être configurée côté API pour la vérification serveur ; aucun changement de configuration backend n'a été effectué ici. Le raccordement SDK/UMP, le raccordement natif des IDs et l'activation fournisseur restent une intervention explicite distincte. Références : [initialisation Google](https://developers.google.com/admob/flutter/quick-start), [vidéo/SSV](https://developers.google.com/admob/flutter/rewarded), [choix UMP](https://developers.google.com/admob/flutter/privacy).
 
@@ -155,7 +155,33 @@ La suite L7 est livrée ci-dessous. L'activation des vidéos reste suivie sépar
 
 La dépendance `google_mobile_ads ^9.1.0` était déjà présente au début de L7 sans raccordement natif. Son fournisseur Android de lancement automatique est exclu du manifeste fusionné pendant que les vidéos restent désactivées ; l'activation exige l'intégration des IDs/UMP selon le [guide Google](https://developers.google.com/admob/flutter/quick-start). Aucun ID AdMob réel ajouté aux documents publics.
 
-Prochain lot : **L8**, appareils et notifications push, avec configuration Firebase et validations sur téléphones réels à préparer.
+La suite L8 est livrée ci-dessous ; l'activation Firebase reste en attente.
+
+## L8 — appareils et notifications
+
+- **Appareils** : écran depuis le profil et la confidentialité après onboarding, conformément aux trois routes autorisées. Liste non paginée avec plateforme, version et dates reçues, sans token affiché ni conservé dans la projection publique. Retrait confirmé, `204`/`404` relus ; après réponse perdue, même cible en attente jusqu'à vérification. Retirer un appareil push ne ferme pas sa session de connexion.
+- **Choix utilisateur** : notifications maintenues désactivées faute de projet Firebase. Les champs publics ci-dessous sont ajoutés au seul `.env` local. Aucun fichier modèle recréé. Avec `PUSH_ENABLED=false`, le code Dart n'initialise pas Firebase, ne demande aucune permission et n'enregistre aucun identifiant push auprès de l'API. La gestion des appareils existants reste utilisable.
+
+```dotenv
+PUSH_ENABLED=false
+FIREBASE_PROJECT_ID=
+FIREBASE_MESSAGING_SENDER_ID=
+FIREBASE_ANDROID_API_KEY=
+FIREBASE_ANDROID_APP_ID=
+FIREBASE_IOS_API_KEY=
+FIREBASE_IOS_APP_ID=
+FIREBASE_IOS_BUNDLE_ID=
+```
+
+- **Raccordement préparé** : `firebase_core ^5.0.0`, `firebase_messaging ^17.0.0` et `package_info_plus ^10.2.2`. Configuration explicite via `.env`, ressources Android natives générées seulement si cette plateforme est configurée et le flag activé, aucun projet de secours. Auto-initialisation Messaging et Analytics désactivées dans Android et les deux plist iOS. SDK 17 : identifiant d'installation FCM (`register`/`onRegistered`) transmis dans le champ contractuel `push_token`, sans utiliser les anciennes méthodes dépréciées. Permission après explication/confirmation, APNs obtenu avant l'enregistrement iOS, version issue de l'application installée. Un enregistrement n'est jamais une preuve de réception. [Client Firebase](https://firebase.google.com/docs/cloud-messaging/flutter/client), [SDK Messaging](https://pub.dev/packages/firebase_messaging), [version d'application](https://pub.dev/packages/package_info_plus).
+- **Session et reprises** : opérations fournisseur sérialisées, intention d'enregistrement identique conservée en mémoire après réponse perdue ; aucune relance automatique de cette mutation incertaine. Mise à jour lors d'une nouvelle identité FCM, retrait de l'ancien enregistrement après acceptation du nouveau. L'état sécurisé contient uniquement origine, propriétaire, UUID d'appareil, choix d'activation et jusqu'à 64 IDs de notifications ouvertes ; aucun identifiant FCM copié dans ce stockage Dart. Retrait distant ou réinstallation sans préférence locale = aucune réactivation implicite. L'arrêt local garde un marqueur de désactivation si le nettoyage échoue, pour le reprendre sans se réenregistrer au redémarrage. Perte de session/consentements : intentions et données en mémoire purgées, arrêt fournisseur demandé.
+- **Réception et navigation** : au premier plan, bandeau générique construit par l'app, sans reprendre titre, texte, URL ou expéditeur du payload. Déduplication des présentations en mémoire (128 IDs) et des ouvertures dans l'état sécurisé (64 IDs, bornés et liés au propriétaire/origine). `getInitialMessage` et `onMessageOpenedApp` préparés ; la restauration de session attend une identité vérifiée. Avant navigation, relecture de session puis de la collection mobile autorisée et de l'historique ; aucun GET administratif ni ouverture d'un match inaccessible. Une autre notification remplace le seul parcours de notification en conservant ses brouillons. Les autres flux chat/SSE sont suspendus pendant ce parcours, puis repris. Les alertes de facturation ouvrent uniquement le catalogue courant ; aucun état de paiement n'est déduit et les détails d'abonnement restent L9.
+- **Arrière-plan** : le système affiche les alertes génériques envoyées par l'API ; le handler Dart ne lit aucune donnée privée, ne journalise rien et ne navigue pas. La déduplication applicative ne supprime pas un doublon déjà affiché par l'OS. Aucun historique de notifications ni rattrapage de tâches push désactivées n'est inventé. [Réception Firebase](https://firebase.google.com/docs/cloud-messaging/flutter/receive-messages).
+- **Vérifications** : dix contrôles L8 ciblés et treize contrôles existants de configuration réussis. Sept aperçus simulés inspectés, dont refus d'activation par configuration, retrait, vide, grand texte, bandeau et conversation autorisée. Analyse sans problème, formatage et APK Android debug compilé. Aucune réception FCM/APNs réelle, permission sur téléphone ou compilation iOS revendiquée. Backend consulté uniquement, sans changement ni test exécuté.
+
+Pour une activation ultérieure, créer les applications Firebase avec les identifiants Android/iOS réellement retenus, renseigner les options publiques et vérifier les restrictions des clés client, puis configurer séparément le fournisseur FCM côté API. Aucun compte de service, clé privée FCM ou clé APNs ne doit entrer dans le `.env` embarqué. Sur Mac, activer **Push Notifications** avec l'entitlement `aps-environment` et la signature adaptés, et associer la clé APNs à Firebase. Le mode d'arrière-plan et le raccordement UIScene/APNs sont préparés ; la capacité/signature reste à finaliser, sans entitlement de production inventé. [Configuration iOS Firebase](https://firebase.google.com/docs/cloud-messaging/flutter/client), [canaux natifs Flutter](https://docs.flutter.dev/platform-integration/platform-channels).
+
+Prochain lot : **L9**, offres et abonnement. L'activation push et les essais Android/iOS restent suivis séparément. Les avertissements de compatibilité future KGP concernent désormais `firebase_core` et `flutter_image_compress_common` ; ils n'empêchent pas la compilation actuelle.
 
 ## Direction artistique
 
@@ -164,6 +190,8 @@ La composition de [la référence fournie](pictures/exemple_feed.png) guide tout
 Les aperçus proviennent des vrais widgets avec des données simulées, sous `build/previews/`. L6 ajoute `continuation`, `continuation-cost`, `continuation-recorded`, `credits` et `credits-videos-disabled` (`.png`). Définir `FLUTTER_ROOT` puis utiliser `flutter test tool/preview_app_test.dart --plain-name 'preview L6' --update-goldens` pour ce lot. Ils ne sont pas des captures d'appareil. L5/L6 sont en mode nuit ; les anciens aperçus L1–L4 gardent leur rendu historique clair.
 
 Les neuf aperçus L7 se trouvent également dans `build/previews/` : `privacy-hub`, `privacy-sessions`, `privacy-rights`, `privacy-accessible`, `privacy-export`, `privacy-deletion`, `privacy-deletion-accepted`, `privacy-blocks` et `report` (`.png`). Même commande de génération avec `--plain-name 'preview L7'`. Ils ne valident pas le partage natif ni une suppression réelle.
+
+L8 ajoute `devices-overview`, `devices-list`, `devices-accessible`, `devices-remove-confirmation`, `devices-empty`, `push-foreground` et `push-conversation`. Génération manuelle avec `--plain-name 'preview L8'` ; les deux derniers utilisent un fournisseur simulé réservé aux tests, sans activer les push de l'application.
 
 ## Principes de développement
 

@@ -1,12 +1,12 @@
 # Histae App — roadmap de développement
 
-Mise à jour : 16 octobre 2026.
+Mise à jour : 17 octobre 2026.
 
 [Accueil](README.md) · [Résumé d'intégration](resume.md) · [Contrat HTTP Rust](../histae-api-rust/docs/http-contract.md)
 
 ## 1. État de départ et suivi
 
-L1 à L5, le cœur de L6 et L7 sont implémentés. L7 couvre sûreté, sessions, droits, export et suppression. Contrôles privés simulés uniquement ; comptes et appareils réels restent à valider. Vidéos désactivées, dépendance Google présente mais intégration native/UMP et fournisseur ouverts. IDs Android dans `.env`, iOS vides. L8 à L10 restent à construire. DA en mode nuit ; aucun fichier modèle `.env` ne doit être recréé.
+L1 à L5, le cœur de L6, L7 et la gestion des appareils L8 sont implémentés. Les flux push L8 sont préparés mais désactivés, sans projet Firebase, conformément au choix utilisateur. L7 couvre sûreté, sessions, droits, export et suppression. Contrôles privés simulés uniquement ; comptes et appareils réels restent à valider. Vidéos désactivées, dépendance Google présente mais intégration native/UMP et fournisseur ouverts. IDs Android dans `.env`, iOS vides. L9 et L10 restent à construire. DA en mode nuit ; aucun fichier modèle `.env` ne doit être recréé.
 
 Cette roadmap couvre toutes les capacités utilisateur de l'API actuelle. Elle exclut l'administration, les webhooks fournisseur, la supervision et les opérations internes. Elle ne dépend pas des anciens dépôts NestJS ou d'un endpoint OpenAPI.
 
@@ -24,7 +24,7 @@ Les états doivent distinguer : `À faire`, `En cours`, `Implémenté`, `Intégr
 | L5 | Matchs, chat, lecture et synchronisation SSE | Implémenté sur sept routes ; neuf tests ciblés, analyse et APK Android ; deux comptes/appareils à valider |
 | L6 | Révélation, continuation, crédits et récompenses volontaires | Cœur implémenté ; huit contrôles ciblés ; vidéos désactivées par choix utilisateur, SDK/UMP et fournisseur en attente |
 | L7 | Sûreté, paramètres de confidentialité, sessions, export et suppression | Implémenté ; neuf contrôles ciblés, dix-huit régressions session/SSE ; comptes et appareils réels à valider |
-| L8 | Appareils, notifications push et ouverture depuis notification | À faire |
+| L8 | Appareils, notifications push et ouverture depuis notification | Appareils implémentés, flux push préparés ; dix contrôles ciblés ; Firebase/push désactivés par choix utilisateur, réel/iOS en attente |
 | L9 | Offres, abonnement, Checkout et portail selon la distribution retenue | À faire |
 | L10 | Robustesse, accessibilité, appareils réels et préparation bêta | À faire |
 
@@ -212,7 +212,7 @@ Critère de sortie : droits accessibles même quand l'onboarding est incomplet s
 - Sources : contrat HTTP, DTO/routes/services droits/effacement/export/signalements/sessions, tests de contrat et Postman consultés. Backend en lecture seule, jamais lancé ni testé. Neuf contrôles L7 + dix-huit contrôles existants session/SSE réussis, neuf aperçus simulés inspectés, analyse/formatage et APK Android debug vérifiés. Partage/export et suppression réels, interruptions/stockage natifs et iOS restent ouverts.
 - Dépendance Google déjà présente conservée, fournisseur Android automatique exclu pour garder les vidéos désactivées jusqu'au raccordement IDs natifs/UMP. IDs réels uniquement dans `.env`. Aucun Git ni fichier modèle recréé.
 
-Prochain lot : **L8**, appareils et notifications push ; configuration Firebase et validations sur téléphones à préparer.
+Suite L8 livrée ci-dessous ; configuration Firebase et validations sur téléphones restent ouvertes.
 
 ## 11. L8 — appareils et push
 
@@ -224,6 +224,17 @@ Prochain lot : **L8**, appareils et notifications push ; configuration Firebase 
 - Valider session et ressource au retour d'une notification, sans exposer de contenu privé ni ouvrir un match devenu inaccessible.
 
 Critère de sortie : essais documentés sur Android et iOS réels, ou limites d'environnement explicitement ouvertes.
+
+### Livraison L8 — 17 octobre 2026
+
+- Liste/retrait d'appareils depuis profil/confidentialité après onboarding, trois routes exactes, sans pagination ni token dans la projection. Retrait distinct d'une fermeture de session ; relecture et reprise de la même cible après réponse perdue.
+- Firebase absent : choix utilisateur explicite de laisser les push désactivés. Huit champs publics dans le `.env` ignoré, `PUSH_ENABLED=false`, aucune permission ni initialisation Firebase Dart dans cette configuration, aucun fichier modèle recréé.
+- Dépendances `firebase_core ^5.0.0`, `firebase_messaging ^17.0.0`, `package_info_plus ^10.2.2` ; options explicites et ressources Android natives conditionnelles depuis `.env`, auto-init/Analytics désactivés. SDK 17 : identifiant d'installation FCM dans le champ `push_token`, version réelle installée. iOS : délégation UIScene, bridge APNs et deux plist préparés, capacité/signature `aps-environment` et clé APNs restant à configurer sur Mac.
+- Permission contextuelle, enregistrement/rotation sérialisés, corps immuable en cas d'incertitude, pas de rejeu automatique après timeout. Préférence sécurisée liée à l'origine/propriétaire, UUID courant et jusqu'à 64 IDs d'ouvertures ; aucun identifiant fournisseur copié dans ce stockage. Retrait distant/réinstallation sans préférence = pas de réactivation implicite. Marqueur d'arrêt durable si le nettoyage échoue, puis reprise sans nouvel enregistrement.
+- Premier plan : bandeau générique, déduplication 128 IDs en mémoire. Ouverture à froid/reprise : seuls types et UUID contractuels conservés, textes/liens distants ignorés ; session puis matchs/historique relus avant chat. Notification périmée n'ouvre pas un match inaccessible. Parcours de notification unique, brouillons conservés et autres flux SSE suspendus temporairement. Facturation : catalogue courant, détails L9. Handler arrière-plan sans HTTP privé ni navigation ; les doublons OS déjà affichés ne sont pas supprimés par Dart et aucun rattrapage offline n'est supposé.
+- Sources : contrat HTTP, DTO/routes/services/stockage/publication Rust, tests `notifications_contract.rs`, Postman et documentation officielle Firebase/Flutter consultés. Aucun test ni changement backend. Dix contrôles L8 + treize contrôles existants de configuration réussis ; sept aperçus simulés inspectés, analyse/formatage et APK Android debug vérifiés. Réception FCM/APNs, permissions sur téléphones, arrêt/reprise natifs et compilation iOS encore à valider. SDK publicitaire toujours désactivé.
+
+Prochain lot : **L9**, offres et abonnement. L'activation Firebase reste une étape indépendante en attente de projet/configuration et d'essais réels.
 
 ## 12. L9 — offres et abonnement
 
@@ -295,9 +306,9 @@ Chemins complets, préfixe `/api` inclus. Les 56 routes restent suivies : catalo
 | POST | `/api/users/me/advertising-rewards` | L6 | Créer/reprendre une intention | Repository/suivi préparés ; aucun lancement UI ; SDK/UMP/fournisseur en attente par choix utilisateur |
 | GET | `/api/users/me/advertising-rewards/:id` | L6 | Suivre la validation serveur | Suivi et crédit serveur contrôlés en simulation ; SDK/SSV réel en attente |
 | DELETE | `/api/users/me/advertising-rewards/:id` | L6 | Annuler une intention | Repository/confirmation préparés ; protection vidéo terminée contrôlée ; réel en attente |
-| GET | `/api/users/me/devices` | L8 | Liste des appareils | À faire |
-| POST | `/api/users/me/devices` | L8 | Enregistrer/rafraîchir le token push | À faire |
-| DELETE | `/api/users/me/devices/:id` | L8 | Retirer un appareil | À faire |
+| GET | `/api/users/me/devices` | L8 | Liste des appareils | Implémenté ; projection sans token, onboarding et purge contrôlés ; compte réel à valider |
+| POST | `/api/users/me/devices` | L8 | Enregistrer/rafraîchir le token push | Contrat/SDK/permission/rotation/reprises préparés et simulés ; push désactivés en attente Firebase et appareils |
+| DELETE | `/api/users/me/devices/:id` | L8 | Retirer un appareil | Implémenté ; confirmation, réponse perdue et arrêt courant contrôlés ; réel à valider |
 | GET | `/api/users/me/events` | L5 | SSE authentifié | Implémenté ; Bearer/refresh/connexion unique contrôlés ; réseau/appareils à valider |
 | GET | `/api/plans` | L1, L6, L9 | Catalogue, tarifs et disponibilité publicitaire | Intégré API L1 ; lecture L6 branchée, vidéos maintenues désactivées ; L9/appareils en attente |
 | GET | `/api/users/me/subscription` | L9 | Abonnement et droits effectifs | À faire |
@@ -322,7 +333,7 @@ Le webhook AdMob figure dans la section récompenses du contrat API, mais il est
 | SMS/OTP | Configuration de développement, quotas et livraison réelle contrôlée |
 | S3 et modération | Upload réel, formats appareils, état propriétaire, URL expirée et retrait |
 | Maintenance/outbox | Transitions, effets différés et resynchronisation sans les simuler localement |
-| FCM | Configuration iOS/Android et réception sur appareils réels |
+| FCM | Projet/options publiques, fournisseur API et APNs/signature iOS à configurer ; push désactivés, réception Android/iOS réelle à valider |
 | AdMob | Configuration serveur et SDK, mode de test, validation signée, disponibilité effective |
 | Stripe | Environnement test, portail, retours app et droits projetés |
 | Distribution | Stratégie de paiement, signatures, permissions et déclarations selon les règles applicables |

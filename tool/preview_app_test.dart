@@ -19,6 +19,12 @@ import 'package:histae_app/features/privacy/presentation/privacy_hub_page.dart';
 import 'package:histae_app/features/privacy/presentation/report_page.dart';
 
 import '../test/support/privacy_fixture.dart';
+import '../test/support/notifications_fixture.dart';
+
+import 'package:histae_app/features/notifications/application/push_controller.dart';
+import 'package:histae_app/features/notifications/data/device_repository.dart';
+import 'package:histae_app/features/notifications/data/notification_models.dart';
+import 'package:histae_app/features/notifications/data/push_vault.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -53,6 +59,157 @@ void main() {
       );
     await icons.load();
   });
+  testWidgets(
+    'preview L8 devices, explicit removal and disabled notifications',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      var hasDevice = true;
+      final session = testSession((r) async {
+        if (r.url.path == '/api/users/me/devices' && r.method == 'GET') {
+          return jsonResponse({
+            'devices': [if (hasDevice) deviceJson()],
+          });
+        }
+        if (r.method == 'DELETE' && r.url.path.endsWith(deviceOne)) {
+          hasDevice = false;
+        }
+        return defaultNotificationsResponse(r);
+      });
+      await session.establish(testTokens);
+      final gateway = FakePushGateway()..available = false;
+      final push = PushController(
+        DeviceRepository(session),
+        gateway,
+        MemoryPushVault(),
+      );
+      const preview = Key('devices-preview');
+      Future<void> tapText(String label) async {
+        await tester.ensureVisible(find.text(label));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(label));
+        await tester.pumpAndSettle();
+      }
+
+      await tester.pumpWidget(
+        RepaintBoundary(
+          key: preview,
+          child: HistaeApp(sessionController: session, pushController: push),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('Appareils et notifications'),
+        180,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tapText('Appareils et notifications');
+      await expectLater(
+        find.byKey(preview),
+        matchesGoldenFile('../build/previews/devices-overview.png'),
+      );
+      await tester.scrollUntilVisible(
+        find.text('Retirer cet appareil'),
+        180,
+        scrollable: find.byType(Scrollable).last,
+      );
+      await tester.ensureVisible(find.text('Retirer cet appareil'));
+      await tester.pumpAndSettle();
+      await expectLater(
+        find.byKey(preview),
+        matchesGoldenFile('../build/previews/devices-list.png'),
+      );
+      tester.view.physicalSize = const Size(320, 640);
+      tester.platformDispatcher.textScaleFactorTestValue = 2;
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('Retirer cet appareil'),
+        220,
+        scrollable: find.byType(Scrollable).last,
+      );
+      await tester.ensureVisible(find.text('Retirer cet appareil'));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await expectLater(
+        find.byKey(preview),
+        matchesGoldenFile('../build/previews/devices-accessible.png'),
+      );
+      tester.view.physicalSize = const Size(390, 844);
+      tester.platformDispatcher.clearTextScaleFactorTestValue();
+      await tester.pumpAndSettle();
+      await tapText('Retirer cet appareil');
+      await expectLater(
+        find.byKey(preview),
+        matchesGoldenFile('../build/previews/devices-remove-confirmation.png'),
+      );
+      await tester.tap(find.widgetWithText(FilledButton, 'Retirer'));
+      await tester.pumpAndSettle();
+      expect(
+        find.text('Aucun appareil enregistré pour les notifications.'),
+        findsOneWidget,
+      );
+      await expectLater(
+        find.byKey(preview),
+        matchesGoldenFile('../build/previews/devices-empty.png'),
+      );
+      expect(gateway.initializations, 0);
+      expect(gateway.requests, 0);
+      await tester.pumpWidget(const SizedBox.shrink());
+      await gateway.close();
+    },
+  );
+  testWidgets(
+    'preview L8 simulated foreground notice and authorized conversation',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final session = testSession((r) async => defaultNotificationsResponse(r));
+      await session.establish(testTokens);
+      final gateway = FakePushGateway();
+      final vault = MemoryPushVault()
+        ..record = const PushRecord(
+          'https://api.example',
+          testUser,
+          deviceId: deviceOne,
+        );
+      final push = PushController(
+        DeviceRepository(session),
+        gateway,
+        vault,
+        appVersion: () async => '1.0',
+      );
+      const preview = Key('push-preview');
+      await tester.pumpWidget(
+        RepaintBoundary(
+          key: preview,
+          child: HistaeApp(sessionController: session, pushController: push),
+        ),
+      );
+      await tester.pumpAndSettle();
+      gateway.foreground.add(
+        const PushIntent(notificationOne, PushKind.newMessage, testMatch),
+      );
+      await tester.pumpAndSettle();
+      await expectLater(
+        find.byKey(preview),
+        matchesGoldenFile('../build/previews/push-foreground.png'),
+      );
+      await tester.tap(find.text('Consulter'));
+      await tester.pumpAndSettle();
+      expect(find.byType(ChatPage), findsOneWidget);
+      await expectLater(
+        find.byKey(preview),
+        matchesGoldenFile('../build/previews/push-conversation.png'),
+      );
+      await tester.pumpWidget(const SizedBox.shrink());
+      await gateway.close();
+    },
+  );
   testWidgets(
     'preview L7 privacy before onboarding, navigation, deletion and report',
     (tester) async {

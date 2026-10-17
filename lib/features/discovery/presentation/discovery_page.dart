@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../privacy/presentation/report_page.dart';
+import '../../notifications/presentation/push_scope.dart';
 
 import '../../../core/widgets/editorial_card.dart';
 import '../../consents/presentation/consents_page.dart';
@@ -55,6 +56,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
   }
 
   Future<void> _resume() async {
+    if (PushScope.maybeOf(context)?.coversMainFlow == true) return;
     await c.session.synchronize();
     if (mounted && c.session.resourceKey == _key) {
       if (c.active) {
