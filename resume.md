@@ -2,6 +2,10 @@
 
 Mise à jour : 18 octobre 2026.
 
+Identité visuelle : les cinq pistes initiales de logo SVG sont conservées dans [pictures/logos/nouvelle-da](pictures/logos/nouvelle-da/README.md), avec planche comparative et variantes. La recherche se poursuit sur les pages ; le mot-symbole actuel de l'app et du site est conservé pendant le choix de sa déclinaison.
+
+Suite du choix graphique : **02 — Les pages** est retenue comme direction. Quatre intégrations au mot Histae sont proposées dans [les-pages-variantes](pictures/logos/les-pages-variantes/README.md), avec formats compacts et simulations de l'en-tête. La variante précise reste en cours de choix.
+
 [Accueil](README.md) · [Roadmap et routes mobiles](roadmap.md) · [Contrat HTTP Rust](../histae-api-rust/docs/http-contract.md)
 
 ## 1. Périmètre et état actuel
@@ -265,3 +269,9 @@ L10 reste à construire ; L9 attend Stripe test et les retours HTTPS pour active
 
 
 
+
+## 18. Logo et ouverture
+
+Le 18 octobre 2026, application du livre ouvert original **02 / Les pages** : logo autonome ; nom Histae en accompagnement facultatif. Les en-têtes mobiles et ceux du site, son pied de page et ses icônes utilisent cette identité. Les icônes Android/iOS affichent uniquement le livre, avec calques adaptatifs et monochrome sur Android. Les anciennes recherches sont conservées.
+
+Ouverture de 1,48 s : H. collés, écartement et révélation de istae, livre au-dessus, puis fondu. Elle laisse la restauration et la navigation vivantes, ignore la présentation si les animations sont désactivées et ne se rejoue pas au retour d'arrière-plan. 21 contrôles ciblés, analyse et APK Android vérifiés ; export et contrôles du site réussis. Icônes iOS générées, compilation/essais natifs sur Mac encore à faire. Aucun déploiement du site ni activation fournisseur. Prochain lot : L10.

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- The complete book stays inside the central 66dp safe area. -->
+    <group android:translateX="12.4" android:translateY="15.40625"
+        android:scaleX="0.65" android:scaleY="0.65">
+        <path android:pathData="M64,104C50,91 31,85 17,87V26C35,23 52,30 64,43Z"
+            android:fillColor="#B69CFF" android:fillAlpha="0.1"
+            android:strokeColor="#B69CFF" android:strokeWidth="5.5"
+            android:strokeLineCap="round" android:strokeLineJoin="round" />
+        <path android:pathData="M64,104C78,91 97,85 111,87V26C93,23 76,30 64,43Z"
+            android:fillColor="#F9F7F2" android:fillAlpha="0.035"
+            android:strokeColor="#F9F7F2" android:strokeWidth="5.5"
+            android:strokeLineCap="round" android:strokeLineJoin="round" />
+        <path android:pathData="M28,45C38,45 46,49 53,55M75,55C82,49 90,45 100,45"
+            android:fillColor="@android:color/transparent"
+            android:strokeColor="#B69CFF" android:strokeAlpha="0.65"
+            android:strokeWidth="3.5" android:strokeLineCap="round" />
+        <path android:pathData="M59,17a5,5 0,1 0,10 0a5,5 0,1 0,-10 0"
+            android:fillColor="#F09A82" />
+    </group>
+</vector>

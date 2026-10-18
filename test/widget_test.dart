@@ -21,6 +21,7 @@ void main() {
   );
 
   Future<void> openCatalog(WidgetTester tester) async {
+    await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('Découvrir les formules'), 200);
     await tester.ensureVisible(find.text('Découvrir les formules'));
     await tester.pumpAndSettle();
@@ -33,7 +34,8 @@ void main() {
     'French public navigation remains usable without API configuration',
     (tester) async {
       await tester.pumpWidget(const HistaeApp());
-      expect(find.text('Histae'), findsOneWidget);
+      await tester.pumpAndSettle();
+      expect(find.bySemanticsLabel('Histae'), findsOneWidget);
       await openCatalog(tester);
       expect(find.text('Service non configuré'), findsOneWidget);
       await tester.tap(find.byTooltip('Retour'));
@@ -154,6 +156,7 @@ void main() {
           ),
         ),
       );
+      await tester.pumpAndSettle();
       await tester.scrollUntilVisible(find.text('Découvrir les formules'), 200);
       await openCatalog(tester);
       await tester.pumpAndSettle();
@@ -195,6 +198,7 @@ void main() {
     (tester) async {
       final semantics = tester.ensureSemantics();
       await tester.pumpWidget(const HistaeApp());
+      await tester.pumpAndSettle();
       await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
       await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
       await expectLater(tester, meetsGuideline(textContrastGuideline));

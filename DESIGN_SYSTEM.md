@@ -45,3 +45,21 @@ Les aperçus de `tool/preview_app_test.dart` et `tool/preview_billing_test.dart`
 Validation du 18 octobre : **52 contrôles ciblés réussis**, dix scénarios visuels et **44 aperçus générés et inspectés**, formatage sans changement restant, analyse Flutter sans problème et APK Android debug compilé. Les vues à 200 % et le clavier du chat font partie de la revue. Aperçu d'ensemble local : `build/previews/site-redesign-overview.png`.
 
 Sources des polices : [Inter](https://github.com/google/fonts/tree/main/ofl/inter), [Source Serif 4](https://github.com/google/fonts/tree/main/ofl/sourceserif4).
+
+## Logo retenu et ouverture
+
+Le **livre ouvert** de la piste originale **02 / Les pages** est le logo Histae. Le nom peut l'accompagner ; il n'est pas une partie obligatoire du symbole. Les autres pistes et les variantes de lettres sont conservées comme recherches graphiques.
+
+- Source du livre : `pictures/logos/nouvelle-da/02-les-pages/symbole.svg` ; copie produit : `assets/branding/histae-logo.svg`.
+- Signature livre + nom : `assets/branding/histae-signature-dark.svg` et `histae-signature-light.svg`. Lettres vectorisées ; dérivés PNG en double résolution utilisés dans les en-têtes Flutter, sans dépendance SVG supplémentaire.
+- Icône native : livre seul sur un carré opaque bleu nuit, sans coins arrondis dessinés dans le fichier. Les cinq densités Android et les dix-neuf entrées iOS sont générées depuis cette source.
+- Android propose aussi des calques vectoriels adaptatifs et une version monochrome pour les icônes thématiques. Le livre tient dans la zone centrale protégée de 66 dp d'un calque de 108 dp.
+- Site : en-tête et pied de page accompagnent le livre du nom ; jusqu'à 360 px, l'en-tête affiche le livre seul. Favicon SVG/PNG, icône Apple et manifeste partagent ce symbole. Le minimum fixe de largeur du body a été retiré pour éviter un débordement avec la barre de défilement.
+
+L'ouverture Flutter dure **1 480 ms** : une courte tenue de **H.**, une séparation horizontale qui dévoile **istae**, l'apparition du livre au-dessus, puis un fondu vers l'écran courant. Elle ne joue qu'au montage de l'app. La session et les notifications se préparent en parallèle ; le contenu garde son état et ses routes. Les interactions et sa lecture par un lecteur d'écran restent suspendues pendant l'ouverture. Si les animations sont désactivées, l'app s'affiche directement. Une mise en arrière-plan termine l'ouverture, sans la rejouer à la reprise.
+
+`tool/generate_brand_assets.cjs` régénère les exports avec Node et Sharp disponible dans le chemin de modules de l'outil, sans l'ajouter aux dépendances mobiles. L'option `--site <chemin-histae-site>` exporte également les fichiers du site. `tool/preview_brand_test.dart --update-goldens` capture les étapes réelles de l'ouverture ; la planche animée est dans `pictures/branding`.
+
+Validation : **21 contrôles ciblés**, dont trois nouveaux sur l'ouverture (contenu vivant et interactions, réduction des animations, cycle de vie), analyse Flutter sans problème, APK Android debug compilé et présence des assets dans l'APK vérifiée. Dimensions et absence d'alpha des icônes iOS contrôlées. Site : types, lint et compilation/export validés ; rendu sur ordinateur et petit écran revu. Les essais natifs Android/iOS, notamment le masque d'icône et le démarrage à froid, restent à effectuer sur appareil. Le site a été modifié localement, sans déploiement.
+
+Références : [icônes adaptatives Android](https://developer.android.com/develop/ui/compose/system/icon_design_adaptive), [préférence Flutter de réduction des animations](https://api.flutter.dev/flutter/widgets/MediaQueryData/disableAnimations.html).

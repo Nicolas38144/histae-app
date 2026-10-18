@@ -2,6 +2,10 @@
 
 Mise à jour : 18 octobre 2026.
 
+Recherche de logo : les cinq pistes SVG initiales sont conservées dans [pictures/logos/nouvelle-da](pictures/logos/nouvelle-da/README.md), avec variantes et planche comparative. Le choix se poursuit sur la direction des pages. Cette livraison graphique ne modifie pas l'avancement des lots fonctionnels.
+
+La direction **02 — Les pages** est retenue ; quatre [variantes typographiques](pictures/logos/les-pages-variantes/README.md) et leurs simulations dans le produit sont disponibles. Le choix de la variante à appliquer reste ouvert ; l'avancement fonctionnel est conservé.
+
 [Accueil](README.md) · [Résumé d'intégration](resume.md) · [Contrat HTTP Rust](../histae-api-rust/docs/http-contract.md)
 
 ## 1. État de départ et suivi
@@ -374,3 +378,9 @@ Après chaque intervention, mettre à jour ce suivi et le résumé, expliquer le
 
 
 
+
+## 16. Identité et ouverture — 18 octobre 2026
+
+Logo original **02 / Les pages** appliqué : le livre est le symbole autonome, le nom est facultatif. Site : en-tête/pied de page, favicon et manifeste ; app : signature des en-têtes, icônes Android et iOS. Android dispose de calques adaptatifs et monochrome. Ouverture H. → Histae. avec livre et fondu, en parallèle de la restauration, sans rejeu au retour d'arrière-plan et avec prise en compte de la réduction des animations.
+
+Vérifications : analyse Flutter, 21 contrôles ciblés (trois nouveaux), aperçu animé issu des images Flutter et APK debug ; types/lint/build/export du site et revue ordinateur/petit écran. Le site reste localement modifié. L10 reste ouvert : essais du démarrage à froid et des masques d'icônes sur appareils, compilation iOS sur Mac, puis qualité bêta. Aucun appel privé réel ni changement d'API.

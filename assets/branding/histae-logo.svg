@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+<title id="title">Les pages</title><desc id="desc">Une histoire qui s’écrit à deux.</desc>
+<g stroke-linecap="round" stroke-linejoin="round">
+  <path d="M64 104C50 91 31 85 17 87V26C35 23 52 30 64 43Z" fill="#B69CFF" fill-opacity="0.10" stroke="#B69CFF" stroke-width="5.5"/>
+  <path d="M64 104C78 91 97 85 111 87V26C93 23 76 30 64 43Z" fill="#F9F7F2" fill-opacity="0.035" stroke="#F9F7F2" stroke-width="5.5"/>
+  <path d="M28 45C38 45 46 49 53 55M75 55C82 49 90 45 100 45" fill="none" stroke="#B69CFF" stroke-opacity="0.65" stroke-width="3.5"/>
+  <circle cx="64" cy="17" r="5" fill="#F09A82"/>
+  </g>
+</svg>

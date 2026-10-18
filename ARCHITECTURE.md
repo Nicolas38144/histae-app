@@ -64,3 +64,9 @@ Références de conception : [recommandations Flutter](https://docs.flutter.dev/
 L10 demeure consacré aux essais réels, à l'accessibilité complète et à la préparation bêta. Une analyse, un test simulé ou une compilation Android ne valide pas une réception push, un paiement, un SMS ou une compilation iOS sur Mac.
 
 Validation finale du 18 octobre : analyse stricte sans problème, formatage de 143 fichiers, 166 tests au passage global puis 39 ciblés après les dernières extractions (167 distincts, trois nouveaux), APK Android debug compilé. Quatre scénarios visuels ont généré 22 aperçus, inspectés en planche avec revue détaillée des écrans représentatifs. Les contrats HTTP et validations de fournisseurs demeurent ceux des lots L1–L9 ; aucun appel privé réel, paiement ou réception push n'a été exécuté pour cette refonte.
+
+## Présentation d'ouverture
+
+`AppOpening` est monté par le builder de `MaterialApp`, au-dessus des scopes et du navigateur existants. Il possède seulement son animation finie ; il ne possède aucune session ou route. Les services démarrent normalement. Le sous-arbre conserve sa position et son état pendant et après l'ouverture, y compris une route de notification ouverte pendant le démarrage. Les entrées tactiles, le focus et la sémantique du contenu sont exclus tant que l'animation le masque. L'observateur de cycle de vie termine l'ouverture lors d'une suspension ; `MediaQuery.disableAnimations` l'ignore immédiatement. Le contrôleur est libéré avec le widget.
+
+`HistaeWordmark` affiche la signature vectorisée exportée en PNG, selon le fond clair/sombre ; `HistaeBrandSymbol` dessine le livre pour l'ouverture. Les SVG originaux et les exports natifs restent dans le dépôt. Aucun package d'animation, de splash ou de rendu SVG n'est ajouté.

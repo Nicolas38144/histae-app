@@ -39,6 +39,7 @@ flutter:
   uses-material-design: true
   assets:
     - .env
+    - assets/branding/
     - assets/fonts/dm_serif_display/OFL.txt
     - assets/fonts/inter/OFL.txt
     - assets/fonts/source_serif_4/OFL.txt

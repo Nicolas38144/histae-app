@@ -14,6 +14,8 @@ Après connexion et validation des consentements obligatoires, l'application s'o
 
 La refonte visuelle du 18 octobre aligne tous les parcours sur [le site Histae](https://www.histae.com/fr/) et son dépôt `histae-site` : bleu nuit, lavande, touches abricot, titres à empattements, boutons dégradés et panneaux à bordure fine. L'accueil reprend le mot-symbole et le motif de rencontre du site. Le feed, le profil, les matchs, le chat et le catalogue ont une composition adaptée au mobile. Inter et Source Serif 4 sont embarquées avec leurs licences ; le mode nuit reste appliqué par défaut. Voir le [système visuel](DESIGN_SYSTEM.md).
 
+Le logo retenu est le **livre ouvert** de la piste originale **02 / Les pages**, disponible en [SVG](assets/branding/histae-logo.svg). Il accompagne le nom dans les en-têtes et apparaît seul sur les icônes Android/iOS. Le site voisin utilise la même identité. Au démarrage, **H.** s'écarte pour dévoiler **istae**, puis le livre apparaît au-dessus ; cette ouverture de 1,48 s est ignorée si les animations sont désactivées et ne se rejoue pas à la reprise. Voir l'[aperçu animé](pictures/branding/apercu-identite.gif) et les détails du [système visuel](DESIGN_SYSTEM.md).
+
 ## Documentation et références
 
 | Document | Utilité |

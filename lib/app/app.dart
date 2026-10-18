@@ -10,6 +10,7 @@ import '../features/billing/presentation/billing_scope.dart';
 import '../features/catalog/data/catalog_repository.dart';
 import '../features/notifications/application/push_controller.dart';
 import '../features/notifications/presentation/push_scope.dart';
+import 'app_opening.dart';
 import 'notification_navigation.dart';
 import 'notification_overlay.dart';
 import 'session_gate.dart';
@@ -126,13 +127,15 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
     locale: const Locale('fr'),
     supportedLocales: const [Locale('fr')],
     localizationsDelegates: GlobalMaterialLocalizations.delegates,
-    builder: (context, child) => BillingScope(
-      controller: widget.billingController,
-      child: PushScope(
-        controller: widget.pushController,
-        child: NotificationOverlay(
+    builder: (context, child) => AppOpening(
+      child: BillingScope(
+        controller: widget.billingController,
+        child: PushScope(
           controller: widget.pushController,
-          child: child!,
+          child: NotificationOverlay(
+            controller: widget.pushController,
+            child: child!,
+          ),
         ),
       ),
     ),
