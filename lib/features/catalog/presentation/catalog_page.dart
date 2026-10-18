@@ -109,7 +109,13 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
             body: strings.catalogIntro,
           ),
           const SizedBox(height: 16),
-          for (final plan in controller.plans) PlanCard(plan: plan),
+          for (final offer in controller.offers)
+            PlanCard(
+              plan: controller.plans.firstWhere(
+                (plan) => plan.code == offer.planCode,
+              ),
+              offer: offer,
+            ),
           const SizedBox(height: 16),
           Text(strings.catalogReadOnly),
           const SizedBox(height: 16),

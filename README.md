@@ -191,6 +191,17 @@ Suite prévue après L8 : L9, livré ci-dessous. L'activation push et les essais
 
 ## L9 — offres et abonnement
 
+Le catalogue public et l'écran d'abonnement affichent trois cartes : **Free**, **Premium Mensuel**
+et **Premium Annuel**. Le catalogue initial de l'API indique 0 EUR, 5 EUR/mois et 48 EUR/an. Les cartes
+lisent `offers` dans `GET /api/plans` pour le nom, le prix, la devise, l'essai et la périodicité ;
+`plan_code` référence les fonctionnalités et quotas communs dans `plans`. Aucun tarif métier n'est
+ajouté en dur. Les deux offres Premium ont les mêmes droits et un essai soumis à éligibilité.
+La facturation annuelle est présentée comme un paiement en une fois chaque année, avec son équivalent
+mensuel indicatif. Chaque bouton Premium prépare uniquement sa propre périodicité Checkout.
+Déployer l'API avec `offers` avant cette version mobile ; une réponse incomplète affiche une erreur
+réessayable. Les continuations et les droits conservent les niveaux `free`/`premium`, sans troisième rôle.
+L'activation des paiements et les essais réels restent indépendants de cet affichage.
+
 L'écran **Mon abonnement et les formules**, depuis le profil, charge le catalogue public et la projection privée `/api/users/me/subscription`. Plan effectif, accès, essai, dates, impayé et résiliation viennent de l'API. Une notification de facturation ouvre désormais cette lecture authentifiée. Les tarifs, devise, essai et fonctionnalités affichés viennent du catalogue ; aucun prix ou identifiant Stripe métier n'est envoyé par le client.
 
 Choix utilisateur : **Android distribué hors Play Store avec Stripe**, paiements **désactivés** avant publication des pages de retour et validation de Stripe test sur téléphone. Le `.env` local contient :

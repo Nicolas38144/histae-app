@@ -20,9 +20,9 @@ Future<void> main() async {
   }
   final repository = CatalogRepository(ApiClient(origin: config.apiOrigin));
   try {
-    final plans = await repository.load(RequestCancellation());
+    final catalog = await repository.load(RequestCancellation());
     stdout.writeln(
-      'Catalogue public lu et décodé : ${plans.length} formule(s).',
+      'Catalogue public lu et décodé : ${catalog.offers.length} offres, ${catalog.plans.length} niveaux de droits.',
     );
   } on ApiFailure catch (error) {
     stderr.writeln('Échec du catalogue : ${error.kind.name}.');

@@ -182,6 +182,13 @@ Seul le callback signé vérifié côté serveur crédite le compte. Le callback
 
 ## 13. Offres et abonnement
 
+Le catalogue expose maintenant trois offres commerciales dans `offers` : Free, Premium Mensuel et
+Premium Annuel (catalogue initial : 0 EUR, 5 EUR/mois, 48 EUR/an). Le client affiche une carte par
+offre dans le catalogue public et l'abonnement, avec prix/devise/essai serveur, facturation annuelle
+en une fois et bouton associé à la bonne périodicité. `plan_code` relie chaque offre aux fonctionnalités
+et quotas des deux niveaux `plans` Free/Premium. Déployer l'API avec `offers` avant l'app ; aucun prix
+ni droit n'est inventé si le catalogue est incomplet. La disponibilité des ventes reste contrôlée séparément.
+
 Charger `/api/plans` et l'état d'abonnement. Les prix mensuel/annuel, devise, essai et fonctionnalités viennent du serveur, sans valeur de secours métier dans l'app. Ne pas promettre un nouvel essai à un compte l'ayant déjà consommé.
 
 Le client choisit uniquement `monthly` ou `annual` pour Checkout, avec une clé d'idempotence. Aucun Product ID, Price ID, Customer ID, montant ou durée d'essai n'est envoyé. Ouvrir l'URL retournée dans un navigateur approprié et traiter retour, annulation et reprise après fermeture. Une création incertaine se reprend avec la même clé et les mêmes paramètres dans les conditions du contrat ; ne pas multiplier les tentatives d'achat.

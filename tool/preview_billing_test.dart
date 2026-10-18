@@ -142,12 +142,9 @@ void main() {
         realtime: QuietRealtime(session),
       );
       await mount(c);
-      await tester.scrollUntilVisible(
-        find.text('Choisir le rythme annuel'),
-        200,
-      );
+      await tester.scrollUntilVisible(find.text('Choisir Premium Annuel'), 200);
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Choisir le rythme annuel'));
+      await tester.tap(find.text('Choisir Premium Annuel'));
       await screenshot('subscription-confirmation');
       await tester.tap(find.text('Continuer dans le navigateur'));
       await tester.pumpAndSettle();

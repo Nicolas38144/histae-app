@@ -2,11 +2,19 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/theme/histae_tokens.dart';
+import '../../billing/data/billing_models.dart' show BillingPeriod;
+import '../data/plan_catalog.dart';
 import '../data/subscription_plan.dart';
 
 class PlanCard extends StatelessWidget {
-  const PlanCard({super.key, required this.plan, this.action});
+  const PlanCard({
+    super.key,
+    required this.plan,
+    required this.offer,
+    this.action,
+  });
   final SubscriptionPlan plan;
+  final SubscriptionOffer offer;
   final Widget? action;
 
   @override
@@ -63,33 +71,52 @@ class PlanCard extends StatelessWidget {
               Semantics(
                 header: true,
                 child: Text(
-                  plan.displayName,
+                  offer.displayName,
                   style: theme.textTheme.headlineSmall,
                 ),
               ),
               const SizedBox(height: 12),
-              Text(
-                strings.monthly(plan.monthlyPriceCents, plan.currency),
-                style: theme.textTheme.headlineSmall,
-              ),
+              Text(switch (offer.billingPeriod) {
+                BillingPeriod.monthly => strings.monthly(
+                  offer.priceCents,
+                  offer.currency,
+                ),
+                BillingPeriod.annual => strings.annual(
+                  offer.priceCents,
+                  offer.currency,
+                ),
+                null => strings.money(offer.priceCents, offer.currency),
+              }, style: theme.textTheme.headlineSmall),
               const SizedBox(height: 6),
               Text(
-                strings.annual(plan.annualPriceCents, plan.currency),
+                switch (offer.billingPeriod) {
+                  BillingPeriod.monthly =>
+                    'Facturé chaque mois. Renouvellement automatique.',
+                  BillingPeriod.annual => 'Facturé en une fois chaque année. Renouvellement automatique.',
+                  null => 'Sans abonnement payant.',
+                },
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
-              const SizedBox(height: 16),
-              Text(
-                strings.trial(plan.trialDays),
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: theme.colorScheme.primary,
+              if (offer.billingPeriod == BillingPeriod.annual) ...[
+                const SizedBox(height: 6),
+                Text(
+                  'Équivalent à environ ${strings.monthly((offer.priceCents / 12).round(), offer.currency)}.',
                 ),
-              ),
-              if (plan.trialDays > 0)
+              ],
+              if (offer.trialDays > 0) ...[
+                const SizedBox(height: 16),
+                Text(
+                  strings.trial(offer.trialDays),
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
                 const Text(
                   'Selon votre éligibilité, confirmée lors de la souscription.',
                 ),
+              ],
               const Divider(height: 32),
               if (plan.weeklyIncludedCredits case final credits?)
                 detail(strings.weeklyCredits(credits)),
@@ -98,9 +125,11 @@ class PlanCard extends StatelessWidget {
                     ? strings.noWeeklyLimit
                     : strings.weeklyLimit(plan.weeklyContinuationLimit!),
               ),
-              detail(strings.adStock(plan.advertisingCreditStockLimit)),
+              if (!plan.adsRemoved)
+                detail(strings.adStock(plan.advertisingCreditStockLimit)),
               detail(strings.ads(plan.adsRemoved)),
-              detail(strings.rewards(plan.rewardedAdvertisingEnabled)),
+              if (!plan.adsRemoved)
+                detail(strings.rewards(plan.rewardedAdvertisingEnabled)),
               for (final feature in plan.features)
                 if (feature.displayName != null ||
                     feature.description != null) ...[

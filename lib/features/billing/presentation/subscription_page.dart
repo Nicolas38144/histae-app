@@ -8,7 +8,7 @@ import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../catalog/application/catalog_controller.dart';
 import '../../catalog/data/catalog_repository.dart';
-import '../../catalog/data/subscription_plan.dart';
+import '../../catalog/data/plan_catalog.dart';
 import '../../notifications/application/push_controller.dart';
 import '../../notifications/presentation/push_scope.dart';
 import '../application/billing_controller.dart';
@@ -91,15 +91,17 @@ class _SubscriptionPageState extends State<SubscriptionPage>
     super.dispose();
   }
 
-  Future<void> _choose(SubscriptionPlan plan, BillingPeriod period) async {
+  Future<void> _choose(SubscriptionOffer offer) async {
+    final period = offer.billingPeriod;
+    if (period == null) return;
     final strings = AppStrings.of(context);
     final price = period == BillingPeriod.monthly
-        ? strings.monthly(plan.monthlyPriceCents, plan.currency)
-        : strings.annual(plan.annualPriceCents, plan.currency);
+        ? strings.monthly(offer.priceCents, offer.currency)
+        : strings.annual(offer.priceCents, offer.currency);
     final accepted = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Poursuivre avec Premium'),
+        title: Text('Poursuivre avec ${offer.displayName}'),
         content: SingleChildScrollView(
           child: Text(
             '$price\n\nAbonnement à renouvellement automatique. '

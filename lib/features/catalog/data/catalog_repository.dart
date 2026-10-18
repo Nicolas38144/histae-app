@@ -1,10 +1,10 @@
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
-import 'subscription_plan.dart';
+import 'plan_catalog.dart';
 
 abstract interface class CatalogRepository {
   factory CatalogRepository(ApiClient api) = ApiCatalogRepository;
-  Future<List<SubscriptionPlan>> load(RequestCancellation cancellation);
+  Future<PlanCatalog> load(RequestCancellation cancellation);
   void close();
 }
 
@@ -13,15 +13,10 @@ final class ApiCatalogRepository implements CatalogRepository {
   final ApiClient _api;
 
   @override
-  Future<List<SubscriptionPlan>> load(RequestCancellation cancellation) async {
+  Future<PlanCatalog> load(RequestCancellation cancellation) async {
     final body = await _api.getJson('/api/plans', cancellation: cancellation);
     try {
-      if (body is! Map<String, dynamic> || body['plans'] is! List) {
-        throw const FormatException('Invalid catalog envelope');
-      }
-      return List.unmodifiable(
-        (body['plans'] as List).map(SubscriptionPlan.fromJson),
-      );
+      return PlanCatalog.fromJson(body);
     } on FormatException {
       throw const ApiFailure(ApiFailureKind.invalidResponse);
     }

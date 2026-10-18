@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../catalog/application/catalog_controller.dart';
-import '../../catalog/data/subscription_plan.dart';
+import '../../catalog/data/plan_catalog.dart';
 import '../../catalog/presentation/plan_card.dart';
-import '../data/billing_models.dart';
 
 class SubscriptionPlans extends StatelessWidget {
   const SubscriptionPlans({
@@ -19,8 +18,7 @@ class SubscriptionPlans extends StatelessWidget {
   });
   final CatalogController catalog;
   final bool paymentsAvailable, canSubscribe, hasPending, canAct;
-  final Future<void> Function(SubscriptionPlan plan, BillingPeriod period)
-  onChoose;
+  final Future<void> Function(SubscriptionOffer offer) onChoose;
   @override
   Widget build(BuildContext context) {
     if (catalog.status == CatalogStatus.loading ||
@@ -29,7 +27,7 @@ class SubscriptionPlans extends StatelessWidget {
         semanticsLabel: 'Chargement des formules',
       );
     }
-    if (catalog.failure != null || catalog.plans.isEmpty) {
+    if (catalog.failure != null || catalog.offers.isEmpty) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -51,30 +49,20 @@ class SubscriptionPlans extends StatelessWidget {
     }
     return Column(
       children: [
-        for (final plan in catalog.plans)
+        for (final offer in catalog.offers)
           PlanCard(
-            plan: plan,
+            plan: catalog.plans.firstWhere(
+              (plan) => plan.code == offer.planCode,
+            ),
+            offer: offer,
             action:
-                plan.code == 'premium' &&
+                offer.billingPeriod != null &&
                     paymentsAvailable &&
                     canSubscribe &&
                     hasPending == false
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      HistaeButton(
-                        onPressed: canAct
-                            ? () => onChoose(plan, BillingPeriod.monthly)
-                            : null,
-                        child: const Text('Choisir le rythme mensuel'),
-                      ),
-                      OutlinedButton(
-                        onPressed: canAct
-                            ? () => onChoose(plan, BillingPeriod.annual)
-                            : null,
-                        child: const Text('Choisir le rythme annuel'),
-                      ),
-                    ],
+                ? HistaeButton(
+                    onPressed: canAct ? () => onChoose(offer) : null,
+                    child: Text('Choisir ${offer.displayName}'),
                   )
                 : null,
           ),

@@ -34,7 +34,14 @@ void main() {
       final repo = repository(
         (_) async => http.Response(catalogFixture(), 200),
       );
-      final plans = await repo.load(RequestCancellation());
+      final catalog = await repo.load(RequestCancellation());
+      final plans = catalog.plans;
+      expect(catalog.offers.map((offer) => offer.code), [
+        'free',
+        'premium_monthly',
+        'premium_annual',
+      ]);
+      expect(catalog.offers.last.priceCents, 9876);
       expect(plans.map((p) => p.code), ['free', 'premium']);
       expect(plans.first.weeklyIncludedCredits, 3);
       expect(plans.first.weeklyContinuationLimit, 6);
@@ -47,6 +54,7 @@ void main() {
       expect(premium.features.single.displayName, isNull);
       expect(premium.features.single.value, true);
       expect(() => plans.clear(), throwsUnsupportedError);
+      expect(() => catalog.offers.clear(), throwsUnsupportedError);
     },
   );
   test('retains server changes without deriving quotas from a plan code', () {
@@ -112,7 +120,7 @@ void main() {
       expect(calls, 1);
       expect(controller.status, CatalogStatus.ready);
       final empty = CatalogController(
-        repository((_) async => http.Response('{"plans":[]}', 200)),
+        repository((_) async => http.Response('{"plans":[],"offers":[]}', 200)),
       );
       addTearDown(empty.dispose);
       await empty.load();
@@ -133,7 +141,7 @@ void main() {
                   429,
                   headers: {'retry-after': '2'},
                 )
-              : http.Response('{"plans":[]}', 200);
+              : http.Response('{"plans":[],"offers":[]}', 200);
         }, now: () => now),
         now: () => now,
       );
@@ -158,7 +166,9 @@ void main() {
       final controller = CatalogController(
         repository((_) async {
           calls++;
-          return calls == 1 ? first.future : http.Response('{"plans":[]}', 200);
+          return calls == 1
+              ? first.future
+              : http.Response('{"plans":[],"offers":[]}', 200);
         }),
       );
       addTearDown(controller.dispose);

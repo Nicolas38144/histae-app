@@ -55,7 +55,8 @@ void main() {
       response.complete(http.Response(catalogFixture(), 200));
       await tester.pumpAndSettle();
       expect(find.text('Free'), findsOneWidget);
-      expect(find.text('Premium'), findsOneWidget);
+      expect(find.text('Premium Mensuel'), findsOneWidget);
+      expect(find.text('Premium Annuel'), findsOneWidget);
       expect(find.text('12,34 EUR / mois'), findsOneWidget);
       expect(find.text('98,76 EUR / an'), findsOneWidget);
       expect(find.text('Crédits inclus par semaine : 3'), findsOneWidget);
@@ -81,7 +82,7 @@ void main() {
         catalogRepository: repository((_) async {
           calls++;
           if (calls == 1) throw http.ClientException('private payload');
-          return http.Response('{"plans":[]}', 200);
+          return http.Response('{"plans":[],"offers":[]}', 200);
         }),
       ),
     );
@@ -172,7 +173,7 @@ void main() {
           calls++;
           return calls == 1
               ? oldResponse.future
-              : http.Response('{"plans":[]}', 200);
+              : http.Response('{"plans":[],"offers":[]}', 200);
         }),
       ),
     );

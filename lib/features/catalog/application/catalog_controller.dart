@@ -6,6 +6,7 @@ import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/network/retry_after.dart';
 import '../data/catalog_repository.dart';
+import '../data/plan_catalog.dart';
 import '../data/subscription_plan.dart';
 
 enum CatalogStatus { idle, loading, ready, empty, failure }
@@ -18,6 +19,7 @@ class CatalogController extends ChangeNotifier {
   final DateTime Function() _now;
   CatalogStatus status = CatalogStatus.idle;
   List<SubscriptionPlan> plans = const [];
+  List<SubscriptionOffer> offers = const [];
   ApiFailure? failure;
   RequestCancellation? _pending;
   late final RetryTicker _cooldown = RetryTicker(
@@ -43,8 +45,9 @@ class CatalogController extends ChangeNotifier {
     try {
       final result = await _repository.load(request);
       if (_disposed || request.isCancelled) return;
-      plans = result;
-      status = plans.isEmpty ? CatalogStatus.empty : CatalogStatus.ready;
+      plans = result.plans;
+      offers = result.offers;
+      status = offers.isEmpty ? CatalogStatus.empty : CatalogStatus.ready;
     } on ApiFailure catch (error) {
       if (_disposed || request.isCancelled) return;
       failure = error;

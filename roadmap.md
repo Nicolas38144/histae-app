@@ -271,6 +271,12 @@ La valeur mobile `BILLING_ENABLED=stripe` était invalide ; elle est remise à `
 
 Achevé le 18 octobre : commandes du profil appelées depuis les vues, téléchargement des photos de stockage signé isolé et partagé (5 Mo, quinze secondes, sans Bearer/redirection/cache disque). 166 contrôles globaux, puis 39 ciblés sur les derniers changements dont un nouveau contrôle photo : **167 contrôles distincts réussis**, trois nouveaux seulement. Analyse stricte sans problème, formatage vérifié sur 143 fichiers et APK Android debug compilé. Quatre scénarios d'aperçu, 22 images simulées, planche d'ensemble et écrans représentatifs inspectés. Les essais API privée/fournisseurs sur téléphones et la compilation iOS restent ouverts ; L10 n'est pas déclaré terminé.
 
+Les trois cartes **Free**, **Premium Mensuel** et **Premium Annuel** sont raccordées à `offers` dans
+`GET /api/plans`, avec fonctionnalités via `plan_code` et `plans`. Prix, devise et essai viennent du serveur ;
+le bouton de chaque carte Premium conserve sa propre périodicité. L'annuel indique sa facturation en une
+fois. Les niveaux de droits restent Free/Premium. Déployer d'abord le backend qui expose `offers`, puis
+le dashboard et cette version mobile. L'activation Stripe et les essais fournisseur restent ouverts.
+
 ## 13. L10 — qualité et bêta
 
 - Vérifier accessibilité, grandes polices, textes longs, clavier et tailles d'écran.
