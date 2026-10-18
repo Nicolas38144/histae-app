@@ -105,18 +105,6 @@ class PlanCard extends StatelessWidget {
                   'Équivalent à environ ${strings.monthly((offer.priceCents / 12).round(), offer.currency)}.',
                 ),
               ],
-              if (offer.trialDays > 0) ...[
-                const SizedBox(height: 16),
-                Text(
-                  strings.trial(offer.trialDays),
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
-                const Text(
-                  'Selon votre éligibilité, confirmée lors de la souscription.',
-                ),
-              ],
               const Divider(height: 32),
               if (plan.weeklyIncludedCredits case final credits?)
                 detail(strings.weeklyCredits(credits)),

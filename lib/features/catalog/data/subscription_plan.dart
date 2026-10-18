@@ -28,7 +28,6 @@ class SubscriptionPlan {
     required this.monthlyPriceCents,
     required this.annualPriceCents,
     required this.currency,
-    required this.trialDays,
     required this.weeklyContinuationLimit,
     required this.weeklyIncludedCredits,
     required this.advertisingCreditStockLimit,
@@ -46,7 +45,6 @@ class SubscriptionPlan {
       monthlyPriceCents: _nonNegativeInt(json, 'monthly_price_cents'),
       annualPriceCents: _nonNegativeInt(json, 'annual_price_cents'),
       currency: _field<String>(json, 'currency'),
-      trialDays: _nonNegativeInt(json, 'trial_days'),
       weeklyContinuationLimit: _optionalInt(json, 'weekly_continuation_limit'),
       weeklyIncludedCredits: _optionalInt(json, 'weekly_included_credits'),
       advertisingCreditStockLimit: _nonNegativeInt(
@@ -66,7 +64,6 @@ class SubscriptionPlan {
   final int monthlyPriceCents;
   final int annualPriceCents;
   final String currency;
-  final int trialDays;
   // Rust omits these fields when None; other fields are required.
   final int? weeklyContinuationLimit;
   final int? weeklyIncludedCredits;

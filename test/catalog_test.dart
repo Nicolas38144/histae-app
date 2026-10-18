@@ -57,6 +57,27 @@ void main() {
       expect(() => catalog.offers.clear(), throwsUnsupportedError);
     },
   );
+  test(
+    'plans-only response is rejected without reconstructing offers or retrying',
+    () async {
+      var calls = 0;
+      final controller = CatalogController(
+        repository((_) async {
+          calls++;
+          return http.Response(
+            jsonEncode(catalogJson()..remove('offers')),
+            200,
+          );
+        }),
+      );
+      addTearDown(controller.dispose);
+      await controller.load();
+      expect(controller.status, CatalogStatus.failure);
+      expect(controller.offers, isEmpty);
+      expect(controller.failure?.kind, ApiFailureKind.invalidResponse);
+      expect(calls, 1);
+    },
+  );
   test('retains server changes without deriving quotas from a plan code', () {
     final json = (catalogJson()['plans'] as List).first as Map<String, dynamic>;
     json['weekly_included_credits'] = 2;

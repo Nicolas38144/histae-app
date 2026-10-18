@@ -74,7 +74,7 @@ Pour préparer le backend, suivre son [guide de développement](../histae-api-ru
 
 Les tests couvrent configuration, contrats du catalogue, codes d'erreur, absence de retry automatique, `Retry-After`, timeout/annulation HTTP, réponses tardives, navigation, cycle de vie, petit écran et texte à 200 %. Les contrôles d'accessibilité de l'accueil portent sur les cibles tactiles, libellés et contraste. Les prix de `test/fixtures/plans.json` sont illustratifs, réservés aux tests.
 
-L'appel réel vers `https://api.histae.com/api/plans` a répondu **HTTP 200** ; le client Dart de l'application a lu et décodé les deux formules avec `tool/check_catalog.dart`. L'intégration du catalogue est vérifiée depuis cet hôte, sans mutation ni compte. Les essais Android/iOS sur appareil, la compilation iOS et les fournisseurs restent non validés. Aucun service backend n'a été lancé ou modifié.
+Le contrôle réseau avec `tool/check_catalog.dart` doit être relancé après le déploiement du contrat courant (`plans` et `offers`). Les contrôles locaux utilisent des réponses simulées. Les essais Android/iOS sur appareil, la compilation iOS et les fournisseurs restent à valider ; aucun service backend n'a été lancé ou modifié depuis cet hôte.
 
 Contrôles exécutés : formatage, analyse Flutter sans problème, **54 tests réussis**, compilation Android debug. Pour relancer les contrôles et, séparément, le GET public volontaire :
 
@@ -193,16 +193,22 @@ Suite prévue après L8 : L9, livré ci-dessous. L'activation push et les essais
 
 Le catalogue public et l'écran d'abonnement affichent trois cartes : **Free**, **Premium Mensuel**
 et **Premium Annuel**. Le catalogue initial de l'API indique 0 EUR, 5 EUR/mois et 48 EUR/an. Les cartes
-lisent `offers` dans `GET /api/plans` pour le nom, le prix, la devise, l'essai et la périodicité ;
+lisent `offers` dans `GET /api/plans` pour le nom, le prix, la devise et la périodicité ;
 `plan_code` référence les fonctionnalités et quotas communs dans `plans`. Aucun tarif métier n'est
-ajouté en dur. Les deux offres Premium ont les mêmes droits et un essai soumis à éligibilité.
+ajouté en dur. Les deux offres Premium ont les mêmes droits et ne proposent aucune période d'essai.
 La facturation annuelle est présentée comme un paiement en une fois chaque année, avec son équivalent
 mensuel indicatif. Chaque bouton Premium prépare uniquement sa propre périodicité Checkout.
-Déployer l'API avec `offers` avant cette version mobile ; une réponse incomplète affiche une erreur
-réessayable. Les continuations et les droits conservent les niveaux `free`/`premium`, sans troisième rôle.
+Le contrat exige `plans` et `offers` ; une réponse sans `offers` est rejetée avec une erreur
+réessayable, sans reconstruire les cartes depuis `plans`. Une liste `offers` explicitement vide
+reste vide. Les continuations et les droits conservent les niveaux `free`/`premium`, sans troisième rôle.
 L'activation des paiements et les essais réels restent indépendants de cet affichage.
 
-L'écran **Mon abonnement et les formules**, depuis le profil, charge le catalogue public et la projection privée `/api/users/me/subscription`. Plan effectif, accès, essai, dates, impayé et résiliation viennent de l'API. Une notification de facturation ouvre désormais cette lecture authentifiée. Les tarifs, devise, essai et fonctionnalités affichés viennent du catalogue ; aucun prix ou identifiant Stripe métier n'est envoyé par le client.
+Le catalogue et les modèles clients ne contiennent plus de champ `trial_days`. Aucun essai n'est
+proposé dans les cartes ni à la création Checkout. Le statut fournisseur `trialing` reste reconnu
+dans les projections d'abonnement. Déployer ensemble l'API, le dashboard et la nouvelle compilation
+de l'app ; les anciennes réponses catalogue ne sont plus prises en charge.
+
+L'écran **Mon abonnement et les formules**, depuis le profil, charge le catalogue public et la projection privée `/api/users/me/subscription`. Plan effectif, accès, essai, dates, impayé et résiliation viennent de l'API. Une notification de facturation ouvre désormais cette lecture authentifiée. Les tarifs, devise et fonctionnalités affichés viennent du catalogue ; aucun prix ou identifiant Stripe métier n'est envoyé par le client.
 
 Choix utilisateur : **Android distribué hors Play Store avec Stripe**, paiements **désactivés** avant publication des pages de retour et validation de Stripe test sur téléphone. Le `.env` local contient :
 

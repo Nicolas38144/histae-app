@@ -115,7 +115,6 @@ class AppStrings {
   String monthly(int cents, String currency) =>
       '${money(cents, currency)} / mois';
   String annual(int cents, String currency) => '${money(cents, currency)} / an';
-  String trial(int days) => 'Période d’essai : $days jour(s)';
   String weeklyCredits(int credits) => 'Crédits inclus par semaine : $credits';
   String weeklyLimit(int limit) => 'Continuations par semaine : $limit maximum';
   String get noWeeklyLimit => 'Continuations sans plafond hebdomadaire';

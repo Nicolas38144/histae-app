@@ -105,7 +105,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
         content: SingleChildScrollView(
           child: Text(
             '$price\n\nAbonnement à renouvellement automatique. '
-            'La date et le montant du premier paiement, ainsi que votre éventuel essai, seront confirmés avant validation dans le navigateur. '
+            'Abonnement sans période d’essai. Le montant et la date du paiement seront confirmés avant validation dans le navigateur. '
             'Vous pourrez gérer la résiliation depuis votre abonnement. '
             'Les photos restent soumises à votre accord mutuel.',
           ),

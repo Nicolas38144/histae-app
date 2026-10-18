@@ -10,7 +10,6 @@ class SubscriptionOffer {
     required this.billingPeriod,
     required this.priceCents,
     required this.currency,
-    required this.trialDays,
   });
 
   factory SubscriptionOffer.fromJson(Object? value) {
@@ -42,13 +41,12 @@ class SubscriptionOffer {
           : BillingPeriod.values.byName(period as String),
       priceCents: nonNegative('price_cents'),
       currency: jsonString(json, 'currency'),
-      trialDays: nonNegative('trial_days'),
     );
   }
 
   final String code, planCode, displayName, currency;
   final BillingPeriod? billingPeriod;
-  final int priceCents, trialDays;
+  final int priceCents;
 }
 
 class PlanCatalog {

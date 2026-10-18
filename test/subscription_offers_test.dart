@@ -28,6 +28,27 @@ void main() {
     expect(catalog.offers[2].priceCents, 9876);
   });
 
+  test('rejects a plans-only response instead of reconstructing offers', () {
+    final json = catalogJson()..remove('offers');
+    expect(() => PlanCatalog.fromJson(json), throwsA(isA<ApiFailure>()));
+    json['plans'] = <dynamic>[];
+    expect(() => PlanCatalog.fromJson(json), throwsA(isA<ApiFailure>()));
+  });
+
+  test('explicitly empty offers stay empty without reconstructing them', () {
+    final explicit = catalogJson()..['offers'] = <dynamic>[];
+    expect(PlanCatalog.fromJson(explicit).offers, isEmpty);
+    explicit['plans'] = <dynamic>[];
+    expect(PlanCatalog.fromJson(explicit).offers, isEmpty);
+  });
+
+  for (final value in <Object?>[null, <String, Object?>{}, 'invalid']) {
+    test('rejects malformed offers: $value', () {
+      final json = catalogJson()..['offers'] = value;
+      expect(() => PlanCatalog.fromJson(json), throwsA(isA<ApiFailure>()));
+    });
+  }
+
   for (final invalid in [
     'missing_plan',
     'duplicate',
@@ -52,7 +73,7 @@ void main() {
     });
   }
 
-  testWidgets('each Premium card selects its own period and server price', (
+  testWidgets('each Premium card selects its period and server price', (
     tester,
   ) async {
     final repository = CatalogRepository(
@@ -87,6 +108,8 @@ void main() {
     expect(find.text('Free'), findsOneWidget);
     expect(find.text('Premium Mensuel'), findsOneWidget);
     expect(find.text('Premium Annuel'), findsOneWidget);
+    expect(find.textContaining('Période d’essai'), findsNothing);
+    expect(find.textContaining('éligibilité'), findsNothing);
     await tester.scrollUntilVisible(find.text('Choisir Premium Mensuel'), 250);
     await tester.tap(find.text('Choisir Premium Mensuel'));
     await tester.scrollUntilVisible(find.text('Choisir Premium Annuel'), 250);

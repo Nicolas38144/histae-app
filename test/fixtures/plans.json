@@ -6,7 +6,6 @@
       "monthly_price_cents": 0,
       "annual_price_cents": 0,
       "currency": "EUR",
-      "trial_days": 0,
       "weekly_continuation_limit": 6,
       "weekly_included_credits": 3,
       "advertising_credit_stock_limit": 3,
@@ -17,7 +16,9 @@
           "code": "messages",
           "display_name": "Messaging",
           "description": null,
-          "feature_value": {"enabled": true}
+          "feature_value": {
+            "enabled": true
+          }
         }
       ]
     },
@@ -27,7 +28,6 @@
       "monthly_price_cents": 1234,
       "annual_price_cents": 9876,
       "currency": "EUR",
-      "trial_days": 7,
       "advertising_credit_stock_limit": 3,
       "ads_removed": true,
       "rewarded_advertising_enabled": false,
@@ -42,8 +42,29 @@
     }
   ],
   "offers": [
-    {"code":"free","plan_code":"free","display_name":"Free","billing_period":null,"price_cents":0,"currency":"EUR","trial_days":0},
-    {"code":"premium_monthly","plan_code":"premium","display_name":"Premium Mensuel","billing_period":"monthly","price_cents":1234,"currency":"EUR","trial_days":7},
-    {"code":"premium_annual","plan_code":"premium","display_name":"Premium Annuel","billing_period":"annual","price_cents":9876,"currency":"EUR","trial_days":7}
+    {
+      "code": "free",
+      "plan_code": "free",
+      "display_name": "Free",
+      "billing_period": null,
+      "price_cents": 0,
+      "currency": "EUR"
+    },
+    {
+      "code": "premium_monthly",
+      "plan_code": "premium",
+      "display_name": "Premium Mensuel",
+      "billing_period": "monthly",
+      "price_cents": 1234,
+      "currency": "EUR"
+    },
+    {
+      "code": "premium_annual",
+      "plan_code": "premium",
+      "display_name": "Premium Annuel",
+      "billing_period": "annual",
+      "price_cents": 9876,
+      "currency": "EUR"
+    }
   ]
 }
