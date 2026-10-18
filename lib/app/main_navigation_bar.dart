@@ -33,74 +33,77 @@ class MainNavigationBar extends StatelessWidget {
         selected: Icons.person_rounded,
       ),
     ];
-    return SafeArea(
-      top: false,
-      minimum: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-      child: Material(
-        color: colors.surfaceContainer,
-        clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-          side: BorderSide(color: colors.outlineVariant),
-        ),
-        child: Row(
-          children: [
-            for (var index = 0; index < destinations.length; index++)
-              Expanded(
-                child: Semantics(
-                  button: true,
-                  selected: index == selectedIndex,
-                  child: InkWell(
-                    key: ValueKey('main-tab-${destinations[index].key}'),
-                    onTap: () => onSelected(index),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 4,
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 48,
-                            height: 30,
-                            decoration: BoxDecoration(
-                              color: index == selectedIndex
-                                  ? colors.primary.withValues(alpha: 0.12)
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(20),
+    return ColoredBox(
+      color: colors.surface,
+      child: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+        child: Material(
+          color: colors.surfaceContainer,
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+            side: BorderSide(color: colors.outlineVariant),
+          ),
+          child: Row(
+            children: [
+              for (var index = 0; index < destinations.length; index++)
+                Expanded(
+                  child: Semantics(
+                    button: true,
+                    selected: index == selectedIndex,
+                    child: InkWell(
+                      key: ValueKey('main-tab-${destinations[index].key}'),
+                      onTap: () => onSelected(index),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 4,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 48,
+                              height: 30,
+                              decoration: BoxDecoration(
+                                color: index == selectedIndex
+                                    ? colors.primary.withValues(alpha: 0.12)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Icon(
+                                index == selectedIndex
+                                    ? destinations[index].selected
+                                    : destinations[index].icon,
+                                size: 22,
+                                color: index == selectedIndex
+                                    ? colors.primary
+                                    : colors.onSurfaceVariant,
+                              ),
                             ),
-                            child: Icon(
-                              index == selectedIndex
-                                  ? destinations[index].selected
-                                  : destinations[index].icon,
-                              size: 22,
-                              color: index == selectedIndex
-                                  ? colors.primary
-                                  : colors.onSurfaceVariant,
+                            const SizedBox(height: 5),
+                            Text(
+                              destinations[index].label,
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.labelMedium
+                                  ?.copyWith(
+                                    color: index == selectedIndex
+                                        ? colors.primary
+                                        : colors.onSurfaceVariant,
+                                    fontWeight: index == selectedIndex
+                                        ? FontWeight.w700
+                                        : FontWeight.w500,
+                                  ),
                             ),
-                          ),
-                          const SizedBox(height: 5),
-                          Text(
-                            destinations[index].label,
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.labelMedium
-                                ?.copyWith(
-                                  color: index == selectedIndex
-                                      ? colors.primary
-                                      : colors.onSurfaceVariant,
-                                  fontWeight: index == selectedIndex
-                                      ? FontWeight.w700
-                                      : FontWeight.w500,
-                                ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );

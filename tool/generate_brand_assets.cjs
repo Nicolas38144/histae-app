@@ -23,7 +23,7 @@ async function png(svg, size, target) {
 async function main() {
   const symbol = await fs.readFile(path.join(source, 'symbole.svg'), 'utf8');
   const body = symbol.slice(symbol.indexOf('<g '), symbol.lastIndexOf('</svg>'));
-  const icon = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0D1421"/><g transform="translate(96 126.0625) scale(6.5)">${body}</g></svg>`;
+  const icon = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0D1421"/><g transform="translate(160 185.4375) scale(5.5)">${body}</g></svg>`;
   await write(path.join(brand, 'histae-logo.svg'), symbol);
   await write(path.join(brand, 'histae-icon.svg'), icon);
   await png(icon, 1024, path.join(brand, 'histae-icon.png'));

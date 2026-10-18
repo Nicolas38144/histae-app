@@ -49,6 +49,11 @@ void main() {
       (plans['plans'] as List).firstWhere(
         (p) => p['code'] == 'premium',
       )['annual_price_cents'] = 12345;
+      final annualOffer = (plans['offers'] as List).firstWhere(
+        (p) => p['billing_period'] == 'annual',
+      );
+      annualOffer['price_cents'] = 12345;
+      final annualChoice = 'Choisir ${annualOffer['display_name']}';
       final catalog = CatalogRepository(
         ApiClient(
           origin: Uri.parse('https://api.example'),
@@ -63,19 +68,16 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await tester.scrollUntilVisible(
-        find.text('Choisir le rythme annuel'),
-        250,
-      );
+      await tester.scrollUntilVisible(find.text(annualChoice), 250);
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Choisir le rythme annuel'));
+      await tester.tap(find.text(annualChoice));
       await tester.pumpAndSettle();
       expect(find.textContaining('123,45 EUR'), findsWidgets);
       expect(posts, 0);
       await tester.tap(find.text('Plus tard'));
       await tester.pumpAndSettle();
       expect(posts, 0);
-      await tester.tap(find.text('Choisir le rythme annuel'));
+      await tester.tap(find.text(annualChoice));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Continuer dans le navigateur'));
       await tester.pumpAndSettle();

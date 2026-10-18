@@ -1,6 +1,6 @@
 # Histae App — roadmap de développement
 
-Mise à jour : 18 octobre 2026.
+Mise à jour : 19 octobre 2026.
 
 Recherche de logo : les cinq pistes SVG initiales sont conservées dans [pictures/logos/nouvelle-da](pictures/logos/nouvelle-da/README.md), avec variantes et planche comparative. Le choix se poursuit sur la direction des pages. Cette livraison graphique ne modifie pas l'avancement des lots fonctionnels.
 
@@ -10,7 +10,7 @@ La direction **02 — Les pages** est retenue ; quatre [variantes typographiques
 
 ## 1. État de départ et suivi
 
-L1 à L5, le cœur de L6, L7 et la gestion des appareils L8 sont implémentés. Les flux push L8 sont préparés mais désactivés, sans projet Firebase, conformément au choix utilisateur. L7 couvre sûreté, sessions, droits, export et suppression. Contrôles privés simulés uniquement ; comptes et appareils réels restent à valider. Vidéos désactivées, dépendance Google présente mais intégration native/UMP et fournisseur ouverts. IDs Android dans `.env`, iOS vides. L9 ajoute le suivi de l’abonnement et prépare Checkout/portail ; ventes désactivées en attendant Stripe test et les retours HTTPS. L10 reste à construire. DA en mode nuit ; aucun fichier modèle `.env` ne doit être recréé.
+L1 à L5, le cœur de L6, L7 et la gestion des appareils L8 sont implémentés. Les flux push L8 sont préparés mais désactivés, sans projet Firebase, conformément au choix utilisateur. L7 couvre sûreté, sessions, droits, export et suppression. Contrôles privés simulés uniquement ; comptes et appareils réels restent à valider. Vidéos désactivées, dépendance Google présente mais intégration native/UMP et fournisseur ouverts. IDs Android dans `.env`, iOS vides. L9 fournit le suivi de l’abonnement et Checkout/portail ; paiements activés localement le 19 octobre sur demande pour Android externe, essais réels encore ouverts. L10 reste à construire. DA en mode nuit ; aucun fichier modèle `.env` ne doit être recréé.
 
 Cette roadmap couvre toutes les capacités utilisateur de l'API actuelle. Elle exclut l'administration, les webhooks fournisseur, la supervision et les opérations internes. Elle ne dépend pas des anciens dépôts NestJS ou d'un endpoint OpenAPI.
 
@@ -344,8 +344,8 @@ Chemins complets, préfixe `/api` inclus. Les 56 routes restent suivies : catalo
 | GET | `/api/users/me/events` | L5 | SSE authentifié | Implémenté ; Bearer/refresh/connexion unique contrôlés ; réseau/appareils à valider |
 | GET | `/api/plans` | L1, L6, L9 | Catalogue, tarifs et disponibilité publicitaire | Intégré API L1 ; lecture L6 branchée, vidéos maintenues désactivées ; affichage L9 branché ; appareils en attente |
 | GET | `/api/users/me/subscription` | L9 | Abonnement et droits effectifs | Implémenté ; accès/dates/états contrôlés côté client ; compte et appareil réels à valider |
-| POST | `/api/users/me/subscription/checkout` | L9 | Achat hébergé si distribution compatible | Préparé ; intention durable, reprise et navigation contrôlées ; désactivé, Stripe test/retours HTTPS en attente |
-| POST | `/api/users/me/subscription/portal` | L9 | Gestion de l'abonnement | Préparé ; disponibilité serveur et navigateur contrôlés ; désactivé, fournisseur/retours en attente |
+| POST | `/api/users/me/subscription/checkout` | L9 | Achat hébergé si distribution compatible | Implémenté ; intention durable, reprise et navigation contrôlées ; activé dans la configuration mobile locale Android externe, achat réel non validé |
+| POST | `/api/users/me/subscription/portal` | L9 | Gestion de l'abonnement | Implémenté ; disponibilité serveur et navigateur contrôlés ; activé localement sur Android externe si le serveur le permet, gestion réelle à valider |
 | GET | `/api/users/me/blocks` | L7 | Comptes bloqués | Implémenté ; liste sans photo ; réel à valider |
 | POST | `/api/users/me/blocks/:userId` | L4, L7 | Bloquer un compte depuis feed ou reçu | Implémenté L4 ; confirmation et reprise ciblées ; réel à valider |
 | DELETE | `/api/users/me/blocks/:userId` | L7 | Débloquer un compte | Implémenté ; relecture, sans restauration ; réel à valider |
@@ -384,3 +384,12 @@ Après chaque intervention, mettre à jour ce suivi et le résumé, expliquer le
 Logo original **02 / Les pages** appliqué : le livre est le symbole autonome, le nom est facultatif. Site : en-tête/pied de page, favicon et manifeste ; app : signature des en-têtes, icônes Android et iOS. Android dispose de calques adaptatifs et monochrome. Ouverture H. → Histae. avec livre et fondu, en parallèle de la restauration, sans rejeu au retour d'arrière-plan et avec prise en compte de la réduction des animations.
 
 Vérifications : analyse Flutter, 21 contrôles ciblés (trois nouveaux), aperçu animé issu des images Flutter et APK debug ; types/lint/build/export du site et revue ordinateur/petit écran. Le site reste localement modifié. L10 reste ouvert : essais du démarrage à froid et des masques d'icônes sur appareils, compilation iOS sur Mac, puis qualité bêta. Aucun appel privé réel ni changement d'API.
+
+## 17. Accès Premium/vidéos et ajustements mobiles — 19 octobre 2026
+
+- Raccourcis sur feed/profil vers les parcours existants. Une lecture de vidéo reste indisponible tant que le SDK AdMob et UMP ne sont pas raccordés. Aucun crédit accordé localement.
+- `BILLING_ENABLED=true` dans le seul `.env` mobile local, à la demande explicite de l’utilisateur. Android externe uniquement, avec les garde-fous de confirmation et de lecture des droits serveur ; iOS inchangé. Une nouvelle compilation est fournie.
+- Fond bleu nuit uniforme sous la navigation et style système racine ; icône native réduite, sources SVG et PNG régénérés.
+- API inspectée sans modification : configuration locale Stripe live/AdMob complète et cohérente avec le mobile ; catalogue public avec publicité activée pour Free ; trois retours HTTPS accessibles. Consoles fournisseur, webhooks et transaction de bout en bout non validés.
+
+16 contrôles ciblés réussis, dont un nouveau pour les raccourcis ; analyse et APK Android debug vérifiés, six aperçus manuels dont petit écran à 200 %. Aucun achat/SMS/visionnage réel. Prochaines étapes : raccordement SDK AdMob/UMP, validation fournisseur puis L10 sur appareils. Les mentions de désactivation des paiements dans les comptes rendus historiques décrivent leur état avant cette activation.

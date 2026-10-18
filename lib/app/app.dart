@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '../core/l10n/app_strings.dart';
@@ -127,14 +128,17 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
     locale: const Locale('fr'),
     supportedLocales: const [Locale('fr')],
     localizationsDelegates: GlobalMaterialLocalizations.delegates,
-    builder: (context, child) => AppOpening(
-      child: BillingScope(
-        controller: widget.billingController,
-        child: PushScope(
-          controller: widget.pushController,
-          child: NotificationOverlay(
+    builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
+      value: Theme.of(context).appBarTheme.systemOverlayStyle!,
+      child: AppOpening(
+        child: BillingScope(
+          controller: widget.billingController,
+          child: PushScope(
             controller: widget.pushController,
-            child: child!,
+            child: NotificationOverlay(
+              controller: widget.pushController,
+              child: child!,
+            ),
           ),
         ),
       ),

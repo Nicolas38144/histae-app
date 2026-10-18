@@ -63,3 +63,13 @@ L'ouverture Flutter dure **1 480 ms** : une courte tenue de **H.**, une séparat
 Validation : **21 contrôles ciblés**, dont trois nouveaux sur l'ouverture (contenu vivant et interactions, réduction des animations, cycle de vie), analyse Flutter sans problème, APK Android debug compilé et présence des assets dans l'APK vérifiée. Dimensions et absence d'alpha des icônes iOS contrôlées. Site : types, lint et compilation/export validés ; rendu sur ordinateur et petit écran revu. Les essais natifs Android/iOS, notamment le masque d'icône et le démarrage à froid, restent à effectuer sur appareil. Le site a été modifié localement, sans déploiement.
 
 Références : [icônes adaptatives Android](https://developer.android.com/develop/ui/compose/system/icon_design_adaptive), [préférence Flutter de réduction des animations](https://api.flutter.dev/flutter/widgets/MediaQueryData/disableAnimations.html).
+
+## Ajustements mobiles du 19 octobre
+
+`MainNavigationBar` peint maintenant une surface bleu nuit autour de la barre, y compris l’inset de sécurité inférieur. Une annotation racine reprend les styles système du thème ; la ligne de séparation native est transparente et le contraste automatique de la barre Android est désactivé pour éviter un voile ajouté sur le fond. Le rendu edge-to-edge reste pris en charge, sans revenir à un ancien mode Android.
+
+Les deux raccourcis Premium/Vidéos utilisent les composants existants, avec icônes et libellés. À grande taille de texte, ils occupent deux lignes complètes pour conserver les mots entiers. Le contenu du feed garde son propre défilement.
+
+L’icône Android adaptative garde la même géométrie et les mêmes couleurs ; son échelle passe de 0,65 à 0,52, recentrée dans le calque de 108 dp. La largeur visible est d’environ 52 dp. Les exports PNG natifs passent d’une échelle SVG de 6,5 à 5,5 sur 1 024 px. Les en-têtes, l’animation d’ouverture et le site ne changent pas de proportions.
+
+Vérification visuelle : six captures dans `build/previews/benefits`, dont les marges système 24/34 px et 320 × 568 à 200 %. [Comportement edge-to-edge Flutter](https://docs.flutter.dev/release/breaking-changes/default-systemuimode-edge-to-edge).

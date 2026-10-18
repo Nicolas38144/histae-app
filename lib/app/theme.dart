@@ -100,6 +100,8 @@ ThemeData histaeTheme(Brightness brightness) {
         statusBarIconBrightness: dark ? Brightness.light : Brightness.dark,
         statusBarBrightness: brightness,
         systemNavigationBarColor: colors.surface,
+        systemNavigationBarDividerColor: Colors.transparent,
+        systemNavigationBarContrastEnforced: false,
         systemNavigationBarIconBrightness: dark
             ? Brightness.light
             : Brightness.dark,

@@ -64,6 +64,11 @@ class SubscriptionPlans extends StatelessWidget {
                     onPressed: canAct ? () => onChoose(offer) : null,
                     child: Text('Choisir ${offer.displayName}'),
                   )
+                : offer.billingPeriod != null && !paymentsAvailable
+                ? const OutlinedButton(
+                    onPressed: null,
+                    child: Text('Paiement indisponible'),
+                  )
                 : null,
           ),
       ],

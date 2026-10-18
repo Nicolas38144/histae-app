@@ -275,3 +275,11 @@ L10 reste à construire ; L9 attend Stripe test et les retours HTTPS pour active
 Le 18 octobre 2026, application du livre ouvert original **02 / Les pages** : logo autonome ; nom Histae en accompagnement facultatif. Les en-têtes mobiles et ceux du site, son pied de page et ses icônes utilisent cette identité. Les icônes Android/iOS affichent uniquement le livre, avec calques adaptatifs et monochrome sur Android. Les anciennes recherches sont conservées.
 
 Ouverture de 1,48 s : H. collés, écartement et révélation de istae, livre au-dessus, puis fondu. Elle laisse la restauration et la navigation vivantes, ignore la présentation si les animations sont désactivées et ne se rejoue pas au retour d'arrière-plan. 21 contrôles ciblés, analyse et APK Android vérifiés ; export et contrôles du site réussis. Icônes iOS générées, compilation/essais natifs sur Mac encore à faire. Aucun déploiement du site ni activation fournisseur. Prochain lot : L10.
+
+## 19. Ajustements et activation Stripe — 19 octobre 2026
+
+Boutons Premium et Vidéos ajoutés sur feed/profil, navigation suspendant la découverte et protégée par la session. Fond de navigation coloré jusque sous l’inset et style système racine. Icône Android adaptative réduite de 20 % ; PNG Android/iOS réduits d’environ 15 %. Logo accompagnant le nom conservé.
+
+L’utilisateur a demandé `BILLING_ENABLED=true` : activation dans le `.env` mobile local pour Android externe avec les URL HTTPS déjà présentes, sans clé secrète côté client. La configuration API locale contient les paramètres requis, dont une clé Stripe live et les deux blocs AdMob ; les blocs et retours correspondent à l’app. Le catalogue en ligne confirme les vidéos pour Free et les retours Stripe répondent 200. Aucun changement de code/configuration de l’API. Aucune transaction réelle ni livraison de webhook vérifiée. Le blocage vidéo identifié se situe dans l’app : raccordement natif/SDK/UMP encore à construire ; bouton de lecture visible et désactivé en attendant.
+
+16 contrôles ciblés et un nouveau parcours de navigation, analyse et APK debug ; six aperçus simulés dont texte à 200 % avec insets système. L10 et les essais fournisseur restent ouverts. Les anciennes mentions de paiements désactivés sont historiques.

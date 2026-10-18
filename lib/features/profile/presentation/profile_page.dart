@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/widgets/account_benefits_actions.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../billing/presentation/billing_scope.dart';
@@ -61,6 +62,15 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
     await Navigator.of(context)
         .push(MaterialPageRoute<void>(builder: (_) => page));
     if (mounted) unawaited(controller.load());
+  }
+
+  void _openSubscription() {
+    final billing = BillingScope.maybeOf(context);
+    _open(
+      billing == null
+          ? CatalogPage(repository: widget.catalog)
+          : SubscriptionPage(controller: billing, catalog: widget.catalog),
+    );
   }
 
   @override
@@ -130,6 +140,12 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
             child: ListView(
               padding: const EdgeInsets.all(24),
               children: [
+                AccountBenefitsActions(
+                  onPremium: _openSubscription,
+                  onVideos: () =>
+                      _open(CreditsPage(controller: widget.continuation)),
+                ),
+                const SizedBox(height: 24),
                 EditorialCard(
                   eyebrow: 'VOTRE PROFIL',
                   title: p == null
@@ -263,17 +279,7 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                   label: const Text('Appareils et notifications'),
                 ),
                 OutlinedButton(
-                  onPressed: () {
-                    final billing = BillingScope.maybeOf(context);
-                    _open(
-                      billing == null
-                          ? CatalogPage(repository: widget.catalog)
-                          : SubscriptionPage(
-                              controller: billing,
-                              catalog: widget.catalog,
-                            ),
-                    );
-                  },
+                  onPressed: _openSubscription,
                   child: const Text('Mon abonnement et les formules'),
                 ),
                 TextButton(
