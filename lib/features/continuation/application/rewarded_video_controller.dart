@@ -157,6 +157,9 @@ class RewardedVideoController extends ChangeNotifier {
       if (_alive(epoch)) {
         message = switch (e.reason) {
           VideoFailure.consent => 'Vos préférences publicitaires n’ont pas pu être vérifiées. Réessayez ou consultez vos choix de confidentialité.',
+          VideoFailure.consentConfiguration => 'Le formulaire de confidentialité des vidéos n’est pas encore disponible. Vos crédits gratuits restent accessibles.',
+          VideoFailure.consentNetwork => 'Les préférences publicitaires n’ont pas pu être chargées. Vérifiez votre connexion puis réessayez.',
+          VideoFailure.consentTimeout => 'Le chargement des préférences publicitaires prend trop de temps. Réessayez dans un instant.',
           VideoFailure.noFill => 'Aucune vidéo disponible pour le moment. Réessayez un peu plus tard.',
           VideoFailure.network =>
             'La vidéo n’a pas pu être chargée. Vérifiez votre connexion.',

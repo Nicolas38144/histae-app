@@ -408,3 +408,12 @@ Vérifications : 22 contrôles ciblés, deux scénarios d’accès Free/Premium 
 Refonte complète de Vos crédits, avec soldes gratuits/vidéos distincts, plafond de semaine, explications repliables et états indisponibles sans faux chiffres. Raccordement du SDK existant : injection des IDs natifs depuis `.env`, UMP avant requête publicitaire, bloc et `custom_data` fournis par l’intention API, annulation des tentatives sans visionnage, suivi exclusivement serveur et reprise après récompense créditée. Free uniquement, sous éligibilité du catalogue et réserve non pleine. Choix publicitaires accessibles également depuis Vie privée.
 
 19 contrôles ciblés réussis, analyse et APK Android debug, aperçus de six états dont texte à 200 %. Le catalogue public autorise Free. Aucun changement backend, paiement, SMS ou publicité réelle. Restent pour L10 : diffusion et validation SSV sur appareil de test, vérification des réglages UMP/SSV de la console AdMob, build iOS sur Mac et essais natifs. Cette section remplace les précédentes mentions de lecteur SDK désactivé.
+
+
+## 20. Gestion du profil et consentements explicites — 19 octobre 2026
+
+Refonte du profil et des réponses : aperçu ordonné/modération, cartes de détail, sélecteur de questions recherchable, limite de trois, réorganisation et retrait, enregistrement fixe et remplacement confirmé. Consentements modifiables montrés en premier avec retrait explicite ; documents nécessaires et limites du contrat expliqués.
+
+Blocage vidéo identifié dans les journaux réels : aucun formulaire UMP pour l’ID actuel. Publier et associer le message Réglementations européennes dans AdMob ; aucune modification API. Erreurs UMP classées et récupération sur accord antérieur uniquement si le SDK l’autorise. Cycle de vie du quota préservé sous les routes natives depuis Profil et Matchs.
+
+25 contrôles ciblés, analyse propre, 12 captures manuelles dont 200 %/clavier, APK Android debug. Aucun changement backend, formulaire de console publié automatiquement ou nouvelle publicité réelle. L10 garde la validation de diffusion et SSV après configuration AdMob, puis les essais iOS sur Mac.

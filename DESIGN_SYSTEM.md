@@ -86,3 +86,12 @@ Les compteurs passent sur deux lignes distinctes avec de grandes polices, en gar
 L’écran présente une carte principale teintée de lavande : disponible réel en grand, puis deux sous-cartes Gratuits/Vidéos (réservations exclues). La progression hebdomadaire reste distincte du solde. La carte vidéo emploie le corail, annonce la récompense et une action en dégradé ; elle affiche les états d’attente, de réserve pleine et d’erreur dans son contexte. Les détails et règles sont repliables. Premium propose un panneau sans publicité. Les valeurs inconnues restent inconnues et une relecture échouée masque l’ancien solde. Les cartes s’empilent en grande police et conservent un défilement complet.
 
 Aperçus réels Flutter avec polices et fournisseur simulé : `build/previews/credits`, six états à 390 × 844 et 320 × 568 à 200 %. Planche : `pictures/branding/vos-credits-refonte.png`.
+
+
+## Espace profil et réponses
+
+La présentation et les débuts de conversation possèdent des panneaux de lecture, avec les réponses ordonnées et leur état de validation. Les détails de rencontre utilisent des cartes plus compactes ; les traits sont visibles en pastilles. L’accès Premium/Mon abonnement reste unique dans le profil et le feed reste dégagé.
+
+L’éditeur distingue chaque réponse par son numéro et sa question, avec compteur, déplacement et retrait. Les nouvelles questions se choisissent dans une feuille avec recherche, sans répéter celles déjà sélectionnées. L’action d’enregistrement reste au bas de l’écran, avec défilement indépendant des cartes. À grande police, le titre de la feuille devient plus compact et les libellés d’action gardent leurs mots entiers.
+
+Les consentements modifiables sont montrés avant les documents nécessaires dans l’espace de gestion. Le libellé **Retirer mon consentement** rend l’action explicite, et l’absence de retrait des documents nécessaires est expliquée. Aperçus avec les polices réelles dans `build/previews/profile` (12 captures, dont 320 × 568 à 200 % et clavier).

@@ -51,6 +51,7 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
     List<Widget> children, {
     VoidCallback? save,
     String saveLabel = 'Enregistrer',
+    bool saveInFooter = false,
   }) => ListenableBuilder(
     listenable: controller,
     builder: (context, _) {
@@ -78,6 +79,25 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
         },
         child: HistaeScaffold(
           appBar: AppBar(title: Text(title)),
+          bottomNavigationBar: saveInFooter && save != null
+              ? DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    border: Border(
+                      top: BorderSide(
+                        color: Theme.of(context).colorScheme.outlineVariant,
+                      ),
+                    ),
+                  ),
+                  child: SafeArea(
+                    top: false,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+                      child: _saveButton(save, saveLabel),
+                    ),
+                  ),
+                )
+              : null,
           body: SafeArea(
             child: ListView(
               padding: const EdgeInsets.all(24),
@@ -107,21 +127,21 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
                     child: const Text('Relire les données serveur'),
                   ),
                 const SizedBox(height: 24),
-                if (save != null)
-                  HistaeButton(
-                    onPressed: busy || !controller.canWrite ? null : save,
-                    child: Text(
-                      controller.retrySeconds > 0
-                          ? 'Réessayez dans ${controller.retrySeconds} s'
-                          : saveLabel,
-                    ),
-                  ),
+                if (save != null && !saveInFooter) _saveButton(save, saveLabel),
               ],
             ),
           ),
         ),
       );
     },
+  );
+  Widget _saveButton(VoidCallback save, String label) => HistaeButton(
+    onPressed: busy || !controller.canWrite ? null : save,
+    child: Text(
+      controller.retrySeconds > 0
+          ? 'Réessayez dans ${controller.retrySeconds} s'
+          : label,
+    ),
   );
   Widget field(
     TextEditingController text,

@@ -31,10 +31,21 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(home: ConsentsPage(session: session)),
       );
-      await tester.scrollUntilVisible(find.text('Retirer mon accord'), 200);
-      await tester.ensureVisible(find.text('Retirer mon accord'));
+      expect(
+        find.byKey(const Key('withdraw-terms_of_service_acceptance')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const Key('withdraw-privacy_notice_acknowledgement')),
+        findsNothing,
+      );
+      await tester.scrollUntilVisible(
+        find.text('Retirer mon consentement'),
+        200,
+      );
+      await tester.ensureVisible(find.text('Retirer mon consentement'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Retirer mon accord'));
+      await tester.tap(find.text('Retirer mon consentement'));
       await tester.pumpAndSettle();
       expect(find.text('Confirmer le retrait'), findsOneWidget);
       await tester.tap(find.text('Annuler'));
@@ -216,7 +227,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(home: ConsentsPage(session: session)),
       );
-      await revealAndTap(tester, find.text('Retirer mon accord'));
+      await revealAndTap(tester, find.text('Retirer mon consentement'));
       expect(
         find.textContaining('efface votre sexe et vos préférences'),
         findsOneWidget,
@@ -224,7 +235,7 @@ void main() {
       await tester.tap(find.text('Annuler'));
       await tester.pumpAndSettle();
       expect(puts, 0);
-      await revealAndTap(tester, find.text('Retirer mon accord'));
+      await revealAndTap(tester, find.text('Retirer mon consentement'));
       await tester.tap(find.text('Confirmer le retrait'));
       await tester.pumpAndSettle();
       expect(puts, 1);

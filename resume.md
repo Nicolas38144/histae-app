@@ -300,3 +300,14 @@ Le 19 octobre 2026 : refonte de Vos crédits autour du solde réellement disponi
 AdMob/UMP est maintenant raccordé : IDs natifs du `.env`, consentement publicitaire distinct, requête explicite, `ad_unit`/`custom_data` de l’intention, aucun identifiant utilisateur persistant. SDK sans pouvoir de crédit : seule la réponse serveur `credited` déclenche la relecture. Nettoyage des tentatives non visionnées, pas d’annulation implicite d’une vidéo terminée ou incertaine, callbacks tardifs ignorés après déconnexion. Le cycle de vie des surcouches natives ne suspend plus le suivi via le MatchesPage sous-jacent.
 
 19 contrôles ciblés, analyse et APK Android debug ; six états visuels inspectés, dont grande police. Aucun appel publicitaire réel ni modification backend. Consoles UMP/SSV et diffusion réelle à vérifier sur appareil de test ; compilation/essais iOS restent à faire sur Mac. Aucun fichier supprimé ni commande Git exécutée.
+
+
+## 22. Profil, réponses et retrait des consentements
+
+Le 19 octobre 2026, refonte de Votre espace Histae et de l’éditeur des réponses. Aperçu des textes/modérations, recherche des questions, exclusion des doublons, ordre et retrait, limite de trois, compteur et pied d’enregistrement. Remplacement complet toujours confirmé et brouillon sans mutation implicite.
+
+Le retrait existait sous Retirer mon accord ; son libellé est maintenant Retirer mon consentement. Pour un compte à jour, les choix sensibles/localisation apparaissent avant les documents nécessaires. CGU et notice sans retrait selon le contrat API, avec explication et accès à la gestion du compte.
+
+Journaux UMP lus sur l’émulateur : `no form(s) configured for the input app ID`, avec ID correspondant au `.env`. Réponse à la question utilisateur : aucune modification API pour Réglementations européennes ; créer/associer/publier le message dans AdMob avec la politique de confidentialité. Erreurs d’app plus précises, reprise sur consentement antérieur uniquement si `canRequestAds` le permet, quota préservé pendant les surcouches natives depuis Profil aussi. Aucun identifiant réel copié dans les documents.
+
+25 contrôles ciblés, analyse sans problème, 12 captures dont grandes polices/clavier et APK Android debug. Aucun appel publicitaire nouveau ou changement backend ; publication du message AdMob et validation réelle SSV restent à effectuer. Aucun fichier supprimé ou commande Git exécutée.

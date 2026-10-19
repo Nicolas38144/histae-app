@@ -6,7 +6,17 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../../../core/config/app_config.dart';
 import 'continuation_models.dart';
 
-enum VideoFailure { consent, noFill, network, load, show, expired }
+enum VideoFailure {
+  consent,
+  consentConfiguration,
+  consentNetwork,
+  consentTimeout,
+  noFill,
+  network,
+  load,
+  show,
+  expired,
+}
 
 class RewardedVideoException implements Exception {
   const RewardedVideoException(this.reason);
@@ -62,18 +72,31 @@ class AdmobRewardedVideoGateway implements RewardedVideoGateway {
     _consentChecked = false;
     // Refresh UMP on each explicit watch request, before any advertising request.
     // Histae's own consent records do not replace Google's privacy choices.
-    final updated = Completer<bool>();
+    final updated = Completer<FormError?>();
     ConsentInformation.instance.requestConsentInfoUpdate(
       ConsentRequestParameters(),
-      () => updated.complete(true),
-      (_) => updated.complete(false),
+      () => updated.complete(null),
+      updated.complete,
     );
-    final success = await updated.future.timeout(
+    final updateError = await updated.future.timeout(
       const Duration(seconds: 20),
-      onTimeout: () => false,
+      onTimeout: () =>
+          FormError(errorCode: -1, message: 'Consent update timed out'),
     );
     if (!isCurrent()) return;
-    if (!success) throw const RewardedVideoException(VideoFailure.consent);
+    if (updateError != null) {
+      // Google allows reuse only when UMP itself reports canRequestAds. Never
+      // infer consent from our own cache or bypass a publisher configuration error.
+      if (!await ConsentInformation.instance.canRequestAds()) {
+        throw _consentFailure(updateError);
+      }
+      privacyOptionsRequired =
+          await ConsentInformation.instance
+              .getPrivacyOptionsRequirementStatus() ==
+          PrivacyOptionsRequirementStatus.required;
+      _consentChecked = isCurrent();
+      return;
+    }
     privacyOptionsRequired =
         await ConsentInformation.instance
             .getPrivacyOptionsRequirementStatus() ==
@@ -82,8 +105,8 @@ class AdmobRewardedVideoGateway implements RewardedVideoGateway {
     FormError? formError;
     await ConsentForm.loadAndShowConsentFormIfRequired((e) => formError = e);
     if (!isCurrent()) return;
-    if (formError != null ||
-        !await ConsentInformation.instance.canRequestAds()) {
+    if (formError != null) throw _consentFailure(formError!);
+    if (!await ConsentInformation.instance.canRequestAds()) {
       throw const RewardedVideoException(VideoFailure.consent);
     }
     _consentChecked = isCurrent();
@@ -94,7 +117,37 @@ class AdmobRewardedVideoGateway implements RewardedVideoGateway {
     _consentChecked = false;
     FormError? error;
     await ConsentForm.showPrivacyOptionsForm((e) => error = e);
-    if (error != null) throw const RewardedVideoException(VideoFailure.consent);
+    if (error != null) throw _consentFailure(error!);
+  }
+
+  RewardedVideoException _consentFailure(FormError error) {
+    final text = error.message.toLowerCase();
+    // Error codes differ across Android and iOS. Keep provider details out of
+    // product copy and logs: messages may contain application/device IDs.
+    final configuration =
+        text.contains('misconfiguration') ||
+        text.contains('no form(s) configured') ||
+        text.contains('invalid app id') ||
+        (platform == 'ios' && [2, 4].contains(error.errorCode));
+    final network = platform == 'ios'
+        ? error.errorCode == 3
+        : error.errorCode == 2;
+    final timeout =
+        error.errorCode == -1 ||
+        (platform == 'ios' ? error.errorCode == 8 : error.errorCode == 4);
+    final reason = configuration
+        ? VideoFailure.consentConfiguration
+        : timeout
+        ? VideoFailure.consentTimeout
+        : network
+        ? VideoFailure.consentNetwork
+        : VideoFailure.consent;
+    if (kDebugMode) {
+      debugPrint(
+        'Rewarded video privacy: ${reason.name} (code ${error.errorCode}).',
+      );
+    }
+    return RewardedVideoException(reason);
   }
 
   Future<void> _initialize() async {

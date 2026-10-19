@@ -233,63 +233,74 @@ void main() {
     expect(gateway.video.disposals, 1);
   });
 
-  testWidgets(
-    'native overlay lifecycle preserves verification through the Matches route',
-    (tester) async {
-      final session = testSession((r) async {
-        if (r.url.path.endsWith('/advertising-rewards') ||
-            r.url.path.endsWith('/$rewardId')) {
-          return jsonResponse(rewardJson());
+  for (final entry in ['matches', 'profile']) {
+    testWidgets(
+      'native overlay lifecycle preserves verification through the $entry route',
+      (tester) async {
+        final session = testSession((r) async {
+          if (r.url.path.endsWith('/advertising-rewards') ||
+              r.url.path.endsWith('/$rewardId')) {
+            return jsonResponse(rewardJson());
+          }
+          return r.url.path == '/api/plans'
+              ? jsonResponse(rewardedCatalogJson())
+              : defaultContinuationResponse(r);
+        });
+        await session.establish(testTokens);
+        final gateway = FakeRewardedVideoGateway();
+        gateway.video.showGate = Completer<bool>();
+        await tester.pumpWidget(
+          HistaeApp(sessionController: session, rewardedVideoGateway: gateway),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(Key('main-tab-$entry')));
+        await tester.pumpAndSettle();
+        final openCredits = entry == 'matches'
+            ? find.byKey(const Key('open-videos'))
+            : find.text('Mes crédits de continuation');
+        await tester.scrollUntilVisible(openCredits, 200);
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(openCredits);
+        await tester.pumpAndSettle();
+        await tester.tap(openCredits);
+        await tester.pumpAndSettle();
+        await tester.scrollUntilVisible(
+          find.byKey(const Key('watch-rewarded-video')),
+          200,
+        );
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(
+          find.byKey(const Key('watch-rewarded-video')),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const Key('watch-rewarded-video')));
+        for (var n = 0; n < 20 && gateway.video.shows == 0; n++) {
+          await tester.pump(const Duration(milliseconds: 50));
         }
-        return r.url.path == '/api/plans'
-            ? jsonResponse(rewardedCatalogJson())
-            : defaultContinuationResponse(r);
-      });
-      await session.establish(testTokens);
-      final gateway = FakeRewardedVideoGateway();
-      gateway.video.showGate = Completer<bool>();
-      await tester.pumpWidget(
-        HistaeApp(sessionController: session, rewardedVideoGateway: gateway),
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('main-tab-matches')));
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('open-videos')));
-      await tester.pumpAndSettle();
-      await tester.scrollUntilVisible(
-        find.byKey(const Key('watch-rewarded-video')),
-        200,
-      );
-      await tester.pumpAndSettle();
-      await tester.ensureVisible(find.byKey(const Key('watch-rewarded-video')));
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('watch-rewarded-video')));
-      for (var n = 0; n < 20 && gateway.video.shows == 0; n++) {
-        await tester.pump(const Duration(milliseconds: 50));
-      }
-      expect(gateway.video.shows, 1);
-      final binding = tester.binding;
-      for (final state in [
-        AppLifecycleState.inactive,
-        AppLifecycleState.hidden,
-        AppLifecycleState.paused,
-        AppLifecycleState.hidden,
-        AppLifecycleState.inactive,
-        AppLifecycleState.resumed,
-      ]) {
-        binding.handleAppLifecycleStateChanged(state);
-        await tester.pump();
-      }
-      gateway.video.showGate!.complete(true);
-      await tester.pumpAndSettle();
-      expect(
-        find.text(
-          'Vidéo terminée. Votre récompense est en cours de validation.',
-        ),
-        findsOneWidget,
-      );
-      expect(tester.takeException(), isNull);
-      await tester.pumpWidget(const SizedBox.shrink());
-    },
-  );
+        expect(gateway.video.shows, 1);
+        final binding = tester.binding;
+        for (final state in [
+          AppLifecycleState.inactive,
+          AppLifecycleState.hidden,
+          AppLifecycleState.paused,
+          AppLifecycleState.hidden,
+          AppLifecycleState.inactive,
+          AppLifecycleState.resumed,
+        ]) {
+          binding.handleAppLifecycleStateChanged(state);
+          await tester.pump();
+        }
+        gateway.video.showGate!.complete(true);
+        await tester.pumpAndSettle();
+        expect(
+          find.text(
+            'Vidéo terminée. Votre récompense est en cours de validation.',
+          ),
+          findsOneWidget,
+        );
+        expect(tester.takeException(), isNull);
+        await tester.pumpWidget(const SizedBox.shrink());
+      },
+    );
+  }
 }

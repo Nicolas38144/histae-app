@@ -112,6 +112,32 @@ class _ConsentsPageState extends State<ConsentsPage> {
     }
   }
 
+  Widget _withdrawControl(
+    PublicConsent consent,
+    ConsentState state,
+    bool blocked,
+  ) {
+    final key = Key('withdraw-${consent.type.wireName}');
+    final action = blocked ? null : () => _withdraw(consent, state);
+    final label = Text(AppStrings.of(context).withdraw);
+    if (MediaQuery.textScalerOf(context).scale(14) > 20) {
+      return OutlinedButton(
+        key: key,
+        onPressed: action,
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+        ),
+        child: label,
+      );
+    }
+    return OutlinedButton.icon(
+      key: key,
+      onPressed: action,
+      icon: const Icon(Icons.remove_circle_outline),
+      label: label,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
@@ -140,6 +166,16 @@ class _ConsentsPageState extends State<ConsentsPage> {
                     _busy ||
                     widget.session.isSynchronizing ||
                     widget.session.retrySeconds > 0;
+                final managing =
+                    !widget.onboarding &&
+                    state.onboardingComplete &&
+                    state.requiredActions.isEmpty;
+                final displayed = managing
+                    ? [
+                        ...state.consents.where((c) => c.type.withdrawable),
+                        ...state.consents.where((c) => !c.type.withdrawable),
+                      ]
+                    : state.consents;
                 return ListView(
                   padding: const EdgeInsets.all(24),
                   children: [
@@ -154,7 +190,19 @@ class _ConsentsPageState extends State<ConsentsPage> {
                     Text(strings.consentsIntro),
                     const SizedBox(height: 12),
                     if (widget.onboarding) Text(strings.onboardingRequired),
-                    for (final consent in state.consents)
+                    for (final consent in displayed) ...[
+                      if (managing &&
+                          (consent.type == ConsentType.sensitive ||
+                              consent.type == ConsentType.terms))
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16, bottom: 12),
+                          child: Text(
+                            consent.type.withdrawable
+                                ? 'Vos consentements modifiables'
+                                : 'Vos documents nécessaires',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ),
                       Card(
                         child: Padding(
                           padding: const EdgeInsets.all(16),
@@ -168,6 +216,24 @@ class _ConsentsPageState extends State<ConsentsPage> {
                                   style: Theme.of(context)
                                       .textTheme
                                       .titleMedium,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Chip(
+                                  visualDensity: VisualDensity.compact,
+                                  avatar: Icon(
+                                    consent.type.withdrawable
+                                        ? Icons.tune_rounded
+                                        : Icons.description_outlined,
+                                    size: 16,
+                                  ),
+                                  label: Text(
+                                    consent.type.withdrawable
+                                        ? 'Consentement modifiable'
+                                        : 'Nécessaire à Histae',
+                                  ),
                                 ),
                               ),
                               TextButton(
@@ -206,16 +272,22 @@ class _ConsentsPageState extends State<ConsentsPage> {
                                         },
                                 ),
                               if (consent.granted && consent.type.withdrawable)
-                                OutlinedButton(
-                                  onPressed: blocked
-                                      ? null
-                                      : () => _withdraw(consent, state),
-                                  child: Text(strings.withdraw),
+                                _withdrawControl(consent, state, blocked),
+                              if (consent.current &&
+                                  !consent.type.withdrawable) ...[
+                                const SizedBox(height: 8),
+                                Text(
+                                  consent.type == ConsentType.privacy
+                                      ? 'Cette notice vous informe sur vos données. Sa prise de connaissance ne constitue pas un consentement que vous pouvez retirer.'
+                                      : 'L’acceptation de ces conditions est nécessaire pour utiliser Histae. Elle ne se retire pas depuis cet écran.',
+                                  style: Theme.of(context).textTheme.bodySmall,
                                 ),
+                              ],
                             ],
                           ),
                         ),
                       ),
+                    ],
                     if (_message != null)
                       Semantics(liveRegion: true, child: Text(_message!)),
                     const SizedBox(height: 16),
@@ -236,20 +308,19 @@ class _ConsentsPageState extends State<ConsentsPage> {
                     ),
                     const SizedBox(height: 20),
                     Text(strings.privacyScope),
-                    if (widget.onboarding)
-                      OutlinedButton(
-                        onPressed: blocked
-                            ? null
-                            : () => Navigator.of(context).push(
-                                MaterialPageRoute<void>(
-                                  builder: (_) =>
-                                      PrivacyHubPage(session: widget.session),
-                                ),
+                    OutlinedButton(
+                      onPressed: blocked
+                          ? null
+                          : () => Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) =>
+                                    PrivacyHubPage(session: widget.session),
                               ),
-                        child: const Text(
-                          'Sessions, données et suppression du compte',
-                        ),
+                            ),
+                      child: const Text(
+                        'Sessions, données et suppression du compte',
                       ),
+                    ),
                     const SizedBox(height: 12),
                     TextButton(
                       onPressed: widget.session.logout,

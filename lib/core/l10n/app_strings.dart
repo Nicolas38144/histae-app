@@ -54,7 +54,7 @@ class AppStrings {
   String get consentCurrent => 'Accord enregistré pour la version actuelle';
   String get saveChoices => 'Enregistrer mes choix';
   String get refreshChoices => 'Actualiser mes consentements';
-  String get withdraw => 'Retirer mon accord';
+  String get withdraw => 'Retirer mon consentement';
   String get confirmWithdrawal => 'Confirmer le retrait';
   String get cancel => 'Annuler';
   String get openDocumentError =>

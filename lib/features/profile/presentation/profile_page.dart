@@ -19,6 +19,7 @@ import '../../privacy/presentation/privacy_hub_page.dart';
 import '../application/profile_controller.dart';
 import 'photo_page.dart';
 import 'profile_editors.dart';
+import 'profile_panels.dart';
 import 'profile_strings.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -52,8 +53,9 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed &&
-        ModalRoute.of(context)?.isCurrent == true) {
+    // A credits route owns its quota while native consent/video UI is visible.
+    if (ModalRoute.of(context)?.isCurrent != true) return;
+    if (state == AppLifecycleState.resumed) {
       unawaited(_load());
     } else if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.hidden ||
@@ -93,57 +95,6 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
       final c = controller;
       final p = c.profile;
       final strings = AppStrings.of(context);
-      Widget section(
-        String title,
-        String body,
-        String action,
-        VoidCallback? onTap,
-        IconData icon,
-      ) => Card(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary
-                          .withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      icon,
-                      color: Theme.of(context).colorScheme.primary,
-                      size: 21,
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                body,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(height: 20),
-              OutlinedButton(onPressed: onTap, child: Text(action)),
-            ],
-          ),
-        ),
-      );
       final editable = !c.loading && !c.saving && !c.uncertain;
       return HistaeScaffold(
         appBar: AppBar(title: Text(strings.accountTitle)),
@@ -200,73 +151,121 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                     ),
                   ),
                 ),
-                section(
-                  'Quelques mots sur vous',
-                  p == null
-                      ? 'Votre prénom, votre majorité et une présentation à votre image.'
-                      : '${p.bio ?? 'Ajoutez une présentation.'}\n\nPrésentation : ${ProfileStrings.moderation(p.bioModeration)}',
-                  p == null ? 'Créer mon profil' : 'Modifier ma présentation',
-                  editable && !c.errors.containsKey('profile')
+                ProfilePanel(
+                  title: 'Quelques mots sur vous',
+                  icon: Icons.format_quote_rounded,
+                  action: p == null
+                      ? 'Créer mon profil'
+                      : 'Modifier ma présentation',
+                  onPressed: editable && !c.errors.containsKey('profile')
                       ? () => _open(IdentityEditor(controller: c))
                       : null,
-                  Icons.edit_outlined,
+                  child: c.errors.containsKey('profile')
+                      ? const Text('Votre présentation n’a pas pu être relue.')
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              p?.bio ?? 'Les livres que vous aimez, les lieux où vous vous sentez bien… Quelques mots suffisent pour commencer.',
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                            if (p?.bioModeration != null) ...[
+                              const SizedBox(height: 12),
+                              ProfileModerationLabel(
+                                moderation: p!.bioModeration,
+                              ),
+                            ],
+                          ],
+                        ),
                 ),
-                const SizedBox(height: 16),
-                section(
-                  'Vos envies de rencontre',
-                  c.preferences == null
+                const SizedBox(height: 12),
+                ProfilePanel(
+                  title: 'Des débuts de conversation',
+                  icon: Icons.chat_bubble_outline_rounded,
+                  count: c.errors.containsKey('answers')
+                      ? 'À actualiser'
+                      : '${c.answers.length} / 3 réponses',
+                  action: 'Écrire mes réponses',
+                  onPressed:
+                      editable &&
+                          p != null &&
+                          !c.errors.containsKey('questions') &&
+                          !c.errors.containsKey('answers')
+                      ? () => _open(AnswersEditor(controller: c))
+                      : null,
+                  child: ProfileAnswersPreview(
+                    answers: c.answers,
+                    unavailable: c.errors.containsKey('answers'),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'Les détails qui comptent.',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                const SizedBox(height: 8),
+                ProfileDetailTile(
+                  title: 'Vos envies de rencontre',
+                  icon: Icons.tune_rounded,
+                  summary: c.errors.containsKey('preferences')
+                      ? 'Vos préférences n’ont pas pu être relues.'
+                      : c.preferences == null
                       ? 'Les personnes, les âges et la distance qui vous correspondent.'
                       : '${ProfileStrings.lookingFor[c.preferences!.lookingFor]} · ${c.preferences!.minAge}–${c.preferences!.maxAge} ans · ${c.preferences!.distance} km',
-                  c.sensitiveAllowed
+                  action: c.sensitiveAllowed
                       ? 'Modifier mes préférences'
                       : 'Choisir mes consentements',
-                  editable && !c.errors.containsKey('preferences')
+                  onTap: editable && !c.errors.containsKey('preferences')
                       ? () => _open(
                           c.sensitiveAllowed
                               ? PreferencesEditor(controller: c)
                               : ConsentsPage(session: controller.session),
                         )
                       : null,
-                  Icons.tune,
                 ),
-                const SizedBox(height: 16),
-                section(
-                  'Ce qui vous ressemble',
-                  c.selectedTraits.isEmpty
-                      ? 'Quelques traits, choisis parmi ceux proposés par Histae.'
-                      : c.selectedTraits.map((t) => t.name).join(' · '),
-                  'Choisir mes traits',
-                  editable &&
+                ProfileDetailTile(
+                  title: 'Ce qui vous ressemble',
+                  icon: Icons.spa_outlined,
+                  summary: c.errors.containsKey('selectedTraits')
+                      ? 'Vos traits n’ont pas pu être relus.'
+                      : c.selectedTraits.isEmpty
+                      ? 'Quelques traits pour donner un aperçu de votre personnalité.'
+                      : 'Les traits que vous avez choisis pour vous raconter.',
+                  details:
+                      c.errors.containsKey('selectedTraits') ||
+                          c.selectedTraits.isEmpty
+                      ? null
+                      : Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            for (final trait in c.selectedTraits)
+                              Chip(label: Text(trait.name)),
+                          ],
+                        ),
+                  action: 'Choisir mes traits',
+                  onTap:
+                      editable &&
                           !c.errors.containsKey('traits') &&
                           !c.errors.containsKey('selectedTraits')
                       ? () => _open(TraitsEditor(controller: c))
                       : null,
-                  Icons.spa_outlined,
                 ),
-                const SizedBox(height: 16),
-                section(
-                  'Des débuts de conversation',
-                  '${c.answers.length} réponse(s) sur 3. Racontez vos habitudes, vos envies ou ce qui vous anime.',
-                  'Écrire mes réponses',
-                  editable &&
-                          p != null &&
-                          !c.errors.containsKey('questions') &&
-                          !c.errors.containsKey('answers')
-                      ? () => _open(AnswersEditor(controller: c))
-                      : null,
-                  Icons.chat_bubble_outline,
-                ),
-                const SizedBox(height: 16),
-                section(
-                  'Une photo, pour plus tard',
-                  p?.photo == null
-                      ? 'Une seule photo. Elle se révélera après votre accord mutuel.'
+                ProfileDetailTile(
+                  title: 'Une photo, pour plus tard',
+                  icon: Icons.photo_outlined,
+                  summary: c.errors.containsKey('profile')
+                      ? 'Votre photo n’a pas pu être vérifiée.'
+                      : p?.photo == null
+                      ? 'Une seule photo, révélée après votre accord mutuel.'
                       : ProfileStrings.moderation(p?.photoModeration),
-                  'Gérer ma photo',
-                  p != null && !c.loading && !c.errors.containsKey('profile')
+                  action: 'Gérer ma photo',
+                  onTap:
+                      p != null &&
+                          !c.loading &&
+                          !c.errors.containsKey('profile')
                       ? () => _open(PhotoPage(controller: c))
                       : null,
-                  Icons.photo_outlined,
                 ),
                 const EditorialDivider(),
                 Text(

@@ -14,6 +14,75 @@ import 'support/continuation_fixture.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  test('UMP configuration and network errors stay distinct; only SDK-confirmed cached consent permits recovery', () async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.android;
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    final messenger =
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+    final ump = MethodChannel(
+      'plugins.flutter.io/google_mobile_ads/ump',
+      StandardMethodCodec(UserMessagingCodec()),
+    );
+    var allowed = false, code = '3', forms = 0;
+    messenger.setMockMethodCallHandler(ump, (call) async {
+      if (call.method == 'ConsentInformation#requestConsentInfoUpdate') {
+        throw PlatformException(
+          code: code,
+          message: code == '3'
+              ? 'Publisher misconfiguration: no form(s) configured for the input app ID.'
+              : 'Network error',
+        );
+      }
+      if (call.method == 'ConsentInformation#canRequestAds') return allowed;
+      if (call.method ==
+          'ConsentInformation#getPrivacyOptionsRequirementStatus') {
+        return 1;
+      }
+      if (call.method ==
+          'UserMessagingPlatform#loadAndShowConsentFormIfRequired') {
+        forms++;
+      }
+      return null;
+    });
+    addTearDown(() => messenger.setMockMethodCallHandler(ump, null));
+    final gateway = AdmobRewardedVideoGateway(
+      AppConfig.fromValues(
+        environment: 'production',
+        apiBaseUrl: 'https://api.example',
+        isDebug: false,
+        admobAndroidAppId: 'ca-app-pub-3940256099942544~3347511713',
+      ),
+    );
+    await expectLater(
+      gateway.requestConsent(() => true),
+      throwsA(
+        isA<RewardedVideoException>().having(
+          (e) => e.reason,
+          'reason',
+          VideoFailure.consentConfiguration,
+        ),
+      ),
+    );
+    await expectLater(
+      gateway.load(RewardIntent.fromJson(rewardJson())),
+      throwsA(isA<RewardedVideoException>()),
+    );
+    code = '2';
+    await expectLater(
+      gateway.requestConsent(() => true),
+      throwsA(
+        isA<RewardedVideoException>().having(
+          (e) => e.reason,
+          'reason',
+          VideoFailure.consentNetwork,
+        ),
+      ),
+    );
+    allowed = true;
+    await gateway.requestConsent(() => true);
+    expect(gateway.privacyOptionsRequired, isTrue);
+    expect(forms, 0);
+  });
   test('real AdMob adapter waits for UMP and attaches the API custom data before native display', () async {
     debugDefaultTargetPlatformOverride = TargetPlatform.android;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
