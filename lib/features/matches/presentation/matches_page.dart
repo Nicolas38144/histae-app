@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_scaffold.dart';
+import '../../continuation/presentation/continuation_balance_card.dart';
 import '../../continuation/presentation/credits_page.dart';
 import '../../notifications/presentation/push_scope.dart';
 import '../application/matches_controller.dart';
@@ -31,11 +32,14 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
   MatchesController get c => widget.controller;
   late final _key = c.session.resourceKey;
   bool _opening = false;
+  bool _creditsOpen = false;
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    unawaited(_start());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) unawaited(_start());
+    });
   }
 
   Future<void> _start() async {
@@ -44,6 +48,12 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
     await c.activate();
     if (mounted && initialMatchId != null && c.accessible) {
       await _open(initialMatchId);
+    }
+    if (mounted &&
+        c.session.resourceKey == _key &&
+        c.active &&
+        ModalRoute.of(context)?.isCurrent == true) {
+      await c.continuation.activate();
     }
   }
 
@@ -59,9 +69,36 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
           builder: (_) => ChatPage(controller: c, matchId: id),
         ),
       );
-      if (mounted && c.active) unawaited(c.refresh());
+      if (mounted && c.active) await _refresh();
     } finally {
       _opening = false;
+    }
+  }
+
+  Future<void> _refresh() async {
+    c.continuation.suspend();
+    await c.refresh();
+    if (mounted && c.active && c.session.resourceKey == _key) {
+      await c.continuation.activate();
+    }
+  }
+
+  Future<void> _openCredits() async {
+    if (_opening) return;
+    _opening = true;
+    _creditsOpen = true;
+    c.continuation.suspend();
+    c.suspend();
+    try {
+      final route = MaterialPageRoute<void>(
+        builder: (_) => CreditsPage(controller: c.continuation),
+      );
+      await Navigator.of(context).push(route);
+      await route.completed;
+    } finally {
+      _creditsOpen = false;
+      _opening = false;
+      if (mounted && c.session.resourceKey == _key) await _resume();
     }
   }
 
@@ -71,29 +108,37 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
         state == AppLifecycleState.hidden ||
         state == AppLifecycleState.detached) {
       c.suspend();
+      c.continuation.suspend();
     }
     if (state == AppLifecycleState.resumed) unawaited(_resume());
   }
 
   Future<void> _resume() async {
+    if (_creditsOpen) return;
     if (!widget.notificationFlow &&
         PushScope.maybeOf(context)?.coversMainFlow == true) {
       return;
     }
     await c.session.synchronize();
-    if (mounted && c.session.resourceKey == _key) await c.activate();
+    if (mounted && c.session.resourceKey == _key) {
+      await c.activate();
+      if (mounted && c.active && ModalRoute.of(context)?.isCurrent == true) {
+        await c.continuation.activate();
+      }
+    }
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     c.suspend(notify: false);
+    c.continuation.suspend(notify: false);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
-    listenable: c,
+    listenable: Listenable.merge([c, c.continuation]),
     builder: (context, _) {
       if (!c.accessible || c.session.resourceKey != _key) {
         return const HistaeScaffold(body: SizedBox.shrink());
@@ -104,29 +149,28 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
           actions: [
             IconButton(
               tooltip: 'Vos crédits',
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => CreditsPage(controller: c.continuation),
-                ),
-              ),
+              onPressed: _openCredits,
               icon: const Icon(Icons.account_balance_wallet_outlined),
             ),
             IconButton(
               tooltip: 'Actualiser les rencontres',
-              onPressed: c.listLoading || c.retrySeconds > 0
-                  ? null
-                  : c.activate,
+              onPressed: c.listLoading || c.retrySeconds > 0 ? null : _refresh,
               icon: const Icon(Icons.refresh),
             ),
           ],
         ),
         body: SafeArea(
           child: RefreshIndicator(
-            onRefresh: c.refresh,
+            onRefresh: _refresh,
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(24),
               children: [
+                ContinuationBalanceCard(
+                  controller: c.continuation,
+                  onVideos: _openCredits,
+                ),
+                const SizedBox(height: 24),
                 const EditorialCard(
                   eyebrow: 'PRENDRE LE TEMPS',
                   title: 'Les mots\ncontinuent.',

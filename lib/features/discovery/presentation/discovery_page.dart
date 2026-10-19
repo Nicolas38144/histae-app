@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../../core/widgets/account_benefits_actions.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
@@ -26,13 +25,10 @@ class DiscoveryPage extends StatefulWidget {
     required this.controller,
     required this.profile,
     this.openMatches,
-    this.onPremium,
-    this.onVideos,
   });
   final DiscoveryController controller;
   final ProfileController profile;
   final Future<void> Function([String? id])? openMatches;
-  final VoidCallback? onPremium, onVideos;
   @override
   State<DiscoveryPage> createState() => _DiscoveryPageState();
 }
@@ -428,70 +424,56 @@ class _DiscoveryPageState extends State<DiscoveryPage>
           ],
         ),
         body: SafeArea(
-          child: Column(
-            children: [
-              if (widget.onPremium != null && widget.onVideos != null)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
-                  child: AccountBenefitsActions(
-                    onPremium: widget.onPremium!,
-                    onVideos: widget.onVideos!,
-                  ),
-                ),
-              Expanded(
-                child: showFeed
-                    ? Column(
-                        children: [
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                              child: FeedProfileCard(
-                                key: ValueKey(profile.id),
-                                profile: profile,
-                                enabled: c.canChoose,
-                                onLike: () => _choose(SwipeDecision.like),
-                                onPass: () => _choose(SwipeDecision.pass),
-                              ),
-                            ),
-                          ),
-                          if (c.notice != null)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 4,
-                              ),
-                              child: Semantics(
-                                liveRegion: true,
-                                child: Text(
-                                  DiscoveryStrings.notice(c.notice),
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                ),
-                              ),
-                            ),
-                          if (_message != null)
-                            Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: Semantics(
-                                liveRegion: true,
-                                child: Text(_message!),
-                              ),
-                            ),
-                          if (c.encounter case final encounter?)
-                            TextButton(
-                              onPressed: () => _showEncounter(encounter),
-                              child: Text(
-                                'Votre rencontre avec ${encounter.profile.firstname}',
-                              ),
-                            ),
-                        ],
-                      )
-                    : ListView(
-                        padding: const EdgeInsets.all(24),
-                        children: statusBody,
+          child: showFeed
+              ? Column(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                        child: FeedProfileCard(
+                          key: ValueKey(profile.id),
+                          profile: profile,
+                          enabled: c.canChoose,
+                          onLike: () => _choose(SwipeDecision.like),
+                          onPass: () => _choose(SwipeDecision.pass),
+                        ),
                       ),
-              ),
-            ],
-          ),
+                    ),
+                    if (c.notice != null)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 4,
+                        ),
+                        child: Semantics(
+                          liveRegion: true,
+                          child: Text(
+                            DiscoveryStrings.notice(c.notice),
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ),
+                      ),
+                    if (_message != null)
+                      Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Semantics(
+                          liveRegion: true,
+                          child: Text(_message!),
+                        ),
+                      ),
+                    if (c.encounter case final encounter?)
+                      TextButton(
+                        onPressed: () => _showEncounter(encounter),
+                        child: Text(
+                          'Votre rencontre avec ${encounter.profile.firstname}',
+                        ),
+                      ),
+                  ],
+                )
+              : ListView(
+                  padding: const EdgeInsets.all(24),
+                  children: statusBody,
+                ),
         ),
       );
     },

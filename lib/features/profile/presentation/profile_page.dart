@@ -41,27 +41,40 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    unawaited(controller.load());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) unawaited(_load());
+    });
+  }
+
+  Future<void> _load() async {
+    await Future.wait([controller.load(), widget.continuation.activate()]);
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed &&
         ModalRoute.of(context)?.isCurrent == true) {
-      unawaited(controller.load());
+      unawaited(_load());
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden ||
+        state == AppLifecycleState.detached) {
+      widget.continuation.suspend();
     }
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    widget.continuation.suspend(notify: false);
     super.dispose();
   }
 
   Future<void> _open(Widget page) async {
-    await Navigator.of(context)
-        .push(MaterialPageRoute<void>(builder: (_) => page));
-    if (mounted) unawaited(controller.load());
+    widget.continuation.suspend();
+    final route = MaterialPageRoute<void>(builder: (_) => page);
+    await Navigator.of(context).push(route);
+    await route.completed;
+    if (mounted) unawaited(_load());
   }
 
   void _openSubscription() {
@@ -75,7 +88,7 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
-    listenable: controller,
+    listenable: Listenable.merge([controller, widget.continuation]),
     builder: (context, _) {
       final c = controller;
       final p = c.profile;
@@ -136,14 +149,17 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
         appBar: AppBar(title: Text(strings.accountTitle)),
         body: SafeArea(
           child: RefreshIndicator(
-            onRefresh: c.load,
+            onRefresh: _load,
             child: ListView(
               padding: const EdgeInsets.all(24),
               children: [
                 AccountBenefitsActions(
-                  onPremium: _openSubscription,
-                  onVideos: () =>
-                      _open(CreditsPage(controller: widget.continuation)),
+                  isPremium:
+                      widget.continuation.loading ||
+                          widget.continuation.quotaReadAt == null
+                      ? null
+                      : widget.continuation.quota?.premium,
+                  onSubscription: _openSubscription,
                 ),
                 const SizedBox(height: 24),
                 EditorialCard(
@@ -277,10 +293,6 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                   ),
                   icon: const Icon(Icons.notifications_none),
                   label: const Text('Appareils et notifications'),
-                ),
-                OutlinedButton(
-                  onPressed: _openSubscription,
-                  child: const Text('Mon abonnement et les formules'),
                 ),
                 TextButton(
                   onPressed: controller.session.logout,

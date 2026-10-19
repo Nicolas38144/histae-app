@@ -393,3 +393,11 @@ Vérifications : analyse Flutter, 21 contrôles ciblés (trois nouveaux), aperç
 - API inspectée sans modification : configuration locale Stripe live/AdMob complète et cohérente avec le mobile ; catalogue public avec publicité activée pour Free ; trois retours HTTPS accessibles. Consoles fournisseur, webhooks et transaction de bout en bout non validés.
 
 16 contrôles ciblés réussis, dont un nouveau pour les raccourcis ; analyse et APK Android debug vérifiés, six aperçus manuels dont petit écran à 200 %. Aucun achat/SMS/visionnage réel. Prochaines étapes : raccordement SDK AdMob/UMP, validation fournisseur puis L10 sur appareils. Les mentions de désactivation des paiements dans les comptes rendus historiques décrivent leur état avant cette activation.
+
+## 18. Répartition finale des accès — 19 octobre 2026
+
+Le feed retrouve toute sa hauteur : suppression des raccourcis de formule et de vidéo. Le profil propose un seul accès, **Premium pour Free**, **Mon abonnement pour Premium**, selon le quota serveur relu ; une formule inconnue utilise le libellé neutre de gestion. Dans Matchs : compteurs `free_remaining` et `advertising_remaining` plus bouton **Vidéos** pour Free. Les réservations et le stock total ne sont pas confondus avec le disponible. Premium affiche l’absence de coût en crédits, sans vidéo, y compris sur l’écran détaillé des crédits. La lecture SDK demeure désactivée.
+
+Les soldes se relisent au retour d’une route, au changement d’onglet et après reprise. Un échec ne produit pas de faux zéro. Activation du contrôleur partagé après démontage de l’onglet précédent, pour éviter qu’une suspension tardive annule la nouvelle lecture. Le chat et les notifications conservent leur reprise et leurs contrôles d’accès ; l’ouverture d’une conversation entrante n’attend pas la lecture des crédits.
+
+Vérifications : 22 contrôles ciblés, deux scénarios d’accès Free/Premium remplaçant l’ancien scénario des raccourcis, dix captures simulées (dont 320 × 568 à 200 %), analyse sans problème et APK Android debug. Aucun fournisseur réel appelé. Prochain lot : raccordement AdMob/UMP puis validations L10 sur appareil. Cette répartition remplace les emplacements précédents de la section 17.

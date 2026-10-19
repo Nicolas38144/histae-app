@@ -58,7 +58,7 @@ class MainNavigationBar extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                           vertical: 12,
-                          horizontal: 4,
+                          horizontal: 0,
                         ),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,

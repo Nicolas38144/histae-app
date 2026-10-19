@@ -70,3 +70,9 @@ Validation finale du 18 octobre : analyse stricte sans problème, formatage de 1
 `AppOpening` est monté par le builder de `MaterialApp`, au-dessus des scopes et du navigateur existants. Il possède seulement son animation finie ; il ne possède aucune session ou route. Les services démarrent normalement. Le sous-arbre conserve sa position et son état pendant et après l'ouverture, y compris une route de notification ouverte pendant le démarrage. Les entrées tactiles, le focus et la sémantique du contenu sont exclus tant que l'animation le masque. L'observateur de cycle de vie termine l'ouverture lors d'une suspension ; `MediaQuery.disableAnimations` l'ignore immédiatement. Le contrôleur est libéré avec le widget.
 
 `HistaeWordmark` affiche la signature vectorisée exportée en PNG, selon le fond clair/sombre ; `HistaeBrandSymbol` dessine le livre pour l'ouverture. Les SVG originaux et les exports natifs restent dans le dépôt. Aucun package d'animation, de splash ou de rendu SVG n'est ajouté.
+
+## Formule et quota dans les onglets
+
+Les écrans Profil et Matchs utilisent le `ContinuationController` de leur `MatchesController` de session, sans nouveau stockage ni calcul local de droits. `ContinuationBalanceCard` affiche `freeRemaining` et `advertisingRemaining`, et traite chargement, indisponibilité et Premium. Le profil adapte son unique accès d’abonnement à la formule effective du quota ; une ancienne lecture n’est pas utilisée comme autorité après échec.
+
+L’activation à l’entrée d’un onglet se fait après la première frame, lorsque la suspension et le démontage de l’onglet précédent sont achevés. Au retour de CreditsPage ou SubscriptionPage, la route attend sa transition complète avant de réactiver la lecture partagée. Le parcours de crédits suspend le contrôleur de liste ; la reprise de la conversation reste portée par son MatchesPage et n’est pas bloquée par l’encart.

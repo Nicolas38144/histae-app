@@ -114,6 +114,26 @@ void main() {
     final chatContext = tester.element(find.byType(ChatPage));
     expect(ModalRoute.of(chatContext)?.isFirst, isFalse);
     expect(discovery.active, isFalse);
+    final chat = tester.widget<ChatPage>(find.byType(ChatPage)).controller;
+    for (final state in [
+      AppLifecycleState.inactive,
+      AppLifecycleState.hidden,
+      AppLifecycleState.paused,
+    ]) {
+      tester.binding.handleAppLifecycleStateChanged(state);
+    }
+    await tester.pump();
+    expect(chat.active, isFalse);
+    for (final state in [
+      AppLifecycleState.hidden,
+      AppLifecycleState.inactive,
+      AppLifecycleState.resumed,
+    ]) {
+      tester.binding.handleAppLifecycleStateChanged(state);
+    }
+    await tester.pumpAndSettle();
+    expect(chat.active, isTrue);
+    expect(find.byType(ChatPage), findsOneWidget);
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
     expect(find.byType(MatchesPage), findsOneWidget);

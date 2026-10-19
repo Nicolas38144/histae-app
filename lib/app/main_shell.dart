@@ -3,11 +3,7 @@ import 'package:flutter/material.dart';
 import '../core/widgets/histae_scaffold.dart';
 
 import '../features/auth/domain/authenticated_session.dart';
-import '../features/billing/presentation/billing_scope.dart';
-import '../features/billing/presentation/subscription_page.dart';
 import '../features/catalog/data/catalog_repository.dart';
-import '../features/catalog/presentation/catalog_page.dart';
-import '../features/continuation/presentation/credits_page.dart';
 import '../features/discovery/application/discovery_controller.dart';
 import '../features/discovery/data/device_location.dart';
 import '../features/discovery/data/discovery_repository.dart';
@@ -49,39 +45,6 @@ class _MainShellState extends State<MainShell> {
   bool _covered = false;
   int _selected = 0, _matchRequest = 0;
   String? _initialMatchId;
-  bool _openingBenefit = false;
-
-  Future<void> _openBenefit(Widget page) async {
-    if (_openingBenefit || widget.session.phase != SessionPhase.ready) return;
-    final key = widget.session.resourceKey;
-    _openingBenefit = true;
-    _discovery.deactivate();
-    try {
-      await Navigator.of(context)
-          .push(MaterialPageRoute<void>(builder: (_) => page));
-      if (!mounted || widget.session.resourceKey != key || _covered) return;
-      await widget.session.synchronize();
-      if (mounted &&
-          widget.session.resourceKey == key &&
-          widget.session.phase == SessionPhase.ready &&
-          !_covered &&
-          _selected == 0) {
-        await _discovery.activate();
-      }
-    } finally {
-      _openingBenefit = false;
-    }
-  }
-
-  void _openSubscription() {
-    final billing = BillingScope.maybeOf(context);
-    _openBenefit(
-      billing == null
-          ? CatalogPage(repository: widget.catalog)
-          : SubscriptionPage(controller: billing, catalog: widget.catalog),
-    );
-  }
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -149,10 +112,6 @@ class _MainShellState extends State<MainShell> {
                 controller: _discovery,
                 profile: _profile,
                 openMatches: _openMatches,
-                onPremium: _openSubscription,
-                onVideos: () => _openBenefit(
-                  CreditsPage(controller: _matches.continuation),
-                ),
               ),
               1 => MatchesPage(
                 key: PageStorageKey('main-matches-$_matchRequest'),

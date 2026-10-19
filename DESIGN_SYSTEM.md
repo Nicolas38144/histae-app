@@ -73,3 +73,9 @@ Les deux raccourcis Premium/Vidéos utilisent les composants existants, avec ic�
 L’icône Android adaptative garde la même géométrie et les mêmes couleurs ; son échelle passe de 0,65 à 0,52, recentrée dans le calque de 108 dp. La largeur visible est d’environ 52 dp. Les exports PNG natifs passent d’une échelle SVG de 6,5 à 5,5 sur 1 024 px. Les en-têtes, l’animation d’ouverture et le site ne changent pas de proportions.
 
 Vérification visuelle : six captures dans `build/previews/benefits`, dont les marges système 24/34 px et 320 × 568 à 200 %. [Comportement edge-to-edge Flutter](https://docs.flutter.dev/release/breaking-changes/default-systemuimode-edge-to-edge).
+
+## Emplacements et formules
+
+Le feed conserve toute la surface disponible au-dessus de la barre de navigation, sans action commerciale. Le profil réserve un bouton pleine largeur à la formule, avec libellé Premium pour Free et Mon abonnement pour Premium. L’encart Pour continuer est placé en tête de Matchs : deux soldes disponibles avec libellés distincts et Vidéos pour Free ; message Premium sans action vidéo pour les abonnés.
+
+Les compteurs passent sur deux lignes distinctes avec de grandes polices, en gardant les mots entiers. Les libellés de navigation disposent de toute la largeur de leur onglet pour éviter la coupure de Matchs à 200 %. L’encart reste dans la liste défilante pour ne pas bloquer les rencontres sur petit écran. Aperçu : `pictures/branding/repartition-acces.png`.

@@ -49,9 +49,13 @@ void main() {
     addTearDown(tester.view.resetPadding);
     addTearDown(tester.view.resetViewPadding);
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    var premium = false;
     final session = testSession((r) async {
+      if (r.url.path == '/api/users/me/continuation-quota') {
+        return jsonResponse(quotaJson(premium: premium));
+      }
       if (r.url.path == '/api/users/me/subscription') {
-        return jsonResponse(subscriptionJson());
+        return jsonResponse(subscriptionJson(access: premium));
       }
       return defaultContinuationResponse(r);
     });
@@ -96,7 +100,7 @@ void main() {
     await tester.tap(find.byKey(const Key('main-tab-profile')));
     await tester.pumpAndSettle();
     await capture('profile');
-    await tester.tap(find.byKey(const Key('open-premium')));
+    await tester.tap(find.byKey(const Key('profile-subscription')));
     await tester.pumpAndSettle();
     await capture('subscription');
     await tester.scrollUntilVisible(find.text('Choisir Premium Mensuel'), 200);
@@ -104,11 +108,28 @@ void main() {
     await capture('subscribe-button');
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('main-tab-matches')));
+    await tester.pumpAndSettle();
+    await capture('matches-free');
     await tester.tap(find.byKey(const Key('open-videos')));
     await tester.pumpAndSettle();
     await capture('videos');
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
+    premium = true;
+    await tester.tap(find.byKey(const Key('main-tab-profile')));
+    await tester.pumpAndSettle();
+    await capture('profile-premium');
+    await tester.tap(find.byKey(const Key('main-tab-matches')));
+    await tester.pumpAndSettle();
+    await capture('matches-premium');
+    premium = false;
+    await tester.tap(find.byTooltip('Actualiser les rencontres'));
+    await tester.pumpAndSettle();
+    tester.view.physicalSize = const Size(320, 568);
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    await tester.pumpAndSettle();
+    await capture('matches-large-text');
     await tester.tap(find.byKey(const Key('main-tab-discovery')));
     tester.view.physicalSize = const Size(320, 568);
     tester.platformDispatcher.textScaleFactorTestValue = 2;

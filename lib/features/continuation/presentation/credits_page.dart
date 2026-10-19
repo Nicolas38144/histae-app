@@ -79,19 +79,19 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
                   title: 'À votre rythme.',
                   body: 'Vos crédits servent à choisir de poursuivre une rencontre. Chacun confirme son propre choix.',
                 ),
-                const SizedBox(height: 24),
-                OutlinedButton.icon(
-                  onPressed: null,
-                  icon: const Icon(Icons.play_circle_outline),
-                  label: const Text('Regarder une vidéo'),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  q?.premium == true
-                      ? 'Votre formule Premium n’utilise pas de vidéos récompensées.'
-                      : 'Les vidéos récompensées ne sont pas encore disponibles dans cette version. Vos crédits gratuits restent accessibles.',
-                ),
-                const SizedBox(height: 24),
+                if (q?.premium != true) ...[
+                  const SizedBox(height: 24),
+                  OutlinedButton.icon(
+                    onPressed: null,
+                    icon: const Icon(Icons.play_circle_outline),
+                    label: const Text('Regarder une vidéo'),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Les vidéos récompensées ne sont pas encore disponibles dans cette version. Vos crédits gratuits restent accessibles.',
+                  ),
+                  const SizedBox(height: 24),
+                ],
                 if (c.loading)
                   const LinearProgressIndicator(
                     semanticsLabel: 'Lecture de vos crédits',
@@ -148,15 +148,17 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
                         : 'Actualiser mes crédits',
                   ),
                 ),
-                const EditorialDivider(),
-                Text(
-                  'Une vidéo, si vous le souhaitez',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'Le crédit est ajouté uniquement après validation de la récompense par le serveur. Le suivi reste accessible si une validation est en attente.',
-                ),
+                if (q?.premium != true) ...[
+                  const EditorialDivider(),
+                  Text(
+                    'Une vidéo, si vous le souhaitez',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Le crédit est ajouté uniquement après validation de la récompense par le serveur. Le suivi reste accessible si une validation est en attente.',
+                  ),
+                ],
                 if (c.catalogFailure case final error?)
                   Text(ContinuationStrings.failure(error)),
                 if (reward.intent case final intent?) ...[

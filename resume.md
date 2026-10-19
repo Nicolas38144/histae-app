@@ -283,3 +283,11 @@ Boutons Premium et Vidéos ajoutés sur feed/profil, navigation suspendant la d�
 L’utilisateur a demandé `BILLING_ENABLED=true` : activation dans le `.env` mobile local pour Android externe avec les URL HTTPS déjà présentes, sans clé secrète côté client. La configuration API locale contient les paramètres requis, dont une clé Stripe live et les deux blocs AdMob ; les blocs et retours correspondent à l’app. Le catalogue en ligne confirme les vidéos pour Free et les retours Stripe répondent 200. Aucun changement de code/configuration de l’API. Aucune transaction réelle ni livraison de webhook vérifiée. Le blocage vidéo identifié se situe dans l’app : raccordement natif/SDK/UMP encore à construire ; bouton de lecture visible et désactivé en attendant.
 
 16 contrôles ciblés et un nouveau parcours de navigation, analyse et APK debug ; six aperçus simulés dont texte à 200 % avec insets système. L10 et les essais fournisseur restent ouverts. Les anciennes mentions de paiements désactivés sont historiques.
+
+## 20. Feed dégagé, formule dans le profil et crédits dans Matchs
+
+Le 19 octobre 2026, à la demande utilisateur, retrait des boutons Premium/Vidéos du feed. Le profil affiche Premium pour Free et Mon abonnement pour Premium d’après la formule effective du quota serveur. En cas de lecture inconnue, le libellé neutre ouvre l’abonnement, sans présumer d’un besoin d’achat. Matchs expose séparément les crédits gratuits et publicitaires disponibles, via `free_remaining` et `advertising_remaining`, plus Vidéos pour Free. Premium n’affiche aucun bouton vidéo et annonce ses continuations sans crédit. Le suivi des anciennes récompenses reste consultable.
+
+Retour des crédits/de l’abonnement, reprise et changement d’onglet relisent le quota ; les lectures périmées ne décident pas du libellé ou du solde. Les entrées des onglets activent leur lecture après démontage du précédent ; la suspension d’un ancien écran n’annule plus la lecture du nouveau. Reprise du chat préservée.
+
+22 contrôles ciblés et dix aperçus simulés, analyse et APK debug vérifiés. Stripe reste activé localement pour Android externe ; lecture vidéo toujours en attente de SDK/UMP. Aucun changement API ni paiement, crédit publicitaire ou SMS réel. L10 et les essais iOS restent ouverts.
