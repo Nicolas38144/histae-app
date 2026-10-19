@@ -291,3 +291,12 @@ Le 19 octobre 2026, à la demande utilisateur, retrait des boutons Premium/Vidé
 Retour des crédits/de l’abonnement, reprise et changement d’onglet relisent le quota ; les lectures périmées ne décident pas du libellé ou du solde. Les entrées des onglets activent leur lecture après démontage du précédent ; la suspension d’un ancien écran n’annule plus la lecture du nouveau. Reprise du chat préservée.
 
 22 contrôles ciblés et dix aperçus simulés, analyse et APK debug vérifiés. Stripe reste activé localement pour Android externe ; lecture vidéo toujours en attente de SDK/UMP. Aucun changement API ni paiement, crédit publicitaire ou SMS réel. L10 et les essais iOS restent ouverts.
+
+
+## 21. Vos crédits et vidéos raccordées
+
+Le 19 octobre 2026 : refonte de Vos crédits autour du solde réellement disponible, des cartes Gratuits/Vidéos et de la progression de semaine. Détails repliables, panneau Premium sans vidéo, réserve pleine et erreur avec explication. La mention indisponible venait du bouton désactivé et du SDK non raccordé. Le catalogue public confirme les vidéos Free.
+
+AdMob/UMP est maintenant raccordé : IDs natifs du `.env`, consentement publicitaire distinct, requête explicite, `ad_unit`/`custom_data` de l’intention, aucun identifiant utilisateur persistant. SDK sans pouvoir de crédit : seule la réponse serveur `credited` déclenche la relecture. Nettoyage des tentatives non visionnées, pas d’annulation implicite d’une vidéo terminée ou incertaine, callbacks tardifs ignorés après déconnexion. Le cycle de vie des surcouches natives ne suspend plus le suivi via le MatchesPage sous-jacent.
+
+19 contrôles ciblés, analyse et APK Android debug ; six états visuels inspectés, dont grande police. Aucun appel publicitaire réel ni modification backend. Consoles UMP/SSV et diffusion réelle à vérifier sur appareil de test ; compilation/essais iOS restent à faire sur Mac. Aucun fichier supprimé ni commande Git exécutée.

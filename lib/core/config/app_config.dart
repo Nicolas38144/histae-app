@@ -106,10 +106,8 @@ class AppConfig {
   final Uri apiOrigin;
   final PushConfig push;
   final BillingConfig billing;
-  // Public IDs reserved for a future native SDK installation. Empty fields do
-  // not enable videos, initialize advertising, or provide an ad unit fallback.
+  // Public IDs also read by native builds. Empty fields disable playback.
   final String? admobAndroidAppId, admobIosAppId;
-  // Reserved public configuration for the future SDK. The API's intent remains
-  // authoritative; these values never replace a missing server ad_unit.
+  // The API's intent remains authoritative; these never replace its ad_unit.
   final String? admobAndroidRewardedAdUnit, admobIosRewardedAdUnit;
 }

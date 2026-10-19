@@ -8,6 +8,7 @@ import '../features/billing/data/billing_gateway.dart';
 import '../features/billing/data/billing_repository.dart';
 import '../features/billing/data/checkout_vault.dart';
 import '../features/catalog/data/catalog_repository.dart';
+import '../features/continuation/data/rewarded_video_gateway.dart';
 import '../features/notifications/application/push_controller.dart';
 import '../features/notifications/data/device_repository.dart';
 import '../features/notifications/data/push_gateway.dart';
@@ -16,7 +17,13 @@ import '../features/notifications/data/push_vault.dart';
 /// The composition root. Feature widgets receive scoped dependencies instead
 /// of reaching into a global locator. HistaeApp owns their disposal.
 class AppDependencies {
-  const AppDependencies({this.catalog, this.session, this.push, this.billing});
+  const AppDependencies({
+    this.catalog,
+    this.session,
+    this.push,
+    this.billing,
+    this.videos,
+  });
   factory AppDependencies.fromConfig(AppConfig config) {
     final session = SessionController(
       AuthRepository(ApiClient(origin: config.apiOrigin)),
@@ -25,6 +32,7 @@ class AppDependencies {
     return AppDependencies(
       catalog: CatalogRepository(ApiClient(origin: config.apiOrigin)),
       session: session,
+      videos: AdmobRewardedVideoGateway(config),
       push: PushController(
         DeviceRepository(session),
         FirebasePushGateway(config.push),
@@ -42,4 +50,5 @@ class AppDependencies {
   final SessionController? session;
   final PushController? push;
   final BillingController? billing;
+  final RewardedVideoGateway? videos;
 }

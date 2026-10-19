@@ -125,8 +125,8 @@ void main() {
       );
       expect(
         tester
-            .widget<OutlinedButton>(
-              find.widgetWithText(OutlinedButton, 'Regarder une vid\u00e9o'),
+            .widget<FilledButton>(
+              find.widgetWithText(FilledButton, 'Regarder une vid\u00e9o'),
             )
             .onPressed,
         isNull,

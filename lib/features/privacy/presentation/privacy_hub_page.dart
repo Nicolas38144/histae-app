@@ -6,6 +6,7 @@ import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../auth/domain/authenticated_session.dart';
 import '../../consents/presentation/consents_page.dart';
+import '../../continuation/presentation/rewarded_video_scope.dart';
 import '../../notifications/presentation/devices_page.dart';
 import '../../notifications/presentation/push_scope.dart';
 import '../application/privacy_controller.dart';
@@ -31,6 +32,7 @@ class _PrivacyHubPageState extends State<PrivacyHubPage>
     exportStore: widget.exportStore,
   );
   late final Future<void> _startup;
+  bool _advertisingFormOpen = false;
   @override
   void initState() {
     super.initState();
@@ -40,6 +42,7 @@ class _PrivacyHubPageState extends State<PrivacyHubPage>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (_advertisingFormOpen) return;
     if (state == AppLifecycleState.resumed) {
       unawaited(c.resume());
     } else {
@@ -64,6 +67,31 @@ class _PrivacyHubPageState extends State<PrivacyHubPage>
     );
     if (mounted) {
       c.leave(section);
+    }
+  }
+
+  Future<void> _advertisingChoices() async {
+    if (_advertisingFormOpen) return;
+    final gateway = RewardedVideoScope.maybeOf(context);
+    if (gateway?.privacyOptionsRequired != true) return;
+    setState(() => _advertisingFormOpen = true);
+    try {
+      await gateway!.showPrivacyOptions();
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Vos préférences publicitaires ne sont pas accessibles pour le moment.',
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _advertisingFormOpen = false);
+        unawaited(c.resume());
+      }
     }
   }
 
@@ -97,6 +125,14 @@ class _PrivacyHubPageState extends State<PrivacyHubPage>
             'Consulter et révoquer les accès',
             () => _open(PrivacySection.sessions),
           ),
+          if (RewardedVideoScope.maybeOf(context)?.privacyOptionsRequired ==
+              true)
+            _tile(
+              Icons.tune_rounded,
+              'Mes choix publicitaires',
+              'Revoir mes préférences pour les vidéos',
+              _advertisingChoices,
+            ),
           if (c.onboarded)
             _tile(
               Icons.notifications_none,

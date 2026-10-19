@@ -401,3 +401,10 @@ Le feed retrouve toute sa hauteur : suppression des raccourcis de formule et de 
 Les soldes se relisent au retour d’une route, au changement d’onglet et après reprise. Un échec ne produit pas de faux zéro. Activation du contrôleur partagé après démontage de l’onglet précédent, pour éviter qu’une suspension tardive annule la nouvelle lecture. Le chat et les notifications conservent leur reprise et leurs contrôles d’accès ; l’ouverture d’une conversation entrante n’attend pas la lecture des crédits.
 
 Vérifications : 22 contrôles ciblés, deux scénarios d’accès Free/Premium remplaçant l’ancien scénario des raccourcis, dix captures simulées (dont 320 × 568 à 200 %), analyse sans problème et APK Android debug. Aucun fournisseur réel appelé. Prochain lot : raccordement AdMob/UMP puis validations L10 sur appareil. Cette répartition remplace les emplacements précédents de la section 17.
+
+
+## 19. Vos crédits et AdMob/UMP — 19 octobre 2026
+
+Refonte complète de Vos crédits, avec soldes gratuits/vidéos distincts, plafond de semaine, explications repliables et états indisponibles sans faux chiffres. Raccordement du SDK existant : injection des IDs natifs depuis `.env`, UMP avant requête publicitaire, bloc et `custom_data` fournis par l’intention API, annulation des tentatives sans visionnage, suivi exclusivement serveur et reprise après récompense créditée. Free uniquement, sous éligibilité du catalogue et réserve non pleine. Choix publicitaires accessibles également depuis Vie privée.
+
+19 contrôles ciblés réussis, analyse et APK Android debug, aperçus de six états dont texte à 200 %. Le catalogue public autorise Free. Aucun changement backend, paiement, SMS ou publicité réelle. Restent pour L10 : diffusion et validation SSV sur appareil de test, vérification des réglages UMP/SSV de la console AdMob, build iOS sur Mac et essais natifs. Cette section remplace les précédentes mentions de lecteur SDK désactivé.

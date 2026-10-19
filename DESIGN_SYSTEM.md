@@ -79,3 +79,10 @@ Vérification visuelle : six captures dans `build/previews/benefits`, dont les m
 Le feed conserve toute la surface disponible au-dessus de la barre de navigation, sans action commerciale. Le profil réserve un bouton pleine largeur à la formule, avec libellé Premium pour Free et Mon abonnement pour Premium. L’encart Pour continuer est placé en tête de Matchs : deux soldes disponibles avec libellés distincts et Vidéos pour Free ; message Premium sans action vidéo pour les abonnés.
 
 Les compteurs passent sur deux lignes distinctes avec de grandes polices, en gardant les mots entiers. Les libellés de navigation disposent de toute la largeur de leur onglet pour éviter la coupure de Matchs à 200 %. L’encart reste dans la liste défilante pour ne pas bloquer les rencontres sur petit écran. Aperçu : `pictures/branding/repartition-acces.png`.
+
+
+## Vos crédits
+
+L’écran présente une carte principale teintée de lavande : disponible réel en grand, puis deux sous-cartes Gratuits/Vidéos (réservations exclues). La progression hebdomadaire reste distincte du solde. La carte vidéo emploie le corail, annonce la récompense et une action en dégradé ; elle affiche les états d’attente, de réserve pleine et d’erreur dans son contexte. Les détails et règles sont repliables. Premium propose un panneau sans publicité. Les valeurs inconnues restent inconnues et une relecture échouée masque l’ancien solde. Les cartes s’empilent en grande police et conservent un défilement complet.
+
+Aperçus réels Flutter avec polices et fournisseur simulé : `build/previews/credits`, six états à 390 × 844 et 320 × 568 à 200 %. Planche : `pictures/branding/vos-credits-refonte.png`.

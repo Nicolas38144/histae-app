@@ -17,6 +17,10 @@ val histaePublicEnv = rootProject.file("../.env").takeIf { it.exists() }
 val histaeAndroidPush = histaePublicEnv["PUSH_ENABLED"] == "true" &&
     listOf("FIREBASE_PROJECT_ID", "FIREBASE_MESSAGING_SENDER_ID", "FIREBASE_ANDROID_API_KEY", "FIREBASE_ANDROID_APP_ID")
         .all { !histaePublicEnv[it].isNullOrBlank() }
+val histaeAdmobAppId = histaePublicEnv["ADMOB_ANDROID_APP_ID"].orEmpty()
+require(histaeAdmobAppId.isEmpty() || Regex("^ca-app-pub-\\d{16}~\\d{10}$").matches(histaeAdmobAppId)) {
+    "Invalid ADMOB_ANDROID_APP_ID in .env"
+}
 
 android {
     buildFeatures { resValues = true }
@@ -42,6 +46,7 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        resValue("string", "histae_admob_app_id", histaeAdmobAppId)
         if (histaeAndroidPush) {
             mapOf("google_app_id" to "FIREBASE_ANDROID_APP_ID", "google_api_key" to "FIREBASE_ANDROID_API_KEY",
                 "gcm_defaultSenderId" to "FIREBASE_MESSAGING_SENDER_ID", "project_id" to "FIREBASE_PROJECT_ID")

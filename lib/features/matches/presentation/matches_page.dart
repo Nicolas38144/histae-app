@@ -104,6 +104,7 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (_creditsOpen) return; // CreditsPage owns native ad/consent lifecycle.
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.hidden ||
         state == AppLifecycleState.detached) {

@@ -9,6 +9,8 @@ import '../features/auth/application/session_controller.dart';
 import '../features/billing/application/billing_controller.dart';
 import '../features/billing/presentation/billing_scope.dart';
 import '../features/catalog/data/catalog_repository.dart';
+import '../features/continuation/data/rewarded_video_gateway.dart';
+import '../features/continuation/presentation/rewarded_video_scope.dart';
 import '../features/notifications/application/push_controller.dart';
 import '../features/notifications/presentation/push_scope.dart';
 import 'app_opening.dart';
@@ -25,12 +27,14 @@ class HistaeApp extends StatefulWidget {
     this.sessionController,
     this.pushController,
     this.billingController,
+    this.rewardedVideoGateway,
   });
   // Ownership is transferred to the app; requests close when it is disposed.
   final CatalogRepository? catalogRepository;
   final SessionController? sessionController;
   final PushController? pushController;
   final BillingController? billingController;
+  final RewardedVideoGateway? rewardedVideoGateway;
 
   @override
   State<HistaeApp> createState() => _HistaeAppState();
@@ -131,13 +135,16 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
     builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
       value: Theme.of(context).appBarTheme.systemOverlayStyle!,
       child: AppOpening(
-        child: BillingScope(
-          controller: widget.billingController,
-          child: PushScope(
-            controller: widget.pushController,
-            child: NotificationOverlay(
+        child: RewardedVideoScope(
+          gateway: widget.rewardedVideoGateway,
+          child: BillingScope(
+            controller: widget.billingController,
+            child: PushScope(
               controller: widget.pushController,
-              child: child!,
+              child: NotificationOverlay(
+                controller: widget.pushController,
+                child: child!,
+              ),
             ),
           ),
         ),

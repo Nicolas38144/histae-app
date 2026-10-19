@@ -8,9 +8,8 @@ import '../../auth/domain/authenticated_session.dart';
 import '../data/continuation_models.dart';
 import '../data/continuation_repository.dart';
 
-// The native video/UMP SDK is deliberately disabled until application IDs and
-// provider configuration are supplied. This tracks only server-owned rewards;
-// a future SDK may call prepare/videoCompleted, never grant a local credit.
+// Tracks only server-owned rewards. Native completion starts verification and
+// never grants a local credit.
 class RewardTracker extends ChangeNotifier {
   RewardTracker(this.repository, {required this.onCredited}) {
     _key = repository.session.resourceKey;
@@ -79,11 +78,15 @@ class RewardTracker extends ChangeNotifier {
         !accessible ||
         busy ||
         waiting ||
-        (intent != null && intent!.status != RewardStatus.cancelled) ||
+        (intent != null &&
+            intent!.status != RewardStatus.cancelled &&
+            intent!.status != RewardStatus.credited) ||
         (_platform != null && _platform != platform)) {
       return null;
     }
     _platform = platform;
+    _poll?.cancel();
+    _pollCount = 0;
     cancelled = false;
     completedVideo = false;
     final epoch = _epoch;
@@ -112,6 +115,9 @@ class RewardTracker extends ChangeNotifier {
   // A device callback records only that the video completed. Poll the signed
   // server result; expired can still become credited after a delayed proof.
   Future<void> videoCompleted() async {
+    if (!_active || !accessible || intent?.status != RewardStatus.pending) {
+      return;
+    }
     completedVideo = true;
     _notify();
     await refresh();

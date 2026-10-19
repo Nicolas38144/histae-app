@@ -16,6 +16,7 @@ import '../test/support/billing_fixture.dart';
 import '../test/support/catalog_fixture.dart';
 import '../test/support/continuation_fixture.dart';
 import '../test/support/matches_fixture.dart';
+import '../test/support/rewarded_video_fixture.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -57,7 +58,9 @@ void main() {
       if (r.url.path == '/api/users/me/subscription') {
         return jsonResponse(subscriptionJson(access: premium));
       }
-      return defaultContinuationResponse(r);
+      return r.url.path == '/api/plans'
+          ? jsonResponse(rewardedCatalogJson())
+          : defaultContinuationResponse(r);
     });
     await session.establish(testTokens);
     final billing = BillingController(
@@ -84,6 +87,7 @@ void main() {
         child: HistaeApp(
           sessionController: session,
           billingController: billing,
+          rewardedVideoGateway: FakeRewardedVideoGateway(),
           catalogRepository: catalog,
         ),
       ),
@@ -114,6 +118,19 @@ void main() {
     await tester.tap(find.byKey(const Key('open-videos')));
     await tester.pumpAndSettle();
     await capture('videos');
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('watch-rewarded-video')),
+      200,
+    );
+    await tester.pumpAndSettle();
+    await capture('videos-action');
+    tester.view.physicalSize = const Size(320, 568);
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    await tester.pumpAndSettle();
+    await capture('videos-large-text');
+    tester.view.physicalSize = const Size(390, 844);
+    tester.platformDispatcher.textScaleFactorTestValue = 1;
+    await tester.pumpAndSettle();
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
     premium = true;

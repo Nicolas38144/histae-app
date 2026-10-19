@@ -2,12 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../application/continuation_controller.dart';
-import '../data/continuation_models.dart';
+import '../application/rewarded_video_controller.dart';
 import 'continuation_strings.dart';
+import 'credits_balance_panel.dart';
+import 'reward_video_card.dart';
+import 'rewarded_video_scope.dart';
 
 class CreditsPage extends StatefulWidget {
   const CreditsPage({super.key, required this.controller});
@@ -19,6 +21,7 @@ class CreditsPage extends StatefulWidget {
 class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
   ContinuationController get c => widget.controller;
   late final _key = c.access.session.resourceKey;
+  RewardedVideoController? _video;
   @override
   void initState() {
     super.initState();
@@ -28,16 +31,33 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
     });
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _video ??= RewardedVideoController(c, RewardedVideoScope.maybeOf(context));
+  }
+
   Future<void> _start() async {
     await c.activate();
-    if (mounted && c.accessible) c.rewards.activate();
+    if (mounted && c.accessible) {
+      _video?.resume();
+      c.rewards.activate();
+    }
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    _video?.foreground =
+        state != AppLifecycleState.paused &&
+        state != AppLifecycleState.hidden &&
+        state != AppLifecycleState.detached;
+    // Native consent/video screens may temporarily take the Activity away.
+    // Keep their attempt alive; page/session invalidation still discards it.
+    if (_video?.nativeOverlay == true) return;
     if (state == AppLifecycleState.resumed) {
       unawaited(_resume());
-    } else {
+    } else if (state != AppLifecycleState.inactive) {
+      _video?.suspend();
       c.suspend();
     }
   }
@@ -50,180 +70,161 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _video?.dispose();
     c.suspend(notify: false);
     super.dispose();
   }
 
+  Future<void> _refresh() async {
+    await c.activate();
+    if (c.rewards.intent != null) await c.rewards.refresh();
+  }
+
+  Future<void> _cancelReward() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Annuler cette demande ?'),
+        content: const Text(
+          'L’annulation empêchera toute validation ultérieure, même si une vidéo déjà terminée est encore en cours de vérification.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Conserver'),
+          ),
+          HistaeButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Annuler la demande'),
+          ),
+        ],
+      ),
+    );
+    if (mounted && confirmed == true) {
+      await c.rewards.cancel(completedVideoWarningAccepted: true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) => ListenableBuilder(
-    listenable: Listenable.merge([c, c.rewards]),
+    listenable: Listenable.merge([c, c.rewards, _video!]),
     builder: (context, _) {
       if (!c.accessible || c.access.session.resourceKey != _key) {
         return const HistaeScaffold(body: SizedBox.shrink());
       }
-      final q = c.quota, reward = c.rewards;
-      return HistaeScaffold(
-        appBar: AppBar(title: const Text('Vos crédits')),
-        body: SafeArea(
-          child: RefreshIndicator(
-            onRefresh: () async {
-              await c.activate();
-              if (reward.intent != null) await reward.refresh();
-            },
-            child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(24),
-              children: [
-                const EditorialCard(
-                  eyebrow: 'LE TEMPS DE CONTINUER',
-                  title: 'À votre rythme.',
-                  body: 'Vos crédits servent à choisir de poursuivre une rencontre. Chacun confirme son propre choix.',
-                ),
-                if (q?.premium != true) ...[
-                  const SizedBox(height: 24),
-                  OutlinedButton.icon(
-                    onPressed: null,
-                    icon: const Icon(Icons.play_circle_outline),
-                    label: const Text('Regarder une vidéo'),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Les vidéos récompensées ne sont pas encore disponibles dans cette version. Vos crédits gratuits restent accessibles.',
-                  ),
-                  const SizedBox(height: 24),
-                ],
-                if (c.loading)
-                  const LinearProgressIndicator(
-                    semanticsLabel: 'Lecture de vos crédits',
-                  ),
-                if (c.failure case final error?)
-                  Text(ContinuationStrings.failure(error)),
-                if (q != null) ...[
+      final q = c.quota, video = _video!, theme = Theme.of(context);
+      final fresh = q != null && c.quotaReadAt != null;
+      return PopScope(
+        canPop: !video.busy,
+        child: HistaeScaffold(
+          appBar: AppBar(
+            title: const Text('Vos crédits'),
+            actions: [
+              IconButton(
+                onPressed: c.loading || video.busy || c.retrySeconds > 0
+                    ? null
+                    : _refresh,
+                tooltip: 'Actualiser mes crédits',
+                icon: const Icon(Icons.refresh_rounded),
+              ),
+              const SizedBox(width: 12),
+            ],
+          ),
+          body: SafeArea(
+            child: RefreshIndicator(
+              onRefresh: video.busy ? () async {} : _refresh,
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+                children: [
                   Text(
-                    q.premium ? 'Votre formule Premium' : 'Votre formule Free',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  if (c.quotaReadAt == null)
-                    const Text(
-                      'Ce solde doit être actualisé avant toute décision.',
+                    'LE TEMPS DE CONTINUER',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.primary,
                     ),
-                  if (q.premium)
-                    const Text(
-                      'Aucun crédit nécessaire pour votre accord de continuation. Le choix de chaque personne reste indépendant.',
-                    )
-                  else ...[
-                    _count('Nouvelles continuations disponibles', q.remaining!),
-                    _count('Crédits gratuits disponibles', q.freeRemaining),
-                    _count('Allocation gratuite hebdomadaire', q.weeklyCredits),
-                    _count('Continuations confirmées cette semaine', q.used),
-                    _count('Plafond hebdomadaire', q.weeklyLimit!),
-                    _count(
-                      'Crédits publicitaires disponibles',
-                      q.advertisingRemaining,
-                    ),
-                  ],
-                  _count('Crédits réservés', q.reserved),
-                  _count(
-                    'Stock publicitaire total, réservations incluses',
-                    q.advertisingBalance,
-                  ),
-                  _count('Capacité du stock publicitaire', q.stockLimit),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Les crédits gratuits sont renouvelés chaque lundi à 00 h UTC, sans cumul. Le stock publicitaire est conservé. Une réservation peut rester rattachée à la semaine de votre accord ; le serveur tient compte des réservations et du plafond dans le solde disponible.',
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Un crédit réservé n’est débité qu’après deux accords valides. Un crédit déjà débité n’est pas remboursé à la clôture.',
-                  ),
-                ],
-                OutlinedButton.icon(
-                  onPressed: c.loading || c.retrySeconds > 0
-                      ? null
-                      : c.activate,
-                  icon: const Icon(Icons.refresh),
-                  label: Text(
-                    c.retrySeconds > 0
-                        ? 'Réessayer dans ${c.retrySeconds} s'
-                        : 'Actualiser mes crédits',
-                  ),
-                ),
-                if (q?.premium != true) ...[
-                  const EditorialDivider(),
-                  Text(
-                    'Une vidéo, si vous le souhaitez',
-                    style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Le crédit est ajouté uniquement après validation de la récompense par le serveur. Le suivi reste accessible si une validation est en attente.',
+                    'La suite commence\nici.',
+                    style: theme.textTheme.headlineLarge,
                   ),
-                ],
-                if (c.catalogFailure case final error?)
-                  Text(ContinuationStrings.failure(error)),
-                if (reward.intent case final intent?) ...[
-                  const SizedBox(height: 20),
-                  Text(switch (intent.status) {
-                    RewardStatus.pending =>
-                      'Récompense en cours de validation par le serveur.',
-                    RewardStatus.credited =>
-                      'Récompense validée. Votre solde a été relu.',
-                    RewardStatus.expired => 'La période de visionnage est terminée. Une validation tardive reste possible si la vidéo a été terminée à temps.',
-                    RewardStatus.cancelled => 'Cette demande a été annulée.',
-                  }),
-                  if (reward.failure case final error?)
-                    Text(ContinuationStrings.failure(error)),
-                  TextButton(
-                    onPressed: reward.busy || reward.waiting
-                        ? null
-                        : reward.refresh,
-                    child: const Text('Vérifier la récompense'),
-                  ),
-                  if (intent.status != RewardStatus.credited &&
-                      intent.status != RewardStatus.cancelled)
-                    TextButton(
-                      onPressed: reward.busy || reward.waiting
-                          ? null
-                          : () async {
-                              final confirmed = await showDialog<bool>(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text('Annuler cette demande ?'),
-                                  content: const Text(
-                                    'L’annulation empêchera toute validation ultérieure, même si une vidéo déjà terminée est encore en cours de vérification.',
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(context, false),
-                                      child: const Text('Conserver'),
-                                    ),
-                                    HistaeButton(
-                                      onPressed: () =>
-                                          Navigator.pop(context, true),
-                                      child: const Text('Annuler la demande'),
-                                    ),
-                                  ],
-                                ),
-                              );
-                              if (confirmed == true) {
-                                await reward.cancel(
-                                  completedVideoWarningAccepted: true,
-                                );
-                              }
-                            },
-                      child: const Text('Annuler la demande de récompense'),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Des crédits pour les rencontres que vous avez envie de poursuivre.',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
+                  ),
+                  const SizedBox(height: 24),
+                  if (c.loading) ...[
+                    const LinearProgressIndicator(
+                      semanticsLabel: 'Lecture de vos crédits',
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  if (fresh) ...[
+                    CreditsBalancePanel(quota: q),
+                    if (!q.premium) ...[
+                      const SizedBox(height: 16),
+                      CreditsWeekPanel(quota: q),
+                    ],
+                  ] else if (!c.loading)
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const Icon(Icons.cloud_off_outlined, size: 32),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Votre solde reste à vérifier',
+                              style: theme.textTheme.titleLarge,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              c.failure == null
+                                  ? 'Actualisez vos crédits pour retrouver votre solde.'
+                                  : ContinuationStrings.failure(c.failure!),
+                            ),
+                            const SizedBox(height: 16),
+                            OutlinedButton.icon(
+                              onPressed: c.retrySeconds > 0 ? null : _refresh,
+                              icon: const Icon(Icons.refresh),
+                              label: Text(
+                                c.retrySeconds > 0
+                                    ? 'Réessayer dans ${c.retrySeconds} s'
+                                    : 'Actualiser mes crédits',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  if (fresh && !q.premium) ...[
+                    const SizedBox(height: 16),
+                    RewardVideoCard(
+                      credits: c,
+                      video: video,
+                      onCancel: _cancelReward,
+                    ),
+                    const SizedBox(height: 16),
+                    CreditsExplanation(quota: q),
+                  ],
+                  const SizedBox(height: 20),
+                  Text(
+                    'Une rencontre se poursuit à deux. Chacun confirme son propre choix.',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ],
-              ],
+              ),
             ),
           ),
         ),
       );
     },
-  );
-  Widget _count(String label, int count) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8),
-    child: Text('$label : $count'),
   );
 }
