@@ -35,6 +35,12 @@ L'API actuelle est écrite en Rust avec Axum, Tokio et SQLx. PostgreSQL, Redis e
 
 ## Démarrage
 
+### Refactoring Flutter — 19 octobre 2026
+
+Les parcours profil, aperçu, découverte et consentements séparent désormais leurs composants visuels, la projection des données publiques et l’accès réseau du mode pause. Le calcul d’âge UTC est partagé avec la validation du profil ; les états du contrôleur de visibilité sont en lecture seule. Les cartes conservent leur position individuelle dans les listes pour préserver le défilement lors du changement de taille du texte. Aucun changement fonctionnel ou de contrat serveur n’est introduit.
+
+Validation : 48 contrôles existants ciblés, 15 captures identiques aux références, formatage et analyse Flutter sans problème. Le refactoring ne modifie pas le statut de déploiement de l’API pause décrit ci-dessous.
+
 ### Aperçu et mode pause — 19 octobre 2026
 
 Dans le profil, **Aperçu de mon profil** reprend les composants du feed : prénom, âge, traits, bio et réponses approuvées dans leur ordre. Aucune photo, aucun geste de swipe ni bouton de décision. La distance dépend du lecteur et n’est pas inventée. Une section non relue ne produit pas d’aperçu trompeur ; la session et les consentements continuent de protéger cet écran.

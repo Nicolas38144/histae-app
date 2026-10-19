@@ -344,3 +344,11 @@ Le 19 octobre 2026, ajout depuis le profil d’un aperçu utilisant la mise en p
 L’utilisateur a expressément autorisé l’ajout de la pause dans histae-api-rust pour cette fonctionnalité. Nouveaux GET/PATCH discovery-settings, colonne persistante avec migration idempotente, diagnostic resume_discovery, filtres demandeur/candidats et contrôles sous verrou au swipe et à la création du match. Conversations et autres données conservées, sans suspension d’abonnement. Export et Postman FR/EN actualisés. Contrôleur de visibilité distinct du profil, état confirmé seulement, réponse incertaine relue sans rejeu automatique, purge à la déconnexion et reprise explicite.
 
 16 contrôles Flutter ciblés réussis, aperçus vérifiés dont 200 %, analyse propre et APK Android debug compilé. Deux tests backend ajoutés mais non exécutés : Cargo/Rust, WSL et Docker indisponibles sur ce poste. Aucune migration, publication ou mutation réelle. Avant mise en service, vérifier Rust et PostgreSQL, puis migrer et déployer l’API ; tant que l’endpoint manque, le réglage affiche un état indisponible. Aucun fichier supprimé ni commande Git exécutée.
+
+## 28. Refactoring des parcours Flutter
+
+Le 19 octobre 2026, extraction du dépôt de visibilité et exposition de l’état du contrôleur en lecture seule. Les appels HTTP/JSON ne sont plus dans le contrôleur. L’aperçu du feed passe par une projection immuable des contenus approuvés, fournie par ProfileController ; le calcul d’âge UTC est partagé avec la majorité. Cartes de profil et découverte isolées, rendu des consentements séparé de leur enregistrement et ouverture native des documents isolée, avec compatibilité des anciens imports.
+
+La comparaison des captures a détecté une modification d’ancrage à 200 % lors du regroupement de cartes ; les cartes restent finalement des enfants distincts des listes, ce qui rétablit les 15 captures à l’identique sans réécrire les références. Les diagnostics générés sont ignorés, sans suppression de fichiers.
+
+48 contrôles existants ciblés réussis, formatage et analyse propres, APK Android debug compilé. Aucun test de décoration ajouté, package introduit, contrat API modifié, fichier supprimé ou commande Git exécutée. Le statut de validation et déploiement Rust de la pause reste celui de la section précédente.

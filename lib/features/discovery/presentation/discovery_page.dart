@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
-import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../../core/widgets/histae_wordmark.dart';
 import '../../consents/presentation/consents_page.dart';
@@ -17,6 +16,7 @@ import '../application/discovery_controller.dart';
 import '../application/discovery_visibility_controller.dart';
 import '../data/device_location.dart';
 import '../data/discovery_models.dart';
+import 'discovery_status_sections.dart';
 import 'discovery_strings.dart';
 import 'encounter_page.dart';
 import 'feed_profile_card.dart';
@@ -247,44 +247,13 @@ class _DiscoveryPageState extends State<DiscoveryPage>
       final enabled = !c.busy && c.retrySeconds == 0;
       final statusBody = <Widget>[
         if (!c.ready && c.status != null) ...[
-          EditorialCard(
-            eyebrow: 'AVANT LA RENCONTRE',
-            title: required.contains(DiscoveryAction.resumeDiscovery)
-                ? 'Prenez votre temps.'
-                : 'Un peu de vous.\nPuis les autres.',
-            body: required.contains(DiscoveryAction.resumeDiscovery)
-                ? 'Les nouvelles rencontres attendront. Vos matchs et vos conversations restent accessibles.'
-                : 'Complétez ces étapes à votre rythme. Vos choix de vie privée restent accessibles.',
+          DiscoveryReadinessIntro(
+            paused: required.contains(DiscoveryAction.resumeDiscovery),
           ),
           for (final action in required)
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      DiscoveryStrings.actionTitle(action),
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(DiscoveryStrings.actionBody(action)),
-                    const SizedBox(height: 20),
-                    OutlinedButton(
-                      onPressed: enabled && !_opening
-                          ? () => _repair(action)
-                          : null,
-                      child: Text(
-                        action == DiscoveryAction.freshPresence
-                            ? 'Actualiser ma position'
-                            : action == DiscoveryAction.resumeDiscovery
-                            ? 'Reprendre la découverte'
-                            : 'Compléter cette étape',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            DiscoveryReadinessCard(
+              action: action,
+              onRepair: enabled && !_opening ? () => _repair(action) : null,
             ),
         ],
         if (c.ready && profile == null && !c.loading && c.failure == null)
@@ -298,30 +267,10 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                 : 'La recherche peut se poursuivre. Chargez la suite lorsque vous le souhaitez.',
           ),
         if (c.pending case final intent?)
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Votre choix pour ${intent.profile.firstname}',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    c.uncertain
-                        ? 'La réponse n’est pas confirmée. Votre choix reste en mémoire ; seul le même choix sera renvoyé.'
-                        : 'Votre demande attend sa confirmation. Aucun autre choix ne sera envoyé pour ce profil.',
-                  ),
-                  const SizedBox(height: 20),
-                  HistaeButton(
-                    onPressed: c.canResume ? _retry : null,
-                    child: Text(DiscoveryStrings.pending(intent.action)),
-                  ),
-                ],
-              ),
-            ),
+          DiscoveryPendingChoiceCard(
+            intent: intent,
+            uncertain: c.uncertain,
+            onResume: c.canResume ? _retry : null,
           ),
         if (c.loading || c.locating || c.sending) ...[
           const SizedBox(height: 16),

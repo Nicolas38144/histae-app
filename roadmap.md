@@ -445,3 +445,9 @@ Les mentions CGU acceptées et Notice consultée remplacent les deux interrupteu
 | Mode pause | Réglage profil et reprise depuis le feed ; `GET/PATCH /api/users/me/discovery-settings` ; action `resume_discovery` | App et API implémentées localement avec autorisation ; 2 tests mobiles ciblés réussis ; 2 tests backend ajoutés non exécutés, migration/déploiement en attente |
 
 16 contrôles Flutter ciblés réussis et analyse propre. Le migrateur ajoute discovery_paused par défaut faux ; filtrage des deux côtés et verrous sur les nouvelles écritures. Aucun consentement retiré pour simuler une pause, aucune altération des matchs ou abonnements existants. Contrat HTTP, export et Postman API mis à jour. Rust/WSL/Docker indisponibles sur le poste ; vérifier compilation et tests avant migration puis déploiement. L10 garde la validation réelle sur appareils et les fournisseurs en attente.
+
+## 26. Refactoring des parcours Flutter — 19 octobre 2026
+
+Dépôt de visibilité distinct du contrôleur, état en lecture seule, projection immuable de l’aperçu public et calcul d’âge partagé. Extraction des cartes de profil/découverte, du contrôle adaptatif des consentements et de l’ouverture native des documents. Navigation, confirmations, contrat API et politique de reprise conservés. Les cartes restent des éléments distincts des listes afin de préserver leurs ancrages à grande police.
+
+48 contrôles existants ciblés réussis ; 15 captures identiques aux références sans les régénérer, formatage et analyse propres. Cette étape ne change ni le périmètre fonctionnel ni les vérifications serveur encore nécessaires à la pause. L10 reste ouvert pour les appareils et fournisseurs réels.

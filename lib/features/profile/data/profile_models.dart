@@ -80,15 +80,20 @@ DateTime? parseBirthdate(String value) {
   return d != null && d.toIso8601String().startsWith(value) ? d : null;
 }
 
+int ageOn(DateTime birthdate, DateTime now) {
+  final today = now.toUtc();
+  var age = today.year - birthdate.year;
+  if (today.month < birthdate.month ||
+      (today.month == birthdate.month && today.day < birthdate.day)) {
+    age--;
+  }
+  return age;
+}
+
 String? validateBirthdate(String value, DateTime now) {
   final d = parseBirthdate(value);
   if (d == null) return 'Indiquez une date valide au format AAAA-MM-JJ.';
-  final today = now.toUtc();
-  var age = today.year - d.year;
-  if (today.month < d.month || (today.month == d.month && today.day < d.day)) {
-    age--;
-  }
-  return age < 18
+  return ageOn(d, now) < 18
       ? 'Histae est réservé aux personnes de 18 ans et plus.'
       : null;
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_failure.dart';
@@ -8,21 +7,13 @@ import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../auth/domain/authenticated_session.dart';
 import '../../privacy/presentation/privacy_hub_page.dart';
+import '../data/legal_document_opener.dart';
 import '../domain/consent_state.dart';
+import 'consent_control.dart';
 import 'consent_strings.dart';
 
-typedef DocumentOpener = Future<bool> Function(Uri url);
-
-Future<bool> openLegalDocument(Uri url) async {
-  if (url.scheme != 'https' || url.host.isEmpty || url.userInfo.isNotEmpty) {
-    return false;
-  }
-  try {
-    return await launchUrl(url, mode: LaunchMode.externalApplication);
-  } catch (_) {
-    return false;
-  }
-}
+export '../data/legal_document_opener.dart'
+    show DocumentOpener, openLegalDocument;
 
 class ConsentsPage extends StatefulWidget {
   const ConsentsPage({
@@ -112,104 +103,6 @@ class _ConsentsPageState extends State<ConsentsPage> {
     }
   }
 
-  Widget _consentControl(
-    PublicConsent consent, {
-    required bool value,
-    required ValueChanged<bool>? onChanged,
-  }) {
-    final strings = AppStrings.of(context);
-    final title = Text(
-      strings.consentTitle(consent.type),
-      style: Theme.of(context).textTheme.titleMedium,
-    );
-    final renewal = consent.granted && !consent.current;
-    final document = TextButton(
-      onPressed: _busy ? null : () => _open(consent),
-      child: Text(strings.readDocument),
-    );
-    final key = Key(consent.type.wireName);
-    if (!consent.type.withdrawable) {
-      return Column(
-        key: consent.current
-            ? Key('acknowledged-${consent.type.wireName}')
-            : null,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (consent.current)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    Icons.check_circle_outline,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      consent.type == ConsentType.terms
-                          ? 'CGU acceptées'
-                          : 'Notice consultée',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ),
-                ],
-              ),
-            )
-          else
-            CheckboxListTile(
-              key: key,
-              contentPadding: EdgeInsets.zero,
-              title: Text(strings.consentLabel(consent.type)),
-              subtitle: renewal ? const Text('À renouveler') : null,
-              value: value,
-              onChanged: onChanged == null
-                  ? null
-                  : (next) => onChanged(next ?? false),
-            ),
-          document,
-        ],
-      );
-    }
-    if (MediaQuery.textScalerOf(context).scale(16) > 20) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Semantics(header: true, child: title),
-          if (renewal) const Text('À renouveler'),
-          Row(
-            children: [
-              Expanded(child: document),
-              Semantics(
-                label: strings.consentLabel(consent.type),
-                child: Switch(key: key, value: value, onChanged: onChanged),
-              ),
-            ],
-          ),
-        ],
-      );
-    }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SwitchListTile(
-          key: key,
-          contentPadding: EdgeInsets.zero,
-          title: Semantics(
-            label: strings.consentLabel(consent.type),
-            excludeSemantics: true,
-            child: title,
-          ),
-          subtitle: renewal ? const Text('À renouveler') : null,
-          value: value,
-          onChanged: onChanged,
-        ),
-        document,
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
@@ -281,8 +174,9 @@ class _ConsentsPageState extends State<ConsentsPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              _consentControl(
-                                consent,
+                              ConsentControl(
+                                consent: consent,
+                                onOpen: _busy ? null : () => _open(consent),
                                 value:
                                     _choices[consent.type] ?? consent.current,
                                 onChanged:

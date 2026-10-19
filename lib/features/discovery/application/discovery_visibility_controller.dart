@@ -2,25 +2,34 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
-import '../../../core/network/json_fields.dart';
 import '../../../core/network/retry_after.dart';
 import '../../auth/domain/authenticated_session.dart';
+import '../data/discovery_visibility_repository.dart';
 
 /// Server-owned visibility; no local preference can hide a profile remotely.
 class DiscoveryVisibilityController extends ChangeNotifier {
-  DiscoveryVisibilityController(this.session) {
+  DiscoveryVisibilityController(AuthenticatedSession session)
+    : this.withRepository(DiscoveryVisibilityRepository(session));
+
+  DiscoveryVisibilityController.withRepository(this.repository) {
     _key = session.resourceKey;
     session.addListener(_sessionChanged);
   }
 
-  final AuthenticatedSession session;
+  final DiscoveryVisibilityRepository repository;
+  AuthenticatedSession get session => repository.session;
   late String _key;
   RequestCancellation _scope = RequestCancellation();
   int _epoch = 0;
   bool _disposed = false;
-  bool loading = false, saving = false, uncertain = false;
-  bool? paused;
-  ApiFailure? failure;
+  bool _loading = false, _saving = false, _uncertain = false;
+  bool? _paused;
+  ApiFailure? _failure;
+  bool get loading => _loading;
+  bool get saving => _saving;
+  bool get uncertain => _uncertain;
+  bool? get paused => _paused;
+  ApiFailure? get failure => _failure;
   DateTime? _retryAt;
   late final RetryTicker _ticker = RetryTicker(
     remaining: () => retrySeconds,
@@ -31,11 +40,11 @@ class DiscoveryVisibilityController extends ChangeNotifier {
   int get retrySeconds => retrySecondsUntil(_retryAt);
   bool get canChange =>
       accessible &&
-      paused != null &&
-      !loading &&
-      !saving &&
-      !uncertain &&
-      failure == null &&
+      _paused != null &&
+      !_loading &&
+      !_saving &&
+      !_uncertain &&
+      _failure == null &&
       retrySeconds == 0;
 
   void _notify() {
@@ -48,9 +57,9 @@ class DiscoveryVisibilityController extends ChangeNotifier {
     _epoch++;
     _scope.cancel();
     _scope = RequestCancellation();
-    paused = null;
-    failure = null;
-    loading = saving = uncertain = false;
+    _paused = null;
+    _failure = null;
+    _loading = _saving = _uncertain = false;
     _retryAt = null;
     _ticker.cancel();
     _notify();
@@ -59,41 +68,27 @@ class DiscoveryVisibilityController extends ChangeNotifier {
   bool _alive(int epoch) => accessible && epoch == _epoch;
 
   void _failed(ApiFailure error) {
-    failure = error;
+    _failure = error;
     _retryAt = error.retryAt;
     if (retrySeconds > 0) _ticker.restart();
   }
 
-  Future<bool> _request(String method, {bool? value}) async => jsonField<bool>(
-    jsonObject(
-      await session.request(
-        method,
-        '/api/users/me/discovery-settings',
-        body: value == null ? null : {'paused': value},
-        expectedStatus: 200,
-        replayAfterRefresh: true,
-        cancellation: _scope,
-      ),
-    ),
-    'paused',
-  );
-
   Future<void> load() async {
-    if (!accessible || loading || saving || retrySeconds > 0) return;
+    if (!accessible || _loading || _saving || retrySeconds > 0) return;
     final epoch = _epoch;
-    loading = true;
+    _loading = true;
     _notify();
     try {
-      final result = await _request('GET');
+      final result = await repository.read(_scope);
       if (!_alive(epoch)) return;
-      paused = result;
-      failure = null;
-      uncertain = false;
+      _paused = result;
+      _failure = null;
+      _uncertain = false;
     } on ApiFailure catch (error) {
       if (_alive(epoch)) _failed(error);
     } finally {
       if (_alive(epoch)) {
-        loading = false;
+        _loading = false;
         _notify();
       }
     }
@@ -102,18 +97,20 @@ class DiscoveryVisibilityController extends ChangeNotifier {
   Future<void> setPaused(bool value) async {
     if (!canChange) throw const ApiFailure(ApiFailureKind.conflict);
     final epoch = _epoch;
-    saving = true;
-    failure = null;
+    _saving = true;
+    _failure = null;
     _notify();
     try {
-      final result = await _request('PATCH', value: value);
+      final result = await repository.setPaused(value, _scope);
       if (!_alive(epoch)) throw const ApiFailure(ApiFailureKind.cancelled);
-      if (result != value) invalidResponse();
-      paused = result;
+      if (result != value) {
+        throw const ApiFailure(ApiFailureKind.invalidResponse);
+      }
+      _paused = result;
     } on ApiFailure catch (error) {
       if (_alive(epoch)) {
         _failed(error);
-        uncertain = const [
+        _uncertain = const [
           ApiFailureKind.network,
           ApiFailureKind.timeout,
           ApiFailureKind.server,
@@ -124,7 +121,7 @@ class DiscoveryVisibilityController extends ChangeNotifier {
       rethrow;
     } finally {
       if (_alive(epoch)) {
-        saving = false;
+        _saving = false;
         _notify();
       }
     }

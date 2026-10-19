@@ -10,6 +10,7 @@ import '../../auth/domain/authenticated_session.dart';
 import '../../consents/domain/consent_state.dart';
 import '../data/profile_models.dart';
 import '../data/profile_repository.dart';
+import 'profile_feed_preview.dart';
 
 class ProfileController extends ChangeNotifier {
   ProfileController(this.repository) {
@@ -53,6 +54,20 @@ class ProfileController extends ChangeNotifier {
       accessible && !saving && !loading && !uncertain && retrySeconds == 0;
   DateTime? retryAt;
   int get retrySeconds => retrySecondsUntil(retryAt);
+
+  bool get hasFeedPreview =>
+      accessible &&
+      profile != null &&
+      !['profile', 'answers', 'selectedTraits'].any(_errors.containsKey);
+
+  ProfileFeedPreview? feedPreviewAt(DateTime now) => hasFeedPreview
+      ? ProfileFeedPreview.fromProfile(
+          profile: profile!,
+          traits: _selectedTraits,
+          answers: _answers,
+          now: now,
+        )
+      : null;
 
   void _notify() {
     if (!_disposed) notifyListeners();

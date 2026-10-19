@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/models/public_profile_answer.dart';
 import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../discovery/presentation/feed_profile_content.dart';
 import '../application/profile_controller.dart';
-import '../data/profile_models.dart';
 
 class ProfileFeedPreviewPage extends StatefulWidget {
   const ProfileFeedPreviewPage({super.key, required this.controller});
@@ -27,28 +25,7 @@ class _ProfileFeedPreviewPageState extends State<ProfileFeedPreviewPage> {
       if (!c.accessible || c.session.resourceKey != _resourceKey) {
         return const HistaeScaffold(body: SizedBox.shrink());
       }
-      final profile = c.profile;
-      final unavailable =
-          profile == null ||
-          ['profile', 'answers', 'selectedTraits'].any(c.errors.containsKey);
-      final birthdate = profile == null
-          ? null
-          : parseBirthdate(profile.birthdate);
-      final today = DateTime.now().toUtc();
-      final age = birthdate == null
-          ? null
-          : today.year -
-                birthdate.year -
-                (today.month < birthdate.month ||
-                        (today.month == birthdate.month &&
-                            today.day < birthdate.day)
-                    ? 1
-                    : 0);
-      final answers =
-          c.answers
-              .where((answer) => answer.moderation.status == 'approved')
-              .toList()
-            ..sort((a, b) => a.position.compareTo(b.position));
+      final preview = c.feedPreviewAt(DateTime.now().toUtc());
       return HistaeScaffold(
         appBar: AppBar(title: const Text('Mon profil dans le feed')),
         body: SafeArea(
@@ -74,7 +51,7 @@ class _ProfileFeedPreviewPageState extends State<ProfileFeedPreviewPage> {
                     const LinearProgressIndicator(
                       semanticsLabel: 'Actualisation de votre aperçu',
                     ),
-                  if (unavailable || age == null)
+                  if (preview == null)
                     const Text(
                       'Votre aperçu ne peut pas être affiché. Revenez à votre profil pour le compléter ou actualisez vos informations.',
                     )
@@ -88,24 +65,12 @@ class _ProfileFeedPreviewPageState extends State<ProfileFeedPreviewPage> {
                         child: Padding(
                           padding: const EdgeInsets.all(24),
                           child: FeedProfileContent(
-                            firstname: profile.firstname,
-                            age: age,
-                            bio: profile.bioModeration?.status == 'approved'
-                                ? profile.bio
-                                : null,
+                            firstname: preview.firstname,
+                            age: preview.age,
+                            bio: preview.bio,
                             distanceLabel: 'Distance selon la personne',
-                            traits: [
-                              for (final trait in c.selectedTraits) trait.name,
-                            ],
-                            answers: [
-                              for (final answer in answers)
-                                PublicProfileAnswer(
-                                  answer.questionId,
-                                  answer.question,
-                                  answer.answer,
-                                  answer.position,
-                                ),
-                            ],
+                            traits: preview.traits,
+                            answers: preview.answers,
                           ),
                         ),
                       ),

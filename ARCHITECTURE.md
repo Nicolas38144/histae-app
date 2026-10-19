@@ -21,7 +21,7 @@ L'application conserve son organisation par fonctionnalité, ses contrôleurs `C
 | `features/*/application` | État des parcours, commandes utilisateur, suspension, annulation et rejet des réponses périmées |
 | `features/*/presentation` | Pages, formulaires, composants et textes propres à la fonctionnalité |
 
-Le dossier `core` n'importe aucune fonctionnalité. Les dépôts des fonctionnalités privées dépendent du contrat `AuthenticatedSession` ; ils n'importent pas `SessionController`. Les neuf dépôts exposent une interface et une implémentation HTTP distincte. Le constructeur habituel, par exemple `BillingRepository(session)`, reste une factory vers son implémentation API. Les tests peuvent injecter une autre implémentation du contrat sans changer un écran.
+Le dossier `core` n'importe aucune fonctionnalité. Les dépôts des fonctionnalités privées dépendent du contrat `AuthenticatedSession` ; ils n'importent pas `SessionController`. Les dépôts exposent une interface et une implémentation HTTP distincte. Le constructeur habituel, par exemple `BillingRepository(session)`, reste une factory vers son implémentation API. Les tests peuvent injecter une autre implémentation du contrat sans changer un écran.
 
 Les modèles n'ont pas tous besoin d'une seconde représentation métier : les DTO simples restent dans `data`. Les contrats de session et de consentement ont un emplacement explicite dans `domain`. Les primitives de lecture JSON, UUID serveur, dates et curseurs ne dépendent plus du profil ou du chat. La réponse publique à une question est commune au feed et au profil partenaire.
 
@@ -92,3 +92,13 @@ Gradle lit l’ID Android public dans `.env`. Un script de fin de build Xcode in
 `ProfilePanel`, `ProfileAnswersPreview` et `ProfileDetailTile` isolent la présentation de l’espace personnel. Le contrôleur et les droits serveur restent inchangés. Le sélecteur de questions travaille sur le catalogue déjà chargé ; il trie par `display_order`, filtre les choix déjà présents et cherche dans les libellés. Les brouillons appartiennent à AnswersEditor ; le PUT reste un remplacement complet confirmé. Le pied d’enregistrement est une option de ProfileEditorState, sans changer les autres éditeurs. Le parent Profil ignore les transitions natives d’une route qui possède déjà le quota.
 
 Les erreurs UMP sont classées à leur frontière native, en tenant compte des codes différents sur Android/iOS. Les messages fournisseur contenant un ID restent hors de l’interface et des logs ajoutés. La reprise sur échec d’actualisation exige `canRequestAds` vrai du SDK et un propriétaire encore valide. Ni le stockage Histae, ni la présence d’un ID AdMob ne constituent un accord publicitaire. Aucun nouveau champ de consentement API n’est introduit.
+
+## Séparation des responsabilités — 19 octobre 2026
+
+`DiscoveryVisibilityRepository` porte les GET/PATCH et le décodage strict du mode pause. Son contrôleur garde uniquement les commandes, les états en lecture seule, l’annulation liée au compte, l’incertitude et le délai de reprise. Le constructeur habituel conserve sa compatibilité ; `withRepository` permet l’injection du dépôt. Le contrat réseau et la règle de relecture après réponse incertaine ne changent pas.
+
+`ProfileFeedPreview` est une projection immuable des seuls textes publics approuvés. `ProfileController` décide si les données chargées permettent cet aperçu ; l’écran affiche le résultat sans recalculer la modération, l’ordre des réponses ou l’âge. `ageOn` partage le calcul calendaire UTC avec la validation de majorité.
+
+Les cartes du profil et de préparation de la découverte ont leurs propres widgets, mais restent des enfants distincts des listes : les regrouper dans une colonne changerait les points d’ancrage du défilement lors du changement d’échelle du texte. La navigation et les confirmations restent dans les pages. `ConsentControl` se limite au rendu adaptatif d’un document ou d’un accord ; `legal_document_opener.dart` isole l’ouverture native HTTPS et conserve les exports historiques de `consents_page.dart`.
+
+Vérification du refactoring : 48 contrôles existants ciblés réussis, formatage et analyse propres, 15 captures strictement identiques aux références, sans mise à jour des images de référence. Aucun package ni contrat API ajouté par ce refactoring.
