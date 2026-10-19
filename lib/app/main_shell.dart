@@ -5,6 +5,7 @@ import '../core/widgets/histae_scaffold.dart';
 import '../features/auth/domain/authenticated_session.dart';
 import '../features/catalog/data/catalog_repository.dart';
 import '../features/discovery/application/discovery_controller.dart';
+import '../features/discovery/application/discovery_visibility_controller.dart';
 import '../features/discovery/data/device_location.dart';
 import '../features/discovery/data/discovery_repository.dart';
 import '../features/discovery/presentation/discovery_page.dart';
@@ -31,6 +32,7 @@ class MainShell extends StatefulWidget {
 }
 
 class _MainShellState extends State<MainShell> {
+  late final _visibility = DiscoveryVisibilityController(widget.session);
   late final _profile = ProfileController(ProfileRepository(widget.session));
   late final _discovery = DiscoveryController(
     DiscoveryRepository(widget.session),
@@ -45,6 +47,24 @@ class _MainShellState extends State<MainShell> {
   bool _covered = false;
   int _selected = 0, _matchRequest = 0;
   String? _initialMatchId;
+  bool? _lastPaused;
+  @override
+  void initState() {
+    super.initState();
+    _visibility.addListener(_visibilityChanged);
+  }
+
+  void _visibilityChanged() {
+    final paused = _visibility.paused;
+    if (paused == _lastPaused) return;
+    _lastPaused = paused;
+    if (paused == null) return;
+    _discovery.deactivate();
+    if (_selected == 0 && !_covered) {
+      Future.microtask(_discovery.activate);
+    }
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -96,6 +116,7 @@ class _MainShellState extends State<MainShell> {
     _push?.removeListener(_pushRouteChanged);
     _matches.dispose();
     _discovery.dispose();
+    _visibility.dispose();
     _profile.dispose();
     super.dispose();
   }
@@ -111,6 +132,7 @@ class _MainShellState extends State<MainShell> {
                 key: const PageStorageKey('main-discovery'),
                 controller: _discovery,
                 profile: _profile,
+                visibility: _visibility,
                 openMatches: _openMatches,
               ),
               1 => MatchesPage(
@@ -124,6 +146,7 @@ class _MainShellState extends State<MainShell> {
                 controller: _profile,
                 continuation: _matches.continuation,
                 catalog: widget.catalog,
+                visibility: _visibility,
               ),
             },
     ),

@@ -1,5 +1,6 @@
 // Manual visual review only; all accounts, ads and server responses are fake.
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -42,7 +43,12 @@ void main() {
     addTearDown(tester.view.resetPadding);
     addTearDown(tester.view.resetViewInsets);
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    var paused = false;
     final session = testSession((r) async {
+      if (r.url.path.endsWith('/discovery-settings')) {
+        if (r.method == 'PATCH') paused = jsonDecode(r.body)['paused'] as bool;
+        return jsonResponse({'paused': paused});
+      }
       if (r.url.path.endsWith('/consents')) {
         return jsonResponse(
           consentJson(
@@ -121,6 +127,25 @@ void main() {
     await tester.tap(find.byKey(const Key('main-tab-profile')));
     await tester.pumpAndSettle();
     await capture('overview');
+    await reveal(find.byKey(const Key('profile-feed-preview')));
+    await tester.tap(find.byKey(const Key('profile-feed-preview')));
+    await tester.pumpAndSettle();
+    await capture('feed-preview');
+    tester.view.physicalSize = const Size(320, 568);
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    await tester.pumpAndSettle();
+    await capture('feed-preview-large');
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+    tester.view.physicalSize = const Size(390, 844);
+    tester.platformDispatcher.textScaleFactorTestValue = 1;
+    await tester.pumpAndSettle();
+    await reveal(find.byKey(const Key('discovery-paused')));
+    await tester.tap(find.byKey(const Key('discovery-paused')));
+    await tester.pumpAndSettle();
+    await capture('pause-active');
+    await tester.tap(find.byKey(const Key('discovery-paused')));
+    await tester.pumpAndSettle();
     await reveal(find.text('Des débuts de conversation'));
     await tester.drag(find.byType(Scrollable).first, const Offset(0, 110));
     await tester.pumpAndSettle();

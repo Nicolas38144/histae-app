@@ -10,7 +10,8 @@ enum DiscoveryAction {
   preferences('preferences'),
   sensitiveConsent('sensitive_data_consent'),
   locationConsent('location_consent'),
-  freshPresence('fresh_presence');
+  freshPresence('fresh_presence'),
+  resumeDiscovery('resume_discovery');
 
   const DiscoveryAction(this.wireName);
   final String wireName;

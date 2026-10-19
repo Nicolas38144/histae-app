@@ -5,6 +5,7 @@ import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../data/discovery_models.dart';
 import 'discovery_strings.dart';
+import 'feed_profile_content.dart';
 
 class FeedProfileCard extends StatefulWidget {
   const FeedProfileCard({
@@ -81,76 +82,14 @@ class _FeedProfileCardState extends State<FeedProfileCard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    'AU FIL DES MOTS',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.primary,
-                    ),
+                  FeedProfileContent(
+                    firstname: p.firstname,
+                    age: p.age,
+                    bio: p.bio,
+                    distanceLabel: DiscoveryStrings.distance(p.distance),
+                    traits: p.traits,
+                    answers: p.answers,
                   ),
-                  const SizedBox(height: 16),
-                  Semantics(
-                    header: true,
-                    child: Text(
-                      '${p.firstname}, ${p.age}',
-                      style: theme.textTheme.headlineLarge?.copyWith(
-                        fontSize: 46,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.location_on_outlined,
-                        size: 22,
-                        color: theme.colorScheme.primary,
-                      ),
-                      const SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          DiscoveryStrings.distance(p.distance),
-                          style: theme.textTheme.bodyLarge,
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (p.bio != null && p.bio!.isNotEmpty) ...[
-                    const EditorialDivider(),
-                    Text(
-                      p.bio!,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        fontSize: 18,
-                        height: 1.55,
-                      ),
-                    ),
-                  ],
-                  if (p.traits.isNotEmpty) ...[
-                    const EditorialDivider(),
-                    Text('Quelques traits', style: theme.textTheme.titleLarge),
-                    const SizedBox(height: 16),
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: p.traits
-                          .map(
-                            (t) => Chip(
-                              label: Text(t),
-                              backgroundColor:
-                                  theme.colorScheme.surfaceContainerLow,
-                              side: BorderSide(
-                                color: theme.colorScheme.outlineVariant,
-                              ),
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  ],
-                  for (final answer in p.answers) ...[
-                    const EditorialDivider(),
-                    Text(answer.question, style: theme.textTheme.titleLarge),
-                    const SizedBox(height: 14),
-                    Text(answer.answer, style: theme.textTheme.bodyLarge),
-                  ],
                   const EditorialDivider(),
                   Text(
                     _readyToPass ? 'Relâchez pour passer' : 'Double appui pour aimer.\nEn fin de lecture, glissez vers le haut pour passer.',

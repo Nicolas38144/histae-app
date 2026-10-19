@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
@@ -13,6 +14,7 @@ import '../../privacy/presentation/report_page.dart';
 import '../../profile/application/profile_controller.dart';
 import '../../profile/presentation/profile_editors.dart';
 import '../application/discovery_controller.dart';
+import '../application/discovery_visibility_controller.dart';
 import '../data/device_location.dart';
 import '../data/discovery_models.dart';
 import 'discovery_strings.dart';
@@ -25,10 +27,12 @@ class DiscoveryPage extends StatefulWidget {
     required this.controller,
     required this.profile,
     this.openMatches,
+    this.visibility,
   });
   final DiscoveryController controller;
   final ProfileController profile;
   final Future<void> Function([String? id])? openMatches;
+  final DiscoveryVisibilityController? visibility;
   @override
   State<DiscoveryPage> createState() => _DiscoveryPageState();
 }
@@ -44,6 +48,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     unawaited(c.activate());
+    if (widget.visibility case final visibility?) unawaited(visibility.load());
   }
 
   @override
@@ -61,6 +66,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
   Future<void> _resume() async {
     if (PushScope.maybeOf(context)?.coversMainFlow == true) return;
     await c.session.synchronize();
+    await widget.visibility?.load();
     if (mounted && c.session.resourceKey == _key) {
       if (c.active) {
         await c.refresh();
@@ -86,6 +92,28 @@ class _DiscoveryPageState extends State<DiscoveryPage>
 
   Future<void> _repair(DiscoveryAction action) async {
     if (_opening || c.busy) return;
+    if (action == DiscoveryAction.resumeDiscovery) {
+      final visibility = widget.visibility;
+      if (visibility == null) return;
+      setState(() => _opening = true);
+      try {
+        await visibility.load();
+        if (!mounted || !c.accessible || c.session.resourceKey != _key) return;
+        if (visibility.paused == true && visibility.canChange) {
+          await visibility.setPaused(false);
+        }
+        if (mounted) await c.refresh();
+      } on ApiFailure {
+        if (mounted) {
+          setState(
+            () => _message = 'La reprise n’a pas pu être confirmée. Actualisez votre visibilité depuis votre profil.',
+          );
+        }
+      } finally {
+        if (mounted) setState(() => _opening = false);
+      }
+      return;
+    }
     if (action == DiscoveryAction.freshPresence) {
       await _locate();
       return;
@@ -202,7 +230,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
-    listenable: c,
+    listenable: Listenable.merge([c, widget.visibility]),
     builder: (context, _) {
       if (!c.accessible || c.session.resourceKey != _key) {
         return const HistaeScaffold(body: SizedBox.shrink());
@@ -219,10 +247,14 @@ class _DiscoveryPageState extends State<DiscoveryPage>
       final enabled = !c.busy && c.retrySeconds == 0;
       final statusBody = <Widget>[
         if (!c.ready && c.status != null) ...[
-          const EditorialCard(
+          EditorialCard(
             eyebrow: 'AVANT LA RENCONTRE',
-            title: 'Un peu de vous.\nPuis les autres.',
-            body: 'Complétez ces étapes à votre rythme. Vos choix de vie privée restent accessibles.',
+            title: required.contains(DiscoveryAction.resumeDiscovery)
+                ? 'Prenez votre temps.'
+                : 'Un peu de vous.\nPuis les autres.',
+            body: required.contains(DiscoveryAction.resumeDiscovery)
+                ? 'Les nouvelles rencontres attendront. Vos matchs et vos conversations restent accessibles.'
+                : 'Complétez ces étapes à votre rythme. Vos choix de vie privée restent accessibles.',
           ),
           for (final action in required)
             Card(
@@ -245,6 +277,8 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                       child: Text(
                         action == DiscoveryAction.freshPresence
                             ? 'Actualiser ma position'
+                            : action == DiscoveryAction.resumeDiscovery
+                            ? 'Reprendre la découverte'
                             : 'Compléter cette étape',
                       ),
                     ),
@@ -433,7 +467,10 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                         child: FeedProfileCard(
                           key: ValueKey(profile.id),
                           profile: profile,
-                          enabled: c.canChoose,
+                          enabled:
+                              c.canChoose &&
+                              widget.visibility?.saving != true &&
+                              widget.visibility?.uncertain != true,
                           onLike: () => _choose(SwipeDecision.like),
                           onPass: () => _choose(SwipeDecision.pass),
                         ),

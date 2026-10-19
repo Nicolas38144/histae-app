@@ -47,6 +47,7 @@ Map<String, dynamic> answerJson(String id, String text, int position) => {
 };
 http.Response defaultProfileResponse(http.Request request) =>
     switch (request.url.path) {
+      '/api/users/me/discovery-settings' => jsonResponse({'paused': false}),
       '/api/users/me' => jsonResponse(ownerJson()),
       '/api/users/me/profile' => jsonResponse({'message': 'profile updated'}),
       '/api/users/me/preferences' =>

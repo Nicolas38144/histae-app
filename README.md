@@ -35,6 +35,18 @@ L'API actuelle est écrite en Rust avec Axum, Tokio et SQLx. PostgreSQL, Redis e
 
 ## Démarrage
 
+### Aperçu et mode pause — 19 octobre 2026
+
+Dans le profil, **Aperçu de mon profil** reprend les composants du feed : prénom, âge, traits, bio et réponses approuvées dans leur ordre. Aucune photo, aucun geste de swipe ni bouton de décision. La distance dépend du lecteur et n’est pas inventée. Une section non relue ne produit pas d’aperçu trompeur ; la session et les consentements continuent de protéger cet écran.
+
+**Mode pause** est un réglage serveur du compte, partagé entre appareils. Il masque les nouvelles découvertes et suspend les nouveaux likes/matchs sans modifier les conversations, consentements, données ou abonnements existants. La reprise est explicite depuis le profil ou le feed et réévalue les prérequis habituels. Le mobile affiche uniquement un état confirmé ; une réponse perdue exige une relecture avant une nouvelle modification. Les anciens résultats déjà reçus ne peuvent pas être effacés des autres appareils à distance.
+
+Contrat ajouté avec autorisation utilisateur dans le dépôt API : `GET/PATCH /api/users/me/discovery-settings`, corps/réponse `{ "paused": true|false }`, et action `resume_discovery` dans le diagnostic. Le schéma et le migrateur ajoutent `user_account.discovery_paused`, les requêtes filtrent les deux côtés et les écritures contrôlent encore la pause sous verrou. Export propriétaire et collections Postman FR/EN mis à jour.
+
+**Mise en service à terminer côté serveur** : compiler/vérifier Rust, exécuter le migrateur avant de déployer la nouvelle API, puis valider sur appareil. Aucune migration ni publication n’a été faite ici. La chaîne Rust/PostgreSQL n’étant pas disponible sur ce poste, les deux tests backend ajoutés (contrat et intégration PostgreSQL) restent non exécutés. Sans cet endpoint déployé, l’app indique que la visibilité ne peut pas être vérifiée et n’annonce pas de pause active.
+
+Vérifications mobiles : 16 contrôles ciblés réussis, aperçus avec polices réelles et texte à 200 %, analyse Flutter sans problème. Aperçus locaux : `build/previews/profile/feed-preview.png` et `pause-active.png`.
+
 Installer un SDK Flutter compatible avec la contrainte Dart du manifeste et les outils de la plateforme ciblée. Fournir le fichier local `.env` avec l'environnement et l'origine API ci-dessous (il existe déjà dans cet espace de travail), puis :
 
 ```bash

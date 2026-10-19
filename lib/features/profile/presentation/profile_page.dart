@@ -13,12 +13,15 @@ import '../../catalog/presentation/catalog_page.dart';
 import '../../consents/presentation/consents_page.dart';
 import '../../continuation/application/continuation_controller.dart';
 import '../../continuation/presentation/credits_page.dart';
+import '../../discovery/application/discovery_visibility_controller.dart';
+import '../../discovery/presentation/discovery_pause_card.dart';
 import '../../notifications/presentation/devices_page.dart';
 import '../../notifications/presentation/push_scope.dart';
 import '../../privacy/presentation/privacy_hub_page.dart';
 import '../application/profile_controller.dart';
 import 'photo_page.dart';
 import 'profile_editors.dart';
+import 'profile_feed_preview_page.dart';
 import 'profile_panels.dart';
 import 'profile_strings.dart';
 
@@ -28,10 +31,12 @@ class ProfilePage extends StatefulWidget {
     required this.controller,
     required this.continuation,
     this.catalog,
+    this.visibility,
   });
   final ProfileController controller;
   final ContinuationController continuation;
   final CatalogRepository? catalog;
+  final DiscoveryVisibilityController? visibility;
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
@@ -48,7 +53,11 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
   }
 
   Future<void> _load() async {
-    await Future.wait([controller.load(), widget.continuation.activate()]);
+    await Future.wait([
+      controller.load(),
+      widget.continuation.activate(),
+      if (widget.visibility case final visibility?) visibility.load(),
+    ]);
   }
 
   @override
@@ -119,6 +128,22 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                   body: 'Une façon de vous raconter, avant de vous rencontrer. Votre photo restera absente du feed.',
                 ),
                 const SizedBox(height: 16),
+                OutlinedButton.icon(
+                  key: const Key('profile-feed-preview'),
+                  onPressed:
+                      editable &&
+                          p != null &&
+                          ![
+                            'profile',
+                            'answers',
+                            'selectedTraits',
+                          ].any(c.errors.containsKey)
+                      ? () => _open(ProfileFeedPreviewPage(controller: c))
+                      : null,
+                  icon: const Icon(Icons.visibility_outlined),
+                  label: const Text('Aperçu de mon profil'),
+                ),
+                const SizedBox(height: 16),
                 if (c.loading)
                   const LinearProgressIndicator(
                     semanticsLabel: 'Chargement du profil',
@@ -135,6 +160,10 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                   const Text(
                     'L’enregistrement reste incertain. Relisez les données avant de renouveler une modification. Une demande photo peut être reprise à l’identique.',
                   ),
+                if (widget.visibility case final visibility?) ...[
+                  DiscoveryPauseCard(controller: visibility),
+                  const SizedBox(height: 16),
+                ],
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton.icon(

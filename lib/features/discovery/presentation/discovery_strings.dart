@@ -29,6 +29,7 @@ class DiscoveryStrings {
   };
   static String actionTitle(DiscoveryAction action) => switch (action) {
     DiscoveryAction.profile => 'Votre présentation',
+    DiscoveryAction.resumeDiscovery => 'Votre profil est en pause',
     DiscoveryAction.sex => 'Le sexe de votre profil',
     DiscoveryAction.preferences => 'Vos envies de rencontre',
     DiscoveryAction.sensitiveConsent => 'Les données sensibles',
@@ -38,6 +39,7 @@ class DiscoveryStrings {
   static String actionBody(DiscoveryAction action) => switch (action) {
     DiscoveryAction.profile =>
       'Ajoutez votre prénom, votre date de naissance et votre présentation.',
+    DiscoveryAction.resumeDiscovery => 'Votre profil est masqué des nouvelles découvertes. Vous pouvez poursuivre vos conversations et reprendre les rencontres à votre rythme.',
     DiscoveryAction.sex => 'Renseignez ce champ pour permettre les critères réciproques de rencontre.',
     DiscoveryAction.preferences => 'Choisissez les personnes, les âges et la distance qui vous correspondent.',
     DiscoveryAction.sensitiveConsent =>

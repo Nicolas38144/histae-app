@@ -436,3 +436,12 @@ Un interrupteur par carte, CGU/notice verrouillées après acceptation, accords 
 ## 24. Documents distincts des consentements — 19 octobre 2026
 
 Les mentions CGU acceptées et Notice consultée remplacent les deux interrupteurs verrouillés de la section précédente. Inscription et renouvellement utilisent des cases explicites, sans présélection ; sensibles/localisation restent des interrupteurs avec retrait confirmé. Liens et contrôles de version conservés, contrat API inchangé. Huit contrôles ciblés réussis, analyse propre et aperçu vérifié à 200 %. Ce changement de présentation ne constitue pas un audit RGPD des traitements ni de leur nécessité pour le feed.
+
+## 25. Aperçu de profil et pause — 19 octobre 2026
+
+| Fonction | Interface et contrat | Vérifications et statut |
+| --- | --- | --- |
+| Aperçu de son profil dans le feed | Entrée profil, rendu commun au feed, textes approuvés seulement, sans photo ni décisions | Implémenté ; confidentialité, lecture impossible, déconnexion et gestes vérifiés ; aperçu à 200 % |
+| Mode pause | Réglage profil et reprise depuis le feed ; `GET/PATCH /api/users/me/discovery-settings` ; action `resume_discovery` | App et API implémentées localement avec autorisation ; 2 tests mobiles ciblés réussis ; 2 tests backend ajoutés non exécutés, migration/déploiement en attente |
+
+16 contrôles Flutter ciblés réussis et analyse propre. Le migrateur ajoute discovery_paused par défaut faux ; filtrage des deux côtés et verrous sur les nouvelles écritures. Aucun consentement retiré pour simuler une pause, aucune altération des matchs ou abonnements existants. Contrat HTTP, export et Postman API mis à jour. Rust/WSL/Docker indisponibles sur le poste ; vérifier compilation et tests avant migration puis déploiement. L10 garde la validation réelle sur appareils et les fournisseurs en attente.

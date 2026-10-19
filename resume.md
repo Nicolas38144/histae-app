@@ -336,3 +336,11 @@ Suppression des numéros de version, de la mention d’accord enregistré et des
 Le 19 octobre 2026, remplacement des interrupteurs CGU/notice acceptées par les mentions CGU acceptées et Notice consultée, avec liens documentaires. Cases à cocher pour l’acceptation initiale ou le renouvellement, sans présélection ; seuls les véritables accords sensibles/localisation gardent un interrupteur. Introduction simplifiée sans mention de verrouillage. Les validations exigées par le contrat API sont conservées sans en déduire une conformité RGPD globale.
 
 Huit contrôles ciblés réussis, analyse Flutter propre et aperçus vérifiés à taille normale et 200 %. Aucun changement backend ni appel réel.
+
+## 27. Aperçu du feed et mode pause
+
+Le 19 octobre 2026, ajout depuis le profil d’un aperçu utilisant la mise en page du feed, sans photo, décision ou distance inventée. Les contenus non approuvés sont masqués, les réponses publiques ordonnées et les erreurs/invalidation de session cachent les données périmées.
+
+L’utilisateur a expressément autorisé l’ajout de la pause dans histae-api-rust pour cette fonctionnalité. Nouveaux GET/PATCH discovery-settings, colonne persistante avec migration idempotente, diagnostic resume_discovery, filtres demandeur/candidats et contrôles sous verrou au swipe et à la création du match. Conversations et autres données conservées, sans suspension d’abonnement. Export et Postman FR/EN actualisés. Contrôleur de visibilité distinct du profil, état confirmé seulement, réponse incertaine relue sans rejeu automatique, purge à la déconnexion et reprise explicite.
+
+16 contrôles Flutter ciblés réussis, aperçus vérifiés dont 200 %, analyse propre et APK Android debug compilé. Deux tests backend ajoutés mais non exécutés : Cargo/Rust, WSL et Docker indisponibles sur ce poste. Aucune migration, publication ou mutation réelle. Avant mise en service, vérifier Rust et PostgreSQL, puis migrer et déployer l’API ; tant que l’endpoint manque, le réglage affiche un état indisponible. Aucun fichier supprimé ni commande Git exécutée.
