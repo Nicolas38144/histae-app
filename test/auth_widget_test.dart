@@ -71,14 +71,14 @@ void main() {
       final checkbox = find.byKey(Key(ConsentType.terms.wireName));
       await tester.tap(checkbox);
       await tester.pumpAndSettle();
-      expect(tester.widget<SwitchListTile>(checkbox).value, isTrue);
+      expect(tester.widget<CheckboxListTile>(checkbox).value, isTrue);
       await session.synchronize();
       await tester.pumpAndSettle();
-      expect(tester.widget<SwitchListTile>(checkbox).value, isTrue);
+      expect(tester.widget<CheckboxListTile>(checkbox).value, isTrue);
       version = 'v2';
       await session.synchronize();
       await tester.pumpAndSettle();
-      expect(tester.widget<SwitchListTile>(checkbox).value, isFalse);
+      expect(tester.widget<CheckboxListTile>(checkbox).value, isFalse);
     },
   );
   Future<void> revealAndTap(WidgetTester tester, Finder finder) async {
@@ -130,7 +130,12 @@ void main() {
       final boxes = tester.widgetList<SwitchListTile>(
         find.byType(SwitchListTile),
       );
-      expect(boxes, hasLength(4));
+      expect(boxes, hasLength(2));
+      final documents = tester.widgetList<CheckboxListTile>(
+        find.byType(CheckboxListTile),
+      );
+      expect(documents, hasLength(2));
+      expect(documents.every((box) => box.value == false), isTrue);
       expect(boxes.every((box) => box.value == false), isTrue);
       expect(find.text('Se déconnecter'), findsOneWidget);
       await revealAndTap(tester, find.byKey(Key(ConsentType.terms.wireName)));
@@ -265,7 +270,7 @@ void main() {
   );
 
   testWidgets(
-    'required switches stay locked and optional switches reflect only saved server choices',
+    'accepted documents have status labels and optional switches reflect only saved server choices',
     (tester) async {
       final grants = {ConsentType.sensitive: true, ConsentType.location: true};
       final writes = <Object?>[];
@@ -289,12 +294,21 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(home: ConsentsPage(session: session)),
       );
+      expect(find.byType(SwitchListTile), findsNWidgets(2));
+      expect(find.byType(CheckboxListTile), findsNothing);
       for (final type in [ConsentType.terms, ConsentType.privacy]) {
-        final finder = find.byKey(Key(type.wireName));
-        await revealAndTap(tester, finder);
-        final tile = tester.widget<SwitchListTile>(finder);
-        expect(tile.value, isTrue);
-        expect(tile.onChanged, isNull);
+        final status = find.text(
+          type == ConsentType.terms ? 'CGU acceptées' : 'Notice consultée',
+        );
+        await tester.scrollUntilVisible(status, 200);
+        await tester.pumpAndSettle();
+        expect(status, findsOneWidget);
+        expect(find.byKey(Key(type.wireName)), findsNothing);
+        final document = find.descendant(
+          of: find.byKey(Key('acknowledged-${type.wireName}')),
+          matching: find.text('Lire le document'),
+        );
+        expect(document, findsOneWidget);
       }
       expect(writes, isEmpty);
       for (final type in [ConsentType.sensitive, ConsentType.location]) {

@@ -48,10 +48,9 @@ class AppStrings {
   String get privacyTitle => 'Vos choix et votre vie privée';
   String get consentsTitle => 'Vos consentements';
   String get consentsIntro =>
-      'Les conditions d’utilisation et la prise de connaissance de la notice '
-      'sont nécessaires pour accéder à Histae et restent verrouillées après acceptation. '
-      'Les accords sur les données sensibles et la localisation sont nécessaires '
-      'au feed, mais restent retirables.';
+      'Retrouvez ici les conditions d’utilisation et la notice de confidentialité. '
+      'Vous pouvez modifier séparément vos accords sur les données sensibles '
+      'et la localisation.';
   String get saveChoices => 'Enregistrer mes choix';
   String get refreshChoices => 'Actualiser mes consentements';
   String get withdraw => 'Retirer mon consentement';

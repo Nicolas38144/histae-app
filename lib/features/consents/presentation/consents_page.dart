@@ -128,6 +128,50 @@ class _ConsentsPageState extends State<ConsentsPage> {
       child: Text(strings.readDocument),
     );
     final key = Key(consent.type.wireName);
+    if (!consent.type.withdrawable) {
+      return Column(
+        key: consent.current
+            ? Key('acknowledged-${consent.type.wireName}')
+            : null,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (consent.current)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.check_circle_outline,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      consent.type == ConsentType.terms
+                          ? 'CGU acceptées'
+                          : 'Notice consultée',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            CheckboxListTile(
+              key: key,
+              contentPadding: EdgeInsets.zero,
+              title: Text(strings.consentLabel(consent.type)),
+              subtitle: renewal ? const Text('À renouveler') : null,
+              value: value,
+              onChanged: onChanged == null
+                  ? null
+                  : (next) => onChanged(next ?? false),
+            ),
+          document,
+        ],
+      );
+    }
     if (MediaQuery.textScalerOf(context).scale(16) > 20) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

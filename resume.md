@@ -330,3 +330,9 @@ Trois contrôles ciblés réussis, dont une réponse différée vérifiant les t
 Le 19 octobre 2026, remplacement des cases et boutons de retrait par un interrupteur par carte. CGU/notice verrouillées une fois acceptées, selon le contrat API lu sans modification. Sensible/localisation nécessaires au feed mais retirables ; confirmation de l’effacement conservée. Réactivation immédiate pour un compte à jour, sans afficher de succès avant la réponse serveur. Inscription toujours explicite et groupée par Enregistrer mes choix.
 
 Suppression des numéros de version, de la mention d’accord enregistré et des explications sous les cartes. Versions toujours vérifiées avant mutation, anciens accords retirables sans accepter leur remplacement. Mise en page adaptée à 200 %. Huit contrôles ciblés réussis, analyse propre, aperçus visuels vérifiés et APK Android debug compilé ; aucun appel réel ni changement backend.
+
+## 26. Distinction documents et consentements
+
+Le 19 octobre 2026, remplacement des interrupteurs CGU/notice acceptées par les mentions CGU acceptées et Notice consultée, avec liens documentaires. Cases à cocher pour l’acceptation initiale ou le renouvellement, sans présélection ; seuls les véritables accords sensibles/localisation gardent un interrupteur. Introduction simplifiée sans mention de verrouillage. Les validations exigées par le contrat API sont conservées sans en déduire une conformité RGPD globale.
+
+Huit contrôles ciblés réussis, analyse Flutter propre et aperçus vérifiés à taille normale et 200 %. Aucun changement backend ni appel réel.

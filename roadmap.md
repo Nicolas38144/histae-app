@@ -432,3 +432,7 @@ Le profil garde son dernier libellé confirmé pendant l’actualisation, puis a
 ## 23. Gestion des consentements par interrupteurs — 19 octobre 2026
 
 Un interrupteur par carte, CGU/notice verrouillées après acceptation, accords sensibles/localisation modifiables pour le feed. Retraits confirmés et état reflétant la réponse serveur, acceptation initiale sans présélection, versions contrôlées sans afficher leur numéro. Suppression des textes d’état sous les documents et adaptation aux grandes polices. Huit contrôles ciblés réussis, analyse propre et aperçus vérifiés ; aucun changement API. Les validations natives L10 restent ouvertes.
+
+## 24. Documents distincts des consentements — 19 octobre 2026
+
+Les mentions CGU acceptées et Notice consultée remplacent les deux interrupteurs verrouillés de la section précédente. Inscription et renouvellement utilisent des cases explicites, sans présélection ; sensibles/localisation restent des interrupteurs avec retrait confirmé. Liens et contrôles de version conservés, contrat API inchangé. Huit contrôles ciblés réussis, analyse propre et aperçu vérifié à 200 %. Ce changement de présentation ne constitue pas un audit RGPD des traitements ni de leur nécessité pour le feed.
