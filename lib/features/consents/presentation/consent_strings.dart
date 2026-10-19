@@ -3,21 +3,18 @@ import '../domain/consent_state.dart';
 
 extension ConsentStrings on AppStrings {
   String consentLabel(ConsentType type) => switch (type) {
-    ConsentType.terms => 'J’accepte les conditions d’utilisation',
-    ConsentType.privacy =>
-      'J’ai pris connaissance de la notice de confidentialité',
-    ConsentType.sensitive => 'J’accepte le traitement de mes données sensibles',
-    ConsentType.location => 'J’accepte le traitement de ma localisation',
+    ConsentType.terms => messages.consentStringsIAcceptTheTermsOfUse,
+    ConsentType.privacy => messages.consentStringsIHaveReadThePrivacyNotice,
+    ConsentType.sensitive => messages.consentStringsIConsentToTheProcessingOf,
+    ConsentType.location => messages.consentStringsIConsentToTheProcessingOf198,
   };
   String consentTitle(ConsentType type) => switch (type) {
-    ConsentType.terms => 'Conditions d’utilisation',
-    ConsentType.privacy => 'Notice de confidentialité',
-    ConsentType.sensitive => 'Données sensibles',
-    ConsentType.location => 'Localisation',
+    ConsentType.terms => messages.consentStringsTermsOfUse,
+    ConsentType.privacy => messages.consentStringsPrivacyNotice,
+    ConsentType.sensitive => messages.consentStringsSensitiveData,
+    ConsentType.location => messages.consentStringsLocation,
   };
   String withdrawalMessage(ConsentType type) => type == ConsentType.sensitive
-      ? 'Ce retrait efface votre sexe et vos préférences sur le serveur. '
-            'La découverte pourra devenir indisponible. Confirmer ce retrait ?'
-      : 'Ce retrait efface votre présence sur le serveur. '
-            'La découverte pourra devenir indisponible. Il ne change pas la permission système. Confirmer ce retrait ?';
+      ? messages.consentStringsWithdrawingDeletesYourSexAndPreferences
+      : messages.consentStringsWithdrawingDeletesYourLocationPresenceFrom;
 }

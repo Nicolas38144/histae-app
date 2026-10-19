@@ -11,7 +11,6 @@ class HistaeScaffold extends StatelessWidget {
     this.body,
     this.bottomNavigationBar,
   });
-
   final PreferredSizeWidget? appBar;
   final Widget? body;
   final Widget? bottomNavigationBar;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../application/continuation_controller.dart';
 import '../application/rewarded_video_controller.dart';
@@ -16,17 +17,28 @@ class RewardVideoCard extends StatelessWidget {
   final ContinuationController credits;
   final RewardedVideoController video;
   final VoidCallback onCancel;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context), colors = theme.colorScheme;
     final r = credits.rewards, intent = r.intent;
     final pending = intent != null && r.canPoll;
     final label = switch (video.phase) {
-      VideoPhase.idle => 'Regarder une vidéo',
-      VideoPhase.checking => 'Vérification…',
-      VideoPhase.consent || VideoPhase.privacy => 'Vos préférences…',
-      VideoPhase.loading => 'Chargement de la vidéo…',
-      VideoPhase.playing => 'Vidéo en cours…',
+      VideoPhase.idle => AppStrings.of(
+        context,
+      ).messages.rewardVideoCardWatchAVideo,
+      VideoPhase.checking => AppStrings.of(
+        context,
+      ).messages.rewardVideoCardChecking,
+      VideoPhase.consent || VideoPhase.privacy => AppStrings.of(
+        context,
+      ).messages.rewardVideoCardYourPreferences,
+      VideoPhase.loading => AppStrings.of(
+        context,
+      ).messages.rewardVideoCardLoadingVideo,
+      VideoPhase.playing => AppStrings.of(
+        context,
+      ).messages.rewardVideoCardVideoPlaying,
     };
     return Card(
       child: Padding(
@@ -51,26 +63,31 @@ class RewardVideoCard extends StatelessWidget {
             ),
             const SizedBox(height: 18),
             Text(
-              'UN COUP DE POUCE',
+              AppStrings.of(context).messages.rewardVideoCardAHelpingHand,
               style: theme.textTheme.labelSmall?.copyWith(
                 color: colors.secondary,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Une vidéo pour\nla suite de l’histoire.',
+              AppStrings.of(context)
+                  .messages
+                  .rewardVideoCardAVideoForTheNextChapter,
               style: theme.textTheme.headlineSmall,
             ),
             const SizedBox(height: 12),
             Text(
-              '+ ${intent?.credits ?? 1} crédit${(intent?.credits ?? 1) > 1 ? 's' : ''} de continuation',
+              AppStrings.of(context).messages
+                  .videoCreditReward(intent?.credits ?? 1),
               style: theme.textTheme.titleMedium?.copyWith(
                 color: colors.secondary,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Si vous le souhaitez, regardez une vidéo jusqu’au bout pour compléter votre réserve de crédits.',
+            Text(
+              AppStrings.of(context)
+                  .messages
+                  .rewardVideoCardIfYouWishWatchAVideo,
             ),
             const SizedBox(height: 20),
             HistaeButton.icon(
@@ -86,17 +103,25 @@ class RewardVideoCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             if (video.unavailableReason case final reason?)
-              Text(reason, style: theme.textTheme.bodySmall)
+              Text(
+                AppStrings.of(context).clientMessage(reason),
+                style: theme.textTheme.bodySmall,
+              )
             else if (!pending)
               Text(
-                'Toujours facultatif. Le crédit apparaît après validation de la récompense.',
+                AppStrings.of(context)
+                    .messages
+                    .rewardVideoCardAlwaysOptionalTheCreditAppearsAfter,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: colors.onSurfaceVariant,
                 ),
               ),
             if (video.message case final message?) ...[
               const SizedBox(height: 12),
-              _Status(text: message, icon: Icons.info_outline),
+              _Status(
+                text: AppStrings.of(context).clientMessage(message),
+                icon: Icons.info_outline,
+              ),
             ],
             if (intent != null) ...[
               const SizedBox(height: 16),
@@ -107,19 +132,29 @@ class RewardVideoCard extends StatelessWidget {
                 text: switch (intent.status) {
                   RewardStatus.pending =>
                     r.completedVideo
-                        ? 'Vidéo terminée. Votre récompense est en cours de validation.'
-                        : 'Votre demande est prête. Vous pouvez reprendre le visionnage.',
-                  RewardStatus.credited =>
-                    'Récompense validée : ${intent.credits} crédit${intent.credits > 1 ? 's' : ''}.',
-                  RewardStatus.expired => 'La demande a expiré. Une vidéo terminée à temps peut encore être validée.',
-                  RewardStatus.cancelled => 'Cette demande a été annulée.',
+                        ? AppStrings.of(context)
+                              .messages
+                              .rewardVideoCardVideoCompletedYourRewardIsBeing
+                        : AppStrings.of(context)
+                              .messages
+                              .rewardVideoCardYourRequestIsReadyYouCan,
+                  RewardStatus.credited => AppStrings.of(
+                    context,
+                  ).messages.videoRewardConfirmed(intent.credits),
+                  RewardStatus.expired => AppStrings.of(
+                    context,
+                  ).messages.rewardVideoCardTheRequestExpiredAVideoCompleted,
+                  RewardStatus.cancelled => AppStrings.of(
+                    context,
+                  ).messages.rewardVideoCardThisRequestWasCanceled,
                 },
               ),
             ],
             if (r.failure case final error?) ...[
               const SizedBox(height: 12),
               _Status(
-                text: ContinuationStrings.failure(error),
+                text: ContinuationStrings(AppStrings.of(context))
+                    .failure(error),
                 icon: Icons.info_outline,
               ),
             ],
@@ -128,11 +163,17 @@ class RewardVideoCard extends StatelessWidget {
               TextButton.icon(
                 onPressed: r.busy || r.waiting || video.busy ? null : r.refresh,
                 icon: const Icon(Icons.refresh),
-                label: const Text('Vérifier la récompense'),
+                label: Text(
+                  AppStrings.of(context).messages.rewardVideoCardCheckReward,
+                ),
               ),
               TextButton(
                 onPressed: r.busy || r.waiting || video.busy ? null : onCancel,
-                child: const Text('Annuler cette demande'),
+                child: Text(
+                  AppStrings.of(context)
+                      .messages
+                      .rewardVideoCardCancelThisRequest,
+                ),
               ),
             ],
             if (video.gateway?.privacyOptionsRequired == true) ...[
@@ -140,7 +181,11 @@ class RewardVideoCard extends StatelessWidget {
               TextButton.icon(
                 onPressed: video.busy ? null : video.privacyOptions,
                 icon: const Icon(Icons.tune_rounded),
-                label: const Text('Mes choix publicitaires'),
+                label: Text(
+                  AppStrings.of(context)
+                      .messages
+                      .rewardVideoCardMyAdvertisingChoices,
+                ),
               ),
             ],
           ],
@@ -154,6 +199,7 @@ class _Status extends StatelessWidget {
   const _Status({required this.text, required this.icon});
   final String text;
   final IconData icon;
+
   @override
   Widget build(BuildContext context) => Semantics(
     liveRegion: true,

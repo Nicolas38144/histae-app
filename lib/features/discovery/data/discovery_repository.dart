@@ -6,15 +6,21 @@ import 'discovery_models.dart';
 abstract interface class DiscoveryRepository {
   factory DiscoveryRepository(AuthenticatedSession session) =
       ApiDiscoveryRepository;
+
   AuthenticatedSession get session;
+
   Future<DiscoveryStatus> status(RequestCancellation scope);
+
   Future<FeedPage> feed(String? cursor, RequestCancellation scope);
+
   Future<void> presence(
     double latitude,
     double longitude,
     RequestCancellation scope,
   );
+
   Future<SwipeResult> swipe(PendingChoice intent, RequestCancellation scope);
+
   Future<void> block(PendingChoice intent, RequestCancellation scope);
 }
 
@@ -22,6 +28,7 @@ final class ApiDiscoveryRepository implements DiscoveryRepository {
   ApiDiscoveryRepository(this.session);
   @override
   final AuthenticatedSession session;
+
   Future<Object?> _request(
     String method,
     String path,
@@ -38,11 +45,13 @@ final class ApiDiscoveryRepository implements DiscoveryRepository {
     replayAfterRefresh: true,
     cancellation: scope,
   );
+
   @override
   Future<DiscoveryStatus> status(RequestCancellation scope) async =>
       DiscoveryStatus.fromJson(
         await _request('GET', '/api/users/me/discovery-status', scope),
       );
+
   @override
   Future<FeedPage> feed(String? cursor, RequestCancellation scope) async =>
       FeedPage.fromJson(
@@ -53,6 +62,7 @@ final class ApiDiscoveryRepository implements DiscoveryRepository {
           query: {'limit': '20', 'cursor': ?cursor},
         ),
       );
+
   @override
   Future<void> presence(
     double latitude,

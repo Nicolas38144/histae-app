@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../data/match_models.dart';
 import 'matches_strings.dart';
 
@@ -22,28 +23,31 @@ class ConversationHeader extends StatelessWidget {
       scrollable: true,
       titleTextStyle: Theme.of(dialogContext).textTheme.titleMedium
           ?.copyWith(color: Theme.of(dialogContext).colorScheme.onSurface),
-      title: Text(MatchesStrings.status(match.status)),
+      title: Text(MatchesStrings(AppStrings.of(context)).status(match.status)),
       content: Text(
-        '${MatchesStrings.stateBody(match)}${connected ? '' : '\n\nConnexion en reprise. Vous pouvez actualiser la conversation manuellement.'}',
+        '${MatchesStrings(AppStrings.of(context)).stateBody(match)}${connected ? '' : AppStrings.of(context).messages.conversationHeaderReconnectingYouCanRefreshTheConversation}',
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(dialogContext),
-          child: const Text('Fermer'),
+          child: Text(AppStrings.of(context).messages.conversationHeaderClose),
         ),
       ],
     ),
   );
 
-  String get _action => match.status == MatchStatus.awaitingContinuation
-      ? 'Choisir la suite'
-      : 'Photos et continuation';
+  String _action(BuildContext context) =>
+      match.status == MatchStatus.awaitingContinuation
+      ? AppStrings.of(context).messages.conversationHeaderChooseWhatComesNext
+      : AppStrings.of(context).messages.chatPagePhotosAndContinuation;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final info = IconButton(
-      tooltip: 'État de la conversation',
+      tooltip: AppStrings.of(context)
+          .messages
+          .conversationHeaderConversationStatus,
       onPressed: () => _details(context),
       icon: Icon(
         Icons.info_outline_rounded,
@@ -65,8 +69,12 @@ class ConversationHeader extends StatelessWidget {
                     onPressed: onDecisions,
                     child: Text(
                       match.status == MatchStatus.awaitingContinuation
-                          ? 'En pause'
-                          : 'Vos choix',
+                          ? AppStrings.of(context)
+                                .messages
+                                .conversationHeaderPaused
+                          : AppStrings.of(context)
+                                .messages
+                                .conversationHeaderYourChoices,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -80,7 +88,7 @@ class ConversationHeader extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    MatchesStrings.status(match.status),
+                    MatchesStrings(AppStrings.of(context)).status(match.status),
                     style: theme.textTheme.titleMedium,
                   ),
                 ),
@@ -88,7 +96,7 @@ class ConversationHeader extends StatelessWidget {
               ],
             ),
             Text(
-              MatchesStrings.stateBody(match),
+              MatchesStrings(AppStrings.of(context)).stateBody(match),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -98,20 +106,24 @@ class ConversationHeader extends StatelessWidget {
               child: TextButton.icon(
                 onPressed: onDecisions,
                 icon: const Icon(Icons.hub_outlined, size: 18),
-                label: Text(_action),
+                label: Text(_action(context)),
               ),
             ),
             if (!connected)
               Text(
-                'Connexion en reprise · actualisation manuelle disponible.',
+                AppStrings.of(context)
+                    .messages
+                    .conversationHeaderReconnectingManualRefreshAvailable,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
           ],
           if (loading)
-            const LinearProgressIndicator(
-              semanticsLabel: 'Synchronisation de la conversation',
+            LinearProgressIndicator(
+              semanticsLabel: AppStrings.of(context)
+                  .messages
+                  .conversationHeaderSyncingConversation,
             ),
         ],
       ),

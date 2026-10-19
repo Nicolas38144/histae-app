@@ -29,7 +29,6 @@ class ApiFailure implements Exception {
     this.requestId,
     this.retryAt,
   });
-
   final ApiFailureKind kind;
   final int? statusCode;
   final String? code;
@@ -63,8 +62,8 @@ class ApiFailure implements Exception {
       _ => ApiFailureKind.unexpected,
     };
   }
-
   // Never include response bodies, URLs, headers or server messages in logs.
+
   @override
   String toString() => 'ApiFailure(${kind.name}, status: $statusCode)';
 }

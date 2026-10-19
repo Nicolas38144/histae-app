@@ -10,6 +10,7 @@ import '../data/continuation_repository.dart';
 
 // Tracks only server-owned rewards. Native completion starts verification and
 // never grants a local credit.
+
 class RewardTracker extends ChangeNotifier {
   RewardTracker(this.repository, {required this.onCredited}) {
     _key = repository.session.resourceKey;
@@ -27,16 +28,21 @@ class RewardTracker extends ChangeNotifier {
   ApiFailure? failure;
   bool busy = false, completedVideo = false, cancelled = false;
   DateTime? retryAt;
+
   bool get accessible =>
       !_disposed &&
       repository.session.hasSession &&
       repository.session.phase == SessionPhase.ready;
+
   bool get canPoll =>
       intent != null &&
       intent!.status != RewardStatus.credited &&
       intent!.status != RewardStatus.cancelled;
+
   bool get waiting => retryAt?.isAfter(DateTime.now()) == true;
+
   bool _alive(int epoch) => _active && accessible && epoch == _epoch;
+
   void _notify() {
     if (!_disposed) notifyListeners();
   }
@@ -111,9 +117,9 @@ class RewardTracker extends ChangeNotifier {
       }
     }
   }
-
   // A device callback records only that the video completed. Poll the signed
   // server result; expired can still become credited after a delayed proof.
+
   Future<void> videoCompleted() async {
     if (!_active || !accessible || intent?.status != RewardStatus.pending) {
       return;

@@ -20,6 +20,7 @@ class PrivacyController extends ChangeNotifier {
   }
   final PrivacyRepository repository;
   final PrivateExportStore exportStore;
+
   AuthenticatedSession get session => repository.session;
   late String _key;
   bool _disposed = false, _active = true;
@@ -45,18 +46,26 @@ class PrivacyController extends ChangeNotifier {
       _sharePendingCleanup = false;
   ApiFailure? failure;
   String? notice;
+
   List<MobileSession> get sessions => List.unmodifiable(_sessions);
+
   List<BlockedPerson> get blocks => List.unmodifiable(_blocks);
+
   List<RightsRequest> get rights => List.unmodifiable(_rights);
+
   bool get accessible =>
       !_disposed &&
       session.hasSession &&
       [SessionPhase.ready, SessionPhase.needsConsents].contains(session.phase);
+
   bool get onboarded => accessible && session.phase == SessionPhase.ready;
+
   bool get active => accessible && _active;
+
   int get retrySeconds => retrySecondsUntil(_retryAt);
 
   bool _alive(int epoch) => active && epoch == _epoch;
+
   void _notify() {
     if (!_disposed) notifyListeners();
   }

@@ -6,6 +6,7 @@ import '../../../core/network/api_failure.dart';
 
 abstract interface class SessionVault {
   Future<String?> read();
+
   Future<void> write(String value);
 }
 
@@ -43,9 +44,9 @@ class SecureSessionVault implements SessionVault {
     }
   }
 }
-
 // A single secure entry is replaced before/after refresh. A rotating entry has
 // no reusable token: a crash or lost response must never replay its predecessor.
+
 class SessionRecord {
   const SessionRecord(this.origin, this.phase, [this.refreshToken]);
   final String origin;

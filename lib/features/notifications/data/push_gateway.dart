@@ -18,19 +18,28 @@ enum PushPermission {
 
 abstract interface class PushGateway {
   bool get configured;
+
   String get platform;
+
   Future<void> initialize();
+
   Future<PushPermission> permission({bool request = false});
+
   Future<String> registration();
+
   Future<void> disable();
+
   Stream<String> get registrations;
+
   Stream<PushIntent> get received;
+
   Stream<PushIntent> get opened;
+
   Future<PushIntent?> initial();
 }
-
 // The OS handles the server's generic background notification. This handler
 // never fetches private resources, touches a session, logs, or navigates.
+
 @pragma('vm:entry-point')
 Future<void> histaeBackgroundPush(RemoteMessage message) async {}
 
@@ -38,9 +47,11 @@ class FirebasePushGateway implements PushGateway {
   FirebasePushGateway(this.config);
   final PushConfig config;
   FirebaseMessaging? _messaging;
+
   @override
   String get platform =>
       defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'android';
+
   @override
   bool get configured =>
       !kIsWeb &&
@@ -50,6 +61,7 @@ class FirebasePushGateway implements PushGateway {
         TargetPlatform.iOS => config.iosReady,
         _ => false,
       };
+
   @override
   Future<void> initialize() async {
     if (!configured || _messaging != null) return;
@@ -144,14 +156,18 @@ class FirebasePushGateway implements PushGateway {
   @override
   Stream<String> get registrations =>
       _messaging?.onRegistered ?? const Stream.empty();
+
   Stream<PushIntent> _map(Stream<RemoteMessage> stream) => stream
       .map((m) => PushIntent.parse(m.data))
       .where((i) => i != null)
       .cast<PushIntent>();
+
   @override
   Stream<PushIntent> get received => _map(FirebaseMessaging.onMessage);
+
   @override
   Stream<PushIntent> get opened => _map(FirebaseMessaging.onMessageOpenedApp);
+
   @override
   Future<PushIntent?> initial() async {
     final message = await _messaging?.getInitialMessage();

@@ -1,182 +1,326 @@
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 
+import '../models/client_message.dart';
 import '../network/api_failure.dart';
+import 'generated/app_messages.dart';
 
-// Centralized French copy; add locales and a delegate when a second language
-// is introduced. Material's built-in labels are localized separately.
+export '../models/client_message.dart';
+
+/// Locale-aware facade for formatting and domain-to-copy mappings.
 class AppStrings {
-  const AppStrings();
-  static AppStrings of(BuildContext context) => const AppStrings();
+  const AppStrings([this._localeName = 'fr']);
+  final String _localeName;
 
-  String get appName => 'Histae';
-  String get wordsFirst => 'LES MOTS D’ABORD';
-  String get registrationHeading => 'Faisons connaissance.';
-  String get loginHeading => 'Heureux de vous retrouver.';
-  String get trustHeading => 'En toute confiance.';
-  String get signIn => 'Se connecter';
-  String get createAccount => 'Créer mon compte';
-  String get existingAccount => 'J’ai déjà un compte';
-  String get myAccount => 'Mon espace';
-  String get otpIntroduction =>
-      'Validez votre numéro avec un code reçu par SMS. '
-      'Ce parcours crée votre compte s’il n’existe pas, ou vous reconnecte sinon.';
+  String get localeName => messages.localeName;
+
+  static AppStrings of(BuildContext context) => AppStrings(
+    Localizations.of<AppMessages>(context, AppMessages)?.localeName ?? 'fr',
+  );
+
+  AppMessages get messages {
+    final language = _localeName.replaceAll('-', '_').split('_').first;
+    return lookupAppMessages(
+      AppMessages.supportedLocales.firstWhere(
+        (l) => l.languageCode == language,
+        orElse: () => const Locale('fr'),
+      ),
+    );
+  }
+
+  String clientMessage(ClientMessage value) => switch (value) {
+    ClientMessage.questionUnavailable =>
+      messages.answersEditorRemoveTheUnavailableQuestionBeforeSaving,
+    ClientMessage.messageEmpty => messages.messageEmpty,
+    ClientMessage.messageTooLong => messages.messageTooLong,
+    ClientMessage.reportTooLong => messages.reportTooLong,
+    ClientMessage.answerInvalid => messages.answerInvalid,
+    ClientMessage.peopleRequired => messages.peopleRequired,
+    ClientMessage.sexInvalid => messages.sexInvalid,
+    ClientMessage.underage => messages.underage,
+    ClientMessage.birthdateInvalid => messages.birthdateInvalid,
+    ClientMessage.distanceInvalid => messages.distanceInvalid,
+    ClientMessage.bioTooLong => messages.bioTooLong,
+    ClientMessage.firstnameInvalid => messages.firstnameInvalid,
+    ClientMessage.ageRangeInvalid => messages.ageRangeInvalid,
+    ClientMessage.videoQuotaRequired =>
+      messages.rewardedVideoControllerRefreshYourBalanceToAccessVideos,
+    ClientMessage.videoNoFill =>
+      messages.rewardedVideoControllerNoVideoIsAvailableRightNow,
+    ClientMessage.videoExpired =>
+      messages.rewardedVideoControllerThisRequestHasExpiredCancelIt,
+    ClientMessage.videoAvailabilityUnknown =>
+      messages.rewardedVideoControllerVideoAvailabilityCouldNotBeChecked,
+    ClientMessage.videoClosed =>
+      messages.rewardedVideoControllerTheVideoWasClosedBeforeThe,
+    ClientMessage.videoUnavailable =>
+      messages.rewardedVideoControllerVideosAreTemporarilyUnavailableYouCan,
+    ClientMessage.videoNetwork =>
+      messages.rewardedVideoControllerTheVideoCouldNotBeLoaded,
+    ClientMessage.videoLoad =>
+      messages.rewardedVideoControllerTheVideoCouldNotBeLoaded218,
+    ClientMessage.videoShow =>
+      messages.rewardedVideoControllerTheVideoCouldNotBeShown,
+    ClientMessage.videoConsentTimeout =>
+      messages.rewardedVideoControllerLoadingAdvertisingPreferencesIsTakingToo,
+    ClientMessage.videoConsentMisconfigured =>
+      messages.rewardedVideoControllerTheVideoPrivacyFormIsNot,
+    ClientMessage.videoConsentNetwork =>
+      messages.rewardedVideoControllerAdvertisingPreferencesCouldNotBeLoaded,
+    ClientMessage.videoNotConfigured =>
+      messages.rewardedVideoControllerVideosAreNotConfiguredForThis,
+    ClientMessage.videoPlanDisabled =>
+      messages.rewardedVideoControllerVideosAreTemporarilyDisabledForYour,
+    ClientMessage.videoPremium =>
+      messages.rewardedVideoControllerPremiumLetsYouContinueWithoutCredits,
+    ClientMessage.videoPrivacyUnavailable =>
+      messages.rewardedVideoControllerYourPreferencesAreCurrentlyUnavailable,
+    ClientMessage.videoConsentUnavailable =>
+      messages.rewardedVideoControllerYourAdvertisingPreferencesCouldNotBe,
+    ClientMessage.videoReserveFull =>
+      messages.rewardedVideoControllerYourVideoReserveIsFullUse,
+    ClientMessage.videoDeviceNotConfigured =>
+      messages.rewardedVideoGatewayVideosAreNotYetConfiguredFor,
+    ClientMessage.videoPlatformUnsupported =>
+      messages.rewardedVideoGatewayVideosAreAvailableOnAndroidAnd,
+  };
+
+  String date(DateTime value) =>
+      DateFormat.yMd(localeName).format(value.toLocal());
+
+  String dateTime(DateTime value) =>
+      DateFormat.yMd(localeName).add_Hm().format(value.toLocal());
+
+  String shortDateTime(DateTime value) =>
+      DateFormat.Md(localeName).add_Hm().format(value.toLocal());
+
+  String decimal(num value) => (NumberFormat.decimalPattern(
+    localeName,
+  )..maximumFractionDigits = 1).format(value);
+
+  String get appName => messages.appOpeningHistae;
+
+  String get wordsFirst => messages.appStringsWordsFirst;
+
+  String get registrationHeading => messages.appStringsLetSGetToKnowYou;
+
+  String get loginHeading => messages.appStringsGoodToSeeYouAgain;
+
+  String get trustHeading => messages.appStringsWithConfidence;
+
+  String get signIn => messages.appStringsSignIn;
+
+  String get createAccount => messages.appStringsCreateMyAccount;
+
+  String get existingAccount => messages.appStringsIAlreadyHaveAnAccount;
+
+  String get myAccount => messages.appStringsMySpace;
+
+  String get otpIntroduction => messages.appStringsVerifyYourNumberWithACode;
+
   String get onboardingRequired =>
-      'Complétez les choix obligatoires indiqués par le serveur avant de poursuivre.';
-  String get actionInProgress => 'Action en cours…';
-  String get phoneLabel => 'Numéro français au format +33';
-  String get phoneHint => '+33 6 12 34 56 78';
-  String get phoneHelp =>
-      'Saisissez +33 suivi des 9 chiffres, sans le zéro initial.';
-  String get sendOtp => 'Demander un code';
-  String get resendOtp => 'Demander un nouveau code';
-  String get resumeOtp => 'Reprendre la demande précédente';
-  String get otpLabel => 'Code de vérification à 6 chiffres';
-  String get verifyOtp => 'Vérifier le code';
-  String get changePhone => 'Changer de numéro';
-  String get otpAccepted =>
-      'La demande a été acceptée. Cela ne confirme pas la réception du SMS.';
+      messages.appStringsCompleteTheRequiredChoicesIndicatedBy;
+
+  String get actionInProgress => messages.appStringsWorking;
+
+  String get phoneLabel => messages.appStringsFrenchPhoneNumberStartingWith33;
+
+  String get phoneHint => messages.appStrings33612345678;
+
+  String get phoneHelp => messages.appStringsEnter33FollowedBy9Digits;
+
+  String get sendOtp => messages.appStringsRequestACode;
+
+  String get resendOtp => messages.appStringsRequestANewCode;
+
+  String get resumeOtp => messages.appStringsResumeThePreviousRequest;
+
+  String get otpLabel => messages.appStrings6DigitVerificationCode;
+
+  String get verifyOtp => messages.appStringsVerifyCode;
+
+  String get changePhone => messages.appStringsChangeNumber;
+
+  String get otpAccepted => messages.appStringsYourRequestWasAcceptedThisDoes;
+
   String get verificationUncertain =>
-      'La vérification n’a pas pu être confirmée. '
-      'Demandez un nouveau code pour vous reconnecter ; le précédent peut avoir été consommé.';
-  String get sessionLoading => 'Vérification de votre session…';
-  String get sessionUnavailable => 'Votre session n’est pas accessible';
-  String get logout => 'Se déconnecter';
-  String get logoutConfirmed => 'Vous êtes déconnecté.';
-  String get logoutUnconfirmed =>
-      'Vous êtes déconnecté sur cet appareil. '
-      'La révocation de la session sur le serveur n’a pas pu être confirmée.';
-  String get privacyTitle => 'Vos choix et votre vie privée';
-  String get consentsTitle => 'Vos consentements';
-  String get consentsIntro =>
-      'Retrouvez ici les conditions d’utilisation et la notice de confidentialité. '
-      'Vous pouvez modifier séparément vos accords sur les données sensibles '
-      'et la localisation.';
-  String get saveChoices => 'Enregistrer mes choix';
-  String get refreshChoices => 'Actualiser mes consentements';
-  String get withdraw => 'Retirer mon consentement';
-  String get confirmWithdrawal => 'Confirmer le retrait';
-  String get cancel => 'Annuler';
+      messages.appStringsVerificationCouldNotBeConfirmedRequest;
+
+  String get sessionLoading => messages.appStringsCheckingYourSession;
+
+  String get sessionUnavailable => messages.appStringsYourSessionIsUnavailable;
+
+  String get logout => messages.appStringsSignOut;
+
+  String get logoutConfirmed => messages.appStringsYouAreSignedOut;
+
+  String get logoutUnconfirmed => messages.appStringsYouAreSignedOutOnThis;
+
+  String get privacyTitle => messages.appStringsYourChoicesAndPrivacy;
+
+  String get consentsTitle => messages.appStringsYourConsents;
+
+  String get consentsIntro => messages.appStringsFindTheTermsOfUseAnd;
+
+  String get saveChoices => messages.appStringsSaveMyChoices;
+
+  String get refreshChoices => messages.appStringsRefreshMyConsents;
+
+  String get withdraw => messages.appStringsWithdrawMyConsent;
+
+  String get confirmWithdrawal => messages.appStringsConfirmWithdrawal;
+
+  String get cancel => messages.appStringsCancel;
+
   String get openDocumentError =>
-      'Le document n’a pas pu être ouvert. Vérifiez votre connexion et réessayez.';
-  String get readDocument => 'Lire le document';
+      messages.appStringsTheDocumentCouldNotBeOpened;
+
+  String get readDocument => messages.appStringsReadDocument;
+
   String get documentsChanged =>
-      'Les documents ont changé. Relisez les nouvelles versions avant de confirmer vos choix.';
-  String get choicesSaved => 'Vos choix ont été enregistrés.';
-  String get accountTitle => 'Votre espace Histae';
-  String get accountReady =>
-      'Votre compte est créé et vos consentements obligatoires sont à jour. '
-      'Vous pourrez compléter votre profil lors de la prochaine mise à jour.';
-  String get privacyScope =>
-      'Vous pouvez consulter vos documents, gérer vos consentements '
-      'ou vous déconnecter ici, même si votre parcours n’est pas terminé.';
+      messages.appStringsTheDocumentsHaveChangedReadThe;
+
+  String get choicesSaved => messages.appStringsYourChoicesHaveBeenSaved;
+
+  String get accountTitle => messages.appStringsYourHistaeSpace;
+
+  String get accountReady => messages.appStringsYourAccountIsCreatedAndYour;
+
+  String get privacyScope => messages.appStringsYouCanViewYourDocumentsManage;
+
   String authFailure(ApiFailure error) => switch (error.code) {
-    'invalid_phone_number' =>
-      'Saisissez un numéro français valide au format +33.',
-    'invalid_otp_request' => 'Saisissez les six chiffres du code reçu.',
-    'invalid_or_expired_otp' => 'Le code est invalide ou a expiré.',
-    'otp_delivery_unavailable' => 'L’envoi du SMS n’a pas pu être effectué. Vous pouvez reprendre la demande.',
-    'otp_delivery_unknown' =>
-      'L’envoi du SMS reste incertain. Le code peut encore arriver. '
-          'Vous pouvez saisir ce code ou reprendre la même demande.',
-    'idempotency_key_conflict' => 'Cette demande ne correspond plus à son intention d’origine. Demandez un nouveau code.',
-    'account_unavailable' => 'Ce compte n’est pas disponible.',
+    'invalid_phone_number' => messages.appStringsEnterAValidFrenchPhoneNumber,
+    'invalid_otp_request' => messages.appStringsEnterTheSixDigitsOfThe,
+    'invalid_or_expired_otp' => messages.appStringsTheCodeIsInvalidOrHas,
+    'otp_delivery_unavailable' => messages.appStringsTheSmsCouldNotBeSent,
+    'otp_delivery_unknown' => messages.appStringsSmsDeliveryIsUncertainTheCode,
+    'idempotency_key_conflict' =>
+      messages.appStringsThisRequestNoLongerMatchesIts,
+    'account_unavailable' => messages.appStringsThisAccountIsUnavailable,
     'legal_documents_changed' => documentsChanged,
     _ => failureMessage(error.kind),
   };
-  String get welcomeTitle => 'Prendre le temps de se rencontrer.';
+
+  String get welcomeTitle => messages.appStringsTakeYourTimeToMeet;
+
   String get welcomeBody =>
-      'Découvrez une personne à travers ses mots. '
-      'Les photos se révèlent lorsque vous le choisissez tous les deux.';
-  String get catalogAction => 'Découvrir les formules';
-  String get catalogTitle => 'Les formules Histae';
+      messages.appStringsDiscoverSomeoneThroughTheirWordsPhotos;
+
+  String get catalogAction => messages.appStringsExplorePlans;
+
+  String get catalogTitle => messages.appStringsHistaePlans;
+
   String get catalogIntro =>
-      'Consultez les formules et leurs conditions. '
-      'La révélation des photos demande toujours votre accord mutuel.';
+      messages.appStringsExplorePlansAndTheirConditionsRevealing;
+
   String get catalogReadOnly =>
-      'Retrouvez votre abonnement et les possibilités de souscription depuis votre profil.';
-  String get loading => 'Chargement des formules…';
-  String get emptyTitle => 'Aucune formule disponible';
-  String get emptyBody =>
-      'Les formules ne sont pas disponibles pour le moment.';
-  String get retry => 'Réessayer';
-  String get refresh => 'Actualiser';
-  String get configurationTitle => 'Service non configuré';
+      messages.appStringsViewYourSubscriptionAndSignUp;
+
+  String get loading => messages.appStringsLoadingPlans;
+
+  String get emptyTitle => messages.appStringsNoPlansAvailable;
+
+  String get emptyBody => messages.appStringsPlansAreCurrentlyUnavailable;
+
+  String get retry => messages.appStringsTryAgain;
+
+  String get refresh => messages.appStringsRefresh;
+
+  String get configurationTitle => messages.appStringsServiceNotConfigured;
+
   String get configurationBody =>
-      'Le service n’est pas encore configuré '
-      'pour cette version de l’application.';
-  String get errorTitle => 'Impossible de charger les formules';
-  String get offlineTitle => 'Connexion indisponible';
-  String retryIn(int seconds) => 'Nouvel essai possible dans $seconds s';
-  String requestReference(String id) => 'Référence de la demande : $id';
-  String money(int cents, String currency) =>
-      '${cents ~/ 100},${(cents % 100).toString().padLeft(2, '0')} $currency';
+      messages.appStringsTheServiceIsNotYetConfigured;
+
+  String get errorTitle => messages.appStringsUnableToLoadPlans;
+
+  String get offlineTitle => messages.appStringsConnectionUnavailable;
+
+  String retryIn(int seconds) => messages.appStringsTryAgainInS(seconds);
+
+  String requestReference(String id) => messages.appStringsRequestReference(id);
+
+  String money(int cents, String currency) => NumberFormat.currency(
+    locale: localeName,
+    name: currency,
+    symbol: currency,
+  ).format(cents / 100);
+
   String monthly(int cents, String currency) =>
-      '${money(cents, currency)} / mois';
-  String annual(int cents, String currency) => '${money(cents, currency)} / an';
-  String weeklyCredits(int credits) => 'Crédits inclus par semaine : $credits';
-  String weeklyLimit(int limit) => 'Continuations par semaine : $limit maximum';
-  String get noWeeklyLimit => 'Continuations sans plafond hebdomadaire';
+      messages.priceMonthly(money(cents, currency));
+
+  String annual(int cents, String currency) =>
+      messages.priceAnnual(money(cents, currency));
+
+  String weeklyCredits(int credits) =>
+      messages.appStringsCreditsIncludedPerWeek(credits);
+
+  String weeklyLimit(int limit) =>
+      messages.appStringsContinuationsPerWeekUpTo(limit);
+
+  String get noWeeklyLimit => messages.appStringsNoWeeklyLimitOnContinuations;
+
   String adStock(int limit) =>
-      'Stock maximal de crédits publicitaires : $limit';
-  String ads(bool removed) =>
-      removed ? 'Publicités retirées' : 'Publicités non retirées';
+      messages.appStringsMaximumVideoCreditBalance(limit);
+
+  String ads(bool removed) => removed
+      ? messages.appStringsAdsRemoved
+      : messages.appStringsAdsNotRemoved;
+
   String rewards(bool enabled) => enabled
-      ? 'Récompenses publicitaires activées pour cette formule'
-      : 'Récompenses publicitaires indisponibles pour cette formule';
+      ? messages.appStringsVideoRewardsEnabledForThisPlan
+      : messages.appStringsVideoRewardsUnavailableForThisPlan;
 
   String? featureTitle(String code, String? fallback) => switch (code) {
-    'messages' => 'Messagerie',
-    'photo_reveal' => 'Révélation mutuelle des photos',
-    'continuations' => 'Poursuivre une conversation',
-    'advertising_credits' => 'Récompenses vidéo volontaires',
-    'no_ads' => 'Sans publicité',
+    'messages' => messages.appStringsMessaging,
+    'photo_reveal' => messages.appStringsMutualPhotoReveal,
+    'continuations' => messages.appStringsContinueAConversation,
+    'advertising_credits' => messages.appStringsOptionalVideoRewards,
+    'no_ads' => messages.appStringsAdFree,
     _ => fallback,
   };
 
   String? featureDescription(String code, String? fallback) => switch (code) {
-    'messages' => 'Échangez pendant la période initiale, puis après votre accord mutuel de continuation.',
-    'photo_reveal' =>
-      'Les photos se révèlent après votre accord à tous les deux.',
-    'continuations' =>
-      'Chaque personne donne son accord et utilise ses propres droits.',
+    'messages' => messages.appStringsChatDuringTheInitialPeriodThen,
+    'photo_reveal' => messages.appStringsPhotosAreRevealedAfterYouBoth,
+    'continuations' => messages.appStringsEachPersonAgreesSeparatelyAndUses,
     'advertising_credits' =>
-      'Le serveur valide la récompense avant d’attribuer les crédits.',
-    'no_ads' => 'Cette formule retire les publicités.',
+      messages.appStringsTheServerValidatesTheRewardBefore,
+    'no_ads' => messages.appStringsThisPlanRemovesAds,
     _ => fallback,
   };
 
   String failureMessage(ApiFailureKind kind) => switch (kind) {
     ApiFailureKind.secureStorage =>
-      'Le stockage sécurisé est indisponible. '
-          'Déverrouillez votre appareil et réessayez. La connexion reste fermée.',
-    ApiFailureKind.sessionUncertain => 'La session ne peut pas être restaurée avec certitude. Reconnectez-vous avec un nouveau code.',
-    ApiFailureKind.network =>
-      'Le service est injoignable. Vérifiez votre connexion puis réessayez.',
-    ApiFailureKind.timeout =>
-      'Le service met trop de temps à répondre. Vous pouvez réessayer.',
+      messages.appStringsSecureStorageIsUnavailableUnlockYour,
+    ApiFailureKind.sessionUncertain =>
+      messages.appStringsYourSessionCannotBeRestoredWith,
+    ApiFailureKind.network => messages.appStringsTheServiceCannotBeReachedCheck,
+    ApiFailureKind.timeout => messages.appStringsTheServiceIsTakingTooLong,
     ApiFailureKind.invalidResponse =>
-      'La réponse du service n’a pas pu être lue.',
-    ApiFailureKind.validation =>
-      'La demande n’a pas été acceptée par le service.',
-    ApiFailureKind.unauthenticated => 'Une connexion au compte est nécessaire.',
+      messages.appStringsTheServiceResponseCouldNotBe,
+    ApiFailureKind.validation => messages.appStringsTheServiceDidNotAcceptThe,
+    ApiFailureKind.unauthenticated =>
+      messages.appStringsPleaseSignInToYourAccount,
     ApiFailureKind.consentRequired =>
-      'Les consentements requis doivent être complétés.',
+      messages.appStringsCompleteTheRequiredConsents,
     ApiFailureKind.discoveryNotReady =>
-      'Votre profil doit être complété pour découvrir des personnes.',
-    ApiFailureKind.quota => 'Le quota disponible ne permet pas cette action.',
+      messages.appStringsCompleteYourProfileToDiscoverPeople,
+    ApiFailureKind.quota =>
+      messages.appStringsYourAvailableAllowanceDoesNotPermit,
     ApiFailureKind.forbidden =>
-      'Cette action n’est pas autorisée actuellement.',
-    ApiFailureKind.notFound => 'Le contenu demandé n’est plus accessible.',
+      messages.appStringsThisActionIsCurrentlyNotAllowed,
+    ApiFailureKind.notFound => messages.appStringsTheRequestedContentIsNoLonger,
     ApiFailureKind.conflict =>
-      'La situation a changé. Actualisez avant de réessayer.',
-    ApiFailureKind.expired => 'Ce contenu a expiré.',
+      messages.appStringsThingsHaveChangedRefreshBeforeTrying,
+    ApiFailureKind.expired => messages.appStringsThisContentHasExpired,
     ApiFailureKind.payloadTooLarge =>
-      'Le contenu envoyé dépasse la taille autorisée.',
+      messages.appStringsTheSubmittedContentExceedsTheAllowed,
     ApiFailureKind.rateLimited =>
-      'Trop de demandes ont été envoyées. Patientez avant de réessayer.',
-    ApiFailureKind.unavailable ||
-    ApiFailureKind.server => 'Le service est temporairement indisponible.',
-    ApiFailureKind.cancelled => 'Le chargement a été interrompu.',
-    ApiFailureKind.unexpected => 'Le service a renvoyé une réponse inattendue.',
+      messages.appStringsTooManyRequestsWaitBeforeTrying,
+    ApiFailureKind.unavailable || ApiFailureKind.server =>
+      messages.appStringsTheServiceIsTemporarilyUnavailable,
+    ApiFailureKind.cancelled => messages.appStringsLoadingWasInterrupted,
+    ApiFailureKind.unexpected =>
+      messages.appStringsTheServiceReturnedAnUnexpectedResponse,
   };
 }

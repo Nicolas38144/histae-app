@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_strings.dart';
+
 class HistaeWordmark extends StatelessWidget {
   const HistaeWordmark({super.key});
 
@@ -9,7 +11,7 @@ class HistaeWordmark extends StatelessWidget {
         ? 'dark'
         : 'light';
     return Semantics(
-      label: 'Histae',
+      label: AppStrings.of(context).messages.appOpeningHistae,
       excludeSemantics: true,
       child: FittedBox(
         fit: BoxFit.scaleDown,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
@@ -23,6 +24,7 @@ class ReportPage extends StatefulWidget {
   final String target;
   final String? matchId;
   final Future<void> Function()? onBlock;
+
   @override
   State<ReportPage> createState() => _ReportPageState();
 }
@@ -35,6 +37,7 @@ class _ReportPageState extends State<ReportPage> {
   );
   final _text = TextEditingController();
   ReportReason _reason = ReportReason.inappropriateContent;
+
   @override
   void initState() {
     super.initState();
@@ -60,7 +63,9 @@ class _ReportPageState extends State<ReportPage> {
       if (!c.accessible) return const HistaeScaffold(body: SizedBox.shrink());
       final editable = !c.sending && c.pending == null && !c.submitted;
       return HistaeScaffold(
-        appBar: AppBar(title: const Text('Signaler un profil')),
+        appBar: AppBar(
+          title: Text(AppStrings.of(context).messages.reportPageReportAProfile),
+        ),
         body: SafeArea(
           child: Center(
             child: ConstrainedBox(
@@ -68,19 +73,25 @@ class _ReportPageState extends State<ReportPage> {
               child: ListView(
                 padding: const EdgeInsets.all(24),
                 children: [
-                  const EditorialCard(
-                    eyebrow: 'PRENDRE SOIN DES ÉCHANGES',
-                    title: 'Un espace\noù se sentir bien.',
-                    body: 'Votre signalement sera transmis pour examen. Le blocage est un choix distinct, disponible après l’envoi.',
+                  EditorialCard(
+                    eyebrow: AppStrings.of(context)
+                        .messages
+                        .reportPageCaringForConversations,
+                    title: AppStrings.of(context)
+                        .messages
+                        .reportPageASpaceToFeelAtEase,
+                    body: AppStrings.of(context)
+                        .messages
+                        .reportPageYourReportWillBeReviewedBlocking,
                   ),
                   const SizedBox(height: 24),
                   if (!c.submitted) ...[
                     PrivacyChoice<ReportReason>(
                       value: _reason,
-                      label: 'Motif',
+                      label: AppStrings.of(context).messages.reportPageReason,
                       choices: {
                         for (final reason in ReportReason.values)
-                          reason: reasonLabel(reason),
+                          reason: reasonLabel(AppStrings.of(context), reason),
                       },
                       onChanged: editable
                           ? (value) => setState(() => _reason = value)
@@ -92,23 +103,34 @@ class _ReportPageState extends State<ReportPage> {
                       enabled: editable,
                       minLines: 3,
                       maxLines: 8,
-                      decoration: const InputDecoration(
-                        labelText: 'Description (facultative)',
+                      decoration: InputDecoration(
+                        labelText: AppStrings.of(context)
+                            .messages
+                            .reportPageDescriptionOptional,
                         alignLabelWithHint: true,
-                        helperText: 'Un court récit des faits suffit.',
+                        helperText: AppStrings.of(context)
+                            .messages
+                            .reportPageABriefAccountOfWhatHappened,
                       ),
                     ),
-                    if (c.validation != null) Text(c.validation!),
+                    if (c.validation != null)
+                      Text(AppStrings.of(context).clientMessage(c.validation!)),
                     if (c.pending != null)
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.symmetric(vertical: 16),
                         child: Text(
-                          'La réponse reste à confirmer. Seul ce même signalement pourra être renvoyé. Revenir en arrière abandonne le brouillon local, sans annuler un éventuel envoi.',
+                          AppStrings.of(context)
+                              .messages
+                              .reportPageTheResponseIsUnconfirmedOnlyThis,
                         ),
                       ),
-                    if (c.failure != null) Text(privacyFailure(c.failure!)),
+                    if (c.failure != null)
+                      Text(privacyFailure(AppStrings.of(context), c.failure!)),
                     if (c.retrySeconds > 0)
-                      Text('Nouvel essai possible dans ${c.retrySeconds} s'),
+                      Text(
+                        AppStrings.of(context).messages
+                            .appStringsTryAgainInS(c.retrySeconds),
+                      ),
                     const SizedBox(height: 20),
                     HistaeButton(
                       onPressed: c.sending || c.retrySeconds > 0
@@ -116,10 +138,14 @@ class _ReportPageState extends State<ReportPage> {
                           : () => c.submit(_reason, _text.text),
                       child: Text(
                         c.sending
-                            ? 'Envoi en cours…'
+                            ? AppStrings.of(context).messages.chatPageSending
                             : c.pending != null
-                            ? 'Reprendre ce signalement'
-                            : 'Envoyer le signalement',
+                            ? AppStrings.of(context)
+                                  .messages
+                                  .reportPageResumeThisReport
+                            : AppStrings.of(context)
+                                  .messages
+                                  .reportPageSubmitReport,
                       ),
                     ),
                   ] else ...[
@@ -127,8 +153,12 @@ class _ReportPageState extends State<ReportPage> {
                       liveRegion: true,
                       child: Text(
                         c.alreadyPending
-                            ? 'Un signalement de cette personne est déjà en attente de traitement.'
-                            : 'Votre signalement a été reçu. Merci de nous avoir alertés.',
+                            ? AppStrings.of(context)
+                                  .messages
+                                  .privacyStringsAReportAboutThisPersonIs
+                            : AppStrings.of(context)
+                                  .messages
+                                  .reportPageYourReportWasReceivedThankYou,
                       ),
                     ),
                     if (widget.onBlock != null)
@@ -136,9 +166,15 @@ class _ReportPageState extends State<ReportPage> {
                         onPressed: () async {
                           if (!await confirmAction(
                                 context,
-                                'Bloquer cette personne ?',
-                                'Les échanges seront terminés. Vos anciennes rencontres ne seront pas rétablies après un déblocage.',
-                                action: 'Bloquer',
+                                AppStrings.of(context)
+                                    .messages
+                                    .encounterPageBlockThisPerson,
+                                AppStrings.of(context)
+                                    .messages
+                                    .reportPageConversationsWillEndPreviousMatchesWill,
+                                action: AppStrings.of(context)
+                                    .messages
+                                    .discoveryPageBlock,
                               ) ||
                               !context.mounted ||
                               !c.accessible) {
@@ -147,11 +183,17 @@ class _ReportPageState extends State<ReportPage> {
                           await widget.onBlock!();
                           if (context.mounted) Navigator.of(context).pop();
                         },
-                        child: const Text('Bloquer aussi cette personne'),
+                        child: Text(
+                          AppStrings.of(context)
+                              .messages
+                              .reportPageAlsoBlockThisPerson,
+                        ),
                       ),
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('Fermer'),
+                      child: Text(
+                        AppStrings.of(context).messages.conversationHeaderClose,
+                      ),
                     ),
                   ],
                 ],

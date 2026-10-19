@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../continuation/presentation/continuation_balance_card.dart';
@@ -24,6 +25,7 @@ class MatchesPage extends StatefulWidget {
   final String? initialMatchId;
   final VoidCallback? onInitialMatchHandled;
   final bool notificationFlow;
+
   @override
   State<MatchesPage> createState() => _MatchesPageState();
 }
@@ -34,8 +36,10 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
   bool _opening = false;
   bool _creditsOpen = false;
   int _overviewLoads = 1;
+
   bool get _loading =>
       _overviewLoads > 0 || c.listLoading || c.continuation.loading;
+
   @override
   void initState() {
     super.initState();
@@ -168,15 +172,17 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
       }
       return HistaeScaffold(
         appBar: AppBar(
-          title: const Text('Vos rencontres'),
+          title: Text(AppStrings.of(context).messages.matchesPageYourMatches),
           actions: [
             IconButton(
-              tooltip: 'Vos crédits',
+              tooltip: AppStrings.of(context).messages.creditsPageYourCredits,
               onPressed: _openCredits,
               icon: const Icon(Icons.account_balance_wallet_outlined),
             ),
             IconButton(
-              tooltip: 'Actualiser les rencontres',
+              tooltip: AppStrings.of(context)
+                  .messages
+                  .discoveryPageRefreshEncounters,
               onPressed: _loading || c.retrySeconds > 0 ? null : _refresh,
               icon: const Icon(Icons.refresh),
             ),
@@ -188,10 +194,11 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
               SizedBox(
                 height: 3,
                 child: _loading
-                    ? const LinearProgressIndicator(
+                    ? LinearProgressIndicator(
                         key: Key('matches-loading'),
-                        semanticsLabel:
-                            'Actualisation des rencontres et des crédits',
+                        semanticsLabel: AppStrings.of(context)
+                            .messages
+                            .matchesPageRefreshingMatchesAndCredits,
                       )
                     : null,
               ),
@@ -208,34 +215,51 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
                         loading: _overviewLoads > 0,
                       ),
                       const SizedBox(height: 24),
-                      const EditorialCard(
-                        eyebrow: 'PRENDRE LE TEMPS',
-                        title: 'Les mots\ncontinuent.',
-                        body: 'Un intérêt réciproque, puis un espace pour faire connaissance.',
+                      EditorialCard(
+                        eyebrow: AppStrings.of(context)
+                            .messages
+                            .discoveryPageTakeYourTime,
+                        title: AppStrings.of(context)
+                            .messages
+                            .matchesPageWordsContinue,
+                        body: AppStrings.of(context)
+                            .messages
+                            .matchesPageMutualInterestThenASpaceTo,
                       ),
                       const SizedBox(height: 16),
                       if (!c.realtimeConnected)
-                        const Text(
-                          'Actualisation en reprise. Vous pouvez relire vos rencontres manuellement.',
+                        Text(
+                          AppStrings.of(context)
+                              .messages
+                              .matchesPageReconnectingUpdatesYouCanRefreshYour,
                         ),
                       if (c.notice == 'ended')
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.symmetric(vertical: 16),
-                          child: Text('Cette rencontre est terminée.'),
+                          child: Text(
+                            AppStrings.of(context)
+                                .messages
+                                .matchesPageThisMatchHasEnded,
+                          ),
                         ),
                       if (c.failure case final error?)
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           child: Semantics(
                             liveRegion: true,
-                            child: Text(MatchesStrings.failure(error)),
+                            child: Text(
+                              MatchesStrings(AppStrings.of(context))
+                                  .failure(error),
+                            ),
                           ),
                         ),
                       if (!_loading && c.items.isEmpty && c.failure == null)
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.symmetric(vertical: 24),
                           child: Text(
-                            'Aucune rencontre pour le moment. Elles apparaîtront après un intérêt réciproque.',
+                            AppStrings.of(context)
+                                .messages
+                                .matchesPageNoMatchesYetTheyWillAppear,
                           ),
                         ),
                       for (final match in c.items)
@@ -245,13 +269,20 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
                           onTap: _opening ? null : () => _open(match.id),
                         ),
                       if (c.retrySeconds > 0)
-                        Text('Nouvel essai possible dans ${c.retrySeconds} s'),
+                        Text(
+                          AppStrings.of(context).messages
+                              .appStringsTryAgainInS(c.retrySeconds),
+                        ),
                       if (c.listCursor != null)
                         OutlinedButton(
                           onPressed: c.listLoading || c.retrySeconds > 0
                               ? null
                               : c.loadMore,
-                          child: const Text('Voir les rencontres suivantes'),
+                          child: Text(
+                            AppStrings.of(context)
+                                .messages
+                                .matchesPageViewMoreMatches,
+                          ),
                         ),
                     ],
                   ),

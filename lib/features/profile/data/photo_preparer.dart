@@ -11,6 +11,7 @@ class PhotoPreparer {
   final _picker = ImagePicker();
   // Never attach an Android recovered selection to a session restored after a
   // process death. The owner binding of that selection is no longer known.
+
   Future<bool> discardInterruptedSelection() async {
     if (!Platform.isAndroid) return false;
     final data = await _picker.retrieveLostData();

@@ -1,34 +1,35 @@
 import 'package:flutter/material.dart';
 
+import '../core/l10n/app_strings.dart';
+
 class MainNavigationBar extends StatelessWidget {
   const MainNavigationBar({
     super.key,
     required this.selectedIndex,
     required this.onSelected,
   });
-
   final int selectedIndex;
   final ValueChanged<int> onSelected;
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    const destinations = [
+    final destinations = [
       (
         key: 'discovery',
-        label: 'Feed',
+        label: AppStrings.of(context).messages.mainNavigationBarFeed,
         icon: Icons.home_outlined,
         selected: Icons.home_rounded,
       ),
       (
         key: 'matches',
-        label: 'Matchs',
+        label: AppStrings.of(context).messages.mainNavigationBarMatches,
         icon: Icons.forum_outlined,
         selected: Icons.forum_rounded,
       ),
       (
         key: 'profile',
-        label: 'Profil',
+        label: AppStrings.of(context).messages.mainNavigationBarProfile,
         icon: Icons.person_outline_rounded,
         selected: Icons.person_rounded,
       ),

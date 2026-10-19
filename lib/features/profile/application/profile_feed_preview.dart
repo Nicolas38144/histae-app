@@ -39,7 +39,6 @@ class ProfileFeedPreview {
       ],
     );
   }
-
   final String firstname;
   final int age;
   final String? bio;

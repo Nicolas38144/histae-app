@@ -3,60 +3,72 @@ import '../../../core/network/api_failure.dart';
 import '../data/profile_models.dart';
 
 // Feature copy is kept together to support a later localization catalogue.
+
 class ProfileStrings {
-  static String failure(ApiFailure e) => switch (e.code) {
+  const ProfileStrings(this.strings);
+  final AppStrings strings;
+
+  String failure(ApiFailure e) => switch (e.code) {
     'invalid_profile' =>
-      'Vérifiez le prénom, la date de naissance, le sexe et la présentation.',
+      strings.messages.profileStringsCheckYourFirstNameDateOf,
     'invalid_preferences' =>
-      'Vérifiez les quatre préférences et leurs limites.',
-    'invalid_profile_answers' => 'Vérifiez vos réponses : trois questions distinctes maximum, de 10 à 300 caractères chacune.',
-    'profile_question_not_found' => 'Une question n’est plus disponible. Relisez le catalogue avant de modifier votre sélection ; votre brouillon reste affiché.',
+      strings.messages.profileStringsCheckAllFourPreferencesAndTheir,
+    'invalid_profile_answers' =>
+      strings.messages.profileStringsCheckYourAnswersUpToThree,
+    'profile_question_not_found' =>
+      strings.messages.profileStringsAQuestionIsNoLongerAvailable,
     'trait_not_found' =>
-      'Ce trait n’est plus disponible. Actualisez les traits.',
-    'profile_not_found' => 'Créez d’abord votre profil.',
-    'photo_selection_unavailable' => 'La photo n’a pas pu être préparée. Vérifiez l’accès aux photos dans les réglages, ou choisissez une autre image.',
+      strings.messages.profileStringsThisTraitIsNoLongerAvailable,
+    'profile_not_found' =>
+      strings.messages.profileStringsCreateYourProfileFirst,
+    'photo_selection_unavailable' =>
+      strings.messages.profileStringsThePhotoCouldNotBePrepared,
     'invalid_photo' =>
-      'Cette photo n’est pas reconnue. Choisissez une autre image.',
+      strings.messages.profileStringsThisPhotoIsNotRecognizedChoose,
     'photo_too_large' =>
-      'La photo doit faire au maximum 500 000 octets après préparation.',
+      strings.messages.profileStringsThePreparedPhotoMustBeNo,
     'photo_storage_unavailable' =>
-      'Les photos sont temporairement indisponibles.',
-    'photo_update_in_progress' || 'photo_update_conflict' => 'Une mise à jour photo est en cours. Relisez le profil puis reprenez la même demande.',
-    'idempotency_key_consumed' || 'idempotency_key_conflict' => 'Cette demande photo ne peut plus être reprise. Relisez votre profil avant de choisir une nouvelle photo.',
-    _ => const AppStrings().failureMessage(e.kind),
+      strings.messages.profileStringsPhotosAreTemporarilyUnavailable,
+    'photo_update_in_progress' || 'photo_update_conflict' =>
+      strings.messages.profileStringsAPhotoUpdateIsInProgress,
+    'idempotency_key_consumed' || 'idempotency_key_conflict' =>
+      strings.messages.profileStringsThisPhotoRequestCanNoLonger,
+    _ => strings.failureMessage(e.kind),
   };
-  static String moderation(Moderation? m) {
-    if (m == null) return 'Aucune analyse disponible.';
+
+  String moderation(Moderation? m) {
+    if (m == null) return strings.messages.profileStringsNoAnalysisAvailable;
     final status = switch (m.status) {
-      'pending' => 'En cours de vérification',
-      'approved' => 'Approuvé',
-      _ => 'À modifier',
+      'pending' => strings.messages.profileStringsUnderReview,
+      'approved' => strings.messages.profileStringsApproved,
+      _ => strings.messages.profileStringsNeedsEditing,
     };
     if (m.reasons.isEmpty) return status;
     return '$status · ${m.reasons.map((r) => switch (r) {
-      'spam' => 'contenu répétitif ou promotionnel',
-      'insult' => 'propos insultants',
-      'personal_contact' => 'coordonnées personnelles',
-      'sexual_content' || 'explicit_image' => 'contenu explicite',
-      'face_not_detected' => 'visage non détecté',
-      'multiple_faces' => 'plusieurs visages',
-      'blurry' => 'image floue',
-      'analysis_unavailable' => 'analyse temporairement indisponible',
-      'legacy_unreviewed' => 'contenu à revérifier',
-      _ => 'vérification nécessaire',
+      'spam' => strings.messages.profileStringsRepetitiveOrPromotionalContent,
+      'insult' => strings.messages.profileStringsInsultingLanguage,
+      'personal_contact' => strings.messages.profileStringsPersonalContactDetails,
+      'sexual_content' || 'explicit_image' => strings.messages.profileStringsExplicitContent,
+      'face_not_detected' => strings.messages.profileStringsNoFaceDetected,
+      'multiple_faces' => strings.messages.profileStringsMultipleFaces,
+      'blurry' => strings.messages.profileStringsBlurryImage,
+      'analysis_unavailable' => strings.messages.profileStringsAnalysisTemporarilyUnavailable,
+      'legacy_unreviewed' => strings.messages.profileStringsContentNeedsRechecking,
+      _ => strings.messages.profileStringsReviewNeeded,
     }).join(', ')}';
   }
 
-  static const sexes = {
-    '': 'Non renseigné',
-    'female': 'Femme',
-    'male': 'Homme',
-    'other': 'Autre',
+  Map<String, String> get sexes => {
+    '': strings.messages.profileStringsNotProvided,
+    'female': strings.messages.profileStringsWoman,
+    'male': strings.messages.profileStringsMan,
+    'other': strings.messages.profileStringsOther,
   };
-  static const lookingFor = {
-    'female': 'Des femmes',
-    'male': 'Des hommes',
-    'both': 'Des femmes et des hommes',
-    'other': 'Autre',
+
+  Map<String, String> get lookingFor => {
+    'female': strings.messages.profileStringsWomen,
+    'male': strings.messages.profileStringsMen,
+    'both': strings.messages.profileStringsWomenAndMen,
+    'other': strings.messages.profileStringsOther,
   };
 }

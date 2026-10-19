@@ -9,8 +9,10 @@ class RewardedVideoScope extends InheritedWidget {
     required super.child,
   });
   final RewardedVideoGateway? gateway;
+
   static RewardedVideoGateway? maybeOf(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<RewardedVideoScope>()?.gateway;
+
   @override
   bool updateShouldNotify(RewardedVideoScope oldWidget) =>
       gateway != oldWidget.gateway;

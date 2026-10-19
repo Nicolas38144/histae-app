@@ -13,6 +13,7 @@ class SignedPhotoLoader {
   SignedPhotoLoader({PhotoClientFactory? clientFactory})
     : _clientFactory = clientFactory ?? http.Client.new;
   final PhotoClientFactory _clientFactory;
+
   SignedPhotoDownload load(String value) {
     final uri = Uri.tryParse(value);
     if (uri == null ||
@@ -34,6 +35,7 @@ class SignedPhotoDownload {
   final http.Client _client;
   bool _closed = false;
   late final Future<Uint8List> bytes;
+
   Future<Uint8List> _load(Uri uri) async {
     try {
       return await _read(uri).timeout(const Duration(seconds: 15));

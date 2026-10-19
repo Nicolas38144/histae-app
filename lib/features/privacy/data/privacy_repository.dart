@@ -6,15 +6,25 @@ import 'privacy_models.dart';
 abstract interface class PrivacyRepository {
   factory PrivacyRepository(AuthenticatedSession session) =
       ApiPrivacyRepository;
+
   AuthenticatedSession get session;
+
   String get owner;
+
   Future<SessionPage> sessions(RequestCancellation scope, {String? cursor});
+
   Future<void> revoke(String id, RequestCancellation scope);
+
   Future<List<BlockedPerson>> blocks(RequestCancellation scope);
+
   Future<void> block(String id, bool blocked, RequestCancellation scope);
+
   Future<List<RightsRequest>> rights(RequestCancellation scope);
+
   Future<RightsRequest> requestRight(DataRight type, RequestCancellation scope);
+
   Future<void> report(ReportIntent intent, RequestCancellation scope);
+
   Future<DeletionTicket> deletionTicket(RequestCancellation scope);
 }
 
@@ -22,8 +32,10 @@ final class ApiPrivacyRepository implements PrivacyRepository {
   ApiPrivacyRepository(this.session);
   @override
   final AuthenticatedSession session;
+
   @override
   String get owner => session.identity?.userId ?? invalidResponse();
+
   Future<Object?> _request(
     String method,
     String path,
@@ -40,6 +52,7 @@ final class ApiPrivacyRepository implements PrivacyRepository {
     cancellation: scope,
     query: query,
   );
+
   @override
   Future<SessionPage> sessions(
     RequestCancellation scope, {
@@ -54,6 +67,7 @@ final class ApiPrivacyRepository implements PrivacyRepository {
       ),
     ),
   );
+
   @override
   Future<void> revoke(String id, RequestCancellation scope) async {
     serverId({'id': id}, 'id');
@@ -68,6 +82,7 @@ final class ApiPrivacyRepository implements PrivacyRepository {
           'blocks',
         ).map(BlockedPerson.fromJson),
       );
+
   @override
   Future<void> block(String id, bool blocked, RequestCancellation scope) async {
     serverId({'id': id}, 'id');
@@ -89,6 +104,7 @@ final class ApiPrivacyRepository implements PrivacyRepository {
           'requests',
         ).map((v) => RightsRequest.fromJson(v, owner)),
       );
+
   @override
   Future<RightsRequest> requestRight(
     DataRight type,
@@ -103,6 +119,7 @@ final class ApiPrivacyRepository implements PrivacyRepository {
     ),
     owner,
   );
+
   @override
   Future<void> report(ReportIntent intent, RequestCancellation scope) async {
     if (intent.target == owner || validateReport(intent.description) != null) {

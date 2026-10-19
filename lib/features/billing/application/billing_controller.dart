@@ -40,6 +40,7 @@ class BillingController extends ChangeNotifier {
   final BillingConfig config;
   final CheckoutVault vault;
   final BillingGateway gateway;
+
   AuthenticatedSession get session => repository.session;
   late final RealtimeClient _realtime;
   String? _owner, _key;
@@ -61,22 +62,27 @@ class BillingController extends ChangeNotifier {
   CheckoutAttempt? pending;
   ApiFailure? failure;
   String? notice;
+
   bool get accessible =>
       !_disposed &&
       session.phase == SessionPhase.ready &&
       session.resourceKey == _key &&
       session.identity?.userId == _owner;
+
   bool get active => accessible && _active && restored;
+
   bool get paymentsAvailable => config.available;
+
   int get retrySeconds => retrySecondsUntil(failure?.retryAt);
 
   bool _alive(int epoch) => active && epoch == _epoch;
+
   void _notify() {
     if (!_disposed) notifyListeners();
   }
-
   // Serialize every storage operation, including logout and owner changes, so
   // a late write cannot resurrect an old owner's pending intent.
+
   Future<T> _stored<T>(Future<T> Function() action) => _storage.run(action);
 
   void _error(ApiFailure e) {

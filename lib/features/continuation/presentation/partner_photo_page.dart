@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/signed_photo_loader.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../profile/data/profile_models.dart';
@@ -17,6 +18,7 @@ class PartnerPhotoPage extends StatefulWidget {
   final MatchAccess access;
   final String matchId;
   final PhotoClientFactory? photoClient;
+
   @override
   State<PartnerPhotoPage> createState() => _PartnerPhotoPageState();
 }
@@ -31,6 +33,7 @@ class _PartnerPhotoPageState extends State<PartnerPhotoPage>
   Timer? _expiry;
   int _epoch = 0;
   bool _foreground = true, _loading = false;
+
   bool get _allowed =>
       _foreground &&
       c.active &&
@@ -41,6 +44,7 @@ class _PartnerPhotoPageState extends State<PartnerPhotoPage>
       c.selected!.photosRevealed &&
       c.readAt != null &&
       DateTime.now().toUtc().difference(c.readAt!) < const Duration(minutes: 4);
+
   @override
   void initState() {
     super.initState();
@@ -106,7 +110,9 @@ class _PartnerPhotoPageState extends State<PartnerPhotoPage>
     } catch (_) {
       if (mounted && epoch == _epoch) {
         setState(() {
-          _error = 'La photo temporaire n’est pas disponible. Actualisez pour obtenir un nouveau lien.';
+          _error = AppStrings.of(context)
+              .messages
+              .partnerPhotoPageTheTemporaryPhotoIsUnavailableRefresh;
         });
       }
     } finally {
@@ -139,17 +145,27 @@ class _PartnerPhotoPageState extends State<PartnerPhotoPage>
 
   @override
   Widget build(BuildContext context) => HistaeScaffold(
-    appBar: AppBar(title: const Text('Une photo, à deux')),
+    appBar: AppBar(
+      title: Text(
+        AppStrings.of(context).messages.partnerPhotoPageAPhotoTogether,
+      ),
+    ),
     body: SafeArea(
       child: ListView(
         padding: const EdgeInsets.all(24),
         children: [
           if (!_allowed || c.selected?.partner.photo == null)
-            const Text('Cette photo n’est pas disponible actuellement.')
+            Text(
+              AppStrings.of(context)
+                  .messages
+                  .partnerPhotoPageThisPhotoIsCurrentlyUnavailable,
+            )
           else ...[
             if (_loading)
-              const LinearProgressIndicator(
-                semanticsLabel: 'Chargement de la photo',
+              LinearProgressIndicator(
+                semanticsLabel: AppStrings.of(context)
+                    .messages
+                    .partnerPhotoPageLoadingPhoto,
               ),
             if (_image != null)
               ClipRRect(
@@ -159,11 +175,15 @@ class _PartnerPhotoPageState extends State<PartnerPhotoPage>
                   child: Image(
                     image: _image!,
                     fit: BoxFit.contain,
-                    semanticLabel: 'Photo de votre rencontre',
-                    errorBuilder: (_, _, _) => const Padding(
+                    semanticLabel: AppStrings.of(context)
+                        .messages
+                        .partnerPhotoPageYourMatchSPhoto,
+                    errorBuilder: (_, _, _) => Padding(
                       padding: EdgeInsets.all(24),
                       child: Text(
-                        'La photo ne peut pas être affichée. Actualisez le lien temporaire.',
+                        AppStrings.of(context)
+                            .messages
+                            .partnerPhotoPageThePhotoCannotBeShownRefresh,
                       ),
                     ),
                   ),
@@ -171,8 +191,10 @@ class _PartnerPhotoPageState extends State<PartnerPhotoPage>
               ),
             if (_error != null) Text(_error!),
             const SizedBox(height: 24),
-            const Text(
-              'Vos accords de révélation sont mutuels. Les photos restent absentes du feed.',
+            Text(
+              AppStrings.of(context)
+                  .messages
+                  .partnerPhotoPageYouBothAgreedToRevealPhotos,
             ),
           ],
           OutlinedButton.icon(
@@ -184,7 +206,9 @@ class _PartnerPhotoPageState extends State<PartnerPhotoPage>
                     if (mounted) _changed();
                   },
             icon: const Icon(Icons.refresh),
-            label: const Text('Actualiser la photo'),
+            label: Text(
+              AppStrings.of(context).messages.partnerPhotoPageRefreshPhoto,
+            ),
           ),
         ],
       ),

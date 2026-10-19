@@ -21,7 +21,6 @@ class ApiClient {
     DateTime Function()? now,
   }) : _client = client ?? http.Client(),
        _now = now ?? DateTime.now;
-
   final Uri origin;
   final http.Client _client;
   final Duration timeout;
@@ -168,9 +167,9 @@ class ApiClient {
       throw ApiFailure(ApiFailureKind.network, requestId: id);
     }
   }
-
   // The transport never retries or refreshes. Callers explicitly choose their
   // route's replay policy; request bodies and credentials are never logged.
+
   Future<Object?> requestJson(
     String method,
     String path, {
@@ -327,6 +326,7 @@ class ApiClient {
 final _uuidPattern = RegExp(
   r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$',
 );
+
 bool _validUuidV4(String? value) =>
     value != null && _uuidPattern.hasMatch(value);
 

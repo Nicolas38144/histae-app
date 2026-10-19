@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../data/continuation_models.dart';
 
 class CreditsBalancePanel extends StatelessWidget {
@@ -34,7 +35,7 @@ class CreditsBalancePanel extends StatelessWidget {
             runSpacing: 8,
             children: [
               Text(
-                'VOTRE SOLDE',
+                AppStrings.of(context).messages.creditsBalancePanelYourBalance,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: colors.onSurfaceVariant,
                 ),
@@ -49,7 +50,13 @@ class CreditsBalancePanel extends StatelessWidget {
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: Text(
-                  q.premium ? 'Premium' : 'Histae Free',
+                  q.premium
+                      ? AppStrings.of(context)
+                            .messages
+                            .accountBenefitsActionsPremium
+                      : AppStrings.of(context)
+                            .messages
+                            .creditsBalancePanelHistaeFree,
                   style: theme.textTheme.labelMedium?.copyWith(
                     color: colors.primary,
                   ),
@@ -62,18 +69,23 @@ class CreditsBalancePanel extends StatelessWidget {
             Icon(Icons.all_inclusive_rounded, size: 52, color: colors.primary),
             const SizedBox(height: 12),
             Text(
-              'Le temps de vous découvrir.',
+              AppStrings.of(context)
+                  .messages
+                  .creditsBalancePanelTimeToDiscoverEachOther,
               style: theme.textTheme.headlineMedium,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
-            const Text(
-              'Vos continuations ne nécessitent aucun crédit. Chacun reste libre de poursuivre la rencontre.',
+            Text(
+              AppStrings.of(context)
+                  .messages
+                  .creditsBalancePanelNoCreditsAreNeededToContinue,
               textAlign: TextAlign.center,
             ),
           ] else ...[
             Semantics(
-              label: '${q.remaining} nouvelles continuations disponibles',
+              label: AppStrings.of(context).messages
+                  .availableContinuations(q.remaining!),
               excludeSemantics: true,
               child: Column(
                 children: [
@@ -87,9 +99,8 @@ class CreditsBalancePanel extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    q.remaining == 1
-                        ? 'continuation disponible'
-                        : 'continuations disponibles',
+                    AppStrings.of(context).messages
+                        .creditsAvailable(q.remaining!),
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyMedium,
                   ),
@@ -105,7 +116,9 @@ class CreditsBalancePanel extends StatelessWidget {
                   flex: largeText ? 0 : 1,
                   child: _Balance(
                     icon: Icons.auto_awesome_outlined,
-                    label: 'Gratuits',
+                    label: AppStrings.of(context)
+                        .messages
+                        .creditsBalancePanelFree,
                     count: q.freeRemaining,
                     color: colors.primary,
                   ),
@@ -115,7 +128,9 @@ class CreditsBalancePanel extends StatelessWidget {
                   flex: largeText ? 0 : 1,
                   child: _Balance(
                     icon: Icons.play_circle_outline_rounded,
-                    label: 'Vidéos',
+                    label: AppStrings.of(context)
+                        .messages
+                        .continuationBalanceCardVideos,
                     count: q.advertisingRemaining,
                     color: colors.secondary,
                   ),
@@ -124,7 +139,9 @@ class CreditsBalancePanel extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              'Soldes disponibles, hors crédits réservés.',
+              AppStrings.of(context)
+                  .messages
+                  .creditsBalancePanelAvailableBalancesExcludingReservedCredits,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: colors.onSurfaceVariant,
               ),
@@ -148,6 +165,7 @@ class _Balance extends StatelessWidget {
   final String label;
   final int count;
   final Color color;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -177,6 +195,7 @@ class _Balance extends StatelessWidget {
 class CreditsWeekPanel extends StatelessWidget {
   const CreditsWeekPanel({super.key, required this.quota});
   final ContinuationQuota quota;
+
   @override
   Widget build(BuildContext context) {
     final q = quota, theme = Theme.of(context), colors = theme.colorScheme;
@@ -186,10 +205,17 @@ class CreditsWeekPanel extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Cette semaine', style: theme.textTheme.titleMedium),
+            Text(
+              AppStrings.of(context).messages.creditsBalancePanelThisWeek,
+              style: theme.textTheme.titleMedium,
+            ),
             const SizedBox(height: 12),
             Text(
-              '${q.used} / ${q.weeklyLimit} continuations confirmées',
+              AppStrings.of(context).messages
+                  .creditsBalancePanelContinuationsConfirmed(
+                    q.used,
+                    q.weeklyLimit!,
+                  ),
               style: theme.textTheme.bodyMedium,
             ),
             const SizedBox(height: 12),
@@ -199,20 +225,28 @@ class CreditsWeekPanel extends StatelessWidget {
                   : (q.used / q.weeklyLimit!).clamp(0, 1),
               minHeight: 5,
               borderRadius: BorderRadius.circular(8),
-              semanticsLabel:
-                  'Continuations confirmées cette semaine : ${q.used} sur ${q.weeklyLimit}',
+              semanticsLabel: AppStrings.of(context).messages
+                  .creditsBalancePanelContinuationsConfirmedThisWeekOf(
+                    q.used,
+                    q.weeklyLimit!,
+                  ),
             ),
             const SizedBox(height: 14),
             Text(
-              '${q.weeklyCredits} crédits gratuits renouvelés le lundi à 00 h UTC.',
+              AppStrings.of(context).messages
+                  .creditsBalancePanelFreeCreditsRenewedOnMondaysAt(
+                    q.weeklyCredits,
+                  ),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: colors.onSurfaceVariant,
               ),
             ),
             if (q.remaining == 0) ...[
               const SizedBox(height: 10),
-              const Text(
-                'Aucune nouvelle continuation disponible actuellement. Le solde tient compte du plafond de la semaine et des réservations.',
+              Text(
+                AppStrings.of(context)
+                    .messages
+                    .creditsBalancePanelNoNewContinuationAvailableRightNow,
               ),
             ],
           ],
@@ -225,31 +259,43 @@ class CreditsWeekPanel extends StatelessWidget {
 class CreditsExplanation extends StatelessWidget {
   const CreditsExplanation({super.key, required this.quota});
   final ContinuationQuota quota;
+
   @override
   Widget build(BuildContext context) => Card(
     child: ExpansionTile(
       tilePadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
       childrenPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-      title: const Text('Comprendre mes crédits'),
+      title: Text(
+        AppStrings.of(context)
+            .messages
+            .creditsBalancePanelUnderstandingMyCredits,
+      ),
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              '${quota.reserved} crédit${quota.reserved == 1 ? '' : 's'} réservé${quota.reserved == 1 ? '' : 's'}',
+              AppStrings.of(context).messages.reservedCredits(quota.reserved),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Un crédit est réservé lorsque vous choisissez de continuer. Il est débité une fois les deux accords confirmés. Un crédit déjà débité n’est pas remboursé à la clôture.',
+            Text(
+              AppStrings.of(context)
+                  .messages
+                  .creditsBalancePanelACreditIsReservedWhenYou,
             ),
             const SizedBox(height: 16),
             Text(
-              'Réserve vidéo : ${quota.advertisingBalance} / ${quota.stockLimit}',
+              AppStrings.of(context).messages.creditsBalancePanelVideoReserve(
+                quota.advertisingBalance,
+                quota.stockLimit,
+              ),
               style: Theme.of(context).textTheme.titleSmall,
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Les crédits vidéo sont conservés, réservations comprises. Les crédits gratuits sont renouvelés chaque semaine, sans cumul. Une réservation peut rester rattachée à la semaine de votre accord.',
+            Text(
+              AppStrings.of(context)
+                  .messages
+                  .creditsBalancePanelVideoCreditsAreKeptIncludingReserved,
             ),
           ],
         ),

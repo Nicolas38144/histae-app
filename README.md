@@ -35,6 +35,14 @@ L'API actuelle est écrite en Rust avec Axum, Tokio et SQLx. PostgreSQL, Redis e
 
 ## Démarrage
 
+### Langues de l’interface — 19 octobre 2026
+
+L’app propose le français, l’anglais, l’espagnol et l’italien. Le bouton de langue dans l’accueil et le profil mémorise le choix sur l’appareil ; le français reste la langue initiale et une option suit celle de l’appareil, avec repli français. Le changement conserve session, navigation et brouillons. Les textes d’interface, validations, erreurs et libellés d’accessibilité sont dans quatre catalogues ARB ; dates, prix et pluriels suivent la langue. Un contrôle de syntaxe empêche le retour de libellés en dur dans les widgets. Voir `lib/core/l10n/README.md` pour ajouter ou modifier une traduction.
+
+Périmètre client uniquement : aucune modification API, ni traduction des contenus reçus du serveur ou des messages des personnes. Les questions, traits, documents et noms d’offres transmis par le serveur gardent leur langue actuelle. L’éligibilité des numéros en +33 et les URL Stripe fournies par l’API sont conservées. Les permissions iOS disposent aussi de ressources localisées ; les dialogues du système et des fournisseurs suivent leurs propres réglages.
+
+Validation : 65 contrôles ciblés distincts réussis, analyse sans problème, APK Android debug compilé et revue de 24 captures avec polices réelles dans les quatre langues, dont des états à 200 %. Aucun appel privé réel. Compilation et essai iOS sur Mac restent à faire.
+
 ### Refactoring Flutter — 19 octobre 2026
 
 Les parcours profil, aperçu, découverte et consentements séparent désormais leurs composants visuels, la projection des données publiques et l’accès réseau du mode pause. Le calcul d’âge UTC est partagé avec la validation du profil ; les états du contrôleur de visibilité sont en lecture seule. Les cartes conservent leur position individuelle dans les listes pour préserver le défilement lors du changement de taille du texte. Aucun changement fonctionnel ou de contrat serveur n’est introduit.

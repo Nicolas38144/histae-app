@@ -33,9 +33,9 @@ class OtpController extends ChangeNotifier {
   int get retrySeconds => retrySecondsUntil(_retryAt, now: _now());
 
   bool get canResume => _key != null;
-
   // New send/resend explicitly creates an intention. Technical resume keeps
   // BOTH its phone and UUID, which are held in memory only.
+
   Future<void> send(String input, {bool newIntention = true}) async {
     if (busy || _disposed || retrySeconds > 0) return;
     final phone = normalizeFrenchPhone(input);

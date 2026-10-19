@@ -11,6 +11,7 @@ import 'billing_models.dart';
 /// amount, payment detail or entitlement is persisted on the device.
 class CheckoutAttempt {
   const CheckoutAttempt(this.origin, this.owner, this.key, this.period);
+
   factory CheckoutAttempt.create(
     String origin,
     String owner,
@@ -18,12 +19,14 @@ class CheckoutAttempt {
   ) => CheckoutAttempt(origin, owner, newUuidV4(), period);
   final String origin, owner, key;
   final BillingPeriod period;
+
   String encode() => jsonEncode({
     'origin': origin,
     'owner': owner,
     'key': key,
     'period': period.name,
   });
+
   static CheckoutAttempt? decode(String? raw) {
     if (raw == null || raw == '{}') return null;
     try {
@@ -51,6 +54,7 @@ class CheckoutAttempt {
 
 abstract interface class CheckoutVault {
   Future<CheckoutAttempt?> read();
+
   Future<void> write(CheckoutAttempt? attempt);
 }
 
@@ -62,6 +66,7 @@ class SecureCheckoutVault implements CheckoutVault {
     ),
   );
   static const _key = 'histae.checkout.v1';
+
   @override
   Future<CheckoutAttempt?> read() async {
     try {

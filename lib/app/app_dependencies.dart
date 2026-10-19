@@ -24,6 +24,7 @@ class AppDependencies {
     this.billing,
     this.videos,
   });
+
   factory AppDependencies.fromConfig(AppConfig config) {
     final session = SessionController(
       AuthRepository(ApiClient(origin: config.apiOrigin)),

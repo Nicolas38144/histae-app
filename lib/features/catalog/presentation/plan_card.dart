@@ -61,8 +61,10 @@ class PlanCard extends StatelessWidget {
             children: [
               Text(
                 featured
-                    ? 'PRENDRE LE TEMPS, LIBREMENT'
-                    : 'POUR FAIRE CONNAISSANCE',
+                    ? AppStrings.of(context).messages.planCardTakeYourTimeFreely
+                    : AppStrings.of(context)
+                          .messages
+                          .planCardToGetToKnowEachOther,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: theme.colorScheme.primary,
                 ),
@@ -90,10 +92,15 @@ class PlanCard extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 switch (offer.billingPeriod) {
-                  BillingPeriod.monthly =>
-                    'Facturé chaque mois. Renouvellement automatique.',
-                  BillingPeriod.annual => 'Facturé en une fois chaque année. Renouvellement automatique.',
-                  null => 'Sans abonnement payant.',
+                  BillingPeriod.monthly => AppStrings.of(
+                    context,
+                  ).messages.planCardBilledMonthlyAutomaticRenewal,
+                  BillingPeriod.annual => AppStrings.of(
+                    context,
+                  ).messages.planCardBilledInFullEachYearAutomatic,
+                  null => AppStrings.of(
+                    context,
+                  ).messages.planCardNoPaidSubscription,
                 },
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
@@ -102,7 +109,12 @@ class PlanCard extends StatelessWidget {
               if (offer.billingPeriod == BillingPeriod.annual) ...[
                 const SizedBox(height: 6),
                 Text(
-                  'Équivalent à environ ${strings.monthly((offer.priceCents / 12).round(), offer.currency)}.',
+                  AppStrings.of(context).messages.planCardEquivalentToAbout(
+                    strings.monthly(
+                      (offer.priceCents / 12).round(),
+                      offer.currency,
+                    ),
+                  ),
                 ),
               ],
               const Divider(height: 32),

@@ -25,6 +25,7 @@ class ConsentsPage extends StatefulWidget {
   final AuthenticatedSession session;
   final DocumentOpener openDocument;
   final bool onboarding;
+
   @override
   State<ConsentsPage> createState() => _ConsentsPageState();
 }
@@ -163,8 +164,12 @@ class _ConsentsPageState extends State<ConsentsPage> {
                           padding: const EdgeInsets.only(top: 16, bottom: 12),
                           child: Text(
                             consent.type.withdrawable
-                                ? 'Vos consentements modifiables'
-                                : 'Vos documents nécessaires',
+                                ? AppStrings.of(context)
+                                      .messages
+                                      .consentsPageYourOptionalConsents
+                                : AppStrings.of(context)
+                                      .messages
+                                      .consentsPageYourRequiredDocuments,
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ),
@@ -209,8 +214,10 @@ class _ConsentsPageState extends State<ConsentsPage> {
                                   onPressed: blocked
                                       ? null
                                       : () => _withdraw(consent, state),
-                                  child: const Text(
-                                    'Retirer mon consentement précédent',
+                                  child: Text(
+                                    AppStrings.of(context)
+                                        .messages
+                                        .consentsPageWithdrawMyPreviousConsent,
                                   ),
                                 ),
                             ],
@@ -248,8 +255,10 @@ class _ConsentsPageState extends State<ConsentsPage> {
                                     PrivacyHubPage(session: widget.session),
                               ),
                             ),
-                      child: const Text(
-                        'Sessions, données et suppression du compte',
+                      child: Text(
+                        AppStrings.of(context)
+                            .messages
+                            .consentsPageSessionsDataAndAccountDeletion,
                       ),
                     ),
                     const SizedBox(height: 12),

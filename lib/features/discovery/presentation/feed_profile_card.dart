@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
@@ -18,6 +19,7 @@ class FeedProfileCard extends StatefulWidget {
   final FeedProfile profile;
   final bool enabled;
   final VoidCallback onLike, onPass;
+
   @override
   State<FeedProfileCard> createState() => _FeedProfileCardState();
 }
@@ -26,6 +28,7 @@ class _FeedProfileCardState extends State<FeedProfileCard> {
   double _overscroll = 0;
   bool _readyToPass = false;
   bool _canPassThisDrag = false;
+
   bool _scroll(ScrollNotification notification) {
     if (notification is ScrollStartNotification) {
       _overscroll = 0;
@@ -86,13 +89,20 @@ class _FeedProfileCardState extends State<FeedProfileCard> {
                     firstname: p.firstname,
                     age: p.age,
                     bio: p.bio,
-                    distanceLabel: DiscoveryStrings.distance(p.distance),
+                    distanceLabel: DiscoveryStrings(AppStrings.of(context))
+                        .distance(p.distance),
                     traits: p.traits,
                     answers: p.answers,
                   ),
                   const EditorialDivider(),
                   Text(
-                    _readyToPass ? 'Relâchez pour passer' : 'Double appui pour aimer.\nEn fin de lecture, glissez vers le haut pour passer.',
+                    _readyToPass
+                        ? AppStrings.of(context)
+                              .messages
+                              .feedProfileCardReleaseToPass
+                        : AppStrings.of(context)
+                              .messages
+                              .feedProfileCardDoubleTapToLikeAtThe,
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodySmall,
                   ),
@@ -105,12 +115,16 @@ class _FeedProfileCardState extends State<FeedProfileCard> {
                       OutlinedButton.icon(
                         onPressed: widget.enabled ? widget.onPass : null,
                         icon: const Icon(Icons.arrow_upward),
-                        label: const Text('Passer'),
+                        label: Text(
+                          AppStrings.of(context).messages.feedProfileCardPass,
+                        ),
                       ),
                       HistaeButton.icon(
                         onPressed: widget.enabled ? widget.onLike : null,
                         icon: const Icon(Icons.favorite_border),
-                        label: const Text('J’aime'),
+                        label: Text(
+                          AppStrings.of(context).messages.feedProfileCardLike,
+                        ),
                       ),
                     ],
                   ),

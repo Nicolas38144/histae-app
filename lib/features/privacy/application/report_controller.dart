@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../../../core/models/client_message.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/network/retry_after.dart';
@@ -17,6 +18,7 @@ class ReportController extends ChangeNotifier {
   final PrivacyRepository repository;
   final String target;
   final String? matchId;
+
   AuthenticatedSession get session => repository.session;
   late final String _key;
   final _scope = RequestCancellation();
@@ -33,12 +35,14 @@ class ReportController extends ChangeNotifier {
       alreadyPending = false;
   ReportIntent? pending;
   ApiFailure? failure;
-  String? validation;
+  ClientMessage? validation;
+
   bool get accessible =>
       !_disposed &&
       session.phase == SessionPhase.ready &&
       session.resourceKey == _key &&
       session.identity?.userId != target;
+
   int get retrySeconds => retrySecondsUntil(_retryAt);
 
   void _notify() {

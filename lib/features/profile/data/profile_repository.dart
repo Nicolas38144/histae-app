@@ -9,18 +9,31 @@ import 'profile_models.dart';
 abstract interface class ProfileRepository {
   factory ProfileRepository(AuthenticatedSession session) =
       ApiProfileRepository;
+
   AuthenticatedSession get session;
+
   Future<OwnerProfile?> profile(RequestCancellation scope);
+
   Future<Preferences?> preferences(RequestCancellation scope);
+
   Future<List<ProfileTrait>> traits(RequestCancellation scope);
+
   Future<List<ProfileTrait>> selectedTraits(RequestCancellation scope);
+
   Future<List<ProfileQuestion>> questions(RequestCancellation scope);
+
   Future<List<ProfileAnswer>> answers(RequestCancellation scope);
+
   Future<void> saveProfile(ProfileDraft draft);
+
   Future<void> savePreferences(Preferences preferences);
+
   Future<void> setTrait(String id, bool selected);
+
   Future<void> saveAnswers(List<AnswerDraft> answers);
+
   Future<void> upload(PhotoIntent intent);
+
   Future<void> removePhoto();
 }
 
@@ -28,6 +41,7 @@ final class ApiProfileRepository implements ProfileRepository {
   ApiProfileRepository(this.session);
   @override
   final AuthenticatedSession session;
+
   Future<Object?> _request(
     String method,
     String path, {
@@ -48,6 +62,7 @@ final class ApiProfileRepository implements ProfileRepository {
   );
   // An expired-access 401 is a definitive rejection before mutation. This is the
   // only automatic replay; lost responses always return control to the user.
+
   @override
   Future<OwnerProfile?> profile(RequestCancellation scope) async {
     try {
@@ -89,15 +104,19 @@ final class ApiProfileRepository implements ProfileRepository {
       field,
     ).map(parse),
   );
+
   @override
   Future<List<ProfileTrait>> traits(RequestCancellation s) =>
       _list('/api/traits', 'traits', ProfileTrait.fromJson, s);
+
   @override
   Future<List<ProfileTrait>> selectedTraits(RequestCancellation s) =>
       _list('/api/users/me/traits', 'traits', ProfileTrait.fromJson, s);
+
   @override
   Future<List<ProfileQuestion>> questions(RequestCancellation s) =>
       _list('/api/profile-questions', 'questions', ProfileQuestion.fromJson, s);
+
   @override
   Future<List<ProfileAnswer>> answers(RequestCancellation s) => _list(
     '/api/users/me/profile-answers',
@@ -105,6 +124,7 @@ final class ApiProfileRepository implements ProfileRepository {
     ProfileAnswer.fromJson,
     s,
   );
+
   @override
   Future<void> saveProfile(ProfileDraft draft) async {
     if (draft.validate(DateTime.now()) != null) {
@@ -186,6 +206,7 @@ class PhotoIntent {
   final Uint8List bytes;
   final String key;
   final DateTime createdAt;
+
   bool get expired =>
       DateTime.now().toUtc().difference(createdAt) >= const Duration(hours: 24);
 }

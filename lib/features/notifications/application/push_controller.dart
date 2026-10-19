@@ -31,6 +31,7 @@ class PushController extends ChangeNotifier {
   final PushGateway gateway;
   final PushVault vault;
   final Future<String?> Function() _appVersion;
+
   AuthenticatedSession get session => repository.session;
   final _subscriptions = <StreamSubscription<dynamic>>[];
   final _presented = <String>{};
@@ -57,17 +58,24 @@ class PushController extends ChangeNotifier {
       if (!_disposed) notifyListeners();
     },
   );
+
   bool get configured => gateway.configured;
+
   bool get stopping => _saved?.optedIn == false;
+
   bool get accessible =>
       !_disposed &&
       session.phase == SessionPhase.ready &&
       session.identity != null;
+
   bool get active => accessible && _foreground;
+
   int get retrySeconds => retrySecondsUntil(failure?.retryAt);
 
   String get _origin => session.apiOrigin.toString();
+
   bool _alive(int epoch) => active && epoch == _epoch;
+
   void _notify() {
     if (!_disposed) notifyListeners();
   }
@@ -100,6 +108,7 @@ class PushController extends ChangeNotifier {
       });
 
   Future<void> start() => _start ??= _initialize();
+
   Future<void> _initialize() async {
     try {
       _saved = await vault.read();

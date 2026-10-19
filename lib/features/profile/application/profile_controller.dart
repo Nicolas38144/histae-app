@@ -18,6 +18,7 @@ class ProfileController extends ChangeNotifier {
     session.addListener(_sessionChanged);
   }
   final ProfileRepository repository;
+
   AuthenticatedSession get session => repository.session;
   OwnerProfile? profile;
   Preferences? preferences;
@@ -38,21 +39,30 @@ class ProfileController extends ChangeNotifier {
   );
   PhotoIntent? photoIntent;
   DateTime? photoReadAt;
+
   bool get sensitiveAllowed =>
       session.consents?.consents.any(
         (c) => c.type == ConsentType.sensitive && c.current,
       ) ??
       false;
+
   List<ProfileTrait> get traits => List.unmodifiable(_traits);
+
   List<ProfileTrait> get selectedTraits => List.unmodifiable(_selectedTraits);
+
   List<ProfileQuestion> get questions => List.unmodifiable(_questions);
+
   List<ProfileAnswer> get answers => List.unmodifiable(_answers);
+
   Map<String, ApiFailure> get errors => Map.unmodifiable(_errors);
+
   bool get accessible =>
       !_disposed && session.hasSession && session.phase == SessionPhase.ready;
+
   bool get canWrite =>
       accessible && !saving && !loading && !uncertain && retrySeconds == 0;
   DateTime? retryAt;
+
   int get retrySeconds => retrySecondsUntil(retryAt);
 
   bool get hasFeedPreview =>
@@ -167,12 +177,16 @@ class ProfileController extends ChangeNotifier {
 
   Future<void> saveIdentity(ProfileDraft draft) =>
       mutate(() => repository.saveProfile(draft));
+
   Future<void> savePreferences(Preferences preferences) =>
       mutate(() => repository.savePreferences(preferences));
+
   Future<void> setTrait(String id, bool selected) =>
       mutate(() => repository.setTrait(id, selected));
+
   Future<void> saveAnswers(List<AnswerDraft> drafts) =>
       mutate(() => repository.saveAnswers(drafts));
+
   Future<void> removePhoto() async {
     await mutate(repository.removePhoto, photo: true);
     setPhoto(null);

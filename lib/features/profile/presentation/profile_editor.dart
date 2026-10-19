@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/histae_button.dart';
@@ -10,8 +11,10 @@ import 'profile_strings.dart';
 abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
   ProfileController get controller;
   bool dirty = false, busy = false, leaving = false;
-  String? message;
+  ClientMessage? message;
+  ApiFailure? messageFailure;
   late final String _resourceKey = controller.session.resourceKey;
+
   void changed() {
     dirty = true;
   }
@@ -21,6 +24,7 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
     setState(() {
       busy = true;
       message = null;
+      messageFailure = null;
     });
     try {
       await action();
@@ -34,7 +38,7 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
     } on ApiFailure catch (e) {
       if (mounted) {
         setState(() {
-          message = ProfileStrings.failure(e);
+          messageFailure = e;
         });
       }
     } finally {
@@ -50,7 +54,7 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
     String title,
     List<Widget> children, {
     VoidCallback? save,
-    String saveLabel = 'Enregistrer',
+    String? saveLabel,
     bool saveInFooter = false,
   }) => ListenableBuilder(
     listenable: controller,
@@ -65,9 +69,11 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
           if (didPop || busy) return;
           if (await confirmAction(
                 context,
-                'Quitter sans enregistrer ?',
-                'Votre brouillon sera abandonné.',
-                action: 'Quitter',
+                AppStrings.of(context).messages.profileEditorLeaveWithoutSaving,
+                AppStrings.of(context)
+                    .messages
+                    .profileEditorYourDraftWillBeDiscarded,
+                action: AppStrings.of(context).messages.profileEditorLeave,
               ) &&
               mounted &&
               context.mounted) {
@@ -93,7 +99,11 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
                     top: false,
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
-                      child: _saveButton(save, saveLabel),
+                      child: _saveButton(
+                        save,
+                        saveLabel ??
+                            AppStrings.of(context).messages.answersEditorSave,
+                      ),
                     ),
                   ),
                 )
@@ -104,19 +114,33 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
               children: [
                 ...children,
                 if (busy || controller.loading)
-                  const LinearProgressIndicator(
-                    semanticsLabel: 'Enregistrement ou relecture en cours',
+                  LinearProgressIndicator(
+                    semanticsLabel: AppStrings.of(context)
+                        .messages
+                        .profileEditorSavingOrRefreshing,
                   ),
-                if (message != null)
+                if (message != null || messageFailure != null)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: Semantics(liveRegion: true, child: Text(message!)),
+                    child: Semantics(
+                      liveRegion: true,
+                      child: Text(
+                        message != null
+                            ? AppStrings.of(context).clientMessage(message!)
+                            : ProfileStrings(AppStrings.of(context))
+                                  .failure(messageFailure!),
+                      ),
+                    ),
                   ),
                 if (controller.uncertain)
-                  const Text(
-                    'Le résultat reste incertain. Relisez les données : aucune modification ne sera renvoyée automatiquement. Votre brouillon est conservé.',
+                  Text(
+                    AppStrings.of(context)
+                        .messages
+                        .profileEditorTheResultIsUncertainRefreshThe,
                   ),
-                if (message != null || controller.uncertain)
+                if (message != null ||
+                    messageFailure != null ||
+                    controller.uncertain)
                   OutlinedButton(
                     onPressed:
                         busy ||
@@ -124,10 +148,19 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
                             controller.retrySeconds > 0
                         ? null
                         : controller.load,
-                    child: const Text('Relire les données serveur'),
+                    child: Text(
+                      AppStrings.of(context)
+                          .messages
+                          .profileEditorRefreshServerData,
+                    ),
                   ),
                 const SizedBox(height: 24),
-                if (save != null && !saveInFooter) _saveButton(save, saveLabel),
+                if (save != null && !saveInFooter)
+                  _saveButton(
+                    save,
+                    saveLabel ??
+                        AppStrings.of(context).messages.answersEditorSave,
+                  ),
               ],
             ),
           ),
@@ -135,14 +168,17 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
       );
     },
   );
+
   Widget _saveButton(VoidCallback save, String label) => HistaeButton(
     onPressed: busy || !controller.canWrite ? null : save,
     child: Text(
       controller.retrySeconds > 0
-          ? 'Réessayez dans ${controller.retrySeconds} s'
+          ? AppStrings.of(context).messages
+                .discoveryPauseCardTryAgainInS(controller.retrySeconds)
           : label,
     ),
   );
+
   Widget field(
     TextEditingController text,
     String label, {

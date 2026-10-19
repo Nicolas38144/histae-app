@@ -15,6 +15,7 @@ class DevicesController extends ChangeNotifier {
     session.addListener(_changed);
   }
   final DeviceRepository repository;
+
   AuthenticatedSession get session => repository.session;
   late final String _key;
   RequestCancellation _scope = RequestCancellation();
@@ -30,15 +31,20 @@ class DevicesController extends ChangeNotifier {
   bool loading = false, removing = false;
   String? pendingRemoval, notice;
   ApiFailure? failure;
+
   List<PushDevice> get devices => List.unmodifiable(_devices);
+
   bool get accessible =>
       !_disposed &&
       session.phase == SessionPhase.ready &&
       session.resourceKey == _key;
+
   bool get active => accessible && _active;
+
   int get retrySeconds => retrySecondsUntil(failure?.retryAt);
 
   bool _alive(int epoch) => active && epoch == _epoch;
+
   void _notify() {
     if (!_disposed) notifyListeners();
   }

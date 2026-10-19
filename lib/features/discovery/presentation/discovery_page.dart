@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
@@ -33,6 +34,7 @@ class DiscoveryPage extends StatefulWidget {
   final ProfileController profile;
   final Future<void> Function([String? id])? openMatches;
   final DiscoveryVisibilityController? visibility;
+
   @override
   State<DiscoveryPage> createState() => _DiscoveryPageState();
 }
@@ -43,6 +45,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
   late final _key = c.session.resourceKey;
   String? _message;
   bool _opening = false;
+
   @override
   void initState() {
     super.initState();
@@ -106,7 +109,10 @@ class _DiscoveryPageState extends State<DiscoveryPage>
       } on ApiFailure {
         if (mounted) {
           setState(
-            () => _message = 'La reprise n’a pas pu être confirmée. Actualisez votre visibilité depuis votre profil.',
+            () =>
+                _message = AppStrings.of(context)
+                    .messages
+                    .discoveryPageResumingCouldNotBeConfirmedRefresh,
           );
         }
       } finally {
@@ -138,7 +144,9 @@ class _DiscoveryPageState extends State<DiscoveryPage>
           profile.errors.containsKey(section) ||
           profile.uncertain) {
         setState(() {
-          _message = 'Votre profil n’a pas pu être relu. Revenez à votre espace personnel pour le reprendre.';
+          _message = AppStrings.of(context)
+              .messages
+              .discoveryPageYourProfileCouldNotBeRefreshed;
         });
         return;
       }
@@ -159,9 +167,9 @@ class _DiscoveryPageState extends State<DiscoveryPage>
     }
     if (!await confirmAction(
           context,
-          'Utiliser votre position ?',
-          'Histae utilisera une mesure ponctuelle pour les rencontres à proximité. Aucun suivi en arrière-plan. Votre position exacte ne sera pas montrée aux autres personnes.',
-          action: 'Localiser cet appareil',
+          AppStrings.of(context).messages.discoveryPageUseYourLocation,
+          AppStrings.of(context).messages.discoveryPageHistaeWillTakeAOneOff,
+          action: AppStrings.of(context).messages.discoveryPageLocateThisDevice,
         ) ||
         !mounted) {
       return;
@@ -200,9 +208,11 @@ class _DiscoveryPageState extends State<DiscoveryPage>
     if (profile == null || c.busy) return;
     if (!await confirmAction(
           context,
-          'Bloquer ce profil ?',
-          'Vous ne pourrez plus vous découvrir ni échanger. Toute rencontre déjà créée avec cette personne sera terminée.',
-          action: 'Bloquer',
+          AppStrings.of(context).messages.discoveryPageBlockThisProfile,
+          AppStrings.of(context)
+              .messages
+              .discoveryPageYouWillNoLongerDiscoverOr,
+          action: AppStrings.of(context).messages.discoveryPageBlock,
         ) ||
         !mounted) {
       return;
@@ -258,13 +268,19 @@ class _DiscoveryPageState extends State<DiscoveryPage>
         ],
         if (c.ready && profile == null && !c.loading && c.failure == null)
           EditorialCard(
-            eyebrow: 'PRENDRE LE TEMPS',
+            eyebrow: AppStrings.of(context).messages.discoveryPageTakeYourTime,
             title: c.exhausted
-                ? 'Le calme,\npour le moment.'
-                : 'Encore un instant.',
+                ? AppStrings.of(context)
+                      .messages
+                      .discoveryPageAQuietMomentForNow
+                : AppStrings.of(context).messages.discoveryPageJustAMoment,
             body: c.exhausted
-                ? 'Vous avez découvert les profils disponibles selon vos préférences. Revenez plus tard ou ajustez vos envies de rencontre.'
-                : 'La recherche peut se poursuivre. Chargez la suite lorsque vous le souhaitez.',
+                ? AppStrings.of(context)
+                      .messages
+                      .discoveryPageYouHaveSeenTheAvailableProfiles
+                : AppStrings.of(context)
+                      .messages
+                      .discoveryPageTheSearchCanContinueLoadMore,
           ),
         if (c.pending case final intent?)
           DiscoveryPendingChoiceCard(
@@ -274,16 +290,22 @@ class _DiscoveryPageState extends State<DiscoveryPage>
           ),
         if (c.loading || c.locating || c.sending) ...[
           const SizedBox(height: 16),
-          const LinearProgressIndicator(
-            semanticsLabel: 'Chargement de la découverte',
+          LinearProgressIndicator(
+            semanticsLabel: AppStrings.of(context)
+                .messages
+                .discoveryPageLoadingDiscovery,
           ),
           const SizedBox(height: 12),
           Text(
             c.locating
-                ? 'Recherche d’une position récente…'
+                ? AppStrings.of(context)
+                      .messages
+                      .discoveryPageFindingARecentLocation
                 : c.sending
-                ? 'Enregistrement de votre choix…'
-                : 'Préparation des rencontres…',
+                ? AppStrings.of(context).messages.discoveryPageSavingYourChoice
+                : AppStrings.of(context)
+                      .messages
+                      .discoveryPagePreparingEncounters,
           ),
         ],
         if (c.notice != null)
@@ -291,7 +313,9 @@ class _DiscoveryPageState extends State<DiscoveryPage>
             padding: const EdgeInsets.symmetric(vertical: 12),
             child: Semantics(
               liveRegion: true,
-              child: Text(DiscoveryStrings.notice(c.notice)),
+              child: Text(
+                DiscoveryStrings(AppStrings.of(context)).notice(c.notice),
+              ),
             ),
           ),
         if (c.failure case final failure?)
@@ -299,13 +323,17 @@ class _DiscoveryPageState extends State<DiscoveryPage>
             padding: const EdgeInsets.symmetric(vertical: 12),
             child: Semantics(
               liveRegion: true,
-              child: Text(DiscoveryStrings.failure(failure)),
+              child: Text(
+                DiscoveryStrings(AppStrings.of(context)).failure(failure),
+              ),
             ),
           ),
         if (c.locationIssue case final issue?) ...[
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Text(DiscoveryStrings.location(issue)),
+            child: Text(
+              DiscoveryStrings(AppStrings.of(context)).location(issue),
+            ),
           ),
           if (issue == LocationIssue.deniedForever ||
               issue == LocationIssue.disabled)
@@ -317,17 +345,24 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                       );
                       if (!opened && mounted) {
                         setState(() {
-                          _message = 'Ouvrez les réglages de localisation de votre appareil, puis revenez dans Histae.';
+                          _message = AppStrings.of(context)
+                              .messages
+                              .discoveryPageOpenYourDeviceSLocationSettings;
                         });
                       }
                     }
                   : null,
-              child: const Text('Ouvrir les réglages'),
+              child: Text(
+                AppStrings.of(context).messages.discoveryPageOpenSettings,
+              ),
             ),
         ],
         if (_message != null) Text(_message!),
         if (c.retrySeconds > 0)
-          Text('Nouvel essai possible dans ${c.retrySeconds} s'),
+          Text(
+            AppStrings.of(context).messages
+                .appStringsTryAgainInS(c.retrySeconds),
+          ),
         if (!showFeed)
           OutlinedButton(
             onPressed: enabled
@@ -338,26 +373,35 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                       ? c.loadMore
                       : c.refresh)
                 : null,
-            child: const Text('Actualiser les rencontres'),
+            child: Text(
+              AppStrings.of(context).messages.discoveryPageRefreshEncounters,
+            ),
           ),
         if (c.ready && !showFeed)
           TextButton(
             onPressed: enabled ? _locate : null,
-            child: const Text('Actualiser ma position'),
+            child: Text(
+              AppStrings.of(context).messages.discoveryPageRefreshMyLocation,
+            ),
           ),
         if (c.encounter case final encounter?)
           TextButton.icon(
             onPressed: !c.busy ? () => _showEncounter(encounter) : null,
             icon: const Icon(Icons.chat_bubble_outline),
-            label: Text('Votre rencontre avec ${encounter.profile.firstname}'),
+            label: Text(
+              AppStrings.of(context).messages
+                  .discoveryPageYourMatchWith(encounter.profile.firstname),
+            ),
           ),
         TextButton(
           onPressed: () => _open(ConsentsPage(session: c.session)),
-          child: const Text('Vos choix et votre vie privée'),
+          child: Text(
+            AppStrings.of(context).messages.appStringsYourChoicesAndPrivacy,
+          ),
         ),
         TextButton(
           onPressed: c.session.logout,
-          child: const Text('Se déconnecter'),
+          child: Text(AppStrings.of(context).messages.appStringsSignOut),
         ),
       ];
       return HistaeScaffold(
@@ -365,14 +409,18 @@ class _DiscoveryPageState extends State<DiscoveryPage>
           title: const HistaeWordmark(),
           actions: [
             IconButton(
-              tooltip: 'Vos préférences',
+              tooltip: AppStrings.of(context)
+                  .messages
+                  .discoveryPageYourPreferences,
               onPressed: enabled
                   ? () => _repair(DiscoveryAction.preferences)
                   : null,
               icon: const Icon(Icons.tune),
             ),
             PopupMenuButton<String>(
-              tooltip: 'Options de découverte',
+              tooltip: AppStrings.of(context)
+                  .messages
+                  .discoveryPageDiscoveryOptions,
               onSelected: (value) {
                 if (value == 'refresh') unawaited(c.refresh());
                 if (value == 'location') unawaited(_locate());
@@ -383,24 +431,40 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                 PopupMenuItem(
                   value: 'refresh',
                   enabled: enabled,
-                  child: const Text('Actualiser les profils'),
+                  child: Text(
+                    AppStrings.of(context)
+                        .messages
+                        .discoveryPageRefreshProfiles,
+                  ),
                 ),
                 PopupMenuItem(
                   value: 'location',
                   enabled: enabled,
-                  child: const Text('Actualiser ma position'),
+                  child: Text(
+                    AppStrings.of(context)
+                        .messages
+                        .discoveryPageRefreshMyLocation,
+                  ),
                 ),
                 if (profile != null)
                   PopupMenuItem(
                     value: 'report',
                     enabled: enabled,
-                    child: const Text('Signaler ce profil'),
+                    child: Text(
+                      AppStrings.of(context)
+                          .messages
+                          .discoveryPageReportThisProfile,
+                    ),
                   ),
                 if (profile != null)
                   PopupMenuItem(
                     value: 'block',
                     enabled: enabled,
-                    child: const Text('Bloquer ce profil'),
+                    child: Text(
+                      AppStrings.of(context)
+                          .messages
+                          .discoveryPageBlockThisProfile372,
+                    ),
                   ),
               ],
             ),
@@ -434,7 +498,8 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                         child: Semantics(
                           liveRegion: true,
                           child: Text(
-                            DiscoveryStrings.notice(c.notice),
+                            DiscoveryStrings(AppStrings.of(context))
+                                .notice(c.notice),
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ),
@@ -451,7 +516,10 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                       TextButton(
                         onPressed: () => _showEncounter(encounter),
                         child: Text(
-                          'Votre rencontre avec ${encounter.profile.firstname}',
+                          AppStrings.of(context).messages
+                              .discoveryPageYourMatchWith(
+                                encounter.profile.firstname,
+                              ),
                         ),
                       ),
                   ],

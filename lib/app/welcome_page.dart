@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/l10n/app_strings.dart';
+import '../core/l10n/language_picker.dart';
 import '../core/widgets/connection_artwork.dart';
 import '../core/widgets/histae_button.dart';
 import '../core/widgets/histae_scaffold.dart';
@@ -20,7 +21,10 @@ class WelcomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
     return HistaeScaffold(
-      appBar: AppBar(title: const HistaeWordmark()),
+      appBar: AppBar(
+        title: const HistaeWordmark(),
+        actions: const [LanguageButton()],
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -30,7 +34,7 @@ class WelcomePage extends StatelessWidget {
               children: [
                 const SizedBox(height: 12),
                 Text(
-                  'UNE AUTRE FAÇON DE SE RENCONTRER',
+                  AppStrings.of(context).messages.welcomePageAnotherWayToMeet,
                   style: Theme.of(context).textTheme.labelSmall
                       ?.copyWith(color: Theme.of(context).colorScheme.primary),
                 ),
@@ -54,7 +58,9 @@ class WelcomePage extends StatelessWidget {
                   if (auth.notice != null)
                     Semantics(
                       liveRegion: true,
-                      child: Text(sessionNotice(auth.notice)),
+                      child: Text(
+                        sessionNotice(AppStrings.of(context), auth.notice),
+                      ),
                     ),
                   if (auth.failure case final failure?)
                     Text(strings.authFailure(failure)),
@@ -91,7 +97,9 @@ class WelcomePage extends StatelessWidget {
                 const ConnectionArtwork(),
                 const SizedBox(height: 20),
                 Text(
-                  'Le temps. La réciprocité. Le consentement.',
+                  AppStrings.of(context)
+                      .messages
+                      .welcomePageTimeReciprocityConsent,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,

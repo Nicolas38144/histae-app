@@ -7,14 +7,15 @@ abstract interface class DiscoveryVisibilityRepository {
       ApiDiscoveryVisibilityRepository;
 
   AuthenticatedSession get session;
+
   Future<bool> read(RequestCancellation cancellation);
+
   Future<bool> setPaused(bool paused, RequestCancellation cancellation);
 }
 
 final class ApiDiscoveryVisibilityRepository
     implements DiscoveryVisibilityRepository {
   ApiDiscoveryVisibilityRepository(this.session);
-
   @override
   final AuthenticatedSession session;
 

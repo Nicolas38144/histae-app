@@ -20,14 +20,15 @@ class MobileSignal {
   final bool ended;
   final DateTime? serverTime;
 }
-
 // Bounded UTF-8 frame decoder: CR/LF/CRLF, chunk boundaries, comments and
 // multiline data. Incomplete frames are discarded on disconnect, never replayed.
+
 class MobileEventDecoder {
   String _line = '', _event = '', _id = '';
   final _data = <String>[];
   int _size = 0;
   bool _cr = false, _first = true;
+
   List<MobileSignal> add(String text) {
     final signals = <MobileSignal>[];
     for (final c in text.codeUnits) {
@@ -126,6 +127,7 @@ class RealtimeClient {
   bool _wanted = false, _disposed = false;
   void Function(MobileSignal)? onSignal;
   void Function(bool, ApiFailure?)? onState;
+
   void start() {
     if (_disposed ||
         !session.hasSession ||

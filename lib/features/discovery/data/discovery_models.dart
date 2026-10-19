@@ -25,6 +25,7 @@ class DiscoveryStatus {
     this.requiredActions,
     this.presenceExpiresAt,
   );
+
   factory DiscoveryStatus.fromJson(Object? value) {
     final j = jsonObject(value);
     final ready = jsonField<bool>(j, 'ready');
@@ -59,6 +60,7 @@ class FeedProfile {
     List<PublicProfileAnswer> answers,
   ) : traits = List.unmodifiable(traits),
       answers = List.unmodifiable(answers);
+
   factory FeedProfile.fromJson(Object? value) {
     final j = jsonObject(value);
     final age = jsonField<int>(j, 'age');
@@ -100,6 +102,7 @@ class FeedProfile {
 class FeedPage {
   FeedPage(List<FeedProfile> profiles, this.nextCursor)
     : profiles = List.unmodifiable(profiles);
+
   factory FeedPage.fromJson(Object? value) {
     final j = jsonObject(value);
     final cursor = optionalText(j, 'next_cursor');
@@ -129,6 +132,7 @@ class PendingChoice {
 
 class ReceivedMatch {
   const ReceivedMatch(this.id, this.status, this.createdAt, this.expiresAt);
+
   factory ReceivedMatch.fromJson(Object? value, String owner, String target) {
     final j = jsonObject(value);
     final members = {serverId(j, 'user1_id'), serverId(j, 'user2_id')};
@@ -158,6 +162,7 @@ class ReceivedMatch {
 
 class SwipeResult {
   const SwipeResult(this.decision, this.match);
+
   factory SwipeResult.fromJson(
     Object? value,
     String owner,
@@ -181,6 +186,6 @@ class SwipeResult {
   final SwipeDecision decision;
   final ReceivedMatch? match;
 }
-
 // Compatibility with the original public feed model name.
+
 typedef FeedAnswer = PublicProfileAnswer;

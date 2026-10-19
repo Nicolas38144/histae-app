@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/l10n/app_strings.dart';
 import '../features/notifications/application/push_controller.dart';
 
 class NotificationOverlay extends StatelessWidget {
@@ -10,6 +11,7 @@ class NotificationOverlay extends StatelessWidget {
   });
   final PushController? controller;
   final Widget child;
+
   @override
   Widget build(BuildContext context) => controller == null
       ? child
@@ -30,17 +32,29 @@ class NotificationOverlay extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const Text('Une mise à jour Histae est disponible.'),
+                          Text(
+                            AppStrings.of(context)
+                                .messages
+                                .notificationOverlayAHistaeUpdateIsAvailable,
+                          ),
                           Wrap(
                             spacing: 12,
                             children: [
                               TextButton(
                                 onPressed: controller!.openForeground,
-                                child: const Text('Consulter'),
+                                child: Text(
+                                  AppStrings.of(context)
+                                      .messages
+                                      .viewNotification,
+                                ),
                               ),
                               TextButton(
                                 onPressed: controller!.dismiss,
-                                child: const Text('Plus tard'),
+                                child: Text(
+                                  AppStrings.of(context)
+                                      .messages
+                                      .notificationOverlayLater,
+                                ),
                               ),
                             ],
                           ),

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../../../core/models/client_message.dart';
 import '../data/continuation_models.dart';
 import '../data/rewarded_video_gateway.dart';
 import 'continuation_controller.dart';
@@ -23,39 +24,46 @@ class RewardedVideoController extends ChangeNotifier {
   bool _disposed = false, _active = true, foreground = true;
   int _epoch = 0;
   VideoPhase phase = VideoPhase.idle;
-  String? message;
+  ClientMessage? message;
+
   bool get busy => phase != VideoPhase.idle;
+
   bool get nativeOverlay => switch (phase) {
     VideoPhase.consent || VideoPhase.playing || VideoPhase.privacy => true,
     _ => false,
   };
+
   bool get _owner =>
       !_disposed &&
       _active &&
       credits.active &&
       credits.access.session.resourceKey == _key &&
       credits.access.privacyEpoch == _privacy;
+
   bool _alive(int epoch) => _owner && epoch == _epoch;
-  String? get unavailableReason {
+
+  ClientMessage? get unavailableReason {
     final q = credits.quota;
     if (!_owner ||
         credits.loading ||
         q == null ||
         credits.quotaReadAt == null) {
-      return 'Actualisez votre solde pour accéder aux vidéos.';
+      return ClientMessage.videoQuotaRequired;
     }
-    if (q.premium) return 'Premium vous permet de continuer sans crédit.';
+    if (q.premium) {
+      return ClientMessage.videoPremium;
+    }
     if (credits.catalogFailure != null) {
-      return 'La disponibilité des vidéos n’a pas pu être vérifiée.';
+      return ClientMessage.videoAvailabilityUnknown;
     }
     if (!credits.advertisingEnabled) {
-      return 'Les vidéos sont momentanément désactivées pour votre formule.';
+      return ClientMessage.videoPlanDisabled;
     }
     if (q.advertisingBalance >= q.stockLimit) {
-      return 'Votre réserve vidéo est pleine. Utilisez un crédit pour libérer une place.';
+      return ClientMessage.videoReserveFull;
     }
     if (gateway == null) {
-      return 'Les vidéos ne sont pas configurées pour cette version.';
+      return ClientMessage.videoNotConfigured;
     }
     return gateway!.unavailableReason;
   }
@@ -150,30 +158,27 @@ class RewardedVideoController extends ChangeNotifier {
       if (earned) {
         await r.videoCompleted();
       } else {
-        message = 'La vidéo a été fermée avant la fin. Vous pouvez réessayer.';
+        message = ClientMessage.videoClosed;
         await r.cancel();
       }
     } on RewardedVideoException catch (e) {
       if (_alive(epoch)) {
         message = switch (e.reason) {
-          VideoFailure.consent => 'Vos préférences publicitaires n’ont pas pu être vérifiées. Réessayez ou consultez vos choix de confidentialité.',
-          VideoFailure.consentConfiguration => 'Le formulaire de confidentialité des vidéos n’est pas encore disponible. Vos crédits gratuits restent accessibles.',
-          VideoFailure.consentNetwork => 'Les préférences publicitaires n’ont pas pu être chargées. Vérifiez votre connexion puis réessayez.',
-          VideoFailure.consentTimeout => 'Le chargement des préférences publicitaires prend trop de temps. Réessayez dans un instant.',
-          VideoFailure.noFill => 'Aucune vidéo disponible pour le moment. Réessayez un peu plus tard.',
-          VideoFailure.network =>
-            'La vidéo n’a pas pu être chargée. Vérifiez votre connexion.',
-          VideoFailure.expired => 'Cette demande a expiré. Annulez-la avant de regarder une nouvelle vidéo.',
-          VideoFailure.load =>
-            'La vidéo n’a pas pu être chargée. Réessayez plus tard.',
-          VideoFailure.show =>
-            'La vidéo n’a pas pu être affichée. Vous pouvez réessayer.',
+          VideoFailure.consent => ClientMessage.videoConsentUnavailable,
+          VideoFailure.consentConfiguration =>
+            ClientMessage.videoConsentMisconfigured,
+          VideoFailure.consentNetwork => ClientMessage.videoConsentNetwork,
+          VideoFailure.consentTimeout => ClientMessage.videoConsentTimeout,
+          VideoFailure.noFill => ClientMessage.videoNoFill,
+          VideoFailure.network => ClientMessage.videoNetwork,
+          VideoFailure.expired => ClientMessage.videoExpired,
+          VideoFailure.load => ClientMessage.videoLoad,
+          VideoFailure.show => ClientMessage.videoShow,
         };
       }
     } catch (_) {
       if (_alive(epoch)) {
-        message =
-            'La vidéo est momentanément indisponible. Vous pouvez réessayer.';
+        message = ClientMessage.videoUnavailable;
       }
     } finally {
       // Release a known unplayed attempt. A displayed video with an uncertain
@@ -204,7 +209,7 @@ class RewardedVideoController extends ChangeNotifier {
       await gateway!.showPrivacyOptions();
     } catch (_) {
       if (_alive(epoch)) {
-        message = 'Vos préférences ne sont pas accessibles pour le moment.';
+        message = ClientMessage.videoPrivacyUnavailable;
       }
     } finally {
       _finish();

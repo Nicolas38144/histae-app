@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_strings.dart';
 import 'histae_button.dart';
 
 /// A subscription entry point. Unknown or stale plans use a neutral label
@@ -10,7 +11,6 @@ class AccountBenefitsActions extends StatelessWidget {
     required this.isPremium,
     required this.onSubscription,
   });
-
   final bool? isPremium;
   final VoidCallback onSubscription;
 
@@ -23,6 +23,12 @@ class AccountBenefitsActions extends StatelessWidget {
           ? Icons.auto_awesome_outlined
           : Icons.manage_accounts_outlined,
     ),
-    label: Text(isPremium == false ? 'Premium' : 'Mon abonnement'),
+    label: Text(
+      isPremium == false
+          ? AppStrings.of(context).messages.accountBenefitsActionsPremium
+          : AppStrings.of(context)
+                .messages
+                .accountBenefitsActionsMySubscription,
+    ),
   );
 }

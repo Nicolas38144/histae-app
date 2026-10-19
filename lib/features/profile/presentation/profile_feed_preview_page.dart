@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../discovery/presentation/feed_profile_content.dart';
@@ -7,7 +8,6 @@ import '../application/profile_controller.dart';
 
 class ProfileFeedPreviewPage extends StatefulWidget {
   const ProfileFeedPreviewPage({super.key, required this.controller});
-
   final ProfileController controller;
 
   @override
@@ -27,7 +27,13 @@ class _ProfileFeedPreviewPageState extends State<ProfileFeedPreviewPage> {
       }
       final preview = c.feedPreviewAt(DateTime.now().toUtc());
       return HistaeScaffold(
-        appBar: AppBar(title: const Text('Mon profil dans le feed')),
+        appBar: AppBar(
+          title: Text(
+            AppStrings.of(context)
+                .messages
+                .profileFeedPreviewPageMyProfileInTheFeed,
+          ),
+        ),
         body: SafeArea(
           child: RefreshIndicator(
             onRefresh: c.load,
@@ -38,22 +44,29 @@ class _ProfileFeedPreviewPageState extends State<ProfileFeedPreviewPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'Comme au fil des mots.',
+                    AppStrings.of(context)
+                        .messages
+                        .profileFeedPreviewPageThroughYourWords,
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    'Voici les éléments de votre profil présentés aux autres. '
-                    'Seuls les textes approuvés sont affichés. Votre photo reste absente du feed.',
+                  Text(
+                    AppStrings.of(context)
+                        .messages
+                        .profileFeedPreviewPageTheseAreThePartsOfYour,
                   ),
                   const SizedBox(height: 20),
                   if (c.loading)
-                    const LinearProgressIndicator(
-                      semanticsLabel: 'Actualisation de votre aperçu',
+                    LinearProgressIndicator(
+                      semanticsLabel: AppStrings.of(context)
+                          .messages
+                          .profileFeedPreviewPageRefreshingYourPreview,
                     ),
                   if (preview == null)
-                    const Text(
-                      'Votre aperçu ne peut pas être affiché. Revenez à votre profil pour le compléter ou actualisez vos informations.',
+                    Text(
+                      AppStrings.of(context)
+                          .messages
+                          .profileFeedPreviewPageYourPreviewCannotBeShownReturn,
                     )
                   else
                     Card(
@@ -68,7 +81,9 @@ class _ProfileFeedPreviewPageState extends State<ProfileFeedPreviewPage> {
                             firstname: preview.firstname,
                             age: preview.age,
                             bio: preview.bio,
-                            distanceLabel: 'Distance selon la personne',
+                            distanceLabel: AppStrings.of(context)
+                                .messages
+                                .profileFeedPreviewPageDistanceDependsOnTheViewer,
                             traits: preview.traits,
                             answers: preview.answers,
                           ),

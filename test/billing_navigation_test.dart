@@ -72,7 +72,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text(annualChoice));
       await tester.pumpAndSettle();
-      expect(find.textContaining('123,45 EUR'), findsWidgets);
+      expect(find.textContaining(RegExp(r'123,45\sEUR')), findsWidgets);
       expect(posts, 0);
       await tester.tap(find.text('Plus tard'));
       await tester.pumpAndSettle();

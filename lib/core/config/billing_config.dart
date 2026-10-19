@@ -17,6 +17,7 @@ class BillingConfig {
     'BILLING_CANCEL_URL',
     'BILLING_PORTAL_RETURN_URL',
   ];
+
   factory BillingConfig.fromValues(Map<String, String> values) {
     final flag = values['BILLING_ENABLED'] ?? 'false';
     final distribution = values['BILLING_DISTRIBUTION'] ?? 'disabled';
@@ -63,7 +64,9 @@ class BillingConfig {
   final bool enabled;
   final String distribution;
   final Uri? successUrl, cancelUrl, portalReturnUrl;
+
   bool get available => allows(defaultTargetPlatform, web: kIsWeb);
+
   bool allows(TargetPlatform platform, {bool web = false}) =>
       !web &&
       platform == TargetPlatform.android &&

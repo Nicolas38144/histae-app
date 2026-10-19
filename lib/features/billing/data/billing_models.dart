@@ -82,6 +82,7 @@ class CheckoutLink {
   }
   late final Uri url;
   late final DateTime expiresAt;
+
   @override
   String toString() => 'CheckoutLink(redacted)';
 }

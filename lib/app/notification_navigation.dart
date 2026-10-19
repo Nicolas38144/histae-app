@@ -32,10 +32,12 @@ class NotificationNavigation {
   final BillingController? billingController;
   final bool Function() isMounted;
   bool _disposed = false;
+
   bool get mounted => !_disposed && isMounted();
   bool _openingPush = false, _replacingPush = false;
   MaterialPageRoute<void>? _pushRoute;
   MatchesController? _pushMatches;
+
   void _pushChanged() {
     if (pushController?.pendingOpen == null ||
         sessionController?.phase != SessionPhase.ready) {

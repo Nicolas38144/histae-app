@@ -2,6 +2,7 @@ import 'dart:ui' show FontVariation, lerpDouble;
 
 import 'package:flutter/material.dart';
 
+import '../core/l10n/app_strings.dart';
 import '../core/theme/histae_tokens.dart';
 import '../core/widgets/histae_brand_symbol.dart';
 
@@ -9,7 +10,6 @@ import '../core/widgets/histae_brand_symbol.dart';
 /// incoming navigation continue while the opening hides their first frames.
 class AppOpening extends StatefulWidget {
   const AppOpening({required this.child, super.key});
-
   final Widget child;
 
   @override
@@ -82,7 +82,7 @@ class _AppOpeningState extends State<AppOpening>
         Positioned.fill(
           key: const Key('app-opening'),
           child: Semantics(
-            label: 'Histae',
+            label: AppStrings.of(context).messages.appOpeningHistae,
             excludeSemantics: true,
             child: AnimatedBuilder(
               animation: _animation,
@@ -121,7 +121,10 @@ class _AppOpeningState extends State<AppOpening>
                                 const SizedBox(height: 20),
                                 CustomPaint(
                                   size: const Size(360, 110),
-                                  painter: _OpeningName(separation),
+                                  painter: _OpeningName(
+                                    separation,
+                                    AppStrings.of(context).appName,
+                                  ),
                                 ),
                               ],
                             ),
@@ -140,8 +143,8 @@ class _AppOpeningState extends State<AppOpening>
 }
 
 class _OpeningName extends CustomPainter {
-  const _OpeningName(this.separation);
-
+  const _OpeningName(this.separation, this.name);
+  final String name;
   final double separation;
 
   @override
@@ -162,8 +165,8 @@ class _OpeningName extends CustomPainter {
       textDirection: TextDirection.ltr,
       textScaler: TextScaler.noScaling,
     )..layout();
-    final h = text('H');
-    final middle = text('istae');
+    final h = text(name.substring(0, 1));
+    final middle = text(name.substring(1));
     final dot = text('.', color: HistaeTokens.coral);
     try {
       final compact = h.width + dot.width;

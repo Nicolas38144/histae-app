@@ -14,10 +14,12 @@ class PrivateExportStore {
   final _name = RegExp(r'^histae-export-[a-f0-9-]{36}\.json(?:\.part)?$');
   static const maxBytes = 512 * 1024 * 1024;
   final _queue = SerialExecutor();
+
   Future<T> _serialized<T>(Future<T> Function() action) => _queue.run(action);
 
   Future<Directory> _cache() async =>
       Directory(await (await _temporaryDirectory()).resolveSymbolicLinks());
+
   Future<Directory> _folder(String name, {bool create = false}) async {
     final cache = await _cache();
     final folder = Directory('${cache.path}${Platform.pathSeparator}$name');
@@ -44,6 +46,7 @@ class PrivateExportStore {
   }
 
   Future<void> clean() => _serialized(_clean);
+
   Future<void> _clean() async {
     // Own files only, including the share plugin's bounded cache copy. Never
     // traverse a symlink, remove a source file, or clear another plugin's data.
@@ -64,6 +67,7 @@ class PrivateExportStore {
 
   Future<String> save(ApiDownload download, RequestCancellation scope) =>
       _serialized(() => _save(download, scope));
+
   Future<String> _save(ApiDownload download, RequestCancellation scope) async {
     String? partial;
     RandomAccessFile? file;

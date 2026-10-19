@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../../../core/models/client_message.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/network/retry_after.dart';
@@ -32,18 +33,22 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     };
   }
   final MatchesRepository repository;
+
   String get ownerId => repository.owner;
   ContinuationController? _continuation;
+
   ContinuationController get continuation =>
       _continuation ??= ContinuationController(this);
   @override
   int readRevision = 0, privacyEpoch = 0;
   @override
   DateTime? readAt;
+
   @override
   bool isRemoved(String id) =>
       _removed.contains(id) ||
       _items.any((m) => m.id == id && !m.historyAllowed);
+
   @override
   void removeUnavailable(String id) {
     _purge(id, remove: true);
@@ -54,6 +59,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   final RealtimeClient realtime;
   final DateTime Function() _now;
   final void Function(String)? onRemoved;
+
   @override
   AuthenticatedSession get session => repository.session;
   late String _key;
@@ -79,12 +85,16 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   final _closures = <String, bool>{};
   final _items = <UserMatch>[];
   final _messages = <ChatMessage>[];
+
   List<UserMatch> get items => List.unmodifiable(_items);
+
   List<ChatMessage> get messages => List.unmodifiable(_messages);
   String? listCursor, messageCursor;
   @override
   String? selectedId;
+
   String? get pendingEnd => _closures[selectedId] == false ? selectedId : null;
+
   String? get pendingBlock => _closures[selectedId] == true ? selectedId : null;
   int _historyPages = 1;
   bool listLoading = false,
@@ -95,16 +105,22 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   bool ending = false;
   bool realtimeConnected = false;
   ApiFailure? failure, chatFailure, readFailure, realtimeFailure;
-  String? notice, validation;
+  String? notice;
+  ClientMessage? validation;
   DateTime? _retryAt;
+
   bool get accessible =>
       !_disposed && session.hasSession && session.phase == SessionPhase.ready;
+
   @override
   bool get active => _active && accessible;
+
   @override
   bool get verified => _verified;
+
   @override
   DateTime get serverNow => _now().toUtc().add(_clockOffset);
+
   @override
   UserMatch? get selected {
     for (final item in _items) {
@@ -114,7 +130,9 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   }
 
   String draftFor(String id) => _outbox.draftFor(id);
+
   MessageIntent? get pendingMessage => _outbox.pendingFor(selectedId);
+
   bool get canSend =>
       active &&
       _verified &&
@@ -126,13 +144,17 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       pendingEnd != selectedId &&
       pendingBlock != selectedId &&
       retrySeconds == 0;
+
   bool get canRead =>
       active && _verified && selected?.historyAllowed == true && !ending;
+
   int get retrySeconds => retrySecondsUntil(_retryAt, now: _now());
 
   bool _alive(int epoch) => active && epoch == _epoch;
+
   bool _chatAlive(int epoch, int chatEpoch, String id) =>
       _alive(epoch) && chatEpoch == _chatEpoch && selectedId == id;
+
   void _notify() {
     if (!_disposed) notifyListeners();
   }
@@ -465,6 +487,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     'invalid_match_state',
     'match_blocked',
   ].contains(e.code);
+
   Future<void> loadMore() async {
     if (!active ||
         listLoading ||

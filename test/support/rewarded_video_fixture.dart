@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:histae_app/core/models/client_message.dart';
+
 import 'package:histae_app/features/continuation/data/continuation_models.dart';
 import 'package:histae_app/features/continuation/data/rewarded_video_gateway.dart';
 
@@ -19,7 +21,7 @@ class FakeRewardedVideoGateway implements RewardedVideoGateway {
   @override
   String? platform = 'android';
   @override
-  String? unavailableReason;
+  ClientMessage? unavailableReason;
   @override
   bool privacyOptionsRequired = true;
   int consents = 0, privacyForms = 0;

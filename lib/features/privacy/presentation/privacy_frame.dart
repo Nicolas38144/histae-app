@@ -6,6 +6,7 @@ class PrivacyFrame extends StatelessWidget {
   const PrivacyFrame({super.key, required this.title, required this.children});
   final String title;
   final List<Widget> children;
+
   @override
   Widget build(BuildContext context) => HistaeScaffold(
     appBar: AppBar(title: Text(title)),

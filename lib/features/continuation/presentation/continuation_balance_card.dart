@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../application/continuation_controller.dart';
 
 /// Displays only server-owned available balances, excluding reserved credits.
@@ -10,7 +11,6 @@ class ContinuationBalanceCard extends StatelessWidget {
     required this.onVideos,
     this.loading = false,
   });
-
   final ContinuationController controller;
   final VoidCallback onVideos;
   final bool loading;
@@ -27,7 +27,8 @@ class ContinuationBalanceCard extends StatelessWidget {
       int count,
       Key key,
     ) => Semantics(
-      label: '$semantics : $count',
+      label: AppStrings.of(context).messages
+          .continuationBalanceCard(semantics, count),
       excludeSemantics: true,
       child: largeText
           ? Row(
@@ -51,27 +52,46 @@ class ContinuationBalanceCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Pour continuer', style: theme.textTheme.titleMedium),
+            Text(
+              AppStrings.of(context).messages.continuationBalanceCardToContinue,
+              style: theme.textTheme.titleMedium,
+            ),
             const SizedBox(height: 12),
             if (loading || c.loading) ...[
-              const Text('Actualisation de vos crédits…'),
+              Text(
+                AppStrings.of(context)
+                    .messages
+                    .continuationBalanceCardRefreshingYourCredits,
+              ),
             ] else if (q == null || c.quotaReadAt == null) ...[
-              const Text(
-                'Votre solde ne peut pas être vérifié pour le moment.',
+              Text(
+                AppStrings.of(context)
+                    .messages
+                    .continuationBalanceCardYourBalanceCannotBeCheckedRight,
               ),
               TextButton.icon(
                 onPressed: c.retrySeconds > 0 ? null : c.activate,
                 icon: const Icon(Icons.refresh),
                 label: Text(
                   c.retrySeconds > 0
-                      ? 'Réessayer dans ${c.retrySeconds} s'
-                      : 'Actualiser les crédits',
+                      ? AppStrings.of(context).messages
+                            .continuationBalanceCardTryAgainInS(c.retrySeconds)
+                      : AppStrings.of(context)
+                            .messages
+                            .continuationBalanceCardRefreshCredits,
                 ),
               ),
             ] else if (q.premium) ...[
-              Text('Premium', style: theme.textTheme.headlineSmall),
+              Text(
+                AppStrings.of(context).messages.accountBenefitsActionsPremium,
+                style: theme.textTheme.headlineSmall,
+              ),
               const SizedBox(height: 4),
-              const Text('Vos continuations ne nécessitent aucun crédit.'),
+              Text(
+                AppStrings.of(context)
+                    .messages
+                    .continuationBalanceCardNoCreditsAreNeededForYour,
+              ),
             ] else ...[
               Flex(
                 direction: largeText ? Axis.vertical : Axis.horizontal,
@@ -80,8 +100,12 @@ class ContinuationBalanceCard extends StatelessWidget {
                   Flexible(
                     flex: largeText ? 0 : 1,
                     child: balance(
-                      'Gratuits restants',
-                      'Crédits gratuits restants',
+                      AppStrings.of(context)
+                          .messages
+                          .continuationBalanceCardFreeRemaining,
+                      AppStrings.of(context)
+                          .messages
+                          .continuationBalanceCardFreeCreditsRemaining,
                       q.freeRemaining,
                       const Key('free-credits-remaining'),
                     ),
@@ -93,8 +117,12 @@ class ContinuationBalanceCard extends StatelessWidget {
                   Flexible(
                     flex: largeText ? 0 : 1,
                     child: balance(
-                      'Publicitaires restants',
-                      'Crédits publicitaires restants',
+                      AppStrings.of(context)
+                          .messages
+                          .continuationBalanceCardVideoRemaining,
+                      AppStrings.of(context)
+                          .messages
+                          .continuationBalanceCardVideoCreditsRemaining,
                       q.advertisingRemaining,
                       const Key('ad-credits-remaining'),
                     ),
@@ -106,7 +134,9 @@ class ContinuationBalanceCard extends StatelessWidget {
                 key: const Key('open-videos'),
                 onPressed: onVideos,
                 icon: const Icon(Icons.play_circle_outline),
-                label: const Text('Vidéos'),
+                label: Text(
+                  AppStrings.of(context).messages.continuationBalanceCardVideos,
+                ),
               ),
             ],
           ],

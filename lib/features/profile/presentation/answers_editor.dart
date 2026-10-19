@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../application/profile_controller.dart';
@@ -12,6 +13,7 @@ import 'question_picker.dart';
 class AnswersEditor extends StatefulWidget {
   const AnswersEditor({super.key, required this.controller});
   final ProfileController controller;
+
   @override
   State<AnswersEditor> createState() => _AnswersEditorState();
 }
@@ -32,6 +34,7 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
           .map((a) => _AnswerInput(a.questionId, a.question, a.answer))
           .toList();
   final removedInputs = <_AnswerInput>[];
+
   @override
   void dispose() {
     for (final a in [...inputs, ...removedInputs]) {
@@ -62,12 +65,18 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
 
   @override
   Widget build(BuildContext context) => page(
-    'Vos réponses',
+    AppStrings.of(context).messages.answersEditorYourAnswers,
     [
-      const EditorialCard(
-        eyebrow: 'VOS MOTS, VOTRE HISTOIRE',
-        title: 'Trois questions.\nMille façons d’être vous.',
-        body: 'Choisissez ce que vous souhaitez raconter. Vous décidez aussi de l’ordre de vos réponses.',
+      EditorialCard(
+        eyebrow: AppStrings.of(context)
+            .messages
+            .answersEditorYourWordsYourStory,
+        title: AppStrings.of(context)
+            .messages
+            .answersEditorThreeQuestionsAThousandWaysTo,
+        body: AppStrings.of(context)
+            .messages
+            .answersEditorChooseWhatYouWantToShare,
       ),
       const SizedBox(height: 24),
       Wrap(
@@ -76,11 +85,12 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
         alignment: WrapAlignment.spaceBetween,
         children: [
           Text(
-            'Votre sélection',
+            AppStrings.of(context).messages.answersEditorYourSelection,
             style: Theme.of(context).textTheme.titleMedium,
           ),
           Text(
-            '${inputs.length} / 3 réponses',
+            AppStrings.of(context).messages
+                .answersEditor3Answers(inputs.length),
             style: Theme.of(context).textTheme.labelLarge
                 ?.copyWith(color: Theme.of(context).colorScheme.primary),
           ),
@@ -101,13 +111,15 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Votre premier mot.',
+                  AppStrings.of(context).messages.answersEditorYourFirstWord,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Une habitude, une envie, une petite chose qui vous rend heureux. Commencez par une question.',
+                Text(
+                  AppStrings.of(context)
+                      .messages
+                      .answersEditorAHabitAWishALittle,
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -123,7 +135,8 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'RÉPONSE ${(i + 1).toString().padLeft(2, '0')}',
+                  AppStrings.of(context).messages
+                      .answersEditorAnswer((i + 1).toString().padLeft(2, '0')),
                   style: Theme.of(context).textTheme.labelSmall
                       ?.copyWith(color: Theme.of(context).colorScheme.primary),
                 ),
@@ -148,12 +161,17 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
                   minLines: 3,
                   maxLines: 6,
                   decoration: InputDecoration(
-                    labelText: 'Réponse ${i + 1}',
+                    labelText: AppStrings.of(context).messages
+                        .answersEditorAnswer737(i + 1),
                     alignLabelWithHint: true,
-                    helperText: '10 à 300 caractères',
+                    helperText: AppStrings.of(context)
+                        .messages
+                        .answersEditor10To300Characters,
                     helperMaxLines: 2,
-                    counterText:
-                        '${inputs[i].text.text.trim().runes.length} / 300',
+                    counterText: AppStrings.of(context).messages
+                        .answersEditor300(
+                          inputs[i].text.text.trim().runes.length,
+                        ),
                     counterStyle: TextStyle(
                       color: inputs[i].text.text.trim().runes.length > 300
                           ? Theme.of(context).colorScheme.error
@@ -163,8 +181,10 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
                 ),
                 const SizedBox(height: 12),
                 if (!controller.questions.any((q) => q.id == inputs[i].id))
-                  const Text(
-                    'Cette question n’est plus dans le catalogue. Retirez-la pour enregistrer une nouvelle sélection.',
+                  Text(
+                    AppStrings.of(context)
+                        .messages
+                        .answersEditorThisQuestionIsNoLongerIn,
                   ),
                 for (final a in controller.answers.where(
                   (a) => a.questionId == inputs[i].id,
@@ -174,7 +194,8 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
                   spacing: 8,
                   children: [
                     IconButton(
-                      tooltip: 'Monter la réponse ${i + 1}',
+                      tooltip: AppStrings.of(context).messages
+                          .answersEditorMoveAnswerUp(i + 1),
                       onPressed: i == 0 || busy
                           ? null
                           : () => setState(() {
@@ -185,7 +206,8 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
                       icon: const Icon(Icons.arrow_upward),
                     ),
                     IconButton(
-                      tooltip: 'Descendre la réponse ${i + 1}',
+                      tooltip: AppStrings.of(context).messages
+                          .answersEditorMoveAnswerDown(i + 1),
                       onPressed: i == inputs.length - 1 || busy
                           ? null
                           : () => setState(() {
@@ -202,7 +224,9 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
                               removedInputs.add(inputs.removeAt(i));
                               changed();
                             }),
-                      child: const Text('Retirer'),
+                      child: Text(
+                        AppStrings.of(context).messages.devicesPageRemove,
+                      ),
                     ),
                   ],
                 ),
@@ -215,23 +239,29 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
         OutlinedButton.icon(
           onPressed: busy ? null : _addQuestion,
           icon: const Icon(Icons.add_rounded),
-          label: const Text('Ajouter une question'),
+          label: Text(
+            AppStrings.of(context).messages.answersEditorAddAQuestion,
+          ),
         )
       else
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 12),
           child: Text(
-            'Votre sélection est complète. Retirez une question pour en choisir une autre.',
+            AppStrings.of(context)
+                .messages
+                .answersEditorYourSelectionIsCompleteRemoveA,
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ),
       const SizedBox(height: 16),
       Text(
-        'Vos réponses seront visibles sur votre profil après validation. Évitez les coordonnées personnelles.',
+        AppStrings.of(context)
+            .messages
+            .answersEditorYourAnswersWillAppearOnYour,
         style: Theme.of(context).textTheme.bodySmall,
       ),
     ],
-    saveLabel: 'Enregistrer mes réponses',
+    saveLabel: AppStrings.of(context).messages.answersEditorSaveMyAnswers,
     saveInFooter: true,
     save: () async {
       final drafts = inputs.map((a) => AnswerDraft(a.id, a.text.text)).toList();
@@ -245,7 +275,7 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
         }
         if (!controller.questions.any((q) => q.id == d.questionId)) {
           setState(() {
-            message = 'Retirez la question indisponible avant d’enregistrer.';
+            message = ClientMessage.questionUnavailable;
           });
           return;
         }
@@ -253,10 +283,18 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
       if (!await confirmAction(
             context,
             inputs.isEmpty
-                ? 'Effacer toutes vos réponses ?'
-                : 'Enregistrer cette sélection ?',
-            'Cette sélection remplacera toutes vos réponses actuelles, dans cet ordre.',
-            action: inputs.isEmpty ? 'Tout effacer' : 'Enregistrer',
+                ? AppStrings.of(context)
+                      .messages
+                      .answersEditorEraseAllYourAnswers
+                : AppStrings.of(context)
+                      .messages
+                      .answersEditorSaveThisSelection,
+            AppStrings.of(context)
+                .messages
+                .answersEditorThisSelectionWillReplaceAllYour,
+            action: inputs.isEmpty
+                ? AppStrings.of(context).messages.answersEditorEraseAll
+                : AppStrings.of(context).messages.answersEditorSave,
           ) ||
           !mounted) {
         return;

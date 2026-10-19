@@ -29,6 +29,7 @@ class ContinuationController extends ChangeNotifier {
   final MatchAccess access;
   final ContinuationRepository repository;
   RewardTracker? _rewards;
+
   RewardTracker get rewards =>
       _rewards ??= RewardTracker(repository, onCredited: loadQuota);
   final DateTime Function() _now;
@@ -54,18 +55,26 @@ class ContinuationController extends ChangeNotifier {
   ContinuationOffer? _offer;
   final _pendingContinue = <String, int>{}, _pendingReveal = <String>{};
   final _continued = <String>{}, _revealed = <String>{};
+
   bool get accessible =>
       !_disposed &&
       access.session.hasSession &&
       access.session.phase == SessionPhase.ready;
+
   bool get active => _active && accessible;
+
   UserMatch? get match => access.selected;
+
   int? get pendingCost => _pendingContinue[access.selectedId];
+
   bool get pendingReveal => _pendingReveal.contains(access.selectedId);
+
   bool get myContinued =>
       match?.myContinued == true || _continued.contains(access.selectedId);
+
   bool get myRevealed =>
       match?.myRevealed == true || _revealed.contains(access.selectedId);
+
   bool get canDecide =>
       active &&
       access.active &&
@@ -77,11 +86,14 @@ class ContinuationController extends ChangeNotifier {
       retrySeconds == 0 &&
       (match!.status == MatchStatus.confirmed ||
           match!.expiresAt.isAfter(access.serverNow));
+
   bool get canContinue =>
       canDecide &&
       match?.status == MatchStatus.awaitingContinuation &&
       !myContinued;
+
   bool get canReveal => canDecide && !myRevealed;
+
   bool get advertisingEnabled {
     final current = quota;
     if (current == null || current.premium) return false;
@@ -193,6 +205,7 @@ class ContinuationController extends ChangeNotifier {
   }
 
   bool _alive(int epoch) => active && epoch == _epoch;
+
   void _error(ApiFailure e) {
     failure = e;
     _offer = null;

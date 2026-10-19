@@ -12,6 +12,7 @@ class OtpPage extends StatefulWidget {
   const OtpPage({super.key, required this.session, this.registration = false});
   final SessionController session;
   final bool registration;
+
   @override
   State<OtpPage> createState() => _OtpPageState();
 }

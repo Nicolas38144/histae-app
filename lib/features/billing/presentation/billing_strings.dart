@@ -1,50 +1,67 @@
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_failure.dart';
 
-abstract final class BillingStrings {
-  static String date(DateTime value) {
-    final d = value.toLocal();
-    return '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
-  }
+class BillingStrings {
+  const BillingStrings(this.strings);
+  final AppStrings strings;
 
-  static String status(String? value) => switch (value) {
-    'trialing' => 'Période d’essai',
-    'active' => 'Abonnement actif',
-    'past_due' => 'Paiement à régulariser',
-    'incomplete' => 'Paiement à terminer',
-    'incomplete_expired' => 'Souscription expirée',
-    'canceled' => 'Abonnement résilié',
-    'unpaid' => 'Paiement impayé',
-    'paused' => 'Abonnement en pause',
-    _ => 'Votre formule actuelle',
+  String date(DateTime value) => strings.date(value);
+
+  String status(String? value) => switch (value) {
+    'trialing' => strings.messages.billingStringsTrialPeriod,
+    'active' => strings.messages.billingStringsActiveSubscription,
+    'past_due' => strings.messages.billingStringsPaymentNeedsAttention,
+    'incomplete' => strings.messages.billingStringsCompletePayment,
+    'incomplete_expired' => strings.messages.billingStringsSubscriptionExpired,
+    'canceled' => strings.messages.billingStringsSubscriptionCanceled,
+    'unpaid' => strings.messages.billingStringsUnpaid,
+    'paused' => strings.messages.billingStringsSubscriptionPaused,
+    _ => strings.messages.billingStringsYourCurrentPlan,
   };
-  static String notice(String? value) => switch (value) {
-    'confirmed' => 'Vos droits ont été confirmés par Histae.',
-    'awaiting_confirmation' => 'Paiement ouvert dans votre navigateur. À votre retour, vérifiez votre abonnement. La confirmation peut prendre quelques instants.',
-    'portal_opened' => 'Gestion ouverte dans votre navigateur. Vérifiez votre abonnement à votre retour.',
-    'attempt_closed' => 'La tentative précédente est terminée ou expirée. Votre formule a été vérifiée. Vous pouvez choisir une nouvelle souscription.',
+
+  String notice(String? value) => switch (value) {
+    'confirmed' =>
+      strings.messages.billingStringsYourEntitlementsHaveBeenConfirmedBy,
+    'awaiting_confirmation' =>
+      strings.messages.billingStringsPaymentOpenedInYourBrowserCheck,
+    'portal_opened' =>
+      strings.messages.billingStringsSubscriptionManagementOpenedInYourBrowser,
+    'attempt_closed' =>
+      strings.messages.billingStringsThePreviousAttemptHasEndedOr,
     _ => '',
   };
-  static String error(ApiFailure e) => switch (e.code) {
-    'subscription_already_active' => 'Un abonnement existe déjà. Actualisez votre situation avant de poursuivre.',
-    'checkout_already_in_progress' => 'Une souscription est déjà ouverte. Reprenez la tentative ou attendez son expiration.',
+
+  String error(ApiFailure e) => switch (e.code) {
+    'subscription_already_active' =>
+      strings.messages.billingStringsASubscriptionAlreadyExistsRefreshYour,
+    'checkout_already_in_progress' =>
+      strings.messages.billingStringsASubscriptionAttemptIsAlreadyOpen,
     'billing_customer_reconciliation_required' ||
     'billing_customer_conflict' ||
-    'checkout_state_conflict' => 'Votre souscription est en cours de vérification. Réessayez plus tard avec la même tentative.',
-    'idempotency_key_reused' => 'Cette tentative doit être vérifiée avant de poursuivre. Contactez l’assistance si le problème persiste.',
+    'checkout_state_conflict' =>
+      strings.messages.billingStringsYourSubscriptionIsBeingCheckedTry,
+    'idempotency_key_reused' =>
+      strings.messages.billingStringsThisAttemptMustBeCheckedBefore,
     'idempotency_key_consumed' =>
-      'Cette tentative est terminée ou expirée. Vérifiez votre abonnement.',
+      strings.messages.billingStringsThisAttemptHasEndedOrExpired,
     'billing_customer_not_found' =>
-      'La gestion de cet abonnement n’est pas encore disponible.',
-    'browser_unavailable' => 'Impossible d’ouvrir le navigateur. Votre tentative reste disponible pour réessayer.',
+      strings.messages.billingStringsManagementOfThisSubscriptionIsNot,
+    'browser_unavailable' =>
+      strings.messages.billingStringsUnableToOpenTheBrowserYour,
     'billing_unavailable' ||
     'stripe_request_failed' ||
-    'stripe_checkout_unavailable' => 'Le paiement est temporairement indisponible. Votre tentative est conservée.',
+    'stripe_checkout_unavailable' =>
+      strings.messages.billingStringsPaymentIsTemporarilyUnavailableYourAttempt,
     _ => switch (e.kind) {
-      ApiFailureKind.network || ApiFailureKind.timeout => 'Connexion interrompue. Le résultat reste à vérifier ; votre tentative est conservée.',
-      ApiFailureKind.rateLimited => 'Veuillez patienter avant de réessayer.',
-      ApiFailureKind.secureStorage => 'Le stockage sécurisé est indisponible. Aucun nouveau paiement ne peut être ouvert.',
-      ApiFailureKind.invalidResponse => 'La réponse ne permet pas de confirmer votre situation. Actualisez avant de poursuivre.',
-      _ => 'Votre abonnement ne peut pas être vérifié pour le moment. Réessayez plus tard.',
+      ApiFailureKind.network || ApiFailureKind.timeout =>
+        strings.messages.billingStringsConnectionInterruptedTheResultStillNeeds,
+      ApiFailureKind.rateLimited =>
+        strings.messages.billingStringsPleaseWaitBeforeTryingAgain,
+      ApiFailureKind.secureStorage =>
+        strings.messages.billingStringsSecureStorageIsUnavailableNoNew,
+      ApiFailureKind.invalidResponse =>
+        strings.messages.billingStringsTheResponseDoesNotConfirmYour,
+      _ => strings.messages.billingStringsYourSubscriptionCannotBeCheckedRight,
     },
   };
 }

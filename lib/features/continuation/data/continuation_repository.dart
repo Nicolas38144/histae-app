@@ -8,13 +8,21 @@ import 'continuation_models.dart';
 abstract interface class ContinuationRepository {
   factory ContinuationRepository(AuthenticatedSession session) =
       ApiContinuationRepository;
+
   AuthenticatedSession get session;
+
   Future<ContinuationQuota> quota(RequestCancellation scope);
+
   Future<List<SubscriptionPlan>> plans(RequestCancellation scope);
+
   Future<bool> reveal(String id, RequestCancellation scope);
+
   Future<bool> continueMatch(String id, int cost, RequestCancellation scope);
+
   Future<RewardIntent> createReward(String platform, RequestCancellation scope);
+
   Future<RewardIntent> reward(String id, RequestCancellation scope);
+
   Future<void> cancelReward(String id, RequestCancellation scope);
 }
 
@@ -22,6 +30,7 @@ final class ApiContinuationRepository implements ContinuationRepository {
   ApiContinuationRepository(this.session);
   @override
   final AuthenticatedSession session;
+
   Future<Object?> _request(
     String method,
     String path,
@@ -36,11 +45,13 @@ final class ApiContinuationRepository implements ContinuationRepository {
     expectedStatus: status,
     replayAfterRefresh: true,
   );
+
   @override
   Future<ContinuationQuota> quota(RequestCancellation scope) async =>
       ContinuationQuota.fromJson(
         await _request('GET', '/api/users/me/continuation-quota', scope),
       );
+
   @override
   Future<List<SubscriptionPlan>> plans(RequestCancellation scope) async {
     final j = jsonObject(
@@ -66,6 +77,7 @@ final class ApiContinuationRepository implements ContinuationRepository {
         jsonObject(await _request('PATCH', '${_path(id)}/reveal', scope)),
         'photos_revealed',
       );
+
   @override
   Future<bool> continueMatch(
     String id,

@@ -6,13 +6,13 @@ import '../theme/histae_tokens.dart';
 class HistaeButton extends StatelessWidget {
   const HistaeButton({super.key, required this.onPressed, required this.child})
     : icon = null;
+
   const HistaeButton.icon({
     super.key,
     required this.onPressed,
     required this.icon,
     required Widget label,
   }) : child = label;
-
   final VoidCallback? onPressed;
   final Widget child;
   final Widget? icon;

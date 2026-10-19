@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/l10n/language_picker.dart';
 import '../../../core/widgets/account_benefits_actions.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_scaffold.dart';
@@ -37,12 +38,14 @@ class ProfilePage extends StatefulWidget {
   final ContinuationController continuation;
   final CatalogRepository? catalog;
   final DiscoveryVisibilityController? visibility;
+
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
   ProfileController get controller => widget.controller;
+
   @override
   void initState() {
     super.initState();
@@ -106,7 +109,10 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
       final strings = AppStrings.of(context);
       final editable = !c.loading && !c.saving && !c.uncertain;
       return HistaeScaffold(
-        appBar: AppBar(title: Text(strings.accountTitle)),
+        appBar: AppBar(
+          title: Text(strings.accountTitle),
+          actions: const [LanguageButton()],
+        ),
         body: SafeArea(
           child: RefreshIndicator(
             onRefresh: _load,
@@ -121,11 +127,18 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                 ),
                 const SizedBox(height: 24),
                 EditorialCard(
-                  eyebrow: 'VOTRE PROFIL',
+                  eyebrow: AppStrings.of(context)
+                      .messages
+                      .profilePageYourProfile,
                   title: p == null
-                      ? 'Une rencontre\ncommence par vous.'
-                      : 'Les mots de\n${p.firstname}.',
-                  body: 'Une façon de vous raconter, avant de vous rencontrer. Votre photo restera absente du feed.',
+                      ? AppStrings.of(context)
+                            .messages
+                            .profilePageAMeetingStartsWithYou
+                      : AppStrings.of(context).messages
+                            .profilePageTheWordsOf(p.firstname),
+                  body: AppStrings.of(context)
+                      .messages
+                      .profilePageAWayToTellYourStory,
                 ),
                 const SizedBox(height: 16),
                 OutlinedButton.icon(
@@ -134,24 +147,33 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                       ? () => _open(ProfileFeedPreviewPage(controller: c))
                       : null,
                   icon: const Icon(Icons.visibility_outlined),
-                  label: const Text('Aperçu de mon profil'),
+                  label: Text(
+                    AppStrings.of(context).messages.profilePagePreviewMyProfile,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 if (c.loading)
-                  const LinearProgressIndicator(
-                    semanticsLabel: 'Chargement du profil',
+                  LinearProgressIndicator(
+                    semanticsLabel: AppStrings.of(context)
+                        .messages
+                        .profilePageLoadingProfile,
                   ),
                 for (final entry in c.errors.entries)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Semantics(
                       liveRegion: true,
-                      child: Text(ProfileStrings.failure(entry.value)),
+                      child: Text(
+                        ProfileStrings(AppStrings.of(context))
+                            .failure(entry.value),
+                      ),
                     ),
                   ),
                 if (c.uncertain)
-                  const Text(
-                    'L’enregistrement reste incertain. Relisez les données avant de renouveler une modification. Une demande photo peut être reprise à l’identique.',
+                  Text(
+                    AppStrings.of(context)
+                        .messages
+                        .profilePageSavingIsUncertainRefreshTheData,
                   ),
                 if (widget.visibility case final visibility?) ...[
                   DiscoveryPauseCard(controller: visibility),
@@ -167,7 +189,9 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                     label: Text(
                       c.retrySeconds > 0
                           ? strings.retryIn(c.retrySeconds)
-                          : 'Actualiser mon profil',
+                          : AppStrings.of(context)
+                                .messages
+                                .profilePageRefreshMyProfile,
                     ),
                   ),
                 ),
@@ -182,7 +206,9 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Les détails qui comptent.',
+                  AppStrings.of(context)
+                      .messages
+                      .profilePageTheDetailsThatMatter,
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 8),
@@ -204,14 +230,18 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                 ),
                 const EditorialDivider(),
                 Text(
-                  'Votre compte',
+                  AppStrings.of(context).messages.profilePageYourAccount,
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () =>
                       _open(CreditsPage(controller: widget.continuation)),
-                  child: const Text('Mes crédits de continuation'),
+                  child: Text(
+                    AppStrings.of(context)
+                        .messages
+                        .profilePageMyContinuationCredits,
+                  ),
                 ),
                 TextButton(
                   onPressed: () =>
@@ -226,7 +256,11 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                     ),
                   ),
                   icon: const Icon(Icons.notifications_none),
-                  label: const Text('Appareils et notifications'),
+                  label: Text(
+                    AppStrings.of(context)
+                        .messages
+                        .devicesPageDevicesAndNotifications,
+                  ),
                 ),
                 TextButton(
                   onPressed: controller.session.logout,

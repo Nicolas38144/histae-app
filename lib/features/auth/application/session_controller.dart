@@ -34,6 +34,7 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
   Future<void>? _terminal;
   int _generation = 0;
   int resourceRevision = 0;
+
   @override
   String get resourceKey => '$_generation:$resourceRevision';
   String? _consentFingerprint;
@@ -41,8 +42,10 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
   bool _loggingOut = false;
   bool _establishing = false;
   bool _saving = false;
+
   bool get isSaving => _saving;
   bool _synchronizing = false;
+
   @override
   bool get isSynchronizing => _synchronizing;
   late final RetryTicker _retryTimer = RetryTicker(
@@ -51,6 +54,7 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
       if (!_disposed) notifyListeners();
     },
   );
+
   @override
   int get retrySeconds => retrySecondsUntil(failure?.retryAt);
 
@@ -64,14 +68,18 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
 
   @override
   Uri get apiOrigin => repository.api.origin;
+
   String get _origin => apiOrigin.toString();
+
   @override
   Future<Object?> publicJson(
     String path, {
     RequestCancellation? cancellation,
   }) => repository.api.getJson(path, cancellation: cancellation);
+
   @override
   bool get hasSession => _tokens != null && !_loggingOut;
+
   void _notify() {
     if (!_disposed) notifyListeners();
   }
@@ -85,6 +93,7 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
   }
 
   Future<void> start() => _start ??= _restore();
+
   Future<void> _restore() async {
     try {
       final record = SessionRecord.decode(await _vault.read());
@@ -166,10 +175,10 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
       rethrow;
     }
   }
-
   // Repositories opt in only after a definitive expired-access 401. Never
   // replay a mutation after a timeout or a lost response.
   // A revoked session (authentication_required) is closed, never refreshed.
+
   Future<Object?> _authorized(
     String method,
     String path, {
@@ -298,19 +307,22 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
         download: true,
         cancellation: cancellation,
       ) as ApiDownload;
-
   // These operations revoke this very session. First remove the reusable
   // refresh from durable storage, then cross the barrier that purges all UI.
   // The single request uses the latest access token, with no replay/rotation
   // after the barrier. A lost response never becomes an authentication probe.
+
   @override
   Future<void> eraseAccount(String confirmationToken) =>
       _closeRemote('erasure', confirmationToken: confirmationToken);
+
   @override
   Future<void> logoutEverywhere() => _closeRemote('all');
+
   @override
   Future<void> revokeCurrentSession(String id) =>
       _closeRemote('current', sessionId: id);
+
   Future<void> _closeRemote(
     String action, {
     String? confirmationToken,
@@ -599,6 +611,7 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
       (_logout ??= _performLogout().whenComplete(() {
         _logout = null;
       }));
+
   Future<void> _performLogout() async {
     _loggingOut = true;
     _scope.cancel();

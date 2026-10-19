@@ -13,7 +13,6 @@ class ConsentControl extends StatelessWidget {
     required this.onChanged,
     required this.onOpen,
   });
-
   final PublicConsent consent;
   final bool value;
   final ValueChanged<bool>? onChanged;
@@ -54,8 +53,12 @@ class ConsentControl extends StatelessWidget {
                   Expanded(
                     child: Text(
                       consent.type == ConsentType.terms
-                          ? 'CGU acceptées'
-                          : 'Notice consultée',
+                          ? AppStrings.of(context)
+                                .messages
+                                .consentControlTermsAccepted
+                          : AppStrings.of(context)
+                                .messages
+                                .consentControlPrivacyNoticeRead,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
@@ -67,7 +70,13 @@ class ConsentControl extends StatelessWidget {
               key: key,
               contentPadding: EdgeInsets.zero,
               title: Text(strings.consentLabel(consent.type)),
-              subtitle: renewal ? const Text('À renouveler') : null,
+              subtitle: renewal
+                  ? Text(
+                      AppStrings.of(context)
+                          .messages
+                          .consentControlRenewalNeeded,
+                    )
+                  : null,
               value: value,
               onChanged: onChanged == null
                   ? null
@@ -82,7 +91,8 @@ class ConsentControl extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Semantics(header: true, child: title),
-          if (renewal) const Text('À renouveler'),
+          if (renewal)
+            Text(AppStrings.of(context).messages.consentControlRenewalNeeded),
           Row(
             children: [
               Expanded(child: document),
@@ -106,7 +116,11 @@ class ConsentControl extends StatelessWidget {
             excludeSemantics: true,
             child: title,
           ),
-          subtitle: renewal ? const Text('À renouveler') : null,
+          subtitle: renewal
+              ? Text(
+                  AppStrings.of(context).messages.consentControlRenewalNeeded,
+                )
+              : null,
           value: value,
           onChanged: onChanged,
         ),

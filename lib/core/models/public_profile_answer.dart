@@ -7,6 +7,7 @@ class PublicProfileAnswer {
     this.answer,
     this.position,
   );
+
   factory PublicProfileAnswer.fromJson(Object? value) {
     final j = jsonObject(value);
     jsonString(j, 'code');

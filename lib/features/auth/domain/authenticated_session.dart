@@ -18,23 +18,38 @@ enum SessionPhase {
 /// own tokens nor depend on the authentication controller's implementation.
 abstract interface class AuthenticatedSession implements Listenable {
   Uri get apiOrigin;
+
   SessionPhase get phase;
+
   MobileIdentity? get identity;
+
   ConsentState? get consents;
+
   String get resourceKey;
+
   bool get hasSession;
+
   bool get isSynchronizing;
+
   int get retrySeconds;
+
   Future<void> synchronize();
+
   Future<void> saveConsents(
     Map<ConsentType, bool> changes,
     Map<ConsentType, String> displayedVersions,
   );
+
   Future<void> logout();
+
   Future<void> eraseAccount(String confirmationToken);
+
   Future<void> logoutEverywhere();
+
   Future<void> revokeCurrentSession(String id);
+
   Future<Object?> publicJson(String path, {RequestCancellation? cancellation});
+
   Future<Object?> request(
     String method,
     String path, {
@@ -46,6 +61,8 @@ abstract interface class AuthenticatedSession implements Listenable {
     required bool replayAfterRefresh,
     RequestCancellation? cancellation,
   });
+
   Future<ApiEventStream> openEvents(RequestCancellation cancellation);
+
   Future<ApiDownload> openDataExport(RequestCancellation cancellation);
 }

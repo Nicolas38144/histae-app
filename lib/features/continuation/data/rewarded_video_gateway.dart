@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../../../core/config/app_config.dart';
+import '../../../core/models/client_message.dart';
 import 'continuation_models.dart';
 
 enum VideoFailure {
@@ -26,16 +27,22 @@ class RewardedVideoException implements Exception {
 /// Native playback has no authority to award credits. Only the API does.
 abstract interface class RewardedVideoGateway {
   String? get platform;
-  String? get unavailableReason;
+
+  ClientMessage? get unavailableReason;
+
   bool get privacyOptionsRequired;
+
   Future<void> requestConsent(bool Function() isCurrent);
+
   Future<void> showPrivacyOptions();
+
   Future<PreparedRewardedVideo> load(RewardIntent intent);
 }
 
 abstract interface class PreparedRewardedVideo {
   /// Completes on dismissal, reporting only the SDK's completion signal.
   Future<bool> show();
+
   Future<void> dispose();
 }
 
@@ -46,6 +53,7 @@ class AdmobRewardedVideoGateway implements RewardedVideoGateway {
   bool _consentChecked = false;
   @override
   bool privacyOptionsRequired = false;
+
   @override
   String? get platform => kIsWeb
       ? null
@@ -54,17 +62,16 @@ class AdmobRewardedVideoGateway implements RewardedVideoGateway {
           TargetPlatform.iOS => 'ios',
           _ => null,
         };
+
   @override
-  String? get unavailableReason {
+  ClientMessage? get unavailableReason {
     if (platform == null) {
-      return 'Les vidéos sont disponibles sur Android et iOS.';
+      return ClientMessage.videoPlatformUnsupported;
     }
     final id = platform == 'android'
         ? config.admobAndroidAppId
         : config.admobIosAppId;
-    return id == null
-        ? 'Les vidéos ne sont pas encore configurées pour cet appareil.'
-        : null;
+    return id == null ? ClientMessage.videoDeviceNotConfigured : null;
   }
 
   @override
@@ -223,6 +230,7 @@ class _AdmobVideo implements PreparedRewardedVideo {
   _AdmobVideo(this.ad);
   final RewardedAd ad;
   bool _disposed = false;
+
   @override
   Future<bool> show() async {
     final closed = Completer<bool>();

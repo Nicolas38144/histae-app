@@ -1,19 +1,23 @@
 import 'dart:convert';
 
+import '../../../core/models/client_message.dart';
 import '../../../core/network/json_fields.dart';
 
 export '../../../core/network/json_fields.dart' show optionalText, serverId;
 
 // Compatibility for existing callers; new code uses the transport-level name.
+
 Never invalidProfile() => invalidResponse();
 
 class Moderation {
   Moderation(this.status, List<String> reasons)
     : reasons = List.unmodifiable(reasons);
+
   factory Moderation.fromJson(Object? value) {
     final j = jsonObject(value);
     return Moderation.parse(jsonString(j, 'status'), j['reasons']);
   }
+
   factory Moderation.parse(String status, Object? reasons) {
     if (!['pending', 'approved', 'rejected'].contains(status) ||
         reasons is! List ||
@@ -37,6 +41,7 @@ class OwnerProfile {
     this.bioModeration,
     this.photoModeration,
   );
+
   factory OwnerProfile.fromJson(Object? value) {
     final j = jsonObject(value);
     final m = jsonObject(j['moderation']);
@@ -90,30 +95,29 @@ int ageOn(DateTime birthdate, DateTime now) {
   return age;
 }
 
-String? validateBirthdate(String value, DateTime now) {
+ClientMessage? validateBirthdate(String value, DateTime now) {
   final d = parseBirthdate(value);
-  if (d == null) return 'Indiquez une date valide au format AAAA-MM-JJ.';
-  return ageOn(d, now) < 18
-      ? 'Histae est réservé aux personnes de 18 ans et plus.'
-      : null;
+  if (d == null) return ClientMessage.birthdateInvalid;
+  return ageOn(d, now) < 18 ? ClientMessage.underage : null;
 }
 
 class ProfileDraft {
   const ProfileDraft(this.firstname, this.birthdate, this.sex, this.bio);
   final String firstname, birthdate;
   final String? sex, bio;
-  String? validate(DateTime now) {
+
+  ClientMessage? validate(DateTime now) {
     if (firstname.trim().isEmpty ||
         utf8.encode(firstname.trim()).length > 100) {
-      return 'Le prénom est obligatoire (100 octets maximum).';
+      return ClientMessage.firstnameInvalid;
     }
     final dateError = validateBirthdate(birthdate, now);
     if (dateError != null) return dateError;
     if (sex != null && !['male', 'female', 'other'].contains(sex)) {
-      return 'Choisissez une valeur proposée.';
+      return ClientMessage.sexInvalid;
     }
     if (bio != null && utf8.encode(bio!.trim()).length > 2000) {
-      return 'La présentation dépasse 2 000 octets.';
+      return ClientMessage.bioTooLong;
     }
     return null;
   }
@@ -128,6 +132,7 @@ class ProfileDraft {
 
 class Preferences {
   const Preferences(this.minAge, this.maxAge, this.distance, this.lookingFor);
+
   factory Preferences.fromJson(Object? value) {
     final j = jsonObject(value);
     serverId(j, 'user_id');
@@ -142,15 +147,16 @@ class Preferences {
   }
   final int minAge, maxAge, distance;
   final String lookingFor;
-  String? validate() {
+
+  ClientMessage? validate() {
     if (minAge < 18 || maxAge > 99 || minAge > maxAge) {
-      return 'Les âges doivent aller de 18 à 99 ans, dans cet ordre.';
+      return ClientMessage.ageRangeInvalid;
     }
     if (distance < 1 || distance > 500) {
-      return 'La distance doit aller de 1 à 500 km.';
+      return ClientMessage.distanceInvalid;
     }
     if (!['male', 'female', 'both', 'other'].contains(lookingFor)) {
-      return 'Choisissez les personnes que vous souhaitez rencontrer.';
+      return ClientMessage.peopleRequired;
     }
     return null;
   }
@@ -165,6 +171,7 @@ class Preferences {
 
 class ProfileTrait {
   const ProfileTrait(this.id, this.name);
+
   factory ProfileTrait.fromJson(Object? value) {
     final j = jsonObject(value);
     return ProfileTrait(serverId(j, 'id'), jsonString(j, 'name'));
@@ -180,6 +187,7 @@ class ProfileQuestion {
     this.category,
     this.order,
   );
+
   factory ProfileQuestion.fromJson(Object? value) {
     final j = jsonObject(value);
     return ProfileQuestion(
@@ -202,6 +210,7 @@ class ProfileAnswer {
     this.position,
     this.moderation,
   );
+
   factory ProfileAnswer.fromJson(Object? value) {
     final j = jsonObject(value);
     jsonString(j, 'code');
@@ -224,17 +233,19 @@ class ProfileAnswer {
 class AnswerDraft {
   const AnswerDraft(this.questionId, this.answer);
   final String questionId, answer;
+
   Map<String, String> toJson() => {
     'question_id': questionId,
     'answer': answer.trim(),
   };
-  String? validate() {
+
+  ClientMessage? validate() {
     final text = answer.trim();
     if (text.runes.length < 10 ||
         text.runes.length > 300 ||
         utf8.encode(text).length > 1000 ||
         text.runes.any((c) => c < 32 || (c >= 127 && c <= 159))) {
-      return 'Chaque réponse doit contenir de 10 à 300 caractères, sur une ligne (1 000 octets maximum).';
+      return ClientMessage.answerInvalid;
     }
     return null;
   }

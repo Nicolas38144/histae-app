@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 // A scrolling choice dialog keeps long labels readable with large text.
+
 class PrivacyChoice<T> extends StatelessWidget {
   const PrivacyChoice({
     super.key,
@@ -13,6 +14,7 @@ class PrivacyChoice<T> extends StatelessWidget {
   final T value;
   final Map<T, String> choices;
   final ValueChanged<T>? onChanged;
+
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,

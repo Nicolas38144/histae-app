@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../data/profile_models.dart';
 import 'profile_strings.dart';
 
@@ -79,22 +80,31 @@ class ProfileAnswersPreview extends StatelessWidget {
   });
   final List<ProfileAnswer> answers;
   final bool unavailable;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context), colors = theme.colorScheme;
     if (unavailable) {
-      return const Text(
-        'Vos réponses n’ont pas pu être relues. Actualisez votre profil pour les retrouver.',
+      return Text(
+        AppStrings.of(context)
+            .messages
+            .profilePanelsYourAnswersCouldNotBeRefreshed,
       );
     }
     if (answers.isEmpty) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text('Les petits détails font les grandes conversations.'),
+          Text(
+            AppStrings.of(context)
+                .messages
+                .profilePanelsLittleDetailsMakeGreatConversations,
+          ),
           const SizedBox(height: 8),
           Text(
-            'Choisissez jusqu’à trois questions pour raconter ce qui vous anime.',
+            AppStrings.of(context)
+                .messages
+                .profilePanelsChooseUpToThreeQuestionsTo,
             style: theme.textTheme.bodySmall?.copyWith(
               color: colors.onSurfaceVariant,
             ),
@@ -114,7 +124,10 @@ class ProfileAnswersPreview extends StatelessWidget {
               child: Divider(height: 1),
             ),
           Text(
-            '${(i + 1).toString().padLeft(2, '0')}  /  ${ordered[i].question}',
+            AppStrings.of(context).messages.profilePanels(
+              (i + 1).toString().padLeft(2, '0'),
+              ordered[i].question,
+            ),
             style: theme.textTheme.labelLarge?.copyWith(color: colors.primary),
           ),
           const SizedBox(height: 8),
@@ -130,11 +143,12 @@ class ProfileAnswersPreview extends StatelessWidget {
 class ProfileModerationLabel extends StatelessWidget {
   const ProfileModerationLabel({super.key, required this.moderation});
   final Moderation? moderation;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Text(
-      ProfileStrings.moderation(moderation),
+      ProfileStrings(AppStrings.of(context)).moderation(moderation),
       style: theme.textTheme.bodySmall?.copyWith(
         color: moderation?.status == 'rejected'
             ? theme.colorScheme.error
@@ -158,6 +172,7 @@ class ProfileDetailTile extends StatelessWidget {
   final IconData icon;
   final VoidCallback? onTap;
   final Widget? details;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context), colors = theme.colorScheme;

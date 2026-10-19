@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class EditorialDivider extends StatelessWidget {
   const EditorialDivider({super.key});
+
   @override
   Widget build(BuildContext context) => const ExcludeSemantics(
     child: Padding(

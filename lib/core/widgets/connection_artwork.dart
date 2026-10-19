@@ -31,6 +31,7 @@ class ConnectionArtwork extends StatelessWidget {
 
 class _ConnectionPainter extends CustomPainter {
   const _ConnectionPainter();
+
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width * 0.52, size.height * 0.54);

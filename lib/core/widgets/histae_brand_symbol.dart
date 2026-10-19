@@ -5,7 +5,6 @@ import '../theme/histae_tokens.dart';
 /// The original 02 / Les pages symbol, in its 128-unit SVG coordinate system.
 class HistaeBrandSymbol extends StatelessWidget {
   const HistaeBrandSymbol({super.key, this.size = 40});
-
   final double size;
 
   @override

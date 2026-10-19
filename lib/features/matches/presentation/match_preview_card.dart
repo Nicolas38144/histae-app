@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/theme/histae_tokens.dart';
 import '../data/match_models.dart';
 import 'matches_strings.dart';
@@ -55,12 +56,16 @@ class MatchPreviewCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${match.partner.firstname}, ${match.partner.age}',
+                          AppStrings.of(context).messages.encounterPage(
+                            match.partner.firstname,
+                            match.partner.age,
+                          ),
                           style: theme.textTheme.titleLarge,
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          MatchesStrings.status(match.status),
+                          MatchesStrings(AppStrings.of(context))
+                              .status(match.status),
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: colors.primary,
                           ),
@@ -79,7 +84,12 @@ class MatchPreviewCard extends StatelessWidget {
               if (match.lastMessage case final last?) ...[
                 const SizedBox(height: 16),
                 Text(
-                  '${last.senderId == ownerId ? 'Vous : ' : ''}${last.content}',
+                  AppStrings.of(context).messages.matchPreviewCard(
+                    last.senderId == ownerId
+                        ? AppStrings.of(context).messages.matchPreviewCardYou
+                        : '',
+                    last.content,
+                  ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -91,7 +101,8 @@ class MatchPreviewCard extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 14),
                   child: Text(
-                    '${match.unreadCount} ${match.unreadCount == 1 ? 'message non lu' : 'messages non lus'}',
+                    AppStrings.of(context).messages
+                        .unreadMessages(match.unreadCount),
                     style: theme.textTheme.labelMedium?.copyWith(
                       color: colors.primary,
                     ),

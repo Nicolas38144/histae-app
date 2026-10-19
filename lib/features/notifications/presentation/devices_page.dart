@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
@@ -14,24 +15,31 @@ import '../application/push_controller.dart';
 import '../data/device_repository.dart';
 import '../data/push_gateway.dart';
 
-String notificationFailure(ApiFailure e) => switch (e.kind) {
-  ApiFailureKind.secureStorage => 'Les réglages sécurisés ne sont pas accessibles. L’activation reste en attente.',
+String notificationFailure(
+  AppStrings strings,
+  ApiFailure e,
+) => switch (e.kind) {
+  ApiFailureKind.secureStorage =>
+    strings.messages.devicesPageSecureSettingsAreUnavailableActivationRemains,
   ApiFailureKind.rateLimited =>
-    'Trop de demandes. Patientez avant de réessayer.',
-  _ => 'La réponse n’a pas été confirmée. Actualisez la liste avant de reprendre la même action.',
+    strings.messages.devicesPageTooManyRequestsWaitBeforeTrying,
+  _ => strings.messages.devicesPageTheResponseWasNotConfirmedRefresh,
 };
 
 class DevicesPage extends StatefulWidget {
   const DevicesPage({super.key, required this.session, this.push});
   final AuthenticatedSession session;
   final PushController? push;
+
   @override
   State<DevicesPage> createState() => _DevicesPageState();
 }
 
 class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
   late final c = DevicesController(DeviceRepository(widget.session));
+
   PushController? get p => widget.push;
+
   @override
   void initState() {
     super.initState();
@@ -73,7 +81,11 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
           c.retrySeconds == 0 &&
           p?.busy != true;
       return HistaeScaffold(
-        appBar: AppBar(title: const Text('Appareils et notifications')),
+        appBar: AppBar(
+          title: Text(
+            AppStrings.of(context).messages.devicesPageDevicesAndNotifications,
+          ),
+        ),
         body: SafeArea(
           child: Center(
             child: ConstrainedBox(
@@ -81,47 +93,77 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
               child: ListView(
                 padding: const EdgeInsets.all(24),
                 children: [
-                  const EditorialCard(
-                    eyebrow: 'GARDER LE LIEN, À VOTRE RYTHME',
-                    title: 'Un signe,\nsi vous le souhaitez.',
-                    body: 'Choisissez de recevoir des notifications sur cet appareil. Les alertes Histae ne contiennent pas le texte privé de vos messages.',
+                  EditorialCard(
+                    eyebrow: AppStrings.of(context)
+                        .messages
+                        .devicesPageStayInTouchAtYourPace,
+                    title: AppStrings.of(context)
+                        .messages
+                        .devicesPageASignIfYouWish,
+                    body: AppStrings.of(context)
+                        .messages
+                        .devicesPageChooseToReceiveNotificationsOnThis,
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Sur cet appareil',
+                    AppStrings.of(context).messages.devicesPageOnThisDevice,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   if (p?.configured != true)
-                    const Text(
-                      'Les notifications push sont désactivées dans cette version, en attendant leur configuration. Vous pouvez gérer les appareils déjà enregistrés ci-dessous.',
+                    Text(
+                      AppStrings.of(context)
+                          .messages
+                          .devicesPagePushNotificationsAreDisabledInThis,
                     )
                   else ...[
                     Text(
                       p!.stopping
-                          ? 'L’arrêt des notifications reste à confirmer.'
+                          ? AppStrings.of(context)
+                                .messages
+                                .devicesPageStoppingNotificationsStillNeedsConfirmation
                           : p!.pending != null ||
                                 (p!.enabled && p!.deviceId == null)
-                          ? 'L’enregistrement de cet appareil reste à confirmer.'
+                          ? AppStrings.of(context)
+                                .messages
+                                .devicesPageThisDeviceSRegistrationStillNeeds
                           : p!.enabled
-                          ? 'Cet appareil est enregistré pour les notifications. Leur réception dépend du système et du service.'
-                          : 'Notifications non activées pour cet appareil.',
+                          ? AppStrings.of(context)
+                                .messages
+                                .devicesPageThisDeviceIsRegisteredForNotifications
+                          : AppStrings.of(context)
+                                .messages
+                                .devicesPageNotificationsAreNotEnabledForThis,
                     ),
                     if (p!.permission == PushPermission.provisional)
-                      const Text(
-                        'Les notifications sont autorisées discrètement par le système.',
+                      Text(
+                        AppStrings.of(context)
+                            .messages
+                            .devicesPageTheSystemAllowsQuietNotifications,
                       ),
                     if (p!.notice == 'permission_denied')
-                      const Text(
-                        'Le système n’a pas autorisé les notifications. Vous pourrez modifier cette permission dans les réglages de l’appareil.',
+                      Text(
+                        AppStrings.of(context)
+                            .messages
+                            .devicesPageTheSystemDidNotAllowNotifications,
                       ),
                     if (p!.notice == 'removed_elsewhere')
-                      const Text(
-                        'Cet appareil a été retiré de votre compte. Il ne sera pas réenregistré automatiquement.',
+                      Text(
+                        AppStrings.of(context)
+                            .messages
+                            .devicesPageThisDeviceWasRemovedFromYour,
                       ),
                     if (p!.failure != null)
-                      Text(notificationFailure(p!.failure!)),
+                      Text(
+                        notificationFailure(
+                          AppStrings.of(context),
+                          p!.failure!,
+                        ),
+                      ),
                     if (p!.retrySeconds > 0)
-                      Text('Nouvel essai possible dans ${p!.retrySeconds} s'),
+                      Text(
+                        AppStrings.of(context).messages
+                            .appStringsTryAgainInS(p!.retrySeconds),
+                      ),
                     if ((!p!.enabled ||
                             p!.pending != null ||
                             p!.deviceId == null ||
@@ -132,11 +174,19 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                             ? () async {
                                 if (!await confirmAction(
                                       context,
-                                      'Recevoir des notifications ?',
-                                      'Histae demandera l’autorisation du système puis enregistrera cet appareil auprès du service de notification. Vous pourrez le retirer ici.',
+                                      AppStrings.of(context)
+                                          .messages
+                                          .devicesPageReceiveNotifications,
+                                      AppStrings.of(context)
+                                          .messages
+                                          .devicesPageHistaeWillAskForSystemPermission,
                                       action: p!.pending == null
-                                          ? 'Continuer'
-                                          : 'Reprendre cet enregistrement',
+                                          ? AppStrings.of(context)
+                                                .messages
+                                                .devicesPageContinue
+                                          : AppStrings.of(context)
+                                                .messages
+                                                .devicesPageResumeThisRegistration,
                                     ) ||
                                     !mounted) {
                                   return;
@@ -147,8 +197,12 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                             : null,
                         child: Text(
                           p!.pending == null
-                              ? 'Activer les notifications'
-                              : 'Reprendre cet enregistrement',
+                              ? AppStrings.of(context)
+                                    .messages
+                                    .devicesPageEnableNotifications
+                              : AppStrings.of(context)
+                                    .messages
+                                    .devicesPageResumeThisRegistration,
                         ),
                       ),
                     if (p!.enabled || p!.deviceId != null || p!.stopping)
@@ -157,9 +211,15 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                             ? () async {
                                 if (await confirmAction(
                                       context,
-                                      'Arrêter les notifications ici ?',
-                                      'Cet appareil sera retiré du service de notification. Votre session de connexion reste ouverte.',
-                                      action: 'Arrêter',
+                                      AppStrings.of(context)
+                                          .messages
+                                          .devicesPageStopNotificationsHere,
+                                      AppStrings.of(context)
+                                          .messages
+                                          .devicesPageThisDeviceWillBeRemovedFrom,
+                                      action: AppStrings.of(context)
+                                          .messages
+                                          .devicesPageStop,
                                     ) &&
                                     mounted) {
                                   await p!.disable();
@@ -167,42 +227,62 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                                 }
                               }
                             : null,
-                        child: const Text(
-                          'Arrêter les notifications sur cet appareil',
+                        child: Text(
+                          AppStrings.of(context)
+                              .messages
+                              .devicesPageStopNotificationsOnThisDevice,
                         ),
                       ),
                   ],
                   const SizedBox(height: 24),
                   Text(
-                    'Vos appareils enregistrés',
+                    AppStrings.of(context)
+                        .messages
+                        .devicesPageYourRegisteredDevices,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
-                  const Text(
-                    'Cette liste concerne les notifications. Retirer un appareil ne ferme pas sa session de connexion ; les sessions se gèrent séparément.',
+                  Text(
+                    AppStrings.of(context)
+                        .messages
+                        .devicesPageThisListIsForNotificationsRemoving,
                   ),
                   if (c.loading || c.removing || p?.busy == true)
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.symmetric(vertical: 16),
                       child: LinearProgressIndicator(
-                        semanticsLabel: 'Actualisation des appareils',
+                        semanticsLabel: AppStrings.of(context)
+                            .messages
+                            .devicesPageRefreshingDevices,
                       ),
                     ),
-                  if (c.failure != null) Text(notificationFailure(c.failure!)),
+                  if (c.failure != null)
+                    Text(
+                      notificationFailure(AppStrings.of(context), c.failure!),
+                    ),
                   if (c.retrySeconds > 0)
-                    Text('Nouvel essai possible dans ${c.retrySeconds} s'),
+                    Text(
+                      AppStrings.of(context).messages
+                          .appStringsTryAgainInS(c.retrySeconds),
+                    ),
                   if (c.notice == 'device_removed')
-                    const Text(
-                      'Cet enregistrement a été retiré de votre compte.',
+                    Text(
+                      AppStrings.of(context)
+                          .messages
+                          .devicesPageThisRegistrationWasRemovedFromYour,
                     ),
                   if (c.pendingRemoval != null)
-                    const Text(
-                      'Un retrait reste à confirmer. Actualisez la liste, puis reprenez le même appareil s’il est encore présent.',
+                    Text(
+                      AppStrings.of(context)
+                          .messages
+                          .devicesPageARemovalStillNeedsConfirmationRefresh,
                     ),
                   if (!c.loading && c.failure == null && c.devices.isEmpty)
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.symmetric(vertical: 16),
                       child: Text(
-                        'Aucun appareil enregistré pour les notifications.',
+                        AppStrings.of(context)
+                            .messages
+                            .devicesPageNoDevicesRegisteredForNotifications,
                       ),
                     ),
                   for (final device in c.devices)
@@ -213,17 +293,32 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Text(
-                              '${device.platform == 'ios' ? 'iOS' : 'Android'}${p?.deviceId == device.id ? ' · cet appareil' : ''}',
+                              '${device.platform == 'ios' ? AppStrings.of(context).messages.devicesPageIos : AppStrings.of(context).messages.devicesPageAndroid}${p?.deviceId == device.id ? AppStrings.of(context).messages.devicesPageThisDevice : ''}',
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                             if (device.version != null)
-                              Text('Version ${device.version}'),
+                              Text(
+                                AppStrings.of(context).messages
+                                    .appVersion(device.version!),
+                              ),
                             Text(
-                              'Enregistré le ${privacyDate(device.createdAt)}',
+                              AppStrings.of(context).messages
+                                  .devicesPageRegisteredOn(
+                                    privacyDate(
+                                      AppStrings.of(context),
+                                      device.createdAt,
+                                    ),
+                                  ),
                             ),
                             if (device.lastUsedAt != null)
                               Text(
-                                'Dernière actualisation le ${privacyDate(device.lastUsedAt!)}',
+                                AppStrings.of(context).messages
+                                    .devicesPageLastRefreshedOn(
+                                      privacyDate(
+                                        AppStrings.of(context),
+                                        device.lastUsedAt!,
+                                      ),
+                                    ),
                               ),
                             OutlinedButton(
                               onPressed:
@@ -233,9 +328,15 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                                   ? () async {
                                       if (!await confirmAction(
                                             context,
-                                            'Retirer cet appareil ?',
-                                            'Les futures notifications ne seront plus envoyées à cet enregistrement. Sa session de connexion restera ouverte.',
-                                            action: 'Retirer',
+                                            AppStrings.of(context)
+                                                .messages
+                                                .devicesPageRemoveThisDevice,
+                                            AppStrings.of(context)
+                                                .messages
+                                                .devicesPageFutureNotificationsWillNoLongerBe,
+                                            action: AppStrings.of(context)
+                                                .messages
+                                                .devicesPageRemove,
                                           ) ||
                                           !mounted) {
                                         return;
@@ -248,8 +349,12 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                                   : null,
                               child: Text(
                                 c.pendingRemoval == device.id
-                                    ? 'Reprendre ce retrait'
-                                    : 'Retirer cet appareil',
+                                    ? AppStrings.of(context)
+                                          .messages
+                                          .devicesPageResumeThisRemoval
+                                    : AppStrings.of(context)
+                                          .messages
+                                          .devicesPageRemoveThisDevice573,
                               ),
                             ),
                           ],
@@ -258,7 +363,9 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                     ),
                   OutlinedButton(
                     onPressed: enabled ? c.load : null,
-                    child: const Text('Actualiser les appareils'),
+                    child: Text(
+                      AppStrings.of(context).messages.devicesPageRefreshDevices,
+                    ),
                   ),
                 ],
               ),

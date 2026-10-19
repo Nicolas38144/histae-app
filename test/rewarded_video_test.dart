@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
+import 'package:histae_app/core/l10n/app_strings.dart';
 import 'package:histae_app/features/continuation/application/rewarded_video_controller.dart';
 import 'package:histae_app/features/continuation/data/continuation_models.dart';
 import 'package:histae_app/features/continuation/data/rewarded_video_gateway.dart';
@@ -134,7 +135,10 @@ void main() {
       expect(gateway.consents, 1);
       expect(posts, 0);
       expect(gateway.intents, isEmpty);
-      expect(video.message, contains('préférences'));
+      expect(
+        const AppStrings().clientMessage(video.message!),
+        contains('préférences'),
+      );
     },
   );
 
@@ -174,7 +178,10 @@ void main() {
     final video = RewardedVideoController(c, gateway);
     addTearDown(video.dispose);
     await video.watch();
-    expect(video.message, contains('Aucune vidéo'));
+    expect(
+      const AppStrings().clientMessage(video.message!),
+      contains('Aucune vidéo'),
+    );
     expect(c.rewards.intent, isNull);
     expect(deletes, 1);
     gateway.loadFailure = null;

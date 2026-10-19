@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../data/discovery_models.dart';
@@ -7,16 +8,25 @@ import 'discovery_strings.dart';
 
 class DiscoveryReadinessIntro extends StatelessWidget {
   const DiscoveryReadinessIntro({super.key, required this.paused});
-
   final bool paused;
 
   @override
   Widget build(BuildContext context) => EditorialCard(
-    eyebrow: 'AVANT LA RENCONTRE',
-    title: paused ? 'Prenez votre temps.' : 'Un peu de vous.\nPuis les autres.',
+    eyebrow: AppStrings.of(context)
+        .messages
+        .discoveryStatusSectionsBeforeYouMeet,
+    title: paused
+        ? AppStrings.of(context).messages.discoveryStatusSectionsTakeYourTime
+        : AppStrings.of(context)
+              .messages
+              .discoveryStatusSectionsALittleAboutYouThenThe,
     body: paused
-        ? 'Les nouvelles rencontres attendront. Vos matchs et vos conversations restent accessibles.'
-        : 'Complétez ces étapes à votre rythme. Vos choix de vie privée restent accessibles.',
+        ? AppStrings.of(context)
+              .messages
+              .discoveryStatusSectionsNewEncountersCanWaitYourMatches
+        : AppStrings.of(context)
+              .messages
+              .discoveryStatusSectionsCompleteTheseStepsAtYourOwn,
   );
 }
 
@@ -26,7 +36,6 @@ class DiscoveryReadinessCard extends StatelessWidget {
     required this.action,
     required this.onRepair,
   });
-
   final DiscoveryAction action;
   final VoidCallback? onRepair;
 
@@ -38,20 +47,26 @@ class DiscoveryReadinessCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            DiscoveryStrings.actionTitle(action),
+            DiscoveryStrings(AppStrings.of(context)).actionTitle(action),
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 12),
-          Text(DiscoveryStrings.actionBody(action)),
+          Text(DiscoveryStrings(AppStrings.of(context)).actionBody(action)),
           const SizedBox(height: 20),
           OutlinedButton(
             onPressed: onRepair,
             child: Text(
               action == DiscoveryAction.freshPresence
-                  ? 'Actualiser ma position'
+                  ? AppStrings.of(context)
+                        .messages
+                        .discoveryPageRefreshMyLocation
                   : action == DiscoveryAction.resumeDiscovery
-                  ? 'Reprendre la découverte'
-                  : 'Compléter cette étape',
+                  ? AppStrings.of(context)
+                        .messages
+                        .discoveryStatusSectionsResumeDiscovery
+                  : AppStrings.of(context)
+                        .messages
+                        .discoveryStatusSectionsCompleteThisStep,
             ),
           ),
         ],
@@ -67,7 +82,6 @@ class DiscoveryPendingChoiceCard extends StatelessWidget {
     required this.uncertain,
     required this.onResume,
   });
-
   final PendingChoice intent;
   final bool uncertain;
   final VoidCallback? onResume;
@@ -80,19 +94,26 @@ class DiscoveryPendingChoiceCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Votre choix pour ${intent.profile.firstname}',
+            AppStrings.of(context).messages
+                .discoveryStatusSectionsYourChoiceFor(intent.profile.firstname),
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 16),
           Text(
             uncertain
-                ? 'La réponse n’est pas confirmée. Votre choix reste en mémoire ; seul le même choix sera renvoyé.'
-                : 'Votre demande attend sa confirmation. Aucun autre choix ne sera envoyé pour ce profil.',
+                ? AppStrings.of(context)
+                      .messages
+                      .discoveryStatusSectionsTheResponseIsUnconfirmedYourChoice
+                : AppStrings.of(context)
+                      .messages
+                      .discoveryStatusSectionsYourRequestIsAwaitingConfirmationNo,
           ),
           const SizedBox(height: 20),
           HistaeButton(
             onPressed: onResume,
-            child: Text(DiscoveryStrings.pending(intent.action)),
+            child: Text(
+              DiscoveryStrings(AppStrings.of(context)).pending(intent.action),
+            ),
           ),
         ],
       ),

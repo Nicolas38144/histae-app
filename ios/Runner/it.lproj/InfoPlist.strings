@@ -1,0 +1,4 @@
+// Generated from the ARB catalog. Do not edit by hand.
+"NSLocationWhenInUseUsageDescription" = "Histae usa una rilevazione singola per proporre incontri nelle vicinanze. La posizione esatta resta privata, senza tracciamento in background.";
+"NSPhotoLibraryUsageDescription" = "Scegli la tua unica foto profilo Histae. Verrà svelata solo dopo il consenso reciproco.";
+"NSLocalNetworkUsageDescription" = "Durante lo sviluppo, Histae si connette al server di test sulla rete locale.";

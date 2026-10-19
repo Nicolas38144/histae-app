@@ -15,8 +15,8 @@ class DiscoveryVisibilityController extends ChangeNotifier {
     _key = session.resourceKey;
     session.addListener(_sessionChanged);
   }
-
   final DiscoveryVisibilityRepository repository;
+
   AuthenticatedSession get session => repository.session;
   late String _key;
   RequestCancellation _scope = RequestCancellation();
@@ -25,10 +25,15 @@ class DiscoveryVisibilityController extends ChangeNotifier {
   bool _loading = false, _saving = false, _uncertain = false;
   bool? _paused;
   ApiFailure? _failure;
+
   bool get loading => _loading;
+
   bool get saving => _saving;
+
   bool get uncertain => _uncertain;
+
   bool? get paused => _paused;
+
   ApiFailure? get failure => _failure;
   DateTime? _retryAt;
   late final RetryTicker _ticker = RetryTicker(
@@ -37,7 +42,9 @@ class DiscoveryVisibilityController extends ChangeNotifier {
   );
 
   bool get accessible => !_disposed && session.phase == SessionPhase.ready;
+
   int get retrySeconds => retrySecondsUntil(_retryAt);
+
   bool get canChange =>
       accessible &&
       _paused != null &&

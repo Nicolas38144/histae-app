@@ -2,6 +2,7 @@ import '../../../core/network/json_fields.dart';
 
 class PushDevice {
   PushDevice.fromJson(Object? value) : this._(jsonObject(value));
+
   PushDevice._(Map<String, dynamic> j)
     : id = serverId(j, 'id'),
       sessionId = j['session_id'] == null ? null : serverId(j, 'session_id'),
@@ -28,6 +29,7 @@ enum PushKind {
 
 class PushIntent {
   const PushIntent(this.id, this.kind, this.matchId);
+
   static PushIntent? parse(Map<String, dynamic> data) {
     try {
       final id = serverId(data, 'notification_id');
@@ -52,6 +54,7 @@ class PushIntent {
   final String id;
   final PushKind kind;
   final String? matchId;
+
   @override
   String toString() => 'PushIntent(redacted)';
 }
@@ -67,11 +70,13 @@ class DeviceRegistration {
   }
   final String token, platform;
   final String? version;
+
   Map<String, Object> get body => {
     'push_token': token,
     'platform': platform,
     'app_version': ?version,
   };
+
   @override
   String toString() => 'DeviceRegistration(redacted)';
 }

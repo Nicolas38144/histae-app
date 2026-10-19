@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../core/widgets/histae_scaffold.dart';
-
 import '../features/auth/domain/authenticated_session.dart';
 import '../features/catalog/data/catalog_repository.dart';
 import '../features/discovery/application/discovery_controller.dart';
@@ -23,7 +22,6 @@ import 'main_navigation_bar.dart';
 /// tab is mounted, so hidden tabs cannot restart discovery or realtime work.
 class MainShell extends StatefulWidget {
   const MainShell({super.key, required this.session, this.catalog});
-
   final AuthenticatedSession session;
   final CatalogRepository? catalog;
 
@@ -48,6 +46,7 @@ class _MainShellState extends State<MainShell> {
   int _selected = 0, _matchRequest = 0;
   String? _initialMatchId;
   bool? _lastPaused;
+
   @override
   void initState() {
     super.initState();

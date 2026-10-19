@@ -1,3 +1,4 @@
+import '../../../core/models/client_message.dart';
 import '../../../core/models/public_profile_answer.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/json_fields.dart';
@@ -26,6 +27,7 @@ class ChatMessage {
     this.createdAt,
     this.readAt,
   );
+
   factory ChatMessage.fromJson(
     Object? value,
     String matchId,
@@ -64,6 +66,7 @@ class MatchPartner {
     this.photo,
   }) : traits = List.unmodifiable(traits),
        answers = List.unmodifiable(answers);
+
   factory MatchPartner.fromJson(
     Object? value,
     String owner, {
@@ -119,6 +122,7 @@ class UserMatch {
     this.unreadCount,
     this.lastMessage,
   );
+
   factory UserMatch.fromJson(Object? value, String owner) {
     final j = jsonObject(value);
     final id = serverId(j, 'id');
@@ -161,10 +165,12 @@ class UserMatch {
   final bool myRevealed, photosRevealed, myContinued;
   final int unreadCount;
   final ChatMessage? lastMessage;
+
   bool get historyAllowed =>
       status == MatchStatus.active ||
       status == MatchStatus.awaitingContinuation ||
       status == MatchStatus.confirmed;
+
   bool get sendAllowed =>
       status == MatchStatus.active || status == MatchStatus.confirmed;
 }
@@ -184,11 +190,12 @@ class MessagePage {
 }
 
 String trimMessage(String value) => trimOuterWhitespace(value);
-String? validateMessage(String value) {
+
+ClientMessage? validateMessage(String value) {
   final content = trimMessage(value);
-  if (content.isEmpty) return 'Écrivez quelques mots avant d’envoyer.';
+  if (content.isEmpty) return ClientMessage.messageEmpty;
   if (content.runes.length > 2000) {
-    return 'Votre message dépasse 2 000 caractères.';
+    return ClientMessage.messageTooLong;
   }
   return null;
 }
@@ -198,6 +205,7 @@ class MessageIntent {
     : content = trimMessage(content),
       key = newUuidV4();
   final String matchId, content, key;
+
   @override
   String toString() => 'MessageIntent(redacted)';
 }

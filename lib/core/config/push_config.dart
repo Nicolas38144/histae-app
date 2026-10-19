@@ -9,6 +9,7 @@ class PushConfig {
     this.iosAppId = '',
     this.iosBundleId = '',
   });
+
   factory PushConfig.fromValues(Map<String, String> values) {
     final flag = values['PUSH_ENABLED'] ?? 'false';
     if (!['true', 'false'].contains(flag)) {
@@ -68,12 +69,14 @@ class PushConfig {
       iosApiKey,
       iosAppId,
       iosBundleId;
+
   bool get androidReady => [
     projectId,
     senderId,
     androidApiKey,
     androidAppId,
   ].every((s) => s.isNotEmpty);
+
   bool get iosReady => [
     projectId,
     senderId,

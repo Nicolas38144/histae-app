@@ -13,6 +13,7 @@ class ContinuationQuota {
     this.reserved,
     this.stockLimit,
   );
+
   factory ContinuationQuota.fromJson(Object? value) {
     final j = jsonObject(value);
     int count(String key) {
@@ -53,8 +54,11 @@ class ContinuationQuota {
       reserved,
       stockLimit;
   final int? weeklyLimit, remaining;
+
   bool get premium => plan == 'premium';
+
   int get creditCost => premium ? 0 : 1;
+
   bool get canStart => premium || remaining! > 0;
 }
 
@@ -69,6 +73,7 @@ class RewardIntent {
     this.status,
     this.credits,
   );
+
   factory RewardIntent.fromJson(Object? value) {
     final j = jsonObject(value), id = serverId(jsonObject(value), 'id');
     final custom = jsonString(j, 'custom_data'),
@@ -99,6 +104,7 @@ class RewardIntent {
   final DateTime expiresAt;
   final RewardStatus status;
   final int credits;
+
   @override
   String toString() => 'RewardIntent(redacted)';
 }

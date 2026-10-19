@@ -9,7 +9,6 @@ class StatusView extends StatelessWidget {
     this.action,
     this.reference,
   });
-
   final String title;
   final String message;
   final IconData icon;

@@ -12,6 +12,7 @@ class RetryTicker {
   final int Function() remaining;
   final void Function() onTick;
   Timer? _timer;
+
   void restart() {
     cancel();
     if (remaining() <= 0) return;

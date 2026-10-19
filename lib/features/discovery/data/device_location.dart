@@ -18,6 +18,7 @@ enum LocationIssue {
 class LocationFailure implements Exception {
   const LocationFailure(this.issue);
   final LocationIssue issue;
+
   @override
   String toString() => 'LocationFailure(${issue.name})';
 }
@@ -32,6 +33,7 @@ class LocationFix {
   final double latitude, longitude;
   final DateTime observedAt;
   final bool approximate;
+
   bool freshAt(DateTime now) {
     final age = now.toUtc().difference(observedAt.toUtc());
     return latitude.isFinite &&
@@ -48,6 +50,7 @@ class LocationFix {
 
 abstract class LocationSource {
   Future<LocationFix> locate(RequestCancellation cancellation);
+
   Future<bool> openSettings({required bool services});
 }
 

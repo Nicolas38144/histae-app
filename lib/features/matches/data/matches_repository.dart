@@ -6,26 +6,35 @@ import 'match_models.dart';
 abstract interface class MatchesRepository {
   factory MatchesRepository(AuthenticatedSession session) =
       ApiMatchesRepository;
+
   AuthenticatedSession get session;
+
   String get owner;
+
   Future<MatchPage> matches(RequestCancellation scope, {String? cursor});
+
   Future<MessagePage> messages(
     UserMatch match,
     RequestCancellation scope, {
     String? cursor,
   });
+
   Future<ChatMessage> send(
     UserMatch match,
     MessageIntent intent,
     RequestCancellation scope,
   );
+
   Future<void> readThrough(
     String id,
     String messageId,
     RequestCancellation scope,
   );
+
   Future<void> readOne(String id, String messageId, RequestCancellation scope);
+
   Future<void> end(String id, RequestCancellation scope);
+
   Future<void> block(String partnerId, RequestCancellation scope);
 }
 
@@ -33,8 +42,10 @@ final class ApiMatchesRepository implements MatchesRepository {
   ApiMatchesRepository(this.session);
   @override
   final AuthenticatedSession session;
+
   @override
   String get owner => session.identity?.userId ?? invalidResponse();
+
   Future<Object?> _request(
     String method,
     String path,
@@ -53,6 +64,7 @@ final class ApiMatchesRepository implements MatchesRepository {
     replayAfterRefresh: true,
     cancellation: scope,
   );
+
   @override
   Future<MatchPage> matches(RequestCancellation scope, {String? cursor}) async {
     final j = jsonObject(

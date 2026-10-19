@@ -5,10 +5,15 @@ import '../data/match_models.dart';
 class MessageOutbox {
   final _drafts = <String, String>{};
   final _pending = <String, MessageIntent>{};
+
   Iterable<String> get matchIds => {..._drafts.keys, ..._pending.keys};
+
   bool hasPending(String id) => _pending.containsKey(id);
+
   MessageIntent? pendingFor(String? id) => _pending[id];
+
   String draftFor(String id) => _pending[id]?.content ?? _drafts[id] ?? '';
+
   void setDraft(String id, String text) {
     if (!hasPending(id)) _drafts[id] = text;
   }
@@ -21,6 +26,7 @@ class MessageOutbox {
   }
 
   void forgetPending(String id) => _pending.remove(id);
+
   void forget(String id) {
     _pending.remove(id);
     _drafts.remove(id);

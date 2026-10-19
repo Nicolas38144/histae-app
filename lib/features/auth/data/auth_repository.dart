@@ -1,22 +1,27 @@
 import '../../../core/network/api_client.dart';
-
 import '../domain/auth_models.dart';
+
 export '../domain/auth_models.dart';
 
 abstract interface class AuthRepository {
   factory AuthRepository(ApiClient api) = ApiAuthRepository;
+
   ApiClient get api;
+
   Future<void> sendOtp(
     String phone,
     String key,
     RequestCancellation cancellation,
   );
+
   Future<TokenPair> verifyOtp(
     String phone,
     String otp,
     RequestCancellation cancellation,
   );
+
   Future<TokenPair> refresh(String refreshToken);
+
   Future<void> logout(TokenPair tokens);
 }
 

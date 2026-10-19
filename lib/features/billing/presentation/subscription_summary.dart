@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../data/billing_models.dart';
 import 'billing_strings.dart';
 
 class SubscriptionSummary extends StatelessWidget {
   const SubscriptionSummary({super.key, required this.state});
   final SubscriptionState state;
+
   @override
   Widget build(BuildContext context) => Card(
     child: Padding(
@@ -14,39 +16,71 @@ class SubscriptionSummary extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            state.plan == 'premium' ? 'Histae Premium' : 'Histae Gratuit',
+            state.plan == 'premium'
+                ? AppStrings.of(context)
+                      .messages
+                      .subscriptionSummaryHistaePremium
+                : AppStrings.of(context).messages.subscriptionSummaryHistaeFree,
             style: Theme.of(context).textTheme.headlineMedium,
           ),
           const SizedBox(height: 12),
-          Text(BillingStrings.status(state.status)),
+          Text(BillingStrings(AppStrings.of(context)).status(state.status)),
           Text(
             state.accessGranted
-                ? 'Accès Premium confirmé lors de la dernière vérification.'
-                : 'Votre accès actuel correspond à la formule gratuite.',
+                ? AppStrings.of(context)
+                      .messages
+                      .subscriptionSummaryPremiumAccessConfirmedAtTheLast
+                : AppStrings.of(context)
+                      .messages
+                      .subscriptionSummaryYouCurrentlyHaveTheFreePlan,
           ),
           if (state.billingPeriod != null)
             Text(
               state.billingPeriod == BillingPeriod.monthly
-                  ? 'Rythme mensuel'
-                  : 'Rythme annuel',
+                  ? AppStrings.of(context)
+                        .messages
+                        .subscriptionSummaryMonthlyPlan
+                  : AppStrings.of(context)
+                        .messages
+                        .subscriptionSummaryAnnualPlan,
             ),
           if (state.trialEnd != null)
-            Text('Fin de l’essai : ${BillingStrings.date(state.trialEnd!)}'),
+            Text(
+              AppStrings.of(context).messages.subscriptionSummaryTrialEnds(
+                BillingStrings(AppStrings.of(context)).date(state.trialEnd!),
+              ),
+            ),
           if (state.periodStart != null)
             Text(
-              'Début de période : ${BillingStrings.date(state.periodStart!)}',
+              AppStrings.of(context).messages.subscriptionSummaryPeriodStarts(
+                BillingStrings(AppStrings.of(context)).date(state.periodStart!),
+              ),
             ),
           if (state.periodEnd != null)
-            Text('Fin de période : ${BillingStrings.date(state.periodEnd!)}'),
+            Text(
+              AppStrings.of(context).messages.subscriptionSummaryPeriodEnds(
+                BillingStrings(AppStrings.of(context)).date(state.periodEnd!),
+              ),
+            ),
           if (state.cancelAtPeriodEnd)
-            const Text('Résiliation prévue à la fin de la période en cours.'),
+            Text(
+              AppStrings.of(context)
+                  .messages
+                  .subscriptionSummaryCancellationScheduledForTheEndOf,
+            ),
           if (state.canceledAt != null)
             Text(
-              'Résiliation enregistrée le ${BillingStrings.date(state.canceledAt!)}',
+              AppStrings.of(context).messages
+                  .subscriptionSummaryCancellationRecordedOn(
+                    BillingStrings(AppStrings.of(context))
+                        .date(state.canceledAt!),
+                  ),
             ),
           if (state.status == 'past_due')
-            const Text(
-              'Votre paiement demande une régularisation. Les droits affichés sont ceux confirmés par Histae.',
+            Text(
+              AppStrings.of(context)
+                  .messages
+                  .subscriptionSummaryYourPaymentNeedsAttentionTheEntitlements,
             ),
         ],
       ),

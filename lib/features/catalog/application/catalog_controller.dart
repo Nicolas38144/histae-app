@@ -14,7 +14,6 @@ enum CatalogStatus { idle, loading, ready, empty, failure }
 class CatalogController extends ChangeNotifier {
   CatalogController(this._repository, {DateTime Function()? now})
     : _now = now ?? DateTime.now;
-
   final CatalogRepository _repository;
   final DateTime Function() _now;
   CatalogStatus status = CatalogStatus.idle;

@@ -7,12 +7,16 @@ import 'checkout_vault.dart';
 abstract interface class BillingRepository {
   factory BillingRepository(AuthenticatedSession session) =
       ApiBillingRepository;
+
   AuthenticatedSession get session;
+
   Future<SubscriptionState> load(RequestCancellation scope);
+
   Future<CheckoutLink> checkout(
     CheckoutAttempt attempt,
     RequestCancellation scope,
   );
+
   Future<Uri> portal(RequestCancellation scope);
 }
 
@@ -20,6 +24,7 @@ final class ApiBillingRepository implements BillingRepository {
   ApiBillingRepository(this.session);
   @override
   final AuthenticatedSession session;
+
   @override
   Future<SubscriptionState> load(RequestCancellation scope) async =>
       SubscriptionState.fromJson(
@@ -31,6 +36,7 @@ final class ApiBillingRepository implements BillingRepository {
           cancellation: scope,
         ),
       );
+
   @override
   Future<CheckoutLink> checkout(
     CheckoutAttempt attempt,
@@ -46,6 +52,7 @@ final class ApiBillingRepository implements BillingRepository {
       body: {'billing_period': attempt.period.name},
     ),
   );
+
   @override
   Future<Uri> portal(RequestCancellation scope) async => stripeUrl(
     jsonObject(

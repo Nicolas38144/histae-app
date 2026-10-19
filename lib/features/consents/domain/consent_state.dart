@@ -25,6 +25,7 @@ class PublicConsent {
     required this.documentUrl,
     required this.updatedAt,
   });
+
   factory PublicConsent.fromJson(Object? value) {
     final json = jsonObject(value);
     final version = json['document_version'];
@@ -49,6 +50,7 @@ class PublicConsent {
   final String requiredVersion;
   final String documentUrl;
   final String? updatedAt;
+
   bool get current => granted && documentVersion == requiredVersion;
 }
 
@@ -59,6 +61,7 @@ class ConsentState {
     List<ConsentType> requiredActions,
   ) : consents = List.unmodifiable(consents),
       requiredActions = List.unmodifiable(requiredActions);
+
   factory ConsentState.fromJson(Object? value) {
     final json = jsonObject(value);
     final consents = jsonField<List<dynamic>>(

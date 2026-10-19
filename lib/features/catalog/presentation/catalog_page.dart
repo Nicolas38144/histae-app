@@ -16,6 +16,7 @@ export 'plan_card.dart' show PlanCard;
 class CatalogPage extends StatefulWidget {
   const CatalogPage({super.key, required this.repository});
   final CatalogRepository? repository;
+
   @override
   State<CatalogPage> createState() => _CatalogPageState();
 }
@@ -104,8 +105,8 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           EditorialCard(
-            eyebrow: 'DES FORMULES SIMPLES',
-            title: 'À votre rythme. Au prix juste.',
+            eyebrow: AppStrings.of(context).messages.catalogPageSimplePlans,
+            title: AppStrings.of(context).messages.catalogPageAtYourPaceAtAFair,
             body: strings.catalogIntro,
           ),
           const SizedBox(height: 16),

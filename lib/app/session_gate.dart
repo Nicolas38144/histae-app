@@ -14,6 +14,7 @@ class SessionGate extends StatelessWidget {
   const SessionGate({super.key, required this.session, this.catalog});
   final SessionController session;
   final CatalogRepository? catalog;
+
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
@@ -68,7 +69,8 @@ class SessionGate extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (session.notice != null) Text(sessionNotice(session.notice)),
+                if (session.notice != null)
+                  Text(sessionNotice(AppStrings.of(context), session.notice)),
                 if (session.hasSession)
                   TextButton(
                     onPressed: session.logout,

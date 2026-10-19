@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
@@ -17,6 +18,7 @@ class EncounterPage extends StatelessWidget {
   final DiscoveryController controller;
   final EncounterReceipt receipt;
   final Future<void> Function()? openMatch;
+
   @override
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: controller,
@@ -24,9 +26,17 @@ class EncounterPage extends StatelessWidget {
       if (!controller.accessible ||
           controller.encounter?.match.id != receipt.match.id) {
         return HistaeScaffold(
-          appBar: AppBar(title: const Text('Votre rencontre')),
-          body: const Center(
-            child: Text('Cette rencontre n’est plus disponible ici.'),
+          appBar: AppBar(
+            title: Text(
+              AppStrings.of(context).messages.continuationPageYourMatch,
+            ),
+          ),
+          body: Center(
+            child: Text(
+              AppStrings.of(context)
+                  .messages
+                  .encounterPageThisMatchIsNoLongerAvailable,
+            ),
           ),
         );
       }
@@ -34,39 +44,59 @@ class EncounterPage extends StatelessWidget {
       // This screen acknowledges the server-created match. It does not infer
       // live chat access, continuation or photo revelation from this snapshot.
       return HistaeScaffold(
-        appBar: AppBar(title: const Text('Une rencontre')),
+        appBar: AppBar(
+          title: Text(AppStrings.of(context).messages.encounterPageAMatch),
+        ),
         body: SafeArea(
           child: ListView(
             padding: const EdgeInsets.all(24),
             children: [
               EditorialCard(
-                eyebrow: 'UN INTÉRÊT RÉCIPROQUE',
-                title: 'Les mots vous\nont rapprochés.',
-                body:
-                    'Vous et ${receipt.profile.firstname} vous êtes choisis. Une rencontre a été créée dans Histae.',
+                eyebrow: AppStrings.of(context)
+                    .messages
+                    .encounterPageMutualInterest,
+                title: AppStrings.of(context)
+                    .messages
+                    .encounterPageWordsBroughtYouTogether,
+                body: AppStrings.of(context).messages
+                    .encounterPageYouAndChoseEachOtherA(
+                      receipt.profile.firstname,
+                    ),
               ),
               const SizedBox(height: 24),
               Text(
-                '${receipt.profile.firstname}, ${receipt.profile.age}',
+                AppStrings.of(context).messages.encounterPage(
+                  receipt.profile.firstname,
+                  receipt.profile.age,
+                ),
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               Text(
-                'Rencontre créée le ${created.day.toString().padLeft(2, '0')}/${created.month.toString().padLeft(2, '0')}/${created.year}.',
+                AppStrings.of(context).messages
+                    .matchCreatedOn(AppStrings.of(context).date(created)),
               ),
               const SizedBox(height: 20),
-              const Text(
-                'Vos photos restent privées. Cette rencontre ne vaut pas accord pour les révéler.',
+              Text(
+                AppStrings.of(context)
+                    .messages
+                    .encounterPageYourPhotosStayPrivateThisMatch,
               ),
               const SizedBox(height: 24),
               if (openMatch != null)
                 HistaeButton.icon(
                   onPressed: openMatch,
                   icon: const Icon(Icons.forum_outlined),
-                  label: const Text('Ouvrir la conversation'),
+                  label: Text(
+                    AppStrings.of(context)
+                        .messages
+                        .encounterPageOpenConversation,
+                  ),
                 ),
               OutlinedButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Revenir aux découvertes'),
+                child: Text(
+                  AppStrings.of(context).messages.encounterPageBackToDiscovery,
+                ),
               ),
               TextButton(
                 onPressed: controller.busy
@@ -74,9 +104,15 @@ class EncounterPage extends StatelessWidget {
                     : () async {
                         if (!await confirmAction(
                               context,
-                              'Bloquer cette personne ?',
-                              'Votre rencontre sera terminée et vous ne pourrez plus échanger.',
-                              action: 'Bloquer',
+                              AppStrings.of(context)
+                                  .messages
+                                  .encounterPageBlockThisPerson,
+                              AppStrings.of(context)
+                                  .messages
+                                  .encounterPageYourMatchWillEndAndYou,
+                              action: AppStrings.of(context)
+                                  .messages
+                                  .discoveryPageBlock,
                             ) ||
                             !context.mounted) {
                           return;
@@ -87,7 +123,11 @@ class EncounterPage extends StatelessWidget {
                           Navigator.of(context).pop();
                         }
                       },
-                child: const Text('Bloquer cette personne'),
+                child: Text(
+                  AppStrings.of(context)
+                      .messages
+                      .encounterPageBlockThisPerson447,
+                ),
               ),
               TextButton(
                 onPressed: controller.busy
@@ -107,7 +147,9 @@ class EncounterPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                child: const Text('Signaler cette personne'),
+                child: Text(
+                  AppStrings.of(context).messages.encounterPageReportThisPerson,
+                ),
               ),
             ],
           ),

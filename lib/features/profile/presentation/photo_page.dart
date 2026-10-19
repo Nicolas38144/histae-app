@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/network/signed_photo_loader.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
@@ -23,6 +24,7 @@ class PhotoPage extends StatefulWidget {
   final ProfileController controller;
   final PhotoPreparer? preparer;
   final PhotoClientFactory? photoClient;
+
   @override
   State<PhotoPage> createState() => _PhotoPageState();
 }
@@ -32,12 +34,14 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
   late final preparer = widget.preparer ?? PhotoPreparer();
   late final String _ownerScope = c.session.resourceKey;
   Uint8List? _remote;
-  String? _url, _message;
+  String? _url;
+  String Function(AppStrings)? _message;
   DateTime? _readAt;
   SignedPhotoDownload? _download;
   Timer? _expiry;
   bool _choosing = false, _fetching = false, _active = true;
   int _downloadGeneration = 0;
+
   @override
   void initState() {
     super.initState();
@@ -55,7 +59,8 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
     try {
       if (await preparer.discardInterruptedSelection() && mounted) {
         setState(() {
-          _message = 'Une sélection a été interrompue. Choisissez à nouveau votre photo pour ce compte.';
+          _message = (strings) =>
+              strings.messages.photoPageSelectionWasInterruptedChooseYourPhoto;
         });
       }
     } catch (_) {
@@ -131,7 +136,8 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
     } catch (_) {
       if (mounted && generation == _downloadGeneration) {
         setState(() {
-          _message = 'L’aperçu temporaire n’est pas disponible. Actualisez pour obtenir un nouveau lien.';
+          _message = (strings) =>
+              strings.messages.photoPageTheTemporaryPreviewIsUnavailableRefresh;
         });
       }
     } finally {
@@ -163,9 +169,9 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
     if (c.photoIntent != null &&
         !await confirmAction(
           context,
-          'Changer la sélection ?',
-          'La demande photo en mémoire sera abandonnée.',
-          action: 'Choisir une autre photo',
+          AppStrings.of(context).messages.photoPageChangeSelection,
+          AppStrings.of(context).messages.photoPageTheSavedPhotoRequestWillBe,
+          action: AppStrings.of(context).messages.photoPageChooseAnotherPhoto,
         )) {
       return;
     }
@@ -185,7 +191,7 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
     } on ApiFailure catch (e) {
       if (mounted) {
         setState(() {
-          _message = ProfileStrings.failure(e);
+          _message = (strings) => ProfileStrings(strings).failure(e);
         });
       }
     } finally {
@@ -202,14 +208,14 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
       await c.upload();
       if (mounted) {
         setState(() {
-          _message =
-              'Photo reçue. Son état de vérification est affiché ci-dessous.';
+          _message = (strings) =>
+              strings.messages.photoPagePhotoReceivedItsReviewStatusIs;
         });
       }
     } on ApiFailure catch (e) {
       if (mounted) {
         setState(() {
-          _message = ProfileStrings.failure(e);
+          _message = (strings) => ProfileStrings(strings).failure(e);
         });
       }
     }
@@ -233,18 +239,22 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
       final intent = c.photoIntent;
       final preview = intent == null ? _remote : intent.bytes;
       return HistaeScaffold(
-        appBar: AppBar(title: const Text('Votre photo')),
+        appBar: AppBar(
+          title: Text(AppStrings.of(context).messages.photoPageYourPhoto),
+        ),
         body: SafeArea(
           child: ListView(
             padding: const EdgeInsets.all(24),
             children: [
               Text(
-                'Un visage,\nau bon moment.',
+                AppStrings.of(context).messages.photoPageAFaceAtTheRightTime,
                 style: Theme.of(context).textTheme.headlineLarge,
               ),
               const SizedBox(height: 20),
-              const Text(
-                'Une seule photo personnelle. Elle n’apparaît pas dans le feed et sa révélation demandera votre accord mutuel.',
+              Text(
+                AppStrings.of(context)
+                    .messages
+                    .photoPageOnePersonalPhotoItDoesNot,
               ),
               const SizedBox(height: 24),
               if (preview != null)
@@ -254,46 +264,76 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
                     preview,
                     height: 320,
                     fit: BoxFit.contain,
-                    semanticLabel: intent == null ? 'Votre photo actuelle' : 'Votre sélection, pas encore confirmée par le serveur',
-                    errorBuilder: (_, _, _) => const SizedBox(
+                    semanticLabel: intent == null
+                        ? AppStrings.of(context)
+                              .messages
+                              .photoPageYourCurrentPhoto
+                        : AppStrings.of(context)
+                              .messages
+                              .photoPageYourSelectionNotYetConfirmedBy,
+                    errorBuilder: (_, _, _) => SizedBox(
                       height: 120,
-                      child: Center(child: Text('Aperçu non disponible')),
+                      child: Center(
+                        child: Text(
+                          AppStrings.of(context)
+                              .messages
+                              .photoPagePreviewUnavailable,
+                        ),
+                      ),
                     ),
                   ),
                 ),
               if (_fetching || _choosing || c.saving || c.loading)
-                const LinearProgressIndicator(
-                  semanticsLabel: 'Préparation ou chargement de la photo',
+                LinearProgressIndicator(
+                  semanticsLabel: AppStrings.of(context)
+                      .messages
+                      .photoPagePreparingOrLoadingPhoto,
                 ),
               if (c.profile?.photo != null)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child: Text(
-                    'Photo actuelle : ${ProfileStrings.moderation(c.profile!.photoModeration)}',
+                    AppStrings.of(context).messages.photoPageCurrentPhoto(
+                      ProfileStrings(AppStrings.of(context))
+                          .moderation(c.profile!.photoModeration),
+                    ),
                   ),
                 ),
               if (intent != null)
                 Text(
-                  'Sélection préparée : ${intent.bytes.length} octets. Elle remplacera votre photo actuelle après envoi.',
+                  AppStrings.of(context).messages
+                      .photoPagePreparedSelectionBytesItWillReplace(
+                        intent.bytes.length,
+                      ),
                 ),
               if (_message != null)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: Semantics(liveRegion: true, child: Text(_message!)),
+                  child: Semantics(
+                    liveRegion: true,
+                    child: Text(_message!(AppStrings.of(context))),
+                  ),
                 ),
               if (c.uncertain)
-                const Text(
-                  'L’envoi peut avoir abouti. Reprendre conserve exactement la même photo et la même demande. Aucun renvoi automatique.',
+                Text(
+                  AppStrings.of(context)
+                      .messages
+                      .photoPageTheUploadMayHaveSucceededResuming,
                 ),
               if (c.retrySeconds > 0)
-                Text('Nouvel essai possible dans ${c.retrySeconds} s'),
+                Text(
+                  AppStrings.of(context).messages
+                      .appStringsTryAgainInS(c.retrySeconds),
+                ),
               const SizedBox(height: 24),
               OutlinedButton(
                 onPressed: !c.canWrite || _choosing ? null : _choose,
                 child: Text(
                   intent == null && c.profile?.photo == null
-                      ? 'Choisir une photo'
-                      : 'Choisir une autre photo',
+                      ? AppStrings.of(context).messages.photoPageChooseAPhoto
+                      : AppStrings.of(context)
+                            .messages
+                            .photoPageChooseAnotherPhoto,
                 ),
               ),
               if (intent != null) ...[
@@ -303,7 +343,11 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
                       _choosing || c.saving || c.loading || c.retrySeconds > 0
                       ? null
                       : _upload,
-                  child: const Text('Envoyer ou reprendre cette photo'),
+                  child: Text(
+                    AppStrings.of(context)
+                        .messages
+                        .photoPageSendOrResumeThisPhoto,
+                  ),
                 ),
               ],
               TextButton(
@@ -314,7 +358,11 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
                         await c.load();
                         if (mounted) _changed();
                       },
-                child: const Text('Actualiser la photo et son état'),
+                child: Text(
+                  AppStrings.of(context)
+                      .messages
+                      .photoPageRefreshPhotoAndStatus,
+                ),
               ),
               if (c.profile?.photo != null)
                 TextButton(
@@ -323,9 +371,15 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
                       : () async {
                           if (!await confirmAction(
                                 context,
-                                'Retirer votre photo ?',
-                                'La photo ne sera plus disponible. Le nettoyage du stockage se poursuivra en arrière-plan.',
-                                action: 'Retirer la photo',
+                                AppStrings.of(context)
+                                    .messages
+                                    .photoPageRemoveYourPhoto,
+                                AppStrings.of(context)
+                                    .messages
+                                    .photoPageThePhotoWillNoLongerBe,
+                                action: AppStrings.of(context)
+                                    .messages
+                                    .photoPageRemovePhoto,
                               ) ||
                               !mounted) {
                             return;
@@ -335,12 +389,15 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
                           } on ApiFailure catch (e) {
                             if (mounted) {
                               setState(() {
-                                _message = ProfileStrings.failure(e);
+                                _message = (strings) =>
+                                    ProfileStrings(strings).failure(e);
                               });
                             }
                           }
                         },
-                  child: const Text('Retirer ma photo'),
+                  child: Text(
+                    AppStrings.of(context).messages.photoPageRemoveMyPhoto,
+                  ),
                 ),
             ],
           ),

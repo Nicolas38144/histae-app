@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../application/profile_controller.dart';
 import '../data/profile_models.dart';
 import 'profile_editor.dart';
@@ -8,6 +9,7 @@ import 'profile_strings.dart';
 class PreferencesEditor extends StatefulWidget {
   const PreferencesEditor({super.key, required this.controller});
   final ProfileController controller;
+
   @override
   State<PreferencesEditor> createState() => _PreferencesEditorState();
 }
@@ -25,6 +27,7 @@ class _PreferencesEditorState extends ProfileEditorState<PreferencesEditor> {
     text: controller.preferences?.distance.toString(),
   );
   late String? looking = controller.preferences?.lookingFor;
+
   @override
   void dispose() {
     min.dispose();
@@ -35,17 +38,23 @@ class _PreferencesEditorState extends ProfileEditorState<PreferencesEditor> {
 
   @override
   Widget build(BuildContext context) => page(
-    'Vos préférences',
+    AppStrings.of(context).messages.discoveryPageYourPreferences,
     [
-      const Text(
-        'Choisissez vos quatre préférences. Elles seront enregistrées ensemble.',
+      Text(
+        AppStrings.of(context)
+            .messages
+            .preferencesEditorChooseYourFourPreferencesTheyWill,
       ),
       const SizedBox(height: 24),
       DropdownButtonFormField<String>(
         initialValue: looking,
         isExpanded: true,
-        decoration: const InputDecoration(labelText: 'Je souhaite rencontrer'),
-        items: ProfileStrings.lookingFor.entries
+        decoration: InputDecoration(
+          labelText: AppStrings.of(context)
+              .messages
+              .preferencesEditorIWantToMeet,
+        ),
+        items: ProfileStrings(AppStrings.of(context)).lookingFor.entries
             .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
             .toList(),
         onChanged: busy
@@ -56,9 +65,21 @@ class _PreferencesEditorState extends ProfileEditorState<PreferencesEditor> {
               }),
       ),
       const SizedBox(height: 24),
-      field(min, 'Âge minimum', keyboard: TextInputType.number),
-      field(max, 'Âge maximum', keyboard: TextInputType.number),
-      field(distance, 'Distance maximale (km)', keyboard: TextInputType.number),
+      field(
+        min,
+        AppStrings.of(context).messages.preferencesEditorMinimumAge,
+        keyboard: TextInputType.number,
+      ),
+      field(
+        max,
+        AppStrings.of(context).messages.preferencesEditorMaximumAge,
+        keyboard: TextInputType.number,
+      ),
+      field(
+        distance,
+        AppStrings.of(context).messages.preferencesEditorMaximumDistanceKm,
+        keyboard: TextInputType.number,
+      ),
     ],
     save: () {
       final p = Preferences(

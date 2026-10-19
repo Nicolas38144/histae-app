@@ -451,3 +451,9 @@ Les mentions CGU acceptées et Notice consultée remplacent les deux interrupteu
 Dépôt de visibilité distinct du contrôleur, état en lecture seule, projection immuable de l’aperçu public et calcul d’âge partagé. Extraction des cartes de profil/découverte, du contrôle adaptatif des consentements et de l’ouverture native des documents. Navigation, confirmations, contrat API et politique de reprise conservés. Les cartes restent des éléments distincts des listes afin de préserver leurs ancrages à grande police.
 
 48 contrôles existants ciblés réussis ; 15 captures identiques aux références sans les régénérer, formatage et analyse propres. Cette étape ne change ni le périmètre fonctionnel ni les vérifications serveur encore nécessaires à la pause. L10 reste ouvert pour les appareils et fournisseurs réels.
+
+## 27. Langues côté application — 19 octobre 2026
+
+Français, anglais, espagnol et italien disponibles pour l’interface. Catalogues ARB complets, génération Flutter, formats locaux, pluriels et codes de validation/vidéo traduits au rendu. Sélecteur accueil/profil, mémorisation sur l’appareil, option système avec repli français et préservation de la session/navigation/brouillons. Contrôle automatique contre les textes visibles en dur ; procédure dans `lib/core/l10n/README.md`.
+
+65 contrôles mobiles ciblés distincts réussis, analyse propre, 24 captures simulées dont grandes polices et APK Android debug compilé. Permissions iOS localisées et ressources Xcode ajoutées, sans compilation iOS sur ce poste. L’API n’est pas modifiée : sa localisation est reportée à la demande utilisateur. Les contenus fournis par l’API, les échanges personnels et les pages de paiement externes conservent leur langue actuelle. L10 et les essais réels restent ouverts.

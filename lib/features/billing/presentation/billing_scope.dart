@@ -9,8 +9,10 @@ class BillingScope extends InheritedWidget {
     required super.child,
   });
   final BillingController? controller;
+
   static BillingController? maybeOf(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<BillingScope>()?.controller;
+
   @override
   bool updateShouldNotify(BillingScope oldWidget) =>
       oldWidget.controller != controller;

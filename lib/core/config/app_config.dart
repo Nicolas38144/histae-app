@@ -15,6 +15,7 @@ class AppConfig {
     this.push,
     this.billing,
   );
+
   factory AppConfig.fromDotEnv(String source, {required bool isDebug}) {
     final values = parsePublicEnv(
       source,
@@ -100,7 +101,6 @@ class AppConfig {
       billing,
     );
   }
-
   final AppEnvironment environment;
   // Origin only; repositories supply full paths including /api.
   final Uri apiOrigin;

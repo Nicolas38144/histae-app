@@ -29,6 +29,7 @@ class DiscoveryController extends ChangeNotifier {
   final DiscoveryRepository repository;
   final LocationSource location;
   final DateTime Function() _now;
+
   AuthenticatedSession get session => repository.session;
   late String _resourceKey;
   RequestCancellation _scope = RequestCancellation();
@@ -46,6 +47,7 @@ class DiscoveryController extends ChangeNotifier {
   bool exhausted = false;
   PendingChoice? pending;
   EncounterReceipt? encounter;
+
   void forgetEncounter(String matchId) {
     if (encounter?.match.id != matchId) return;
     encounter = null;
@@ -60,11 +62,16 @@ class DiscoveryController extends ChangeNotifier {
     },
   );
   DateTime? _retryAt, _checkedExpiry;
+
   bool get accessible =>
       !_disposed && session.hasSession && session.phase == SessionPhase.ready;
+
   bool get active => _active && accessible;
+
   bool get ready => status?.ready == true;
+
   bool get busy => loading || locating || sending;
+
   bool get canChoose =>
       active &&
       ready &&
@@ -73,22 +80,27 @@ class DiscoveryController extends ChangeNotifier {
       failure == null &&
       retrySeconds == 0 &&
       current != null;
+
   bool get canResume =>
       active &&
       !busy &&
       pending != null &&
       (ready || pending!.action == PendingAction.block) &&
       retrySeconds == 0;
+
   bool get locationConsent =>
       session.consents?.consents.any(
         (c) => c.type == ConsentType.location && c.current,
       ) ??
       false;
+
   FeedProfile? get current =>
       pending?.profile ?? (_queue.isEmpty ? null : _queue.first);
+
   int get retrySeconds => retrySecondsUntil(_retryAt, now: _now());
 
   bool _alive(int epoch) => active && epoch == _epoch && !_scope.isCancelled;
+
   void _notify() {
     if (!_disposed) notifyListeners();
   }

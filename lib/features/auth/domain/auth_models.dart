@@ -2,6 +2,7 @@ import '../../../core/network/json_fields.dart';
 
 class TokenPair {
   const TokenPair(this.accessToken, this.refreshToken);
+
   factory TokenPair.fromJson(Object? value) {
     final json = jsonObject(value);
     return TokenPair(
@@ -10,12 +11,14 @@ class TokenPair {
     );
   }
   final String accessToken, refreshToken;
+
   @override
   String toString() => 'TokenPair(redacted)';
 }
 
 class MobileIdentity {
   const MobileIdentity(this.userId, this.onboardingComplete);
+
   factory MobileIdentity.fromJson(Object? value) {
     final json = jsonObject(value);
     return MobileIdentity(

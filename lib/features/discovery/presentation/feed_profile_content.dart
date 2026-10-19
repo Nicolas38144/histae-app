@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/models/public_profile_answer.dart';
 import '../../../core/widgets/editorial_card.dart';
 
@@ -14,7 +15,6 @@ class FeedProfileContent extends StatelessWidget {
     required this.traits,
     required this.answers,
   });
-
   final String firstname, distanceLabel;
   final int age;
   final String? bio;
@@ -28,7 +28,7 @@ class FeedProfileContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'AU FIL DES MOTS',
+          AppStrings.of(context).messages.feedProfileContentThroughWords,
           style: theme.textTheme.labelSmall?.copyWith(
             color: theme.colorScheme.primary,
           ),
@@ -37,7 +37,7 @@ class FeedProfileContent extends StatelessWidget {
         Semantics(
           header: true,
           child: Text(
-            '$firstname, $age',
+            AppStrings.of(context).messages.encounterPage(firstname, age),
             style: theme.textTheme.headlineLarge?.copyWith(fontSize: 46),
           ),
         ),
@@ -67,7 +67,10 @@ class FeedProfileContent extends StatelessWidget {
         ],
         if (traits.isNotEmpty) ...[
           const EditorialDivider(),
-          Text('Quelques traits', style: theme.textTheme.titleLarge),
+          Text(
+            AppStrings.of(context).messages.feedProfileContentAFewTraits,
+            style: theme.textTheme.titleLarge,
+          ),
           const SizedBox(height: 16),
           Wrap(
             spacing: 10,

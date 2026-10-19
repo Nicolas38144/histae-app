@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '../core/l10n/app_strings.dart';
+import '../core/l10n/generated/app_messages.dart';
+import '../core/l10n/locale_controller.dart';
 import '../features/auth/application/session_controller.dart';
 import '../features/billing/application/billing_controller.dart';
 import '../features/billing/presentation/billing_scope.dart';
@@ -24,6 +25,7 @@ class HistaeApp extends StatefulWidget {
   const HistaeApp({
     super.key,
     this.catalogRepository,
+    this.localeController,
     this.sessionController,
     this.pushController,
     this.billingController,
@@ -31,6 +33,7 @@ class HistaeApp extends StatefulWidget {
   });
   // Ownership is transferred to the app; requests close when it is disposed.
   final CatalogRepository? catalogRepository;
+  final LocaleController? localeController;
   final SessionController? sessionController;
   final PushController? pushController;
   final BillingController? billingController;
@@ -42,10 +45,12 @@ class HistaeApp extends StatefulWidget {
 
 class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
   final _navigator = GlobalKey<NavigatorState>();
+  late final _locale = widget.localeController ?? LocaleController();
   bool _hadSession = false;
   int _resourceRevision = 0;
   SessionPhase? _previousPhase;
   late final NotificationNavigation _notifications;
+
   @override
   void initState() {
     super.initState();
@@ -114,6 +119,7 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     widget.sessionController?.removeListener(_sessionChanged);
     _notifications.dispose();
+    _locale.dispose();
     widget.pushController?.dispose();
     widget.billingController?.dispose();
     widget.sessionController?.dispose();
@@ -122,42 +128,49 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
   }
 
   @override
-  Widget build(BuildContext context) => MaterialApp(
-    navigatorKey: _navigator,
-    title: const AppStrings().appName,
-    debugShowCheckedModeBanner: false,
-    theme: histaeTheme(Brightness.light),
-    darkTheme: histaeTheme(Brightness.dark),
-    themeMode: ThemeMode.dark,
-    locale: const Locale('fr'),
-    supportedLocales: const [Locale('fr')],
-    localizationsDelegates: GlobalMaterialLocalizations.delegates,
-    builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
-      value: Theme.of(context).appBarTheme.systemOverlayStyle!,
-      child: AppOpening(
-        child: RewardedVideoScope(
-          gateway: widget.rewardedVideoGateway,
-          child: BillingScope(
-            controller: widget.billingController,
-            child: PushScope(
-              controller: widget.pushController,
-              child: NotificationOverlay(
-                controller: widget.pushController,
-                child: child!,
+  Widget build(BuildContext context) => LocaleScope(
+    controller: _locale,
+    child: ListenableBuilder(
+      listenable: _locale,
+      builder: (context, _) => MaterialApp(
+        navigatorKey: _navigator,
+        onGenerateTitle: (context) => AppStrings.of(context).appName,
+        debugShowCheckedModeBanner: false,
+        theme: histaeTheme(Brightness.light),
+        darkTheme: histaeTheme(Brightness.dark),
+        themeMode: ThemeMode.dark,
+        locale: _locale.locale,
+        supportedLocales: AppMessages.supportedLocales,
+        localeResolutionCallback: LocaleController.resolve,
+        localizationsDelegates: AppMessages.localizationsDelegates,
+        builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
+          value: Theme.of(context).appBarTheme.systemOverlayStyle!,
+          child: AppOpening(
+            child: RewardedVideoScope(
+              gateway: widget.rewardedVideoGateway,
+              child: BillingScope(
+                controller: widget.billingController,
+                child: PushScope(
+                  controller: widget.pushController,
+                  child: NotificationOverlay(
+                    controller: widget.pushController,
+                    child: child!,
+                  ),
+                ),
               ),
             ),
           ),
         ),
+        home: widget.sessionController == null
+            ? WelcomePage(repository: widget.catalogRepository)
+            : ListenableBuilder(
+                listenable: widget.sessionController!,
+                builder: (context, _) => SessionGate(
+                  session: widget.sessionController!,
+                  catalog: widget.catalogRepository,
+                ),
+              ),
       ),
     ),
-    home: widget.sessionController == null
-        ? WelcomePage(repository: widget.catalogRepository)
-        : ListenableBuilder(
-            listenable: widget.sessionController!,
-            builder: (context, _) => SessionGate(
-              session: widget.sessionController!,
-              catalog: widget.catalogRepository,
-            ),
-          ),
   );
 }

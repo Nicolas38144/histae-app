@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../application/continuation_controller.dart';
@@ -14,6 +15,7 @@ import 'rewarded_video_scope.dart';
 class CreditsPage extends StatefulWidget {
   const CreditsPage({super.key, required this.controller});
   final ContinuationController controller;
+
   @override
   State<CreditsPage> createState() => _CreditsPageState();
 }
@@ -22,6 +24,7 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
   ContinuationController get c => widget.controller;
   late final _key = c.access.session.resourceKey;
   RewardedVideoController? _video;
+
   @override
   void initState() {
     super.initState();
@@ -84,18 +87,24 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Annuler cette demande ?'),
-        content: const Text(
-          'L’annulation empêchera toute validation ultérieure, même si une vidéo déjà terminée est encore en cours de vérification.',
+        title: Text(
+          AppStrings.of(context).messages.creditsPageCancelThisRequest,
+        ),
+        content: Text(
+          AppStrings.of(context)
+              .messages
+              .creditsPageCancellationPreventsAnyLaterValidationEven,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Conserver'),
+            child: Text(AppStrings.of(context).messages.creditsPageKeep),
           ),
           HistaeButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Annuler la demande'),
+            child: Text(
+              AppStrings.of(context).messages.creditsPageCancelRequest,
+            ),
           ),
         ],
       ),
@@ -118,13 +127,15 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
         canPop: !video.busy,
         child: HistaeScaffold(
           appBar: AppBar(
-            title: const Text('Vos crédits'),
+            title: Text(AppStrings.of(context).messages.creditsPageYourCredits),
             actions: [
               IconButton(
                 onPressed: c.loading || video.busy || c.retrySeconds > 0
                     ? null
                     : _refresh,
-                tooltip: 'Actualiser mes crédits',
+                tooltip: AppStrings.of(context)
+                    .messages
+                    .creditsPageRefreshMyCredits,
                 icon: const Icon(Icons.refresh_rounded),
               ),
               const SizedBox(width: 12),
@@ -138,27 +149,33 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
                 padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
                 children: [
                   Text(
-                    'LE TEMPS DE CONTINUER',
+                    AppStrings.of(context).messages.creditsPageTimeToContinue,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: theme.colorScheme.primary,
                     ),
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'La suite commence\nici.',
+                    AppStrings.of(context)
+                        .messages
+                        .creditsPageTheNextChapterStartsHere,
                     style: theme.textTheme.headlineLarge,
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Des crédits pour les rencontres que vous avez envie de poursuivre.',
+                    AppStrings.of(context)
+                        .messages
+                        .creditsPageCreditsForTheConnectionsYouWant,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 24),
                   if (c.loading) ...[
-                    const LinearProgressIndicator(
-                      semanticsLabel: 'Lecture de vos crédits',
+                    LinearProgressIndicator(
+                      semanticsLabel: AppStrings.of(context)
+                          .messages
+                          .creditsPageCheckingYourCredits,
                     ),
                     const SizedBox(height: 16),
                   ],
@@ -178,14 +195,19 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
                             const Icon(Icons.cloud_off_outlined, size: 32),
                             const SizedBox(height: 16),
                             Text(
-                              'Votre solde reste à vérifier',
+                              AppStrings.of(context)
+                                  .messages
+                                  .creditsPageYourBalanceStillNeedsChecking,
                               style: theme.textTheme.titleLarge,
                             ),
                             const SizedBox(height: 8),
                             Text(
                               c.failure == null
-                                  ? 'Actualisez vos crédits pour retrouver votre solde.'
-                                  : ContinuationStrings.failure(c.failure!),
+                                  ? AppStrings.of(context)
+                                        .messages
+                                        .creditsPageRefreshYourCreditsToViewYour
+                                  : ContinuationStrings(AppStrings.of(context))
+                                        .failure(c.failure!),
                             ),
                             const SizedBox(height: 16),
                             OutlinedButton.icon(
@@ -193,8 +215,13 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
                               icon: const Icon(Icons.refresh),
                               label: Text(
                                 c.retrySeconds > 0
-                                    ? 'Réessayer dans ${c.retrySeconds} s'
-                                    : 'Actualiser mes crédits',
+                                    ? AppStrings.of(context).messages
+                                          .continuationBalanceCardTryAgainInS(
+                                            c.retrySeconds,
+                                          )
+                                    : AppStrings.of(context)
+                                          .messages
+                                          .creditsPageRefreshMyCredits,
                               ),
                             ),
                           ],
@@ -213,7 +240,9 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
                   ],
                   const SizedBox(height: 20),
                   Text(
-                    'Une rencontre se poursuit à deux. Chacun confirme son propre choix.',
+                    AppStrings.of(context)
+                        .messages
+                        .creditsPageAMatchContinuesTogetherEachPerson,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),

@@ -27,6 +27,7 @@ class SubscriptionPage extends StatefulWidget {
   final BillingController controller;
   final CatalogRepository? catalog;
   final bool notificationFlow;
+
   @override
   State<SubscriptionPage> createState() => _SubscriptionPageState();
 }
@@ -35,7 +36,9 @@ class _SubscriptionPageState extends State<SubscriptionPage>
     with WidgetsBindingObserver {
   CatalogController? _catalog;
   PushController? _push;
+
   BillingController get c => widget.controller;
+
   @override
   void initState() {
     super.initState();
@@ -101,23 +104,28 @@ class _SubscriptionPageState extends State<SubscriptionPage>
     final accepted = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Poursuivre avec ${offer.displayName}'),
+        title: Text(
+          AppStrings.of(context).messages
+              .subscriptionPageContinueWith(offer.displayName),
+        ),
         content: SingleChildScrollView(
           child: Text(
-            '$price\n\nAbonnement à renouvellement automatique. '
-            'Abonnement sans période d’essai. Le montant et la date du paiement seront confirmés avant validation dans le navigateur. '
-            'Vous pourrez gérer la résiliation depuis votre abonnement. '
-            'Les photos restent soumises à votre accord mutuel.',
+            AppStrings.of(context).messages
+                .subscriptionPageAutoRenewingSubscriptionWithNoTrial(price),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Plus tard'),
+            child: Text(
+              AppStrings.of(context).messages.notificationOverlayLater,
+            ),
           ),
           HistaeButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Continuer dans le navigateur'),
+            child: Text(
+              AppStrings.of(context).messages.subscriptionPageContinueInBrowser,
+            ),
           ),
         ],
       ),
@@ -135,7 +143,11 @@ class _SubscriptionPageState extends State<SubscriptionPage>
 
   @override
   Widget build(BuildContext context) => HistaeScaffold(
-    appBar: AppBar(title: const Text('Mon abonnement')),
+    appBar: AppBar(
+      title: Text(
+        AppStrings.of(context).messages.accountBenefitsActionsMySubscription,
+      ),
+    ),
     body: SafeArea(
       child: Center(
         child: ConstrainedBox(
@@ -147,32 +159,46 @@ class _SubscriptionPageState extends State<SubscriptionPage>
               child: ListView(
                 padding: const EdgeInsets.all(24),
                 children: [
-                  const EditorialCard(
-                    eyebrow: 'À VOTRE RYTHME',
-                    title: 'Plus de place\npour une histoire.',
-                    body: 'Retrouvez votre formule et ce qu’elle vous permet de vivre. La révélation des photos demande toujours votre accord mutuel.',
+                  EditorialCard(
+                    eyebrow: AppStrings.of(context)
+                        .messages
+                        .subscriptionPageAtYourOwnPace,
+                    title: AppStrings.of(context)
+                        .messages
+                        .subscriptionPageMoreRoomForAStory,
+                    body: AppStrings.of(context)
+                        .messages
+                        .subscriptionPageFindYourPlanAndWhatIt,
                   ),
                   const SizedBox(height: 20),
                   if (!c.accessible)
-                    const Text(
-                      'Votre session doit être vérifiée pour consulter votre abonnement.',
+                    Text(
+                      AppStrings.of(context)
+                          .messages
+                          .subscriptionPageYourSessionMustBeVerifiedTo,
                     )
                   else ...[
                     if (c.loading || !c.restored && c.failure == null)
-                      const LinearProgressIndicator(
-                        semanticsLabel: 'Vérification de votre abonnement',
+                      LinearProgressIndicator(
+                        semanticsLabel: AppStrings.of(context)
+                            .messages
+                            .subscriptionPageCheckingYourSubscription,
                       ),
                     if (c.subscription case final state?)
                       SubscriptionSummary(state: state),
                     if (!c.fresh && c.subscription != null)
-                      const Text(
-                        'Dernière situation connue. Actualisez pour confirmer vos droits actuels.',
+                      Text(
+                        AppStrings.of(context)
+                            .messages
+                            .subscriptionPageLastKnownStatusRefreshToConfirm,
                       ),
                     if (c.failure case final error?) ...[
                       const SizedBox(height: 16),
                       Semantics(
                         liveRegion: true,
-                        child: Text(BillingStrings.error(error)),
+                        child: Text(
+                          BillingStrings(AppStrings.of(context)).error(error),
+                        ),
                       ),
                       if (error.requestId != null)
                         Text(
@@ -180,11 +206,16 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                               .requestReference(error.requestId!),
                         ),
                     ],
-                    if (BillingStrings.notice(c.notice).isNotEmpty) ...[
+                    if (BillingStrings(AppStrings.of(context))
+                        .notice(c.notice)
+                        .isNotEmpty) ...[
                       const SizedBox(height: 16),
                       Semantics(
                         liveRegion: true,
-                        child: Text(BillingStrings.notice(c.notice)),
+                        child: Text(
+                          BillingStrings(AppStrings.of(context))
+                              .notice(c.notice),
+                        ),
                       ),
                     ],
                     const SizedBox(height: 16),
@@ -195,18 +226,30 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                       child: Text(
                         c.retrySeconds > 0
                             ? AppStrings.of(context).retryIn(c.retrySeconds)
-                            : 'Vérifier mon abonnement',
+                            : AppStrings.of(context)
+                                  .messages
+                                  .subscriptionPageCheckMySubscription,
                       ),
                     ),
                     if (c.busy)
-                      const LinearProgressIndicator(
-                        semanticsLabel: 'Ouverture du navigateur',
+                      LinearProgressIndicator(
+                        semanticsLabel: AppStrings.of(context)
+                            .messages
+                            .subscriptionPageOpeningBrowser,
                       ),
                     if (c.pending case final attempt?) ...[
                       const SizedBox(height: 16),
                       Text(
-                        'Une tentative ${attempt.period == BillingPeriod.monthly ? 'mensuelle' : 'annuelle'} est en attente de vérification. '
-                        'Reprenez-la pour éviter une seconde souscription.',
+                        AppStrings.of(context).messages
+                            .subscriptionPageAAttemptIsAwaitingVerificationResume(
+                              attempt.period == BillingPeriod.monthly
+                                  ? AppStrings.of(context)
+                                        .messages
+                                        .subscriptionPageMonthly
+                                  : AppStrings.of(context)
+                                        .messages
+                                        .subscriptionPageAnnual,
+                            ),
                       ),
                       if (c.paymentsAvailable &&
                           c.subscription?.accessGranted != true)
@@ -214,14 +257,19 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                           onPressed: _canAct
                               ? () => c.checkout(attempt.period)
                               : null,
-                          child: const Text('Reprendre cette tentative'),
+                          child: Text(
+                            AppStrings.of(context)
+                                .messages
+                                .subscriptionPageResumeThisAttempt,
+                          ),
                         ),
                     ],
                     if (!c.paymentsAvailable) ...[
                       const EditorialDivider(),
-                      const Text(
-                        'La souscription et la gestion des paiements ne sont pas encore disponibles dans cette version. '
-                        'Votre formule et vos droits existants restent consultables.',
+                      Text(
+                        AppStrings.of(context)
+                            .messages
+                            .subscriptionPageSignUpAndPaymentManagementAre,
                       ),
                     ],
                     if (c.subscription?.portalAvailable == true &&
@@ -229,12 +277,16 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                       OutlinedButton.icon(
                         onPressed: _canAct ? c.portal : null,
                         icon: const Icon(Icons.open_in_new),
-                        label: const Text('Gérer mon abonnement'),
+                        label: Text(
+                          AppStrings.of(context)
+                              .messages
+                              .subscriptionPageManageMySubscription,
+                        ),
                       ),
                   ],
                   const EditorialDivider(),
                   Text(
-                    'Les formules',
+                    AppStrings.of(context).messages.subscriptionPagePlans,
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   const SizedBox(height: 16),
@@ -258,6 +310,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
       ),
     ),
   );
+
   bool get _canAct =>
       c.active && c.fresh && !c.busy && !c.loading && c.retrySeconds == 0;
 }

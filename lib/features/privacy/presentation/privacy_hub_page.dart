@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../auth/domain/authenticated_session.dart';
@@ -21,6 +22,7 @@ class PrivacyHubPage extends StatefulWidget {
   const PrivacyHubPage({super.key, required this.session, this.exportStore});
   final AuthenticatedSession session;
   final PrivateExportStore? exportStore;
+
   @override
   State<PrivacyHubPage> createState() => _PrivacyHubPageState();
 }
@@ -33,6 +35,7 @@ class _PrivacyHubPageState extends State<PrivacyHubPage>
   );
   late final Future<void> _startup;
   bool _advertisingFormOpen = false;
+
   @override
   void initState() {
     super.initState();
@@ -80,9 +83,11 @@ class _PrivacyHubPageState extends State<PrivacyHubPage>
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              'Vos préférences publicitaires ne sont pas accessibles pour le moment.',
+              AppStrings.of(context)
+                  .messages
+                  .privacyHubPageYourAdvertisingPreferencesAreCurrentlyUnavailable,
             ),
           ),
         );
@@ -101,18 +106,22 @@ class _PrivacyHubPageState extends State<PrivacyHubPage>
     builder: (context, _) {
       if (!c.accessible) return const HistaeScaffold(body: SizedBox.shrink());
       return PrivacyFrame(
-        title: 'Vie privée et sécurité',
+        title: AppStrings.of(context).messages.privacyHubPagePrivacyAndSecurity,
         children: [
-          const EditorialCard(
-            eyebrow: 'VOTRE ESPACE, VOS CHOIX',
-            title: 'En toute\nconfiance.',
-            body: 'Retrouvez vos choix, vos accès et vos données. Ces démarches restent disponibles avant la fin de votre inscription.',
+          EditorialCard(
+            eyebrow: AppStrings.of(context)
+                .messages
+                .privacyHubPageYourSpaceYourChoices,
+            title: AppStrings.of(context).messages.privacyHubPageWithConfidence,
+            body: AppStrings.of(context)
+                .messages
+                .privacyHubPageFindYourChoicesAccessAndData,
           ),
           const SizedBox(height: 24),
           _tile(
             Icons.tune,
-            'Mes consentements',
-            'Consulter ou modifier mes choix',
+            AppStrings.of(context).messages.privacyHubPageMyConsents,
+            AppStrings.of(context).messages.privacyHubPageViewOrChangeMyChoices,
             () => Navigator.of(context).push(
               MaterialPageRoute<void>(
                 builder: (_) => ConsentsPage(session: widget.session),
@@ -121,23 +130,31 @@ class _PrivacyHubPageState extends State<PrivacyHubPage>
           ),
           _tile(
             Icons.devices,
-            'Mes sessions',
-            'Consulter et révoquer les accès',
+            AppStrings.of(context).messages.privacyDetailPageMySessions,
+            AppStrings.of(context).messages.privacyHubPageViewAndRevokeAccess,
             () => _open(PrivacySection.sessions),
           ),
           if (RewardedVideoScope.maybeOf(context)?.privacyOptionsRequired ==
               true)
             _tile(
               Icons.tune_rounded,
-              'Mes choix publicitaires',
-              'Revoir mes préférences pour les vidéos',
+              AppStrings.of(context)
+                  .messages
+                  .rewardVideoCardMyAdvertisingChoices,
+              AppStrings.of(context)
+                  .messages
+                  .privacyHubPageReviewMyVideoPreferences,
               _advertisingChoices,
             ),
           if (c.onboarded)
             _tile(
               Icons.notifications_none,
-              'Appareils et notifications',
-              'Choisir les alertes et gérer les appareils',
+              AppStrings.of(context)
+                  .messages
+                  .devicesPageDevicesAndNotifications,
+              AppStrings.of(context)
+                  .messages
+                  .privacyHubPageChooseAlertsAndManageDevices,
               () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
                   builder: (_) => DevicesPage(
@@ -150,36 +167,43 @@ class _PrivacyHubPageState extends State<PrivacyHubPage>
           if (c.onboarded)
             _tile(
               Icons.person_off_outlined,
-              'Personnes bloquées',
-              'Gérer les blocages',
+              AppStrings.of(context).messages.privacyDetailPageBlockedPeople,
+              AppStrings.of(context).messages.privacyHubPageManageBlocks,
               () => _open(PrivacySection.blocks),
             ),
           _tile(
             Icons.fact_check_outlined,
-            'Mes demandes de données',
-            'Exercer mes droits et suivre mes demandes',
+            AppStrings.of(context).messages.privacyDetailPageMyDataRequests,
+            AppStrings.of(context)
+                .messages
+                .privacyHubPageExerciseMyRightsAndTrackRequests,
             () => _open(PrivacySection.rights),
           ),
           _tile(
             Icons.download_outlined,
-            'Exporter mes données',
-            'Télécharger puis choisir un partage',
+            AppStrings.of(context).messages.privacyDetailPageExportMyData,
+            AppStrings.of(context)
+                .messages
+                .privacyHubPageDownloadThenChooseWhereToShare,
             () => _open(PrivacySection.export),
           ),
           _tile(
             Icons.delete_outline,
-            'Supprimer mon compte',
-            'Fermer mon compte et demander son nettoyage',
+            AppStrings.of(context).messages.privacyDetailPageDeleteMyAccount,
+            AppStrings.of(context)
+                .messages
+                .privacyHubPageCloseMyAccountAndRequestCleanup,
             () => _open(PrivacySection.deletion),
           ),
           TextButton(
             onPressed: widget.session.logout,
-            child: const Text('Se déconnecter'),
+            child: Text(AppStrings.of(context).messages.appStringsSignOut),
           ),
         ],
       );
     },
   );
+
   Widget _tile(
     IconData icon,
     String title,

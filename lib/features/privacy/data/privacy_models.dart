@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import '../../../core/models/client_message.dart';
 import '../../../core/network/json_fields.dart';
 import '../../../core/text/whitespace.dart';
 
@@ -34,6 +35,7 @@ class MobileSession {
     this.expiresAt,
     this.current,
   );
+
   factory MobileSession.fromJson(Object? value) {
     final j = jsonObject(value), id = serverId(jsonObject(value), 'id');
     if (!RegExp(
@@ -66,6 +68,7 @@ class SessionPage {
 
 class BlockedPerson {
   BlockedPerson.fromJson(Object? value) : this._(jsonObject(value));
+
   BlockedPerson._(Map<String, dynamic> j)
     : id = serverId(j, 'user_id'),
       firstname = optionalText(j, 'firstname'),
@@ -84,6 +87,7 @@ class RightsRequest {
     this.requestedAt,
     this.completedAt,
   );
+
   factory RightsRequest.fromJson(Object? value, String owner) {
     final j = jsonObject(value);
     if (serverId(j, 'user_id') != owner) invalidResponse();
@@ -109,12 +113,14 @@ class RightsRequest {
   final RightStatus status;
   final DateTime requestedAt;
   final DateTime? completedAt;
+
   bool get open =>
       status == RightStatus.pending || status == RightStatus.inProgress;
 }
 
 class DeletionTicket {
   DeletionTicket.fromJson(Object? value) : this._(jsonObject(value));
+
   DeletionTicket._(Map<String, dynamic> j)
     : value = jsonString(j, 'confirmation_token'),
       expiresAt = wireTime(j['expires_at']) {
@@ -126,6 +132,7 @@ class DeletionTicket {
   }
   final String value;
   final DateTime expiresAt;
+
   @override
   String toString() => 'DeletionTicket(redacted)';
 }
@@ -140,16 +147,17 @@ class ReportIntent {
   final String? matchId;
   final ReportReason reason;
   final String description;
+
   Map<String, Object?> get body => {
     'reported_user_id': target,
     'match_id': ?matchId,
     'reason': reason.wire,
     if (description.isNotEmpty) 'description': description,
   };
+
   @override
   String toString() => 'ReportIntent(redacted)';
 }
 
-String? validateReport(String value) => utf8.encode(value).length > 2000
-    ? 'Votre description est trop longue. Raccourcissez-la avant de l’envoyer.'
-    : null;
+ClientMessage? validateReport(String value) =>
+    utf8.encode(value).length > 2000 ? ClientMessage.reportTooLong : null;

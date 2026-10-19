@@ -19,12 +19,15 @@ class SubscriptionPlans extends StatelessWidget {
   final CatalogController catalog;
   final bool paymentsAvailable, canSubscribe, hasPending, canAct;
   final Future<void> Function(SubscriptionOffer offer) onChoose;
+
   @override
   Widget build(BuildContext context) {
     if (catalog.status == CatalogStatus.loading ||
         catalog.status == CatalogStatus.idle) {
-      return const LinearProgressIndicator(
-        semanticsLabel: 'Chargement des formules',
+      return LinearProgressIndicator(
+        semanticsLabel: AppStrings.of(context)
+            .messages
+            .subscriptionPlansLoadingPlans,
       );
     }
     if (catalog.failure != null || catalog.offers.isEmpty) {
@@ -33,15 +36,21 @@ class SubscriptionPlans extends StatelessWidget {
         children: [
           Text(
             catalog.failure == null
-                ? 'Aucune formule disponible.'
-                : 'Les formules ne sont pas disponibles pour le moment.',
+                ? AppStrings.of(context)
+                      .messages
+                      .subscriptionPlansNoPlansAvailable
+                : AppStrings.of(context)
+                      .messages
+                      .appStringsPlansAreCurrentlyUnavailable,
           ),
           OutlinedButton(
             onPressed: catalog.retrySeconds > 0 ? null : catalog.load,
             child: Text(
               catalog.retrySeconds > 0
                   ? AppStrings.of(context).retryIn(catalog.retrySeconds)
-                  : 'Actualiser les formules',
+                  : AppStrings.of(context)
+                        .messages
+                        .subscriptionPlansRefreshPlans,
             ),
           ),
         ],
@@ -62,12 +71,19 @@ class SubscriptionPlans extends StatelessWidget {
                     hasPending == false
                 ? HistaeButton(
                     onPressed: canAct ? () => onChoose(offer) : null,
-                    child: Text('Choisir ${offer.displayName}'),
+                    child: Text(
+                      AppStrings.of(context).messages
+                          .chooseOffer(offer.displayName),
+                    ),
                   )
                 : offer.billingPeriod != null && !paymentsAvailable
-                ? const OutlinedButton(
+                ? OutlinedButton(
                     onPressed: null,
-                    child: Text('Paiement indisponible'),
+                    child: Text(
+                      AppStrings.of(context)
+                          .messages
+                          .subscriptionPlansPaymentUnavailable,
+                    ),
                   )
                 : null,
           ),

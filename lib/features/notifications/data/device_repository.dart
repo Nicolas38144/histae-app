@@ -5,12 +5,16 @@ import 'notification_models.dart';
 
 abstract interface class DeviceRepository {
   factory DeviceRepository(AuthenticatedSession session) = ApiDeviceRepository;
+
   AuthenticatedSession get session;
+
   Future<List<PushDevice>> list(RequestCancellation scope);
+
   Future<PushDevice> register(
     DeviceRegistration intent,
     RequestCancellation scope,
   );
+
   Future<void> remove(String id, RequestCancellation scope);
 }
 
@@ -18,6 +22,7 @@ final class ApiDeviceRepository implements DeviceRepository {
   ApiDeviceRepository(this.session);
   @override
   final AuthenticatedSession session;
+
   @override
   Future<List<PushDevice>> list(RequestCancellation scope) async =>
       List.unmodifiable(
@@ -34,6 +39,7 @@ final class ApiDeviceRepository implements DeviceRepository {
           'devices',
         ).map(PushDevice.fromJson),
       );
+
   @override
   Future<PushDevice> register(
     DeviceRegistration intent,
@@ -48,6 +54,7 @@ final class ApiDeviceRepository implements DeviceRepository {
       body: intent.body,
     ),
   );
+
   @override
   Future<void> remove(String id, RequestCancellation scope) async {
     serverId({'id': id}, 'id');

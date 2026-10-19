@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../application/profile_controller.dart';
 import 'profile_panels.dart';
 import 'profile_strings.dart';
@@ -10,7 +11,6 @@ class ProfileIntroductionCard extends StatelessWidget {
     required this.controller,
     required this.onEdit,
   });
-
   final ProfileController controller;
   final VoidCallback onEdit;
 
@@ -20,17 +20,26 @@ class ProfileIntroductionCard extends StatelessWidget {
     final p = c.profile;
     final editable = !c.loading && !c.saving && !c.uncertain;
     return ProfilePanel(
-      title: 'Quelques mots sur vous',
+      title: AppStrings.of(context).messages.identityEditorAFewWordsAboutYou,
       icon: Icons.format_quote_rounded,
-      action: p == null ? 'Créer mon profil' : 'Modifier ma présentation',
+      action: p == null
+          ? AppStrings.of(context).messages.profileSectionsCreateMyProfile
+          : AppStrings.of(context).messages.profileSectionsEditMyIntroduction,
       onPressed: editable && !c.errors.containsKey('profile') ? onEdit : null,
       child: c.errors.containsKey('profile')
-          ? const Text('Votre présentation n’a pas pu être relue.')
+          ? Text(
+              AppStrings.of(context)
+                  .messages
+                  .profileSectionsYourIntroductionCouldNotBeRefreshed,
+            )
           : Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  p?.bio ?? 'Les livres que vous aimez, les lieux où vous vous sentez bien… Quelques mots suffisent pour commencer.',
+                  p?.bio ??
+                      AppStrings.of(context)
+                          .messages
+                          .profileSectionsBooksYouLovePlacesYouFeel,
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 if (p?.bioModeration != null) ...[
@@ -49,7 +58,6 @@ class ProfileAnswersCard extends StatelessWidget {
     required this.controller,
     required this.onEdit,
   });
-
   final ProfileController controller;
   final VoidCallback onEdit;
 
@@ -59,12 +67,15 @@ class ProfileAnswersCard extends StatelessWidget {
     final p = c.profile;
     final editable = !c.loading && !c.saving && !c.uncertain;
     return ProfilePanel(
-      title: 'Des débuts de conversation',
+      title: AppStrings.of(context)
+          .messages
+          .profileSectionsConversationStarters,
       icon: Icons.chat_bubble_outline_rounded,
       count: c.errors.containsKey('answers')
-          ? 'À actualiser'
-          : '${c.answers.length} / 3 réponses',
-      action: 'Écrire mes réponses',
+          ? AppStrings.of(context).messages.profileSectionsRefreshNeeded
+          : AppStrings.of(context).messages
+                .answersEditor3Answers(c.answers.length),
+      action: AppStrings.of(context).messages.profileSectionsWriteMyAnswers,
       onPressed:
           editable &&
               p != null &&
@@ -86,7 +97,6 @@ class ProfilePreferencesTile extends StatelessWidget {
     required this.controller,
     required this.onEdit,
   });
-
   final ProfileController controller;
   final VoidCallback onEdit;
 
@@ -95,16 +105,28 @@ class ProfilePreferencesTile extends StatelessWidget {
     final c = controller;
     final editable = !c.loading && !c.saving && !c.uncertain;
     return ProfileDetailTile(
-      title: 'Vos envies de rencontre',
+      title: AppStrings.of(context)
+          .messages
+          .discoveryStringsYourDatingPreferences,
       icon: Icons.tune_rounded,
       summary: c.errors.containsKey('preferences')
-          ? 'Vos préférences n’ont pas pu être relues.'
+          ? AppStrings.of(context)
+                .messages
+                .profileSectionsYourPreferencesCouldNotBeRefreshed
           : c.preferences == null
-          ? 'Les personnes, les âges et la distance qui vous correspondent.'
-          : '${ProfileStrings.lookingFor[c.preferences!.lookingFor]} · ${c.preferences!.minAge}–${c.preferences!.maxAge} ans · ${c.preferences!.distance} km',
+          ? AppStrings.of(context)
+                .messages
+                .profileSectionsThePeopleAgesAndDistanceThat
+          : AppStrings.of(context).messages.profileSectionsAgesKm(
+              ProfileStrings(AppStrings.of(context))
+                  .lookingFor[c.preferences!.lookingFor]!,
+              c.preferences!.minAge,
+              c.preferences!.maxAge,
+              c.preferences!.distance,
+            ),
       action: c.sensitiveAllowed
-          ? 'Modifier mes préférences'
-          : 'Choisir mes consentements',
+          ? AppStrings.of(context).messages.profileSectionsEditMyPreferences
+          : AppStrings.of(context).messages.profileSectionsChooseMyConsents,
       onTap: editable && !c.errors.containsKey('preferences') ? onEdit : null,
     );
   }
@@ -116,7 +138,6 @@ class ProfileTraitsTile extends StatelessWidget {
     required this.controller,
     required this.onEdit,
   });
-
   final ProfileController controller;
   final VoidCallback onEdit;
 
@@ -125,13 +146,17 @@ class ProfileTraitsTile extends StatelessWidget {
     final c = controller;
     final editable = !c.loading && !c.saving && !c.uncertain;
     return ProfileDetailTile(
-      title: 'Ce qui vous ressemble',
+      title: AppStrings.of(context).messages.profileSectionsWhatMakesYouYou,
       icon: Icons.spa_outlined,
       summary: c.errors.containsKey('selectedTraits')
-          ? 'Vos traits n’ont pas pu être relus.'
+          ? AppStrings.of(context)
+                .messages
+                .profileSectionsYourTraitsCouldNotBeRefreshed
           : c.selectedTraits.isEmpty
-          ? 'Quelques traits pour donner un aperçu de votre personnalité.'
-          : 'Les traits que vous avez choisis pour vous raconter.',
+          ? AppStrings.of(context).messages.profileSectionsAFewTraitsToShowYour
+          : AppStrings.of(context)
+                .messages
+                .profileSectionsTheTraitsYouChoseToTell,
       details:
           c.errors.containsKey('selectedTraits') || c.selectedTraits.isEmpty
           ? null
@@ -143,7 +168,7 @@ class ProfileTraitsTile extends StatelessWidget {
                   Chip(label: Text(trait.name)),
               ],
             ),
-      action: 'Choisir mes traits',
+      action: AppStrings.of(context).messages.profileSectionsChooseMyTraits,
       onTap:
           editable &&
               !c.errors.containsKey('traits') &&
@@ -160,7 +185,6 @@ class ProfilePhotoTile extends StatelessWidget {
     required this.controller,
     required this.onEdit,
   });
-
   final ProfileController controller;
   final VoidCallback onEdit;
 
@@ -169,14 +193,19 @@ class ProfilePhotoTile extends StatelessWidget {
     final c = controller;
     final p = c.profile;
     return ProfileDetailTile(
-      title: 'Une photo, pour plus tard',
+      title: AppStrings.of(context).messages.profileSectionsAPhotoForLater,
       icon: Icons.photo_outlined,
       summary: c.errors.containsKey('profile')
-          ? 'Votre photo n’a pas pu être vérifiée.'
+          ? AppStrings.of(context)
+                .messages
+                .profileSectionsYourPhotoCouldNotBeChecked
           : p?.photo == null
-          ? 'Une seule photo, révélée après votre accord mutuel.'
-          : ProfileStrings.moderation(p?.photoModeration),
-      action: 'Gérer ma photo',
+          ? AppStrings.of(context)
+                .messages
+                .profileSectionsOnePhotoRevealedAfterMutualConsent
+          : ProfileStrings(AppStrings.of(context))
+                .moderation(p?.photoModeration),
+      action: AppStrings.of(context).messages.profileSectionsManageMyPhoto,
       onTap: p != null && !c.loading && !c.errors.containsKey('profile')
           ? onEdit
           : null,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../application/profile_controller.dart';
 import '../data/profile_models.dart';
@@ -9,6 +10,7 @@ import 'profile_strings.dart';
 class IdentityEditor extends StatefulWidget {
   const IdentityEditor({super.key, required this.controller});
   final ProfileController controller;
+
   @override
   State<IdentityEditor> createState() => _IdentityEditorState();
 }
@@ -24,6 +26,7 @@ class _IdentityEditorState extends ProfileEditorState<IdentityEditor> {
   );
   late final bio = TextEditingController(text: controller.profile?.bio);
   late String sex = controller.profile?.sex ?? '';
+
   @override
   void dispose() {
     firstname.dispose();
@@ -34,26 +37,30 @@ class _IdentityEditorState extends ProfileEditorState<IdentityEditor> {
 
   @override
   Widget build(BuildContext context) => page(
-    'Votre présentation',
+    AppStrings.of(context).messages.discoveryStringsYourIntroduction,
     [
-      const EditorialCard(
-        title: 'À votre façon.',
-        body: 'Les détails du quotidien font souvent les plus belles conversations.',
+      EditorialCard(
+        title: AppStrings.of(context).messages.identityEditorYourOwnWay,
+        body: AppStrings.of(context)
+            .messages
+            .identityEditorEverydayDetailsOftenMakeTheBest,
       ),
       const SizedBox(height: 24),
-      field(firstname, 'Prénom'),
+      field(firstname, AppStrings.of(context).messages.identityEditorFirstName),
       field(
         birthdate,
-        'Date de naissance',
+        AppStrings.of(context).messages.identityEditorDateOfBirth,
         keyboard: TextInputType.datetime,
-        hint: 'AAAA-MM-JJ · Vous devez avoir 18 ans ou plus.',
+        hint: AppStrings.of(context).messages.identityEditorYyyyMmDdYouMustBe,
       ),
       if (controller.sensitiveAllowed)
         DropdownButtonFormField<String>(
           initialValue: sex,
           isExpanded: true,
-          decoration: const InputDecoration(labelText: 'Sexe'),
-          items: ProfileStrings.sexes.entries
+          decoration: InputDecoration(
+            labelText: AppStrings.of(context).messages.identityEditorSex,
+          ),
+          items: ProfileStrings(AppStrings.of(context)).sexes.entries
               .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
               .toList(),
           onChanged: busy
@@ -64,18 +71,25 @@ class _IdentityEditorState extends ProfileEditorState<IdentityEditor> {
                 }),
         ),
       if (!controller.sensitiveAllowed)
-        const Text(
-          'Le sexe est facultatif pour enregistrer ce profil. Son utilisation demande votre consentement aux données sensibles, accessible depuis vos choix de vie privée.',
+        Text(
+          AppStrings.of(context)
+              .messages
+              .identityEditorSexIsOptionalWhenSavingThis,
         ),
       const SizedBox(height: 24),
       field(
         bio,
-        'Quelques mots sur vous',
+        AppStrings.of(context).messages.identityEditorAFewWordsAboutYou,
         lines: 5,
-        hint: '2 000 octets maximum · Évitez vos coordonnées.',
+        hint: AppStrings.of(context)
+            .messages
+            .identityEditor2000BytesMaximumAvoidContact,
       ),
       if (controller.profile?.bioModeration != null)
-        Text(ProfileStrings.moderation(controller.profile!.bioModeration)),
+        Text(
+          ProfileStrings(AppStrings.of(context))
+              .moderation(controller.profile!.bioModeration),
+        ),
     ],
     save: () {
       final draft = ProfileDraft(

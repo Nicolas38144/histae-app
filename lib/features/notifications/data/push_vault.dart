@@ -17,6 +17,7 @@ class PushRecord {
   final String? deviceId;
   final List<String> opened;
   final bool optedIn;
+
   String encode() => jsonEncode({
     'origin': origin,
     'owner': owner,
@@ -24,6 +25,7 @@ class PushRecord {
     'opted_in': optedIn,
     'opened': opened.take(64).toList(),
   });
+
   static PushRecord? decode(String? raw) {
     if (raw == null || raw == '{}') return null;
     try {
@@ -53,6 +55,7 @@ class PushRecord {
 
 abstract interface class PushVault {
   Future<PushRecord?> read();
+
   Future<void> write(PushRecord? record);
 }
 
@@ -64,6 +67,7 @@ class SecurePushVault implements PushVault {
     ),
   );
   static const _key = 'histae.push.v1';
+
   @override
   Future<PushRecord?> read() async {
     try {

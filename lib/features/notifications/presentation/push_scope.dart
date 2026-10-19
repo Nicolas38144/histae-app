@@ -8,6 +8,7 @@ class PushScope extends InheritedNotifier<PushController> {
     required PushController? controller,
     required super.child,
   }) : super(notifier: controller);
+
   static PushController? maybeOf(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<PushScope>()?.notifier;
 }

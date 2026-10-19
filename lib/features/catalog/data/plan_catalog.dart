@@ -43,7 +43,6 @@ class SubscriptionOffer {
       currency: jsonString(json, 'currency'),
     );
   }
-
   final String code, planCode, displayName, currency;
   final BillingPeriod? billingPeriod;
   final int priceCents;
@@ -68,7 +67,6 @@ class PlanCatalog {
     }
     return PlanCatalog._(plans, offers);
   }
-
   final List<SubscriptionPlan> plans;
   final List<SubscriptionOffer> offers;
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../data/profile_models.dart';
 
 Future<ProfileQuestion?> pickProfileQuestion(
@@ -18,12 +19,14 @@ class _QuestionPicker extends StatefulWidget {
   const _QuestionPicker({required this.questions, required this.selected});
   final List<ProfileQuestion> questions;
   final Set<String> selected;
+
   @override
   State<_QuestionPicker> createState() => _QuestionPickerState();
 }
 
 class _QuestionPickerState extends State<_QuestionPicker> {
   final search = TextEditingController();
+
   @override
   void dispose() {
     search.dispose();
@@ -54,7 +57,9 @@ class _QuestionPickerState extends State<_QuestionPicker> {
               children: [
                 Expanded(
                   child: Text(
-                    'Choisir une question',
+                    AppStrings.of(context)
+                        .messages
+                        .questionPickerChooseAQuestion,
                     style: largeText
                         ? theme.textTheme.titleMedium
                         : theme.textTheme.titleLarge,
@@ -62,7 +67,9 @@ class _QuestionPickerState extends State<_QuestionPicker> {
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  tooltip: 'Fermer les questions',
+                  tooltip: AppStrings.of(context)
+                      .messages
+                      .questionPickerCloseQuestions,
                   icon: const Icon(Icons.close_rounded),
                 ),
               ],
@@ -72,8 +79,8 @@ class _QuestionPickerState extends State<_QuestionPicker> {
               controller: search,
               onChanged: (_) => setState(() {}),
               textInputAction: TextInputAction.search,
-              decoration: const InputDecoration(
-                labelText: 'Recherche',
+              decoration: InputDecoration(
+                labelText: AppStrings.of(context).messages.questionPickerSearch,
                 prefixIcon: Icon(Icons.search_rounded),
               ),
             ),
@@ -83,8 +90,12 @@ class _QuestionPickerState extends State<_QuestionPicker> {
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 child: Text(
                   available.isEmpty
-                      ? 'Aucune autre question n’est proposée pour le moment.'
-                      : 'Aucune question ne correspond à votre recherche.',
+                      ? AppStrings.of(context)
+                            .messages
+                            .questionPickerNoOtherQuestionsAreCurrentlyAvailable
+                      : AppStrings.of(context)
+                            .messages
+                            .questionPickerNoQuestionsMatchYourSearch,
                 ),
               ),
             for (final q in filtered)

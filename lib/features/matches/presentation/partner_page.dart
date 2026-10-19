@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../continuation/presentation/partner_photo_page.dart';
@@ -10,6 +11,7 @@ class PartnerPage extends StatelessWidget {
   const PartnerPage({super.key, required this.controller, required this.id});
   final MatchesController controller;
   final String id;
+
   @override
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: controller,
@@ -21,19 +23,33 @@ class PartnerPage extends StatelessWidget {
           ? controller.selected
           : null;
       return HistaeScaffold(
-        appBar: AppBar(title: Text(match?.partner.firstname ?? 'Profil')),
+        appBar: AppBar(
+          title: Text(
+            match?.partner.firstname ??
+                AppStrings.of(context).messages.mainNavigationBarProfile,
+          ),
+        ),
         body: SafeArea(
           child: ListView(
             padding: const EdgeInsets.all(24),
             children: [
               if (match == null)
-                const Text('Ce profil n’est plus disponible.')
+                Text(
+                  AppStrings.of(context)
+                      .messages
+                      .discoveryStringsThisProfileIsNoLongerAvailable,
+                )
               else ...[
                 EditorialCard(
-                  title: '${match.partner.firstname}, ${match.partner.age}',
+                  title: AppStrings.of(context).messages.encounterPage(
+                    match.partner.firstname,
+                    match.partner.age,
+                  ),
                   body:
                       match.partner.bio ??
-                      'Découvrez cette personne au fil de vos échanges.',
+                      AppStrings.of(context)
+                          .messages
+                          .partnerPageDiscoverThisPersonThroughYourConversations,
                 ),
                 const SizedBox(height: 24),
                 if (match.photosRevealed && match.partner.photo != null)
@@ -49,7 +65,11 @@ class PartnerPage extends StatelessWidget {
                             ),
                           ),
                     icon: const Icon(Icons.photo_outlined),
-                    label: const Text('Voir sa photo'),
+                    label: Text(
+                      AppStrings.of(context)
+                          .messages
+                          .continuationPageViewTheirPhoto,
+                    ),
                   ),
                 TextButton(
                   onPressed: () => Navigator.of(context).push(
@@ -62,7 +82,11 @@ class PartnerPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  child: const Text('Signaler cette personne'),
+                  child: Text(
+                    AppStrings.of(context)
+                        .messages
+                        .encounterPageReportThisPerson,
+                  ),
                 ),
                 Wrap(
                   spacing: 8,

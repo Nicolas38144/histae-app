@@ -4,7 +4,9 @@ import 'plan_catalog.dart';
 
 abstract interface class CatalogRepository {
   factory CatalogRepository(ApiClient api) = ApiCatalogRepository;
+
   Future<PlanCatalog> load(RequestCancellation cancellation);
+
   void close();
 }
 

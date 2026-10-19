@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
@@ -17,6 +18,7 @@ class ChatPage extends StatefulWidget {
   const ChatPage({super.key, required this.controller, required this.matchId});
   final MatchesController controller;
   final String matchId;
+
   @override
   State<ChatPage> createState() => _ChatPageState();
 }
@@ -30,6 +32,7 @@ class _ChatPageState extends State<ChatPage> {
   final _incoming = <String, GlobalKey>{};
   Timer? _readTimer;
   String? _head;
+
   @override
   void initState() {
     super.initState();
@@ -107,11 +110,17 @@ class _ChatPageState extends State<ChatPage> {
   Future<void> _end({required bool block}) async {
     if (!await confirmAction(
           context,
-          block ? 'Bloquer cette personne ?' : 'Terminer cette rencontre ?',
           block
-              ? 'La rencontre sera terminée et vous ne pourrez plus vous découvrir ni échanger.'
-              : 'La conversation ne sera plus accessible. Cette action ne bloque pas cette personne. Un crédit déjà débité ne sera pas remboursé.',
-          action: block ? 'Bloquer' : 'Terminer',
+              ? AppStrings.of(context).messages.encounterPageBlockThisPerson
+              : AppStrings.of(context).messages.chatPageEndThisMatch,
+          block
+              ? AppStrings.of(context).messages.chatPageTheMatchWillEndAndYou
+              : AppStrings.of(context)
+                    .messages
+                    .chatPageTheConversationWillNoLongerBe,
+          action: block
+              ? AppStrings.of(context).messages.discoveryPageBlock
+              : AppStrings.of(context).messages.chatPageEnd,
         ) ||
         !mounted) {
       return;
@@ -169,16 +178,21 @@ class _ChatPageState extends State<ChatPage> {
     final unavailable = match == null || !match.historyAllowed;
     return HistaeScaffold(
       appBar: AppBar(
-        title: Text(match?.partner.firstname ?? 'Votre rencontre'),
+        title: Text(
+          match?.partner.firstname ??
+              AppStrings.of(context).messages.continuationPageYourMatch,
+        ),
         actions: [
           IconButton(
-            tooltip: 'Actualiser la conversation',
+            tooltip: AppStrings.of(context)
+                .messages
+                .chatPageRefreshConversation,
             onPressed: c.listLoading || c.retrySeconds > 0 ? null : c.activate,
             icon: const Icon(Icons.refresh),
           ),
           if (match != null)
             PopupMenuButton<String>(
-              tooltip: 'Options de la rencontre',
+              tooltip: AppStrings.of(context).messages.chatPageMatchOptions,
               onSelected: (value) {
                 if (value == 'decisions') unawaited(_decisions());
                 if (value == 'profile') {
@@ -194,27 +208,41 @@ class _ChatPageState extends State<ChatPage> {
                 if (value == 'report') unawaited(_report());
               },
               itemBuilder: (_) => [
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'decisions',
-                  child: Text('Photos et continuation'),
+                  child: Text(
+                    AppStrings.of(context)
+                        .messages
+                        .chatPagePhotosAndContinuation,
+                  ),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'profile',
-                  child: Text('Voir son profil'),
+                  child: Text(
+                    AppStrings.of(context).messages.chatPageViewTheirProfile,
+                  ),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'report',
-                  child: Text('Signaler cette personne'),
+                  child: Text(
+                    AppStrings.of(context)
+                        .messages
+                        .encounterPageReportThisPerson,
+                  ),
                 ),
                 PopupMenuItem(
                   value: 'end',
                   enabled: !c.sending && !c.ending,
-                  child: const Text('Terminer la rencontre'),
+                  child: Text(AppStrings.of(context).messages.chatPageEndMatch),
                 ),
                 PopupMenuItem(
                   value: 'block',
                   enabled: !c.sending && !c.ending,
-                  child: const Text('Bloquer cette personne'),
+                  child: Text(
+                    AppStrings.of(context)
+                        .messages
+                        .encounterPageBlockThisPerson447,
+                  ),
                 ),
               ],
             ),
@@ -227,19 +255,29 @@ class _ChatPageState extends State<ChatPage> {
                 children: [
                   EditorialCard(
                     title: c.failure != null || c.listLoading
-                        ? 'Votre rencontre'
-                        : 'Cette rencontre\nest terminée.',
+                        ? AppStrings.of(context)
+                              .messages
+                              .continuationPageYourMatch
+                        : AppStrings.of(context)
+                              .messages
+                              .chatPageThisMatchHasEnded,
                     body: c.failure != null || c.listLoading
-                        ? 'La rencontre doit être relue pour ouvrir la conversation.'
-                        : 'La conversation n’est plus disponible.',
+                        ? AppStrings.of(context)
+                              .messages
+                              .chatPageRefreshTheMatchToOpenThe
+                        : AppStrings.of(context)
+                              .messages
+                              .chatPageTheConversationIsNoLongerAvailable,
                   ),
                   if (c.failure case final error?)
-                    Text(MatchesStrings.failure(error)),
+                    Text(MatchesStrings(AppStrings.of(context)).failure(error)),
                   OutlinedButton(
                     onPressed: c.listLoading || c.retrySeconds > 0
                         ? null
                         : c.activate,
-                    child: const Text('Relire mes rencontres'),
+                    child: Text(
+                      AppStrings.of(context).messages.chatPageRefreshMyMatches,
+                    ),
                   ),
                 ],
               )
@@ -276,16 +314,22 @@ class _ChatPageState extends State<ChatPage> {
                                             c.historyLoading || c.listLoading
                                             ? null
                                             : c.older,
-                                        child: const Text(
-                                          'Messages plus anciens',
+                                        child: Text(
+                                          AppStrings.of(context)
+                                              .messages
+                                              .chatPageOlderMessages,
                                         ),
                                       )
                                     : Padding(
                                         padding: const EdgeInsets.all(20),
                                         child: Text(
                                           messages.isEmpty
-                                              ? 'Quelques mots pour commencer ?'
-                                              : 'Le début de votre conversation',
+                                              ? AppStrings.of(context)
+                                                    .messages
+                                                    .chatPageAFewWordsToStart
+                                              : AppStrings.of(context)
+                                                    .messages
+                                                    .chatPageTheStartOfYourConversation,
                                           textAlign: TextAlign.center,
                                         ),
                                       );
@@ -358,7 +402,7 @@ class _ChatPageState extends State<ChatPage> {
                                             ),
                                             const SizedBox(height: 8),
                                             Text(
-                                              '${MatchesStrings.date(m.createdAt)}${own ? (m.readAt == null ? ' · Envoyé' : ' · Lu') : ''}',
+                                              '${MatchesStrings(AppStrings.of(context)).date(m.createdAt)}${own ? (m.readAt == null ? AppStrings.of(context).messages.chatPageSent : ' · Lu') : ''}',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .bodySmall
@@ -395,7 +439,10 @@ class _ChatPageState extends State<ChatPage> {
                                 padding: const EdgeInsets.only(bottom: 10),
                                 child: Semantics(
                                   liveRegion: true,
-                                  child: Text(MatchesStrings.failure(error)),
+                                  child: Text(
+                                    MatchesStrings(AppStrings.of(context))
+                                        .failure(error),
+                                  ),
                                 ),
                               ),
                             if (c.readFailure != null)
@@ -403,19 +450,28 @@ class _ChatPageState extends State<ChatPage> {
                                 onPressed: c.reading
                                     ? null
                                     : () => _readVisible(explicitRetry: true),
-                                child: const Text(
-                                  'Reprendre la confirmation de lecture',
+                                child: Text(
+                                  AppStrings.of(context)
+                                      .messages
+                                      .chatPageResumeReadConfirmation,
                                 ),
                               ),
-                            if (c.validation != null) Text(c.validation!),
+                            if (c.validation != null)
+                              Text(
+                                AppStrings.of(context)
+                                    .clientMessage(c.validation!),
+                              ),
                             if (c.retrySeconds > 0)
                               Text(
-                                'Nouvel essai possible dans ${c.retrySeconds} s',
+                                AppStrings.of(context).messages
+                                    .appStringsTryAgainInS(c.retrySeconds),
                               ),
                             if (c.pendingEnd == widget.matchId ||
                                 c.pendingBlock == widget.matchId) ...[
-                              const Text(
-                                'La clôture reste à confirmer. Aucun nouveau message ne sera envoyé.',
+                              Text(
+                                AppStrings.of(context)
+                                    .messages
+                                    .chatPageClosingStillNeedsConfirmationNoNew,
                               ),
                               OutlinedButton(
                                 onPressed: c.ending || c.retrySeconds > 0
@@ -423,18 +479,28 @@ class _ChatPageState extends State<ChatPage> {
                                     : () => c.endCurrent(
                                         block: c.pendingBlock == widget.matchId,
                                       ),
-                                child: const Text('Reprendre la même demande'),
+                                child: Text(
+                                  AppStrings.of(context)
+                                      .messages
+                                      .chatPageResumeTheSameRequest,
+                                ),
                               ),
                             ] else if (c.pendingMessage != null) ...[
-                              const Text(
-                                'Cet envoi attend sa confirmation. Reprendre conserve exactement les mêmes mots et la même demande.',
+                              Text(
+                                AppStrings.of(context)
+                                    .messages
+                                    .chatPageThisMessageIsAwaitingConfirmationResuming,
                               ),
                               HistaeButton(
                                 onPressed: c.canSend ? c.resumeSend : null,
                                 child: Text(
                                   c.sending
-                                      ? 'Envoi en cours…'
-                                      : 'Reprendre le même envoi',
+                                      ? AppStrings.of(context)
+                                            .messages
+                                            .chatPageSending
+                                      : AppStrings.of(context)
+                                            .messages
+                                            .chatPageResumeTheSameMessage,
                                 ),
                               ),
                             ],
@@ -446,9 +512,13 @@ class _ChatPageState extends State<ChatPage> {
                                 readOnly:
                                     !c.canSend || c.pendingMessage != null,
                                 decoration: InputDecoration(
-                                  labelText: 'Votre message',
-                                  helperText:
-                                      '${_text.text.runes.length} / 2 000 caractères',
+                                  labelText: AppStrings.of(context)
+                                      .messages
+                                      .chatPageYourMessage,
+                                  helperText: AppStrings.of(context).messages
+                                      .chatPage2000Characters(
+                                        _text.text.runes.length,
+                                      ),
                                 ),
                                 onChanged: (text) {
                                   c.setDraft(widget.matchId, text);
@@ -463,7 +533,11 @@ class _ChatPageState extends State<ChatPage> {
                                       ? () => c.send(_text.text)
                                       : null,
                                   icon: const Icon(Icons.send_outlined),
-                                  label: const Text('Envoyer'),
+                                  label: Text(
+                                    AppStrings.of(context)
+                                        .messages
+                                        .chatPageSend,
+                                  ),
                                 ),
                               ),
                           ],
