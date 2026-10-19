@@ -318,3 +318,9 @@ Journaux UMP lus sur l’émulateur : `no form(s) configured for the input app I
 Le 19 octobre 2026, correction de l’alternance bas/haut signalée dans Matchs. La liste et les crédits possédaient deux barres ; leurs lectures successives et la connexion au temps réel les faisaient se relayer. MatchesPage affiche maintenant une seule barre fixe, dans une zone de hauteur constante sous l’en-tête. Les opérations d’aperçu regroupent leurs phases et une traction pendant le démarrage ne relance pas celui-ci. Les retours de chat/crédits conservent leurs lectures ; l’ouverture d’une conversation entrante n’attend pas le quota.
 
 12 contrôles ciblés réussis, dont un nouveau vérifiant l’unique position pendant des réponses différées puis une panne, et analyse Flutter propre. Aucun changement API, fichier supprimé ou commande Git. Rendu réel à confirmer sur l’émulateur après mise à jour de l’APK.
+
+## 24. Libellé de l’abonnement pendant l’actualisation
+
+Le 19 octobre 2026, le profil conserve le dernier statut reçu pendant la relecture du quota : Premium ne devient plus temporairement Mon abonnement. Le résultat serveur met toujours à jour le bouton ; une lecture en échec ou une invalidation de session conserve le traitement neutre existant. Aucun cache supplémentaire ni changement API.
+
+Trois contrôles ciblés réussis, dont une réponse différée vérifiant les transitions Free/Premium et l’échec de lecture ; analyse Flutter sans problème.

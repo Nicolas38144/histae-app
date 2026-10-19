@@ -424,3 +424,7 @@ Blocage vidéo identifié dans les journaux réels : aucun formulaire UMP pour l
 Une seule barre fixe sous l’en-tête regroupe les chargements des rencontres et des crédits. Suppression des indicateurs alternés dans la liste/carte, protection du chargement initial contre une actualisation manuelle concurrente, et absence de faux état vide/indisponible à l’entrée. Relectures temps réel, accès vidéo et navigation depuis les notifications conservés.
 
 Vérifications : 12 contrôles ciblés, dont un scénario différant liste/quota puis simulant une relecture temps réel et une panne ; analyse propre. Aucun changement backend. Prochaine vérification : rendu du chargement sur l’émulateur avec la nouvelle compilation.
+
+## 22. Bouton d’abonnement stable — 19 octobre 2026
+
+Le profil garde son dernier libellé confirmé pendant l’actualisation, puis applique le résultat de l’API. Les états inconnus et les erreurs restent neutres. Trois contrôles ciblés réussis et analyse propre ; aucun changement backend.

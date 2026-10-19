@@ -105,9 +105,7 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
               padding: const EdgeInsets.all(24),
               children: [
                 AccountBenefitsActions(
-                  isPremium:
-                      widget.continuation.loading ||
-                          widget.continuation.quotaReadAt == null
+                  isPremium: widget.continuation.quotaReadAt == null
                       ? null
                       : widget.continuation.quota?.premium,
                   onSubscription: _openSubscription,

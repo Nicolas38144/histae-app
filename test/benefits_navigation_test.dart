@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
@@ -22,6 +24,7 @@ Future<void> mountBenefits(
   required bool Function() premium,
   Map<String, dynamic> Function()? quota,
   bool Function()? quotaUnavailable,
+  Future<http.Response> Function()? readQuota,
   void Function(http.Request)? inspect,
 }) async {
   final session = testSession((r) async {
@@ -30,6 +33,7 @@ Future<void> mountBenefits(
       return jsonResponse(subscriptionJson(access: premium()));
     }
     if (r.url.path == '/api/users/me/continuation-quota') {
+      if (readQuota != null) return readQuota();
       return quotaUnavailable?.call() == true
           ? apiError(503, 'service_unavailable')
           : jsonResponse(quota?.call() ?? quotaJson(premium: premium()));
@@ -61,6 +65,62 @@ Future<void> mountBenefits(
 }
 
 void main() {
+  testWidgets(
+    'Profile keeps its confirmed subscription label while refreshing and applies new results',
+    (tester) async {
+      Completer<http.Response>? pending;
+      await mountBenefits(
+        tester,
+        premium: () => false,
+        readQuota: () =>
+            pending?.future ?? Future.value(jsonResponse(quotaJson())),
+      );
+      await tester.tap(find.byKey(const Key('main-tab-profile')));
+      await tester.pumpAndSettle();
+      expect(find.text('Premium'), findsOneWidget);
+
+      Future<void> refreshWith(
+        http.Response response, {
+        required String during,
+        required String after,
+      }) async {
+        pending = Completer<http.Response>();
+        final refresh = tester
+            .widget<RefreshIndicator>(find.byType(RefreshIndicator))
+            .onRefresh();
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 200));
+        expect(find.text(during), findsOneWidget);
+        expect(
+          find.text(during == 'Premium' ? 'Mon abonnement' : 'Premium'),
+          findsNothing,
+        );
+        pending!.complete(response);
+        await refresh;
+        await tester.pumpAndSettle();
+        expect(find.text(after), findsOneWidget);
+      }
+
+      await refreshWith(
+        jsonResponse(quotaJson(premium: true)),
+        during: 'Premium',
+        after: 'Mon abonnement',
+      );
+      await refreshWith(
+        jsonResponse(quotaJson()),
+        during: 'Mon abonnement',
+        after: 'Premium',
+      );
+      await refreshWith(
+        apiError(503, 'service_unavailable'),
+        during: 'Premium',
+        after: 'Mon abonnement',
+      );
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
+
   testWidgets(
     'Free gets a full feed, a profile upgrade and exact available balances with videos in matches at large text',
     (tester) async {
