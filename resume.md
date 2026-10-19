@@ -324,3 +324,9 @@ Le 19 octobre 2026, correction de l’alternance bas/haut signalée dans Matchs.
 Le 19 octobre 2026, le profil conserve le dernier statut reçu pendant la relecture du quota : Premium ne devient plus temporairement Mon abonnement. Le résultat serveur met toujours à jour le bouton ; une lecture en échec ou une invalidation de session conserve le traitement neutre existant. Aucun cache supplémentaire ni changement API.
 
 Trois contrôles ciblés réussis, dont une réponse différée vérifiant les transitions Free/Premium et l’échec de lecture ; analyse Flutter sans problème.
+
+## 25. Interrupteurs des consentements
+
+Le 19 octobre 2026, remplacement des cases et boutons de retrait par un interrupteur par carte. CGU/notice verrouillées une fois acceptées, selon le contrat API lu sans modification. Sensible/localisation nécessaires au feed mais retirables ; confirmation de l’effacement conservée. Réactivation immédiate pour un compte à jour, sans afficher de succès avant la réponse serveur. Inscription toujours explicite et groupée par Enregistrer mes choix.
+
+Suppression des numéros de version, de la mention d’accord enregistré et des explications sous les cartes. Versions toujours vérifiées avant mutation, anciens accords retirables sans accepter leur remplacement. Mise en page adaptée à 200 %. Huit contrôles ciblés réussis, analyse propre, aperçus visuels vérifiés et APK Android debug compilé ; aucun appel réel ni changement backend.

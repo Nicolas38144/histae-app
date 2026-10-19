@@ -48,10 +48,10 @@ class AppStrings {
   String get privacyTitle => 'Vos choix et votre vie privée';
   String get consentsTitle => 'Vos consentements';
   String get consentsIntro =>
-      'Chaque choix est indépendant. Les conditions d’utilisation '
-      'et la prise de connaissance de la notice sont nécessaires pour utiliser Histae. '
-      'Les autres choix concernent les données sensibles et la localisation.';
-  String get consentCurrent => 'Accord enregistré pour la version actuelle';
+      'Les conditions d’utilisation et la prise de connaissance de la notice '
+      'sont nécessaires pour accéder à Histae et restent verrouillées après acceptation. '
+      'Les accords sur les données sensibles et la localisation sont nécessaires '
+      'au feed, mais restent retirables.';
   String get saveChoices => 'Enregistrer mes choix';
   String get refreshChoices => 'Actualiser mes consentements';
   String get withdraw => 'Retirer mon consentement';
@@ -59,8 +59,7 @@ class AppStrings {
   String get cancel => 'Annuler';
   String get openDocumentError =>
       'Le document n’a pas pu être ouvert. Vérifiez votre connexion et réessayez.';
-  String documentVersion(String version) =>
-      'Lire le document — version $version';
+  String get readDocument => 'Lire le document';
   String get documentsChanged =>
       'Les documents ont changé. Relisez les nouvelles versions avant de confirmer vos choix.';
   String get choicesSaved => 'Vos choix ont été enregistrés.';

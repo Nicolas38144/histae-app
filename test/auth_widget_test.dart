@@ -40,12 +40,14 @@ void main() {
         findsNothing,
       );
       await tester.scrollUntilVisible(
-        find.text('Retirer mon consentement'),
+        find.text('Retirer mon consentement précédent'),
         200,
       );
-      await tester.ensureVisible(find.text('Retirer mon consentement'));
+      await tester.ensureVisible(
+        find.text('Retirer mon consentement précédent'),
+      );
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Retirer mon consentement'));
+      await tester.tap(find.text('Retirer mon consentement précédent'));
       await tester.pumpAndSettle();
       expect(find.text('Confirmer le retrait'), findsOneWidget);
       await tester.tap(find.text('Annuler'));
@@ -69,14 +71,14 @@ void main() {
       final checkbox = find.byKey(Key(ConsentType.terms.wireName));
       await tester.tap(checkbox);
       await tester.pumpAndSettle();
-      expect(tester.widget<CheckboxListTile>(checkbox).value, isTrue);
+      expect(tester.widget<SwitchListTile>(checkbox).value, isTrue);
       await session.synchronize();
       await tester.pumpAndSettle();
-      expect(tester.widget<CheckboxListTile>(checkbox).value, isTrue);
+      expect(tester.widget<SwitchListTile>(checkbox).value, isTrue);
       version = 'v2';
       await session.synchronize();
       await tester.pumpAndSettle();
-      expect(tester.widget<CheckboxListTile>(checkbox).value, isFalse);
+      expect(tester.widget<SwitchListTile>(checkbox).value, isFalse);
     },
   );
   Future<void> revealAndTap(WidgetTester tester, Finder finder) async {
@@ -125,8 +127,8 @@ void main() {
       await revealAndTap(tester, find.text('Vérifier le code'));
       expect(session.phase, SessionPhase.needsConsents);
       expect(find.text('Votre espace Histae'), findsNothing);
-      final boxes = tester.widgetList<CheckboxListTile>(
-        find.byType(CheckboxListTile),
+      final boxes = tester.widgetList<SwitchListTile>(
+        find.byType(SwitchListTile),
       );
       expect(boxes, hasLength(4));
       expect(boxes.every((box) => box.value == false), isTrue);
@@ -149,7 +151,7 @@ void main() {
       expect(find.text('Vie privée et sécurité'), findsOneWidget);
       await revealAndTap(tester, find.text('Mes consentements'));
       expect(find.text('Vos consentements'), findsOneWidget);
-      expect(find.textContaining('Accord enregistré'), findsNWidgets(2));
+      expect(find.textContaining('Accord enregistré'), findsNothing);
       await revealAndTap(tester, find.text('Se déconnecter'));
       expect(find.text('Créer mon compte'), findsOneWidget);
       expect(find.text('Vos consentements'), findsNothing);
@@ -161,7 +163,7 @@ void main() {
   );
 
   testWidgets(
-    'documents use the server URL/version and accepting is never preselected',
+    'documents hide version labels while keeping server URLs and explicit acceptance',
     (tester) async {
       tester.view.physicalSize = const Size(800, 1800);
       tester.view.devicePixelRatio = 1;
@@ -184,13 +186,13 @@ void main() {
           ),
         ),
       );
-      expect(find.text('Lire le document — version v1'), findsNWidgets(4));
-      await tester.tap(find.text('Lire le document — version v1').first);
+      expect(find.text('Lire le document'), findsNWidgets(4));
+      await tester.tap(find.text('Lire le document').first);
       await tester.pumpAndSettle();
       expect(opened.single.toString(), 'https://legal.example/terms/v1');
       expect(
         tester
-            .widgetList<CheckboxListTile>(find.byType(CheckboxListTile))
+            .widgetList<SwitchListTile>(find.byType(SwitchListTile))
             .every((box) => box.value == false),
         isTrue,
       );
@@ -227,7 +229,10 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(home: ConsentsPage(session: session)),
       );
-      await revealAndTap(tester, find.text('Retirer mon consentement'));
+      await revealAndTap(
+        tester,
+        find.byKey(Key(ConsentType.sensitive.wireName)),
+      );
       expect(
         find.textContaining('efface votre sexe et vos préférences'),
         findsOneWidget,
@@ -235,7 +240,10 @@ void main() {
       await tester.tap(find.text('Annuler'));
       await tester.pumpAndSettle();
       expect(puts, 0);
-      await revealAndTap(tester, find.text('Retirer mon consentement'));
+      await revealAndTap(
+        tester,
+        find.byKey(Key(ConsentType.sensitive.wireName)),
+      );
       await tester.tap(find.text('Confirmer le retrait'));
       await tester.pumpAndSettle();
       expect(puts, 1);
@@ -245,6 +253,84 @@ void main() {
             .granted,
         isFalse,
       );
+      expect(
+        tester
+            .widget<SwitchListTile>(
+              find.byKey(Key(ConsentType.sensitive.wireName)),
+            )
+            .value,
+        isFalse,
+      );
+    },
+  );
+
+  testWidgets(
+    'required switches stay locked and optional switches reflect only saved server choices',
+    (tester) async {
+      final grants = {ConsentType.sensitive: true, ConsentType.location: true};
+      final writes = <Object?>[];
+      var reject = false;
+      final session = testSession((request) async {
+        if (request.method == 'PUT') {
+          final body = jsonDecode(request.body) as Map<String, dynamic>;
+          writes.add(body);
+          if (reject) return apiError(503, 'service_unavailable');
+          final change = (body['consents'] as List).single as Map;
+          grants[ConsentType.parse(change['consent_type'] as String)] =
+              change['granted'] as bool;
+        }
+        if (request.url.path.endsWith('consents')) {
+          return jsonResponse(consentJson(complete: true, grants: grants));
+        }
+        return defaultAuthResponse(request, complete: true);
+      });
+      addTearDown(session.dispose);
+      await session.establish(testTokens);
+      await tester.pumpWidget(
+        MaterialApp(home: ConsentsPage(session: session)),
+      );
+      for (final type in [ConsentType.terms, ConsentType.privacy]) {
+        final finder = find.byKey(Key(type.wireName));
+        await revealAndTap(tester, finder);
+        final tile = tester.widget<SwitchListTile>(finder);
+        expect(tile.value, isTrue);
+        expect(tile.onChanged, isNull);
+      }
+      expect(writes, isEmpty);
+      for (final type in [ConsentType.sensitive, ConsentType.location]) {
+        tester
+            .state<ScrollableState>(find.byType(Scrollable).first)
+            .position
+            .jumpTo(0);
+        await tester.pumpAndSettle();
+        final finder = find.byKey(Key(type.wireName));
+        await revealAndTap(tester, finder);
+        await tester.tap(find.text('Confirmer le retrait'));
+        await tester.pumpAndSettle();
+        expect(tester.widget<SwitchListTile>(finder).value, isFalse);
+        await revealAndTap(tester, finder);
+        expect(tester.widget<SwitchListTile>(finder).value, isTrue);
+        expect(writes.sublist(writes.length - 2), [
+          {
+            'consents': [
+              {'consent_type': type.wireName, 'granted': false},
+            ],
+          },
+          {
+            'consents': [
+              {'consent_type': type.wireName, 'granted': true},
+            ],
+          },
+        ]);
+      }
+      reject = true;
+      final location = find.byKey(Key(ConsentType.location.wireName));
+      await revealAndTap(tester, location);
+      await tester.tap(find.text('Confirmer le retrait'));
+      await tester.pumpAndSettle();
+      expect(tester.widget<SwitchListTile>(location).value, isTrue);
+      expect(grants[ConsentType.location], isTrue);
+      expect(tester.takeException(), isNull);
     },
   );
 

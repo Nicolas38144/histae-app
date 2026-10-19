@@ -112,29 +112,57 @@ class _ConsentsPageState extends State<ConsentsPage> {
     }
   }
 
-  Widget _withdrawControl(
-    PublicConsent consent,
-    ConsentState state,
-    bool blocked,
-  ) {
-    final key = Key('withdraw-${consent.type.wireName}');
-    final action = blocked ? null : () => _withdraw(consent, state);
-    final label = Text(AppStrings.of(context).withdraw);
-    if (MediaQuery.textScalerOf(context).scale(14) > 20) {
-      return OutlinedButton(
-        key: key,
-        onPressed: action,
-        style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-        ),
-        child: label,
+  Widget _consentControl(
+    PublicConsent consent, {
+    required bool value,
+    required ValueChanged<bool>? onChanged,
+  }) {
+    final strings = AppStrings.of(context);
+    final title = Text(
+      strings.consentTitle(consent.type),
+      style: Theme.of(context).textTheme.titleMedium,
+    );
+    final renewal = consent.granted && !consent.current;
+    final document = TextButton(
+      onPressed: _busy ? null : () => _open(consent),
+      child: Text(strings.readDocument),
+    );
+    final key = Key(consent.type.wireName);
+    if (MediaQuery.textScalerOf(context).scale(16) > 20) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Semantics(header: true, child: title),
+          if (renewal) const Text('À renouveler'),
+          Row(
+            children: [
+              Expanded(child: document),
+              Semantics(
+                label: strings.consentLabel(consent.type),
+                child: Switch(key: key, value: value, onChanged: onChanged),
+              ),
+            ],
+          ),
+        ],
       );
     }
-    return OutlinedButton.icon(
-      key: key,
-      onPressed: action,
-      icon: const Icon(Icons.remove_circle_outline),
-      label: label,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SwitchListTile(
+          key: key,
+          contentPadding: EdgeInsets.zero,
+          title: Semantics(
+            label: strings.consentLabel(consent.type),
+            excludeSemantics: true,
+            child: title,
+          ),
+          subtitle: renewal ? const Text('À renouveler') : null,
+          value: value,
+          onChanged: onChanged,
+        ),
+        document,
+      ],
     );
   }
 
@@ -209,80 +237,44 @@ class _ConsentsPageState extends State<ConsentsPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              Semantics(
-                                header: true,
-                                child: Text(
-                                  strings.consentTitle(consent.type),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Chip(
-                                  visualDensity: VisualDensity.compact,
-                                  avatar: Icon(
-                                    consent.type.withdrawable
-                                        ? Icons.tune_rounded
-                                        : Icons.description_outlined,
-                                    size: 16,
-                                  ),
-                                  label: Text(
-                                    consent.type.withdrawable
-                                        ? 'Consentement modifiable'
-                                        : 'Nécessaire à Histae',
-                                  ),
-                                ),
-                              ),
-                              TextButton(
-                                onPressed: _busy ? null : () => _open(consent),
-                                child: Text(
-                                  strings.documentVersion(
-                                    consent.requiredVersion,
-                                  ),
-                                ),
-                              ),
-                              if (consent.current) ...[
-                                Text(strings.consentCurrent),
-                              ] else
-                                CheckboxListTile(
-                                  contentPadding: EdgeInsets.zero,
-                                  key: Key(consent.type.wireName),
-                                  title: Text(
-                                    strings.consentLabel(consent.type),
-                                  ),
-                                  value: _choices[consent.type] ?? false,
-                                  onChanged: blocked
-                                      ? null
-                                      : (value) {
-                                          // Declining an outdated sensitive/location grant also
-                                          // withdraws it, so use the same explicit confirmation.
-                                          if (value == false &&
-                                              consent.granted &&
-                                              consent.type.withdrawable) {
-                                            _withdraw(consent, state);
-                                            return;
-                                          }
+                              _consentControl(
+                                consent,
+                                value:
+                                    _choices[consent.type] ?? consent.current,
+                                onChanged:
+                                    blocked ||
+                                        (consent.current &&
+                                            !consent.type.withdrawable)
+                                    ? null
+                                    : (value) {
+                                        if (!value &&
+                                            consent.granted &&
+                                            consent.type.withdrawable) {
+                                          _withdraw(consent, state);
+                                        } else if (managing &&
+                                            consent.type.withdrawable) {
+                                          _save({consent.type: value}, state);
+                                        } else {
                                           setState(() {
-                                            _choices[consent.type] =
-                                                value ?? false;
+                                            _choices[consent.type] = value;
                                           });
-                                        },
+                                        }
+                                      },
+                              ),
+                              // An old grant is still withdrawable, but must never
+                              // preselect acceptance of the replacement document.
+                              if (consent.granted &&
+                                  !consent.current &&
+                                  consent.type.withdrawable)
+                                TextButton(
+                                  key: Key('withdraw-${consent.type.wireName}'),
+                                  onPressed: blocked
+                                      ? null
+                                      : () => _withdraw(consent, state),
+                                  child: const Text(
+                                    'Retirer mon consentement précédent',
+                                  ),
                                 ),
-                              if (consent.granted && consent.type.withdrawable)
-                                _withdrawControl(consent, state, blocked),
-                              if (consent.current &&
-                                  !consent.type.withdrawable) ...[
-                                const SizedBox(height: 8),
-                                Text(
-                                  consent.type == ConsentType.privacy
-                                      ? 'Cette notice vous informe sur vos données. Sa prise de connaissance ne constitue pas un consentement que vous pouvez retirer.'
-                                      : 'L’acceptation de ces conditions est nécessaire pour utiliser Histae. Elle ne se retire pas depuis cet écran.',
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                ),
-                              ],
                             ],
                           ),
                         ),
@@ -291,16 +283,17 @@ class _ConsentsPageState extends State<ConsentsPage> {
                     if (_message != null)
                       Semantics(liveRegion: true, child: Text(_message!)),
                     const SizedBox(height: 16),
-                    HistaeButton(
-                      onPressed: blocked || changes.isEmpty
-                          ? null
-                          : () => _save(changes, state),
-                      child: Text(
-                        widget.session.retrySeconds > 0
-                            ? strings.retryIn(widget.session.retrySeconds)
-                            : strings.saveChoices,
+                    if (!managing)
+                      HistaeButton(
+                        onPressed: blocked || changes.isEmpty
+                            ? null
+                            : () => _save(changes, state),
+                        child: Text(
+                          widget.session.retrySeconds > 0
+                              ? strings.retryIn(widget.session.retrySeconds)
+                              : strings.saveChoices,
+                        ),
                       ),
-                    ),
                     const SizedBox(height: 12),
                     OutlinedButton(
                       onPressed: blocked ? null : widget.session.synchronize,

@@ -428,3 +428,7 @@ Vérifications : 12 contrôles ciblés, dont un scénario différant liste/quota
 ## 22. Bouton d’abonnement stable — 19 octobre 2026
 
 Le profil garde son dernier libellé confirmé pendant l’actualisation, puis applique le résultat de l’API. Les états inconnus et les erreurs restent neutres. Trois contrôles ciblés réussis et analyse propre ; aucun changement backend.
+
+## 23. Gestion des consentements par interrupteurs — 19 octobre 2026
+
+Un interrupteur par carte, CGU/notice verrouillées après acceptation, accords sensibles/localisation modifiables pour le feed. Retraits confirmés et état reflétant la réponse serveur, acceptation initiale sans présélection, versions contrôlées sans afficher leur numéro. Suppression des textes d’état sous les documents et adaptation aux grandes polices. Huit contrôles ciblés réussis, analyse propre et aperçus vérifiés ; aucun changement API. Les validations natives L10 restent ouvertes.
