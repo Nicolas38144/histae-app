@@ -311,3 +311,10 @@ Le retrait existait sous Retirer mon accord ; son libellé est maintenant Retire
 Journaux UMP lus sur l’émulateur : `no form(s) configured for the input app ID`, avec ID correspondant au `.env`. Réponse à la question utilisateur : aucune modification API pour Réglementations européennes ; créer/associer/publier le message dans AdMob avec la politique de confidentialité. Erreurs d’app plus précises, reprise sur consentement antérieur uniquement si `canRequestAds` le permet, quota préservé pendant les surcouches natives depuis Profil aussi. Aucun identifiant réel copié dans les documents.
 
 25 contrôles ciblés, analyse sans problème, 12 captures dont grandes polices/clavier et APK Android debug. Aucun appel publicitaire nouveau ou changement backend ; publication du message AdMob et validation réelle SSV restent à effectuer. Aucun fichier supprimé ou commande Git exécutée.
+
+
+## 23. Barre de progression de Matchs
+
+Le 19 octobre 2026, correction de l’alternance bas/haut signalée dans Matchs. La liste et les crédits possédaient deux barres ; leurs lectures successives et la connexion au temps réel les faisaient se relayer. MatchesPage affiche maintenant une seule barre fixe, dans une zone de hauteur constante sous l’en-tête. Les opérations d’aperçu regroupent leurs phases et une traction pendant le démarrage ne relance pas celui-ci. Les retours de chat/crédits conservent leurs lectures ; l’ouverture d’une conversation entrante n’attend pas le quota.
+
+12 contrôles ciblés réussis, dont un nouveau vérifiant l’unique position pendant des réponses différées puis une panne, et analyse Flutter propre. Aucun changement API, fichier supprimé ou commande Git. Rendu réel à confirmer sur l’émulateur après mise à jour de l’APK.

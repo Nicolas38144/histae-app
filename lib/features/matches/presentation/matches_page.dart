@@ -33,12 +33,15 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
   late final _key = c.session.resourceKey;
   bool _opening = false;
   bool _creditsOpen = false;
+  int _overviewLoads = 1;
+  bool get _loading =>
+      _overviewLoads > 0 || c.listLoading || c.continuation.loading;
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) unawaited(_start());
+      if (mounted) unawaited(_start().whenComplete(_endOverview));
     });
   }
 
@@ -69,18 +72,35 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
           builder: (_) => ChatPage(controller: c, matchId: id),
         ),
       );
-      if (mounted && c.active) await _refresh();
+      if (mounted && c.active) await _refresh(afterChat: true);
     } finally {
       _opening = false;
     }
   }
 
-  Future<void> _refresh() async {
-    c.continuation.suspend();
-    await c.refresh();
-    if (mounted && c.active && c.session.resourceKey == _key) {
-      await c.continuation.activate();
+  void _endOverview() {
+    if (mounted) setState(() => _overviewLoads--);
+  }
+
+  Future<void> _withOverview(Future<void> Function() read) async {
+    if (!mounted) return;
+    setState(() => _overviewLoads++);
+    try {
+      await read();
+    } finally {
+      _endOverview();
     }
+  }
+
+  Future<void> _refresh({bool afterChat = false}) async {
+    if (_overviewLoads > 0 && !afterChat) return;
+    await _withOverview(() async {
+      c.continuation.suspend();
+      await c.refresh();
+      if (mounted && c.active && c.session.resourceKey == _key) {
+        await c.continuation.activate();
+      }
+    });
   }
 
   Future<void> _openCredits() async {
@@ -120,13 +140,15 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
         PushScope.maybeOf(context)?.coversMainFlow == true) {
       return;
     }
-    await c.session.synchronize();
-    if (mounted && c.session.resourceKey == _key) {
-      await c.activate();
-      if (mounted && c.active && ModalRoute.of(context)?.isCurrent == true) {
-        await c.continuation.activate();
+    await _withOverview(() async {
+      await c.session.synchronize();
+      if (mounted && c.session.resourceKey == _key) {
+        await c.activate();
+        if (mounted && c.active && ModalRoute.of(context)?.isCurrent == true) {
+          await c.continuation.activate();
+        }
       }
-    }
+    });
   }
 
   @override
@@ -155,74 +177,87 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
             ),
             IconButton(
               tooltip: 'Actualiser les rencontres',
-              onPressed: c.listLoading || c.retrySeconds > 0 ? null : _refresh,
+              onPressed: _loading || c.retrySeconds > 0 ? null : _refresh,
               icon: const Icon(Icons.refresh),
             ),
           ],
         ),
         body: SafeArea(
-          child: RefreshIndicator(
-            onRefresh: _refresh,
-            child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(24),
-              children: [
-                ContinuationBalanceCard(
-                  controller: c.continuation,
-                  onVideos: _openCredits,
+          child: Column(
+            children: [
+              SizedBox(
+                height: 3,
+                child: _loading
+                    ? const LinearProgressIndicator(
+                        key: Key('matches-loading'),
+                        semanticsLabel:
+                            'Actualisation des rencontres et des crédits',
+                      )
+                    : null,
+              ),
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: _refresh,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(24),
+                    children: [
+                      ContinuationBalanceCard(
+                        controller: c.continuation,
+                        onVideos: _openCredits,
+                        loading: _overviewLoads > 0,
+                      ),
+                      const SizedBox(height: 24),
+                      const EditorialCard(
+                        eyebrow: 'PRENDRE LE TEMPS',
+                        title: 'Les mots\ncontinuent.',
+                        body: 'Un intérêt réciproque, puis un espace pour faire connaissance.',
+                      ),
+                      const SizedBox(height: 16),
+                      if (!c.realtimeConnected)
+                        const Text(
+                          'Actualisation en reprise. Vous pouvez relire vos rencontres manuellement.',
+                        ),
+                      if (c.notice == 'ended')
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          child: Text('Cette rencontre est terminée.'),
+                        ),
+                      if (c.failure case final error?)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Semantics(
+                            liveRegion: true,
+                            child: Text(MatchesStrings.failure(error)),
+                          ),
+                        ),
+                      if (!_loading && c.items.isEmpty && c.failure == null)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 24),
+                          child: Text(
+                            'Aucune rencontre pour le moment. Elles apparaîtront après un intérêt réciproque.',
+                          ),
+                        ),
+                      for (final match in c.items)
+                        MatchPreviewCard(
+                          match: match,
+                          ownerId: c.ownerId,
+                          onTap: _opening ? null : () => _open(match.id),
+                        ),
+                      if (c.retrySeconds > 0)
+                        Text('Nouvel essai possible dans ${c.retrySeconds} s'),
+                      if (c.listCursor != null)
+                        OutlinedButton(
+                          onPressed: c.listLoading || c.retrySeconds > 0
+                              ? null
+                              : c.loadMore,
+                          child: const Text('Voir les rencontres suivantes'),
+                        ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 24),
-                const EditorialCard(
-                  eyebrow: 'PRENDRE LE TEMPS',
-                  title: 'Les mots\ncontinuent.',
-                  body: 'Un intérêt réciproque, puis un espace pour faire connaissance.',
-                ),
-                const SizedBox(height: 16),
-                if (!c.realtimeConnected)
-                  const Text(
-                    'Actualisation en reprise. Vous pouvez relire vos rencontres manuellement.',
-                  ),
-                if (c.listLoading)
-                  const LinearProgressIndicator(
-                    semanticsLabel: 'Chargement des rencontres',
-                  ),
-                if (c.notice == 'ended')
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    child: Text('Cette rencontre est terminée.'),
-                  ),
-                if (c.failure case final error?)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: Semantics(
-                      liveRegion: true,
-                      child: Text(MatchesStrings.failure(error)),
-                    ),
-                  ),
-                if (!c.listLoading && c.items.isEmpty && c.failure == null)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 24),
-                    child: Text(
-                      'Aucune rencontre pour le moment. Elles apparaîtront après un intérêt réciproque.',
-                    ),
-                  ),
-                for (final match in c.items)
-                  MatchPreviewCard(
-                    match: match,
-                    ownerId: c.ownerId,
-                    onTap: _opening ? null : () => _open(match.id),
-                  ),
-                if (c.retrySeconds > 0)
-                  Text('Nouvel essai possible dans ${c.retrySeconds} s'),
-                if (c.listCursor != null)
-                  OutlinedButton(
-                    onPressed: c.listLoading || c.retrySeconds > 0
-                        ? null
-                        : c.loadMore,
-                    child: const Text('Voir les rencontres suivantes'),
-                  ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       );

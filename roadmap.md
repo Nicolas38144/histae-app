@@ -417,3 +417,10 @@ Refonte du profil et des réponses : aperçu ordonné/modération, cartes de dé
 Blocage vidéo identifié dans les journaux réels : aucun formulaire UMP pour l’ID actuel. Publier et associer le message Réglementations européennes dans AdMob ; aucune modification API. Erreurs UMP classées et récupération sur accord antérieur uniquement si le SDK l’autorise. Cycle de vie du quota préservé sous les routes natives depuis Profil et Matchs.
 
 25 contrôles ciblés, analyse propre, 12 captures manuelles dont 200 %/clavier, APK Android debug. Aucun changement backend, formulaire de console publié automatiquement ou nouvelle publicité réelle. L10 garde la validation de diffusion et SSV après configuration AdMob, puis les essais iOS sur Mac.
+
+
+## 21. Progression de Matchs stabilisée — 19 octobre 2026
+
+Une seule barre fixe sous l’en-tête regroupe les chargements des rencontres et des crédits. Suppression des indicateurs alternés dans la liste/carte, protection du chargement initial contre une actualisation manuelle concurrente, et absence de faux état vide/indisponible à l’entrée. Relectures temps réel, accès vidéo et navigation depuis les notifications conservés.
+
+Vérifications : 12 contrôles ciblés, dont un scénario différant liste/quota puis simulant une relecture temps réel et une panne ; analyse propre. Aucun changement backend. Prochaine vérification : rendu du chargement sur l’émulateur avec la nouvelle compilation.

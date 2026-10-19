@@ -315,3 +315,10 @@ Le diagnostic des journaux UMP de l’émulateur a identifié précisément `no 
 Les erreurs de configuration, de réseau et de délai UMP ont maintenant des messages distincts. Sur échec d’actualisation, seule la valeur `canRequestAds` retournée par le SDK peut autoriser la reprise avec un consentement déjà connu ; aucun consentement n’est déduit d’un stockage Histae. Aucun détail fournisseur contenant des identifiants n’est ajouté aux logs de l’app. Le profil sous-jacent ne suspend plus le quota d’une route de crédits lors de l’ouverture d’un formulaire ou d’une vidéo natifs.
 
 Vérifications : 25 contrôles ciblés dont trois ajouts nécessaires, analyse propre, 12 aperçus manuels dont clavier et texte à 200 %, APK Android debug compilé. Journaux consultés en lecture seule ; aucune nouvelle publicité, aucun paiement ni mutation API réelle. Aperçu : `pictures/branding/profil-reponses-consentements.png`.
+
+
+## Chargement stable de Matchs — 19 octobre 2026
+
+Les lectures des rencontres et des crédits alimentent désormais une seule barre fixe sous l’en-tête. Les indicateurs dans la liste et la carte de crédits ne se relaient plus à des hauteurs différentes. Les phases d’une actualisation sont regroupées ; une nouvelle traction pendant le chargement initial ne l’annule pas. La relecture de cohérence après connexion au temps réel reste active, et une conversation entrante s’ouvre toujours sans attendre le quota. Le premier chargement n’affiche plus brièvement une liste vide ou un solde indisponible.
+
+12 contrôles ciblés réussis, dont une régression avec réponses différées vérifiant la position de l’unique barre, les lectures successives, la connexion temps réel et la sortie sur erreur. Analyse Flutter propre. La vérification visuelle finale reste à effectuer sur l’émulateur après installation ; aucun changement API ou appel fournisseur réel.

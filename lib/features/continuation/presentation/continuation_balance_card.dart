@@ -8,10 +8,12 @@ class ContinuationBalanceCard extends StatelessWidget {
     super.key,
     required this.controller,
     required this.onVideos,
+    this.loading = false,
   });
 
   final ContinuationController controller;
   final VoidCallback onVideos;
+  final bool loading;
 
   @override
   Widget build(BuildContext context) {
@@ -51,11 +53,7 @@ class ContinuationBalanceCard extends StatelessWidget {
           children: [
             Text('Pour continuer', style: theme.textTheme.titleMedium),
             const SizedBox(height: 12),
-            if (c.loading) ...[
-              const LinearProgressIndicator(
-                semanticsLabel: 'Lecture de vos crédits',
-              ),
-              const SizedBox(height: 8),
+            if (loading || c.loading) ...[
               const Text('Actualisation de vos crédits…'),
             ] else if (q == null || c.quotaReadAt == null) ...[
               const Text(
