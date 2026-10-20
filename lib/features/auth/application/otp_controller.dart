@@ -59,7 +59,10 @@ class OtpController extends ChangeNotifier {
     if (_phone != phone || _key == null) return;
     await _run(() async {
       await session.repository.sendOtp(
-        _phone!, _key!, _request!, language: _language,
+        _phone!,
+        _key!,
+        _request!,
+        language: _language,
       );
       requested = true;
       verificationUncertain = false;

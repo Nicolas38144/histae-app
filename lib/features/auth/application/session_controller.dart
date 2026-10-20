@@ -49,14 +49,25 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
     _localizedReads++;
     _notify();
     try {
-      final state = ConsentState.fromJson(await _authorized(
-        'GET', '/api/users/me/consents', language: requestLanguage,
-      ));
-      if (_disposed || generation != _generation || revision != localizationRevision) return;
+      final state = ConsentState.fromJson(
+        await _authorized(
+          'GET',
+          '/api/users/me/consents',
+          language: requestLanguage,
+        ),
+      );
+      if (_disposed ||
+          generation != _generation ||
+          revision != localizationRevision) {
+        return;
+      }
       _acceptConsents(state);
       _applyConsentPhase(state);
     } on ApiFailure catch (error) {
-      if (!_disposed && hasSession && generation == _generation && revision == localizationRevision) {
+      if (!_disposed &&
+          hasSession &&
+          generation == _generation &&
+          revision == localizationRevision) {
         // A failed translation read must not replace the session/navigation.
         // Definitive auth rejection is still handled by _authorized.
         _setFailure(error);
@@ -66,6 +77,7 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
       _notify();
     }
   }
+
   final AuthRepository repository;
   final SessionVault _vault;
   @override
@@ -556,7 +568,11 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
         return;
       }
       final state = ConsentState.fromJson(
-        await _authorized('GET', '/api/users/me/consents', language: requestLanguage),
+        await _authorized(
+          'GET',
+          '/api/users/me/consents',
+          language: requestLanguage,
+        ),
       );
       if (generation != _generation || _loggingOut || _disposed) return;
       if (revision != localizationRevision) return;
@@ -596,25 +612,32 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
     if (changes.isEmpty) return;
     if (retrySeconds > 0) throw failure!;
     final requestLanguage = language;
-    final documents = displayedDocuments ?? {
-      for (final consent in consents?.consents ?? <PublicConsent>[])
-        consent.type: consent,
-    };
+    final documents =
+        displayedDocuments ??
+        {
+          for (final consent in consents?.consents ?? <PublicConsent>[])
+            consent.type: consent,
+        };
     _saving = true;
     failure = null;
     final generation = _generation;
     try {
       final current = ConsentState.fromJson(
-        await _authorized('GET', '/api/users/me/consents', language: requestLanguage),
+        await _authorized(
+          'GET',
+          '/api/users/me/consents',
+          language: requestLanguage,
+        ),
       );
-      if (requestLanguage != language || changes.keys.any((type) {
-        final next = current.consents.firstWhere((c) => c.type == type);
-        final shown = documents[type];
-        return next.requiredVersion != displayedVersions[type] ||
-            shown == null ||
-            next.documentUrl != shown.documentUrl ||
-            next.documentLanguage != shown.documentLanguage;
-      })) {
+      if (requestLanguage != language ||
+          changes.keys.any((type) {
+            final next = current.consents.firstWhere((c) => c.type == type);
+            final shown = documents[type];
+            return next.requiredVersion != displayedVersions[type] ||
+                shown == null ||
+                next.documentUrl != shown.documentUrl ||
+                next.documentLanguage != shown.documentLanguage;
+          })) {
         if (requestLanguage == language) {
           _acceptConsents(current);
           _applyConsentPhase(current);

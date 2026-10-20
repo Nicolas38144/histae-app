@@ -11,19 +11,28 @@ class LanguageRepository {
 
   Future<ApiLanguage> read(RequestCancellation cancellation) async => _parse(
     await session.request(
-      'GET', '/api/users/me/language',
-      expectedStatus: 200, replayAfterRefresh: true,
+      'GET',
+      '/api/users/me/language',
+      expectedStatus: 200,
+      replayAfterRefresh: true,
       cancellation: cancellation,
     ),
   );
 
-  Future<void> write(ApiLanguage language, RequestCancellation cancellation) async {
-    final confirmed = _parse(await session.request(
-      'PATCH', '/api/users/me/language',
-      body: {'language': language.code},
-      expectedStatus: 200, replayAfterRefresh: true,
-      cancellation: cancellation,
-    ));
+  Future<void> write(
+    ApiLanguage language,
+    RequestCancellation cancellation,
+  ) async {
+    final confirmed = _parse(
+      await session.request(
+        'PATCH',
+        '/api/users/me/language',
+        body: {'language': language.code},
+        expectedStatus: 200,
+        replayAfterRefresh: true,
+        cancellation: cancellation,
+      ),
+    );
     if (confirmed != language) {
       throw const ApiFailure(ApiFailureKind.invalidResponse);
     }

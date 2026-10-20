@@ -6,7 +6,8 @@ import '../../../core/network/api_failure.dart';
 import 'plan_catalog.dart';
 
 abstract interface class CatalogRepository {
-  factory CatalogRepository(ApiClient api, {Listenable? languageChanges}) = ApiCatalogRepository;
+  factory CatalogRepository(ApiClient api, {Listenable? languageChanges}) =
+      ApiCatalogRepository;
 
   ApiLanguage get language;
   Listenable? get languageChanges;

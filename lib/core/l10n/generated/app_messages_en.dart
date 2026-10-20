@@ -3141,7 +3141,7 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get languageDescription =>
-      'Content supplied by Histae and people’s messages keep their original language.';
+      'The selected language applies to the interface, catalogues and notifications on this device. Selecting it while signed in also updates the account preference. People’s messages, bios and answers keep their original language.';
 
   @override
   String get messageRead => ' · Read';

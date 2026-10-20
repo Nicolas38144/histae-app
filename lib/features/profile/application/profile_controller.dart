@@ -150,7 +150,12 @@ class ProfileController extends ChangeNotifier {
     ) async {
       try {
         final result = await fetch();
-        if (_disposed || generation != _generation || readRevision != _readRevision || scope.isCancelled) return;
+        if (_disposed ||
+            generation != _generation ||
+            readRevision != _readRevision ||
+            scope.isCancelled) {
+          return;
+        }
         assign(result);
         _errors.remove(section);
       } on ApiFailure catch (e) {

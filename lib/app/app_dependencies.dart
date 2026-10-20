@@ -26,7 +26,10 @@ class AppDependencies {
     this.videos,
   });
 
-  factory AppDependencies.fromConfig(AppConfig config, {LocaleController? locale}) {
+  factory AppDependencies.fromConfig(
+    AppConfig config, {
+    LocaleController? locale,
+  }) {
     ApiClient client() => ApiClient(
       origin: config.apiOrigin,
       language: locale == null ? null : () => locale.apiLanguage,

@@ -44,8 +44,11 @@ class AccountLanguageBinding {
     unawaited(_read(next, epoch, scope));
   }
 
-  bool _alive(String owner, int epoch) => !_disposed && epoch == _epoch &&
-      session.hasSession && session.identity?.userId == owner;
+  bool _alive(String owner, int epoch) =>
+      !_disposed &&
+      epoch == _epoch &&
+      session.hasSession &&
+      session.identity?.userId == owner;
 
   Future<void> _read(String owner, int epoch, RequestCancellation scope) async {
     try {
@@ -59,8 +62,12 @@ class AccountLanguageBinding {
     }
   }
 
-  Future<void> _write(ApiLanguage language, String owner, int epoch,
-      RequestCancellation scope) async {
+  Future<void> _write(
+    ApiLanguage language,
+    String owner,
+    int epoch,
+    RequestCancellation scope,
+  ) async {
     // Selection may have awaited secure storage while the account was closing.
     if (!_alive(owner, epoch)) return;
     final previous = _failure;

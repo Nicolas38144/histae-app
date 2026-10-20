@@ -42,12 +42,16 @@ class _ConsentsPageState extends State<ConsentsPage> {
       _message = null;
     });
     try {
-      await widget.session.saveConsents(changes, {
-        for (final consent in state.consents)
-          consent.type: consent.requiredVersion,
-      }, displayedDocuments: {
-        for (final consent in state.consents) consent.type: consent,
-      });
+      await widget.session.saveConsents(
+        changes,
+        {
+          for (final consent in state.consents)
+            consent.type: consent.requiredVersion,
+        },
+        displayedDocuments: {
+          for (final consent in state.consents) consent.type: consent,
+        },
+      );
       if (mounted) {
         setState(() {
           _choices.clear();
@@ -121,7 +125,10 @@ class _ConsentsPageState extends State<ConsentsPage> {
                 final state = widget.session.consents;
                 if (state == null) return const SizedBox.shrink();
                 final signature = state.consents
-                    .map((c) => '${c.type.name}:${c.requiredVersion}:${c.documentLanguage.code}:${c.documentUrl}')
+                    .map(
+                      (c) =>
+                          '${c.type.name}:${c.requiredVersion}:${c.documentLanguage.code}:${c.documentUrl}',
+                    )
                     .join('|');
                 if (_versionSignature != signature) {
                   _versionSignature = signature;

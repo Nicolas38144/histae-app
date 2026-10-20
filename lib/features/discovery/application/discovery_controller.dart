@@ -222,7 +222,9 @@ class DiscoveryController extends ChangeNotifier {
     _notify();
     try {
       final next = await repository.status(_scope);
-      if (!_alive(epoch) || languageRevision != session.localizationRevision) return;
+      if (!_alive(epoch) || languageRevision != session.localizationRevision) {
+        return;
+      }
       status = next;
       _armExpiry();
       if (!next.ready) {
@@ -266,7 +268,10 @@ class DiscoveryController extends ChangeNotifier {
       try {
         result = await repository.feed(_cursor, _scope);
       } on ApiFailure catch (e) {
-        if (!_alive(epoch) || languageRevision != session.localizationRevision) return;
+        if (!_alive(epoch) ||
+            languageRevision != session.localizationRevision) {
+          return;
+        }
         if (e.code == 'invalid_cursor' && !restarted) {
           restarted = true;
           _cursor = null;
@@ -277,7 +282,9 @@ class DiscoveryController extends ChangeNotifier {
           rethrow;
         }
       }
-      if (!_alive(epoch) || languageRevision != session.localizationRevision) return;
+      if (!_alive(epoch) || languageRevision != session.localizationRevision) {
+        return;
+      }
       if (result.nextCursor != null && result.nextCursor == _cursor) {
         throw const ApiFailure(ApiFailureKind.invalidResponse);
       }

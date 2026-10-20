@@ -51,8 +51,10 @@ class LocaleController extends ChangeNotifier {
 
   ApiLanguage get apiLanguage =>
       ApiLanguage.tryParse(
-        _language ?? WidgetsBinding.instance.platformDispatcher.locale.languageCode,
-      ) ?? ApiLanguage.fr;
+        _language ??
+            WidgetsBinding.instance.platformDispatcher.locale.languageCode,
+      ) ??
+      ApiLanguage.fr;
 
   void systemLocaleChanged() {
     if (!_disposed && _language == null) notifyListeners();

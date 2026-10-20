@@ -3170,7 +3170,7 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get languageDescription =>
-      'Los contenidos de Histae y los mensajes de las personas conservan su idioma original.';
+      'El idioma elegido se aplica a la interfaz, los catálogos y las notificaciones de este dispositivo. Si lo eliges con la sesión iniciada, también actualiza la preferencia de la cuenta. Los mensajes, biografías y respuestas de las personas conservan su idioma original.';
 
   @override
   String get messageRead => ' · Leído';

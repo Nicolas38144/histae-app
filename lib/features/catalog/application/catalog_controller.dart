@@ -32,6 +32,7 @@ class CatalogController extends ChangeNotifier {
     notifyListeners();
     if (!_suspended) unawaited(load());
   }
+
   final CatalogRepository _repository;
   final DateTime Function() _now;
   CatalogStatus status = CatalogStatus.idle;

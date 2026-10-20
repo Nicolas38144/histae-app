@@ -11,7 +11,13 @@ import 'billing_models.dart';
 /// Persist intent BEFORE the first POST. No hosted URL, provider/customer ID,
 /// amount, payment detail or entitlement is persisted on the device.
 class CheckoutAttempt {
-  const CheckoutAttempt(this.origin, this.owner, this.key, this.period, {this.language});
+  const CheckoutAttempt(
+    this.origin,
+    this.owner,
+    this.key,
+    this.period, {
+    this.language,
+  });
 
   factory CheckoutAttempt.create(
     String origin,
@@ -46,8 +52,10 @@ class CheckoutAttempt {
         owner,
         key,
         BillingPeriod.values.byName(j['period'] as String),
-        language: j['language'] == null ? null : ApiLanguage.tryParse(j['language']) ??
-            (throw const FormatException()),
+        language: j['language'] == null
+            ? null
+            : ApiLanguage.tryParse(j['language']) ??
+                  (throw const FormatException()),
       );
     } catch (_) {
       throw const ApiFailure(ApiFailureKind.secureStorage);

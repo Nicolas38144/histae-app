@@ -9,8 +9,9 @@ class PushDevice {
       sessionId = j['session_id'] == null ? null : serverId(j, 'session_id'),
       platform = jsonString(j, 'platform'),
       version = optionalText(j, 'app_version'),
-      language = j['language'] == null ? null : ApiLanguage.tryParse(j['language']) ??
-          invalidResponse(),
+      language = j['language'] == null
+          ? null
+          : ApiLanguage.tryParse(j['language']) ?? invalidResponse(),
       createdAt = wireTime(j['created_at']),
       lastUsedAt = j['last_used_at'] == null
           ? null
