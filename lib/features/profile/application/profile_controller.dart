@@ -15,6 +15,7 @@ import 'profile_feed_preview.dart';
 class ProfileController extends ChangeNotifier {
   ProfileController(this.repository) {
     _key = session.resourceKey;
+    _localeRevision = session.localizationRevision;
     session.addListener(_sessionChanged);
   }
   final ProfileRepository repository;
@@ -28,7 +29,9 @@ class ProfileController extends ChangeNotifier {
   final _errors = <String, ApiFailure>{};
   bool loading = false, saving = false, uncertain = false;
   bool _disposed = false;
-  int _generation = 0;
+  int _generation = 0, _readRevision = 0;
+  late int _localeRevision;
+  bool _languageDirty = false;
   late String _key;
   RequestCancellation _scope = RequestCancellation();
   late final RetryTicker _timer = RetryTicker(
@@ -84,8 +87,20 @@ class ProfileController extends ChangeNotifier {
   }
 
   void _sessionChanged() {
-    if (_key == session.resourceKey && accessible) return;
+    if (_key == session.resourceKey && accessible) {
+      if (_localeRevision != session.localizationRevision) {
+        _localeRevision = session.localizationRevision;
+        _readRevision++;
+        _scope.cancel();
+        _scope = RequestCancellation();
+        loading = false;
+        _languageDirty = true;
+        if (!saving) unawaited(load());
+      }
+      return;
+    }
     _key = session.resourceKey;
+    _localeRevision = session.localizationRevision;
     _generation++;
     _scope.cancel();
     _scope = RequestCancellation();
@@ -122,7 +137,9 @@ class ProfileController extends ChangeNotifier {
     if (_disposed || !accessible || loading || saving || retrySeconds > 0) {
       return;
     }
+    _languageDirty = false;
     final generation = _generation;
+    final readRevision = ++_readRevision;
     final scope = _scope;
     loading = true;
     _notify();
@@ -133,11 +150,12 @@ class ProfileController extends ChangeNotifier {
     ) async {
       try {
         final result = await fetch();
-        if (_disposed || generation != _generation || scope.isCancelled) return;
+        if (_disposed || generation != _generation || readRevision != _readRevision || scope.isCancelled) return;
         assign(result);
         _errors.remove(section);
       } on ApiFailure catch (e) {
         if (_disposed || generation != _generation) return;
+        if (readRevision != _readRevision) return;
         _errors[section] = e;
         _cooldown(e);
         if (e.kind == ApiFailureKind.consentRequired) {
@@ -170,9 +188,17 @@ class ProfileController extends ChangeNotifier {
       read('answers', () => repository.answers(scope), (v) => _answers = v),
     ]);
     if (_disposed || generation != _generation) return;
+    if (readRevision != _readRevision) return;
     loading = false;
     if (_errors.isEmpty) uncertain = false;
     _notify();
+  }
+
+  String questionPrompt(String id, String fallback) {
+    for (final question in _questions) {
+      if (question.id == id) return question.prompt;
+    }
+    return fallback;
   }
 
   Future<void> saveIdentity(ProfileDraft draft) =>
@@ -236,6 +262,10 @@ class ProfileController extends ChangeNotifier {
       if (!_disposed && generation == _generation) {
         saving = false;
         _notify();
+        if (_languageDirty) {
+          _localeRevision = session.localizationRevision;
+          unawaited(load());
+        }
       }
     }
     await load();

@@ -24,6 +24,7 @@ class DiscoveryController extends ChangeNotifier {
     DateTime Function()? now,
   }) : _now = now ?? DateTime.now {
     _resourceKey = session.resourceKey;
+    _localeRevision = session.localizationRevision;
     session.addListener(_sessionChanged);
   }
   final DiscoveryRepository repository;
@@ -32,6 +33,8 @@ class DiscoveryController extends ChangeNotifier {
 
   AuthenticatedSession get session => repository.session;
   late String _resourceKey;
+  late int _localeRevision;
+  bool _languageDirty = false;
   RequestCancellation _scope = RequestCancellation();
   int _epoch = 0;
   bool _active = false, _disposed = false;
@@ -106,8 +109,17 @@ class DiscoveryController extends ChangeNotifier {
   }
 
   void _sessionChanged() {
-    if (_resourceKey == session.resourceKey && accessible) return;
+    if (_resourceKey == session.resourceKey && accessible) {
+      if (_localeRevision != session.localizationRevision) {
+        _localeRevision = session.localizationRevision;
+        _languageDirty = true;
+        // Do not cancel a swipe/GPS mutation or alter an uncertain intention.
+        if (!busy && active) unawaited(refresh());
+      }
+      return;
+    }
     _resourceKey = session.resourceKey;
+    _localeRevision = session.localizationRevision;
     deactivate();
     status = null;
     pending = null;
@@ -196,6 +208,8 @@ class DiscoveryController extends ChangeNotifier {
   Future<void> refresh() async {
     if (!active || busy || retrySeconds > 0) return;
     final epoch = _epoch;
+    final languageRevision = session.localizationRevision;
+    _languageDirty = false;
     loading = true;
     failure = null;
     locationIssue = null;
@@ -208,7 +222,7 @@ class DiscoveryController extends ChangeNotifier {
     _notify();
     try {
       final next = await repository.status(_scope);
-      if (!_alive(epoch)) return;
+      if (!_alive(epoch) || languageRevision != session.localizationRevision) return;
       status = next;
       _armExpiry();
       if (!next.ready) {
@@ -239,18 +253,20 @@ class DiscoveryController extends ChangeNotifier {
       if (_alive(epoch)) {
         loading = false;
         _notify();
+        if (_languageDirty && !busy) unawaited(refresh());
       }
     }
   }
 
   Future<void> _readPages(int epoch) async {
+    final languageRevision = session.localizationRevision;
     var restarted = false;
     for (var page = 0; page < 3; page++) {
       FeedPage result;
       try {
         result = await repository.feed(_cursor, _scope);
       } on ApiFailure catch (e) {
-        if (!_alive(epoch)) return;
+        if (!_alive(epoch) || languageRevision != session.localizationRevision) return;
         if (e.code == 'invalid_cursor' && !restarted) {
           restarted = true;
           _cursor = null;
@@ -261,7 +277,7 @@ class DiscoveryController extends ChangeNotifier {
           rethrow;
         }
       }
-      if (!_alive(epoch)) return;
+      if (!_alive(epoch) || languageRevision != session.localizationRevision) return;
       if (result.nextCursor != null && result.nextCursor == _cursor) {
         throw const ApiFailure(ApiFailureKind.invalidResponse);
       }
@@ -289,6 +305,7 @@ class DiscoveryController extends ChangeNotifier {
       return;
     }
     final epoch = _epoch;
+    _languageDirty = false;
     loading = true;
     failure = null;
     _notify();
@@ -305,6 +322,7 @@ class DiscoveryController extends ChangeNotifier {
       if (_alive(epoch)) {
         loading = false;
         _notify();
+        if (_languageDirty && !busy) unawaited(refresh());
       }
     }
     if (_alive(epoch) && status == null) await refresh();
@@ -340,6 +358,7 @@ class DiscoveryController extends ChangeNotifier {
       if (_alive(epoch)) {
         locating = false;
         _notify();
+        if (_languageDirty && !busy) unawaited(refresh());
       }
     }
     // No replay of a position write. Re-read its server result instead.
@@ -429,6 +448,7 @@ class DiscoveryController extends ChangeNotifier {
       if (_alive(epoch)) {
         sending = false;
         _notify();
+        if (_languageDirty && !busy) unawaited(refresh());
       }
     }
     if (_alive(epoch)) {

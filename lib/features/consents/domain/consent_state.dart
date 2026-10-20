@@ -1,3 +1,4 @@
+import '../../../core/l10n/api_language.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/network/json_fields.dart';
 
@@ -24,6 +25,8 @@ class PublicConsent {
     required this.requiredVersion,
     required this.documentUrl,
     required this.updatedAt,
+    this.documentLanguage = ApiLanguage.fr,
+    this.acceptedDocumentLanguage,
   });
 
   factory PublicConsent.fromJson(Object? value) {
@@ -42,6 +45,11 @@ class PublicConsent {
       requiredVersion: jsonString(json, 'required_document_version'),
       documentUrl: jsonString(json, 'document_url'),
       updatedAt: updated as String?,
+      documentLanguage: ApiLanguage.tryParse(json['document_language']) ??
+          (throw const ApiFailure(ApiFailureKind.invalidResponse)),
+      acceptedDocumentLanguage: json['accepted_document_language'] == null
+          ? null : ApiLanguage.tryParse(json['accepted_document_language']) ??
+              (throw const ApiFailure(ApiFailureKind.invalidResponse)),
     );
   }
   final ConsentType type;
@@ -50,6 +58,8 @@ class PublicConsent {
   final String requiredVersion;
   final String documentUrl;
   final String? updatedAt;
+  final ApiLanguage documentLanguage;
+  final ApiLanguage? acceptedDocumentLanguage;
 
   bool get current => granted && documentVersion == requiredVersion;
 }

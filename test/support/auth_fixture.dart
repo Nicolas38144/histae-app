@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+import 'package:histae_app/core/l10n/api_language.dart';
 import 'package:histae_app/core/network/api_client.dart';
 import 'package:histae_app/features/auth/application/session_controller.dart';
 import 'package:histae_app/features/auth/data/auth_repository.dart';
@@ -38,6 +40,7 @@ Map<String, dynamic> consentJson({
         },
         'required_document_version': version,
         'document_url': 'https://legal.example/${type.name}/$version',
+        'document_language': 'fr',
       },
   ],
   'onboarding_complete': complete,
@@ -97,20 +100,25 @@ class MemorySessionVault implements SessionVault {
 SessionController testSession(
   Future<http.Response> Function(http.Request request) handle, {
   MemorySessionVault? vault,
+  ApiLanguage Function()? language,
+  Listenable? languageChanges,
 }) => SessionController(
   AuthRepository(
     ApiClient(
       origin: Uri.parse('https://api.example'),
       client: MockClient(handle),
+      language: language,
     ),
   ),
   vault ?? MemorySessionVault(),
+  languageChanges: languageChanges,
 );
 
 http.Response defaultAuthResponse(
   http.Request request, {
   bool complete = false,
 }) => switch (request.url.path) {
+  '/api/users/me/language' => jsonResponse({'language': 'fr'}),
   '/api/auth/me' => jsonResponse(identityJson(complete: complete)),
   '/api/users/me/consents' => jsonResponse(consentJson(complete: complete)),
   '/api/auth/otp/send' => jsonResponse({'message': 'accepted'}, 202),

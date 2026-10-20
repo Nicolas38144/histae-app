@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../../../core/l10n/api_language.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/network/json_fields.dart';
@@ -14,7 +15,57 @@ import '../domain/authenticated_session.dart';
 export '../domain/authenticated_session.dart' show SessionPhase;
 
 class SessionController extends ChangeNotifier implements AuthenticatedSession {
-  SessionController(this.repository, this._vault);
+  SessionController(this.repository, this._vault, {Listenable? languageChanges})
+    : _languageChanges = languageChanges {
+    _lastLanguage = language;
+    languageChanges?.addListener(_languageChanged);
+  }
+  final Listenable? _languageChanges;
+  late ApiLanguage _lastLanguage;
+  int _localizationRevision = 0;
+  @override
+  int get localizationRevision => _localizationRevision;
+  @override
+  ApiLanguage get language => repository.api.language;
+
+  void _languageChanged() {
+    if (_disposed || _lastLanguage == language) return;
+    _lastLanguage = language;
+    _localizationRevision++;
+    // Separate from privacy/resource revisions: never discard drafts or intents.
+    _notify();
+    unawaited(_reloadLanguage());
+  }
+
+  Future<void> _reloadLanguage() async {
+    await _sync;
+    if (_disposed || !hasSession || retrySeconds > 0) return;
+    if (identity == null) {
+      await synchronize();
+      return;
+    }
+    final generation = _generation, revision = localizationRevision;
+    final requestLanguage = language;
+    _localizedReads++;
+    _notify();
+    try {
+      final state = ConsentState.fromJson(await _authorized(
+        'GET', '/api/users/me/consents', language: requestLanguage,
+      ));
+      if (_disposed || generation != _generation || revision != localizationRevision) return;
+      _acceptConsents(state);
+      _applyConsentPhase(state);
+    } on ApiFailure catch (error) {
+      if (!_disposed && hasSession && generation == _generation && revision == localizationRevision) {
+        // A failed translation read must not replace the session/navigation.
+        // Definitive auth rejection is still handled by _authorized.
+        _setFailure(error);
+      }
+    } finally {
+      _localizedReads--;
+      _notify();
+    }
+  }
   final AuthRepository repository;
   final SessionVault _vault;
   @override
@@ -45,9 +96,10 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
 
   bool get isSaving => _saving;
   bool _synchronizing = false;
+  int _localizedReads = 0;
 
   @override
-  bool get isSynchronizing => _synchronizing;
+  bool get isSynchronizing => _synchronizing || _localizedReads > 0;
   late final RetryTicker _retryTimer = RetryTicker(
     remaining: () => retrySeconds,
     onTick: () {
@@ -183,6 +235,7 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
     String method,
     String path, {
     Object? body,
+    ApiLanguage? language,
     bool events = false,
     bool download = false,
     Map<String, String>? query,
@@ -193,6 +246,7 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
     RequestCancellation? cancellation,
   }) async {
     final generation = _generation;
+    final requestLanguage = language ?? this.language;
     if (_rotation case final pending?) await pending;
     final used = _tokens;
     if (used == null || _loggingOut || _disposed || generation != _generation) {
@@ -224,6 +278,7 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
               method,
               path,
               body: body,
+              language: requestLanguage,
               query: query,
               photo: photo,
               idempotencyKey: idempotencyKey,
@@ -272,6 +327,7 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
     String method,
     String path, {
     Object? body,
+    ApiLanguage? language,
     Map<String, String>? query,
     List<int>? photo,
     String? idempotencyKey,
@@ -282,6 +338,7 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
     method,
     path,
     body: body,
+    language: language,
     query: query,
     photo: photo,
     idempotencyKey: idempotencyKey,
@@ -480,6 +537,8 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
   Future<void> _synchronize() async {
     if (!hasSession || _disposed || retrySeconds > 0) return;
     final generation = _generation;
+    final revision = localizationRevision;
+    final requestLanguage = language;
     _synchronizing = true;
     // Keep the existing form alive when returning from a legal document.
     // Unsaved choices survive only while the server document versions match.
@@ -490,21 +549,23 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
     _notify();
     try {
       final me = MobileIdentity.fromJson(
-        await _authorized('GET', '/api/auth/me'),
+        await _authorized('GET', '/api/auth/me', language: requestLanguage),
       );
       if (identity != null && identity!.userId != me.userId) {
         await _invalidate(const ApiFailure(ApiFailureKind.sessionUncertain));
         return;
       }
       final state = ConsentState.fromJson(
-        await _authorized('GET', '/api/users/me/consents'),
+        await _authorized('GET', '/api/users/me/consents', language: requestLanguage),
       );
       if (generation != _generation || _loggingOut || _disposed) return;
+      if (revision != localizationRevision) return;
       identity = me;
       _acceptConsents(state);
       _applyConsentPhase(state);
     } on ApiFailure catch (error) {
       if (generation != _generation || _loggingOut || _disposed) return;
+      if (revision != localizationRevision) return;
       if (hasSession) {
         phase = SessionPhase.unavailable;
         _setFailure(error);
@@ -525,31 +586,40 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
   @override
   Future<void> saveConsents(
     Map<ConsentType, bool> changes,
-    Map<ConsentType, String> displayedVersions,
-  ) async {
+    Map<ConsentType, String> displayedVersions, {
+    Map<ConsentType, PublicConsent>? displayedDocuments,
+  }) async {
     if (_disposed || !hasSession) {
       throw const ApiFailure(ApiFailureKind.unauthenticated);
     }
     if (_saving) throw const ApiFailure(ApiFailureKind.conflict);
     if (changes.isEmpty) return;
     if (retrySeconds > 0) throw failure!;
+    final requestLanguage = language;
+    final documents = displayedDocuments ?? {
+      for (final consent in consents?.consents ?? <PublicConsent>[])
+        consent.type: consent,
+    };
     _saving = true;
     failure = null;
     final generation = _generation;
     try {
       final current = ConsentState.fromJson(
-        await _authorized('GET', '/api/users/me/consents'),
+        await _authorized('GET', '/api/users/me/consents', language: requestLanguage),
       );
-      if (changes.keys.any(
-        (type) =>
-            current.consents
-                .firstWhere((c) => c.type == type)
-                .requiredVersion !=
-            displayedVersions[type],
-      )) {
-        _acceptConsents(current);
-        _applyConsentPhase(current);
-        _notify();
+      if (requestLanguage != language || changes.keys.any((type) {
+        final next = current.consents.firstWhere((c) => c.type == type);
+        final shown = documents[type];
+        return next.requiredVersion != displayedVersions[type] ||
+            shown == null ||
+            next.documentUrl != shown.documentUrl ||
+            next.documentLanguage != shown.documentLanguage;
+      })) {
+        if (requestLanguage == language) {
+          _acceptConsents(current);
+          _applyConsentPhase(current);
+          _notify();
+        }
         throw const ApiFailure(
           ApiFailureKind.conflict,
           code: 'legal_documents_changed',
@@ -559,6 +629,7 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
         await _authorized(
           'PUT',
           '/api/users/me/consents',
+          language: requestLanguage,
           body: {
             'consents': changes.entries
                 .map(
@@ -570,6 +641,10 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
       );
       if (generation != _generation || _loggingOut || _disposed) {
         throw const ApiFailure(ApiFailureKind.cancelled);
+      }
+      if (requestLanguage != language) {
+        await _reloadLanguage();
+        return;
       }
       _acceptConsents(state);
       identity = MobileIdentity(identity!.userId, state.onboardingComplete);
@@ -647,6 +722,7 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
     _disposed = true;
     _retryTimer.cancel();
     _scope.cancel();
+    _languageChanges?.removeListener(_languageChanged);
     repository.api.close();
     super.dispose();
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../core/l10n/api_language.dart';
 import '../../../core/network/api_client.dart';
 import '../../consents/domain/consent_state.dart';
 import 'auth_models.dart';
@@ -19,6 +20,10 @@ enum SessionPhase {
 abstract interface class AuthenticatedSession implements Listenable {
   Uri get apiOrigin;
 
+  ApiLanguage get language;
+
+  int get localizationRevision;
+
   SessionPhase get phase;
 
   MobileIdentity? get identity;
@@ -37,8 +42,9 @@ abstract interface class AuthenticatedSession implements Listenable {
 
   Future<void> saveConsents(
     Map<ConsentType, bool> changes,
-    Map<ConsentType, String> displayedVersions,
-  );
+    Map<ConsentType, String> displayedVersions, {
+    Map<ConsentType, PublicConsent>? displayedDocuments,
+  });
 
   Future<void> logout();
 
@@ -54,6 +60,7 @@ abstract interface class AuthenticatedSession implements Listenable {
     String method,
     String path, {
     Object? body,
+    ApiLanguage? language,
     Map<String, String>? query,
     List<int>? photo,
     String? idempotencyKey,

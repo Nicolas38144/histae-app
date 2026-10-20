@@ -1,9 +1,15 @@
+import 'package:flutter/foundation.dart';
+
+import '../../../core/l10n/api_language.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
 import 'plan_catalog.dart';
 
 abstract interface class CatalogRepository {
-  factory CatalogRepository(ApiClient api) = ApiCatalogRepository;
+  factory CatalogRepository(ApiClient api, {Listenable? languageChanges}) = ApiCatalogRepository;
+
+  ApiLanguage get language;
+  Listenable? get languageChanges;
 
   Future<PlanCatalog> load(RequestCancellation cancellation);
 
@@ -11,7 +17,11 @@ abstract interface class CatalogRepository {
 }
 
 final class ApiCatalogRepository implements CatalogRepository {
-  ApiCatalogRepository(this._api);
+  ApiCatalogRepository(this._api, {this.languageChanges});
+  @override
+  final Listenable? languageChanges;
+  @override
+  ApiLanguage get language => _api.language;
   final ApiClient _api;
 
   @override

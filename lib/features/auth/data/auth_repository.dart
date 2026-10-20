@@ -1,3 +1,4 @@
+import '../../../core/l10n/api_language.dart';
 import '../../../core/network/api_client.dart';
 import '../domain/auth_models.dart';
 
@@ -11,8 +12,9 @@ abstract interface class AuthRepository {
   Future<void> sendOtp(
     String phone,
     String key,
-    RequestCancellation cancellation,
-  );
+    RequestCancellation cancellation, {
+    ApiLanguage? language,
+  });
 
   Future<TokenPair> verifyOtp(
     String phone,
@@ -34,11 +36,13 @@ final class ApiAuthRepository implements AuthRepository {
   Future<void> sendOtp(
     String phone,
     String key,
-    RequestCancellation cancellation,
-  ) async {
+    RequestCancellation cancellation, {
+    ApiLanguage? language,
+  }) async {
     await api.requestJson(
       'POST',
       '/api/auth/otp/send',
+      language: language,
       body: {'phone_number': phone},
       idempotencyKey: key,
       expectedStatus: 202,

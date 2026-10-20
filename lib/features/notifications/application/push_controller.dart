@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../../core/async/serial_executor.dart';
+import '../../../core/l10n/api_language.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/network/retry_after.dart';
@@ -19,14 +20,37 @@ class PushController extends ChangeNotifier {
     this.gateway,
     this.vault, {
     Future<String?> Function()? appVersion,
-  }) : _appVersion =
+    ApiLanguage Function()? language,
+    Listenable? languageChanges,
+  }) : _language = language,
+       _languageChanges = languageChanges,
+       _appVersion =
            appVersion ??
            (() async {
              final p = await PackageInfo.fromPlatform();
              return '${p.version}+${p.buildNumber}';
            }) {
     session.addListener(_sessionChanged);
+    _lastLanguage = _language?.call();
+    languageChanges?.addListener(_languageChanged);
   }
+  final ApiLanguage Function()? _language;
+  final Listenable? _languageChanges;
+  ApiLanguage? _lastLanguage;
+  bool _languageDirty = false;
+
+  void _languageChanged() {
+    final next = _language?.call();
+    if (_disposed || next == _lastLanguage) return;
+    _lastLanguage = next;
+    _languageDirty = true;
+    if (!active || !enabled || !configured || busy || pending != null || retrySeconds > 0) return;
+    final epoch = _epoch;
+    unawaited(_enqueue(() async {
+      if (_alive(epoch) && enabled && pending == null && _languageDirty) await _newRegistration(epoch);
+    }));
+  }
+
   final DeviceRepository repository;
   final PushGateway gateway;
   final PushVault vault;
@@ -349,7 +373,8 @@ class PushController extends ChangeNotifier {
     if (!_alive(epoch)) return;
     final version = await _appVersion();
     if (!_alive(epoch)) return;
-    pending = DeviceRegistration(token, gateway.platform, version);
+    pending = DeviceRegistration(token, gateway.platform, version, language: _language?.call());
+    _languageDirty = false;
     await _send(epoch);
   }
 
@@ -359,7 +384,7 @@ class PushController extends ChangeNotifier {
     final old = deviceId;
     final registered = await repository.register(intent, _scope);
     if (!_alive(epoch)) return;
-    if (registered.platform != intent.platform) {
+    if (registered.platform != intent.platform || registered.language != intent.language) {
       throw const ApiFailure(ApiFailureKind.invalidResponse);
     }
     await _persist(epoch, id: registered.id);
@@ -374,8 +399,12 @@ class PushController extends ChangeNotifier {
     final latest = _latestRegistration;
     if (latest != null && _alive(epoch)) {
       _latestRegistration = null;
-      pending = DeviceRegistration(latest, gateway.platform, intent.version);
+      pending = DeviceRegistration(latest, gateway.platform, intent.version, language: _language?.call());
       await _send(epoch);
+    }
+    if (_alive(epoch) && enabled && pending == null &&
+        (intent.language != _language?.call() || _languageDirty)) {
+      await _newRegistration(epoch);
     }
     _notify();
   }
@@ -412,7 +441,7 @@ class PushController extends ChangeNotifier {
         try {
           final version = await _appVersion();
           if (!_alive(epoch)) return;
-          pending = DeviceRegistration(latest, gateway.platform, version);
+          pending = DeviceRegistration(latest, gateway.platform, version, language: _language?.call());
           await _send(epoch);
         } catch (e) {
           if (_alive(epoch)) _error(e);
@@ -522,7 +551,7 @@ class PushController extends ChangeNotifier {
           return;
         }
         await _cleanObsolete(epoch);
-        if (deviceId == null && pending == null) await _newRegistration(epoch);
+        if ((deviceId == null || _languageDirty) && pending == null) await _newRegistration(epoch);
       } catch (e) {
         if (_alive(epoch)) _error(e);
       } finally {
@@ -624,6 +653,7 @@ class PushController extends ChangeNotifier {
       unawaited(s.cancel());
     }
     session.removeListener(_sessionChanged);
+    _languageChanges?.removeListener(_languageChanged);
     pending = null;
     foreground = null;
     pendingOpen = null;

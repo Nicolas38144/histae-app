@@ -166,6 +166,7 @@ void main() {
       'push_token': syntheticRegistration,
       'platform': 'android',
       'app_version': '2.3.0+12',
+      'language': null,
     });
     gateway.tokens.add('synthetic-fcm-installation-two');
     await pumpEventQueue();

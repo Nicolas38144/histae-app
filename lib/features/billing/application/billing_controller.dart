@@ -264,6 +264,7 @@ class BillingController extends ChangeNotifier {
       session.apiOrigin.toString(),
       _owner!,
       period,
+      language: session.language,
     );
     final intent = pending!;
     _notify();

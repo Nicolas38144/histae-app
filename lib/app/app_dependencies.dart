@@ -1,4 +1,5 @@
 import '../core/config/app_config.dart';
+import '../core/l10n/locale_controller.dart';
 import '../core/network/api_client.dart';
 import '../features/auth/application/session_controller.dart';
 import '../features/auth/data/auth_repository.dart';
@@ -25,19 +26,26 @@ class AppDependencies {
     this.videos,
   });
 
-  factory AppDependencies.fromConfig(AppConfig config) {
+  factory AppDependencies.fromConfig(AppConfig config, {LocaleController? locale}) {
+    ApiClient client() => ApiClient(
+      origin: config.apiOrigin,
+      language: locale == null ? null : () => locale.apiLanguage,
+    );
     final session = SessionController(
-      AuthRepository(ApiClient(origin: config.apiOrigin)),
+      AuthRepository(client()),
       SecureSessionVault(),
+      languageChanges: locale,
     );
     return AppDependencies(
-      catalog: CatalogRepository(ApiClient(origin: config.apiOrigin)),
+      catalog: CatalogRepository(client(), languageChanges: locale),
       session: session,
       videos: AdmobRewardedVideoGateway(config),
       push: PushController(
         DeviceRepository(session),
         FirebasePushGateway(config.push),
         SecurePushVault(),
+        language: locale == null ? null : () => locale.apiLanguage,
+        languageChanges: locale,
       ),
       billing: BillingController(
         BillingRepository(session),

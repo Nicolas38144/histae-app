@@ -105,8 +105,25 @@ Vérification du refactoring : 48 contrôles existants ciblés réussis, formata
 
 ## Localisation de l’interface — 19 octobre 2026
 
-Les textes de l’interface sont portés par quatre catalogues ARB (français, anglais, espagnol, italien), avec génération Flutter dans `core/l10n/generated`. `AppStrings` reste la façade des formats et des erreurs métier ; les correspondances propres aux fonctionnalités reçoivent cette façade explicitement. Les validateurs et le lecteur vidéo renvoient `ClientMessage`, indépendant de Flutter, puis la présentation traduit au rendu. Les erreurs de photo sont conservées sous une forme résolue au rendu. Aucune locale globale mutable, traduction automatique de contenu serveur ou modification de requête API.
+Les textes de l’interface sont portés par quatre catalogues ARB (français, anglais, espagnol, italien), avec génération Flutter dans `core/l10n/generated`. `AppStrings` reste la façade des formats et des erreurs métier ; les correspondances propres aux fonctionnalités reçoivent cette façade explicitement. Les validateurs et le lecteur vidéo renvoient `ClientMessage`, indépendant de Flutter, puis la présentation traduit au rendu. Les erreurs de photo sont conservées sous une forme résolue au rendu. Aucune locale globale mutable ni traduction automatique de contenu personnel. Le raccordement des requêtes API à la préférence de langue est décrit dans le complément ci-dessous.
 
 `LocaleController` et son stockage injectable appartiennent à l’application. La préférence est restaurée avant le premier rendu, conservée entre comptes et indépendante des données de session. Le navigateur garde sa clé et son état lors du changement de langue. Le français initial est conservé ; le mode appareil résout les variantes régionales et revient au français pour les langues non prises en charge. Les libellés Material et Cupertino utilisent les délégués Flutter. `intl` assure les formats et les messages ICU gèrent les pluriels. Les permissions iOS ont leurs ressources natives générées depuis les mêmes catalogues.
 
 Le test de localisation contrôle les quatre catalogues et analyse la syntaxe des widgets pour refuser de nouveaux textes visibles en dur. `analyzer` est une dépendance de développement uniquement. La procédure de contribution et les limites des contenus API/dialogues natifs sont documentées dans `lib/core/l10n/README.md`.
+
+## Langue du contrat API — 20 octobre 2026
+
+`ApiLanguage` porte les quatre codes exacts sans dépendance Flutter. La composition partage la source
+`LocaleController` avec les deux clients HTTP, la session, le catalogue et les notifications.
+`LanguageRepository` ne fait que les GET/PATCH de préférence et leur décodage ;
+`AccountLanguageBinding` relie ce dépôt au propriétaire authentifié et au choix d’interface. Le socle
+`core` reçoit un callback et n’importe aucune fonctionnalité.
+
+La langue d’une requête est fixée avant une éventuelle rotation d’accès. OTP et Checkout possèdent
+leur instantané dans l’intention, comme leur clé et leur payload. La révision de localisation est
+séparée des révisions de confidentialité : les lectures et libellés changent sans purger les brouillons,
+la navigation ou les écritures en attente. Les contrôleurs conservent leurs gardes de session,
+leurs délais de reprise et leur propriété des annulations. Les consentements comparent aussi l’URL
+et la langue du document présenté ; leur relecture pour traduction ne simule pas une reconnexion.
+
+Voir [les routes couvertes et la validation à réaliser avec Flutter](docs/api-languages.md).

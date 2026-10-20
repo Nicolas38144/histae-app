@@ -6,6 +6,7 @@ import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
+import '../l10n/api_language.dart';
 import 'api_failure.dart';
 import 'api_stream.dart';
 import 'request_cancellation.dart';
@@ -19,8 +20,13 @@ class ApiClient {
     http.Client? client,
     this.timeout = const Duration(seconds: 15),
     DateTime Function()? now,
+    ApiLanguage Function()? language,
   }) : _client = client ?? http.Client(),
-       _now = now ?? DateTime.now;
+       _now = now ?? DateTime.now,
+       _language = language ?? (() => ApiLanguage.fr);
+  final ApiLanguage Function() _language;
+  ApiLanguage get language => _language();
+
   final Uri origin;
   final http.Client _client;
   final Duration timeout;
@@ -80,6 +86,7 @@ class ApiClient {
           ..headers.addAll({
             'Accept': dataExport ? 'application/json' : 'text/event-stream',
             if (dataExport) 'Accept-Encoding': 'identity',
+            'Accept-Language': language.code,
             'Authorization': 'Bearer $bearer',
             'X-Request-ID': id,
           });
@@ -174,6 +181,7 @@ class ApiClient {
     String method,
     String path, {
     Object? body,
+    ApiLanguage? language,
     Map<String, String>? query,
     List<int>? photo,
     String? bearer,
@@ -224,6 +232,7 @@ class ApiClient {
     request.followRedirects = false;
     request.headers.addAll({
       'Accept': 'application/json',
+      'Accept-Language': (language ?? this.language).code,
       'X-Request-ID': requestId,
     });
     if (bearer != null) request.headers['Authorization'] = 'Bearer $bearer';

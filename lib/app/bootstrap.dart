@@ -2,10 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import '../core/config/app_config.dart';
+import '../core/l10n/locale_controller.dart';
 import '../features/privacy/data/private_export_store.dart';
 import 'app_dependencies.dart';
 
-Future<AppDependencies> bootstrap() async {
+Future<AppDependencies> bootstrap({LocaleController? locale}) async {
   try {
     await PrivateExportStore().clean();
   } catch (_) {
@@ -32,6 +33,7 @@ Future<AppDependencies> bootstrap() async {
         await rootBundle.loadString('.env'),
         isDebug: kDebugMode,
       ),
+      locale: locale,
     );
   } on FormatException {
     // Invalid configuration may contain secrets: never log its source.

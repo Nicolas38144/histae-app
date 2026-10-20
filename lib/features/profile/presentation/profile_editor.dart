@@ -15,6 +15,22 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
   ApiFailure? messageFailure;
   late final String _resourceKey = controller.session.resourceKey;
 
+  @override
+  void initState() {
+    super.initState();
+    controller.addListener(_dataChanged);
+  }
+
+  void _dataChanged() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    controller.removeListener(_dataChanged);
+    super.dispose();
+  }
+
   void changed() {
     dirty = true;
   }

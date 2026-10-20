@@ -348,3 +348,10 @@ Vérifications : 25 contrôles ciblés dont trois ajouts nécessaires, analyse p
 Les lectures des rencontres et des crédits alimentent désormais une seule barre fixe sous l’en-tête. Les indicateurs dans la liste et la carte de crédits ne se relaient plus à des hauteurs différentes. Les phases d’une actualisation sont regroupées ; une nouvelle traction pendant le chargement initial ne l’annule pas. La relecture de cohérence après connexion au temps réel reste active, et une conversation entrante s’ouvre toujours sans attendre le quota. Le premier chargement n’affiche plus brièvement une liste vide ou un solde indisponible.
 
 12 contrôles ciblés réussis, dont une régression avec réponses différées vérifiant la position de l’unique barre, les lectures successives, la connexion temps réel et la sortie sur erreur. Analyse Flutter propre. La vérification visuelle finale reste à effectuer sur l’émulateur après installation ; aucun changement API ou appel fournisseur réel.
+
+## Langues et contrat API
+
+Le choix de langue pilote désormais les appels API, les catalogues, les documents, les pages Stripe
+et l’exception push de l’appareil. Le [guide des langues API](docs/api-languages.md) décrit la
+préférence du compte, les règles de reprise OTP/Checkout et les commandes à exécuter avec Flutter.
+La livraison a été préparée sans SDK Flutter/Dart local ; les tests ajoutés restent à exécuter.

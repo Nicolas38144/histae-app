@@ -142,7 +142,7 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  inputs[i].prompt,
+                  controller.questionPrompt(inputs[i].id, inputs[i].prompt),
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 16),

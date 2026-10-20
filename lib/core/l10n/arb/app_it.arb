@@ -847,7 +847,7 @@
   "languageItalian": "Italiano",
   "languageSaveFailure": "Impossibile salvare la lingua. Riprova.",
   "languageSaving": "Salvataggio della lingua…",
-  "languageDescription": "I contenuti forniti da Histae e i messaggi delle persone mantengono la lingua originale.",
+  "languageDescription": "La lingua scelta si applica all’interfaccia, ai cataloghi e alle notifiche di questo dispositivo. Se la scegli dopo l’accesso, viene aggiornata anche la preferenza dell’account. I messaggi, le biografie e le risposte delle persone mantengono la lingua originale.",
   "messageRead": " · Letto",
   "iosLocationPermission": "Histae usa una rilevazione singola per proporre incontri nelle vicinanze. La posizione esatta resta privata, senza tracciamento in background.",
   "iosPhotoPermission": "Scegli la tua unica foto profilo Histae. Verrà svelata solo dopo il consenso reciproco.",

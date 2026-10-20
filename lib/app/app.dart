@@ -14,6 +14,7 @@ import '../features/continuation/data/rewarded_video_gateway.dart';
 import '../features/continuation/presentation/rewarded_video_scope.dart';
 import '../features/notifications/application/push_controller.dart';
 import '../features/notifications/presentation/push_scope.dart';
+import 'account_language_binding.dart';
 import 'app_opening.dart';
 import 'notification_navigation.dart';
 import 'notification_overlay.dart';
@@ -46,6 +47,7 @@ class HistaeApp extends StatefulWidget {
 class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
   final _navigator = GlobalKey<NavigatorState>();
   late final _locale = widget.localeController ?? LocaleController();
+  AccountLanguageBinding? _accountLanguage;
   bool _hadSession = false;
   int _resourceRevision = 0;
   SessionPhase? _previousPhase;
@@ -64,6 +66,9 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
       billingController: widget.billingController,
       isMounted: () => mounted,
     );
+    if (widget.sessionController case final session?) {
+      _accountLanguage = AccountLanguageBinding(_locale, session);
+    }
     if (widget.pushController case final push?) unawaited(push.start());
     if (widget.sessionController case final session?) {
       unawaited(session.start());
@@ -90,6 +95,9 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
       });
     }
   }
+
+  @override
+  void didChangeLocales(List<Locale>? locales) => _locale.systemLocaleChanged();
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -119,11 +127,12 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     widget.sessionController?.removeListener(_sessionChanged);
     _notifications.dispose();
-    _locale.dispose();
+    _accountLanguage?.dispose();
     widget.pushController?.dispose();
     widget.billingController?.dispose();
     widget.sessionController?.dispose();
     widget.catalogRepository?.close();
+    _locale.dispose();
     super.dispose();
   }
 

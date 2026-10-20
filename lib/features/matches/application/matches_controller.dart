@@ -23,6 +23,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   }) : realtime = realtime ?? RealtimeClient(repository.session),
        _now = now ?? DateTime.now {
     _key = session.resourceKey;
+    _localeRevision = session.localizationRevision;
     session.addListener(_sessionChanged);
     this.realtime.onSignal = _signal;
     this.realtime.onState = (connected, error) {
@@ -63,6 +64,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   @override
   AuthenticatedSession get session => repository.session;
   late String _key;
+  late int _localeRevision;
   bool _disposed = false, _active = false, _verified = false, _dirty = false;
   int _epoch = 0, _chatEpoch = 0, _listRevision = 0;
   @override
@@ -166,8 +168,18 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   }
 
   void _sessionChanged() {
-    if (_key == session.resourceKey && accessible) return;
+    if (_key == session.resourceKey && accessible) {
+      if (_localeRevision != session.localizationRevision) {
+        _localeRevision = session.localizationRevision;
+        _dirty = true;
+        _verified = false;
+        _notify();
+        _schedule();
+      }
+      return;
+    }
     _key = session.resourceKey;
+    _localeRevision = session.localizationRevision;
     privacyEpoch++;
     suspend();
     _items.clear();
@@ -379,6 +391,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
 
   Future<void> _refresh() async {
     final epoch = _epoch, chatEpoch = _chatEpoch;
+    final languageRevision = session.localizationRevision;
     final target = selectedId;
     final scope = _scope;
     listLoading = true;
@@ -393,6 +406,10 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       do {
         final page = await repository.matches(scope, cursor: cursor);
         if (!_alive(epoch)) return;
+        if (languageRevision != session.localizationRevision) {
+          _dirty = true;
+          return;
+        }
         for (final item in page.items) {
           if (!_removed.contains(item.id) &&
               seen.add(item.id) &&
@@ -497,6 +514,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       return;
     }
     final epoch = _epoch, revision = _listRevision;
+    final languageRevision = session.localizationRevision;
     final cursor = listCursor;
     listLoading = true;
     failure = null;
@@ -506,6 +524,10 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       if (!_alive(epoch) || revision != _listRevision) return;
       if (page.cursor != null && page.cursor == cursor) {
         throw const ApiFailure(ApiFailureKind.invalidResponse);
+      }
+      if (languageRevision != session.localizationRevision) {
+        _dirty = true;
+        return;
       }
       final ids = _items.map((m) => m.id).toSet();
       for (final item in page.items) {

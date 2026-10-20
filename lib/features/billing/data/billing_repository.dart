@@ -49,6 +49,7 @@ final class ApiBillingRepository implements BillingRepository {
       replayAfterRefresh: true,
       cancellation: scope,
       idempotencyKey: attempt.key,
+      language: attempt.language,
       body: {'billing_period': attempt.period.name},
     ),
   );

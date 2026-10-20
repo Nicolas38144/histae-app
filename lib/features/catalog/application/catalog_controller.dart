@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../../../core/l10n/api_language.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/network/retry_after.dart';
@@ -13,7 +14,24 @@ enum CatalogStatus { idle, loading, ready, empty, failure }
 
 class CatalogController extends ChangeNotifier {
   CatalogController(this._repository, {DateTime Function()? now})
-    : _now = now ?? DateTime.now;
+    : _now = now ?? DateTime.now {
+    _language = _repository.language;
+    _repository.languageChanges?.addListener(_languageChanged);
+  }
+  late ApiLanguage _language;
+  bool _suspended = false;
+
+  void _languageChanged() {
+    if (_disposed || _language == _repository.language) return;
+    _language = _repository.language;
+    _pending?.cancel();
+    _pending = null;
+    plans = const [];
+    offers = const [];
+    status = retrySeconds > 0 ? CatalogStatus.failure : CatalogStatus.idle;
+    notifyListeners();
+    if (!_suspended) unawaited(load());
+  }
   final CatalogRepository _repository;
   final DateTime Function() _now;
   CatalogStatus status = CatalogStatus.idle;
@@ -35,6 +53,7 @@ class CatalogController extends ChangeNotifier {
     if (_disposed || status == CatalogStatus.loading || retrySeconds > 0) {
       return;
     }
+    _suspended = false;
     _cooldown.cancel();
     final request = RequestCancellation();
     _pending = request;
@@ -62,6 +81,7 @@ class CatalogController extends ChangeNotifier {
   }
 
   void suspend() {
+    _suspended = true;
     if (status != CatalogStatus.loading) return;
     _pending?.cancel();
     _pending = null;
@@ -74,6 +94,7 @@ class CatalogController extends ChangeNotifier {
     _disposed = true;
     _pending?.cancel();
     _cooldown.cancel();
+    _repository.languageChanges?.removeListener(_languageChanged);
     super.dispose();
   }
 }

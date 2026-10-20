@@ -1,3 +1,4 @@
+import '../../../core/l10n/api_language.dart';
 import '../../../core/network/json_fields.dart';
 
 class PushDevice {
@@ -8,6 +9,8 @@ class PushDevice {
       sessionId = j['session_id'] == null ? null : serverId(j, 'session_id'),
       platform = jsonString(j, 'platform'),
       version = optionalText(j, 'app_version'),
+      language = j['language'] == null ? null : ApiLanguage.tryParse(j['language']) ??
+          invalidResponse(),
       createdAt = wireTime(j['created_at']),
       lastUsedAt = j['last_used_at'] == null
           ? null
@@ -16,6 +19,7 @@ class PushDevice {
   }
   final String id, platform;
   final String? sessionId, version;
+  final ApiLanguage? language;
   final DateTime createdAt;
   final DateTime? lastUsedAt;
 }
@@ -60,7 +64,7 @@ class PushIntent {
 }
 
 class DeviceRegistration {
-  DeviceRegistration(this.token, this.platform, this.version) {
+  DeviceRegistration(this.token, this.platform, this.version, {this.language}) {
     if (token.trim().length < 20 ||
         token.length > 4096 ||
         !['android', 'ios'].contains(platform) ||
@@ -70,11 +74,13 @@ class DeviceRegistration {
   }
   final String token, platform;
   final String? version;
+  final ApiLanguage? language;
 
-  Map<String, Object> get body => {
+  Map<String, Object?> get body => {
     'push_token': token,
     'platform': platform,
     'app_version': ?version,
+    'language': language?.code,
   };
 
   @override

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../../../core/l10n/api_language.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/network/retry_after.dart';
@@ -15,6 +16,7 @@ class OtpController extends ChangeNotifier {
   final DateTime Function() _now;
   String? _phone;
   String? _key;
+  ApiLanguage? _language;
   bool busy = false;
   bool requested = false;
   bool verificationUncertain = false;
@@ -50,12 +52,15 @@ class OtpController extends ChangeNotifier {
     if (newIntention) {
       _phone = phone;
       _key = newUuidV4();
+      _language = session.language;
       requested = false;
       verificationUncertain = false;
     }
     if (_phone != phone || _key == null) return;
     await _run(() async {
-      await session.repository.sendOtp(_phone!, _key!, _request!);
+      await session.repository.sendOtp(
+        _phone!, _key!, _request!, language: _language,
+      );
       requested = true;
       verificationUncertain = false;
       notice = 'otp_accepted';
@@ -143,6 +148,7 @@ class OtpController extends ChangeNotifier {
     if (busy) return;
     _phone = null;
     _key = null;
+    _language = null;
     requested = false;
     verificationUncertain = false;
     failure = null;
@@ -158,6 +164,7 @@ class OtpController extends ChangeNotifier {
     _timer.cancel();
     _phone = null;
     _key = null;
+    _language = null;
     super.dispose();
   }
 }

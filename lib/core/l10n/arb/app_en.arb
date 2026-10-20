@@ -847,7 +847,7 @@
   "languageItalian": "Italiano",
   "languageSaveFailure": "The language could not be saved. Try again.",
   "languageSaving": "Saving language…",
-  "languageDescription": "Content supplied by Histae and people’s messages keep their original language.",
+  "languageDescription": "The selected language applies to the interface, catalogues and notifications on this device. Selecting it while signed in also updates the account preference. People’s messages, bios and answers keep their original language.",
   "messageRead": " · Read",
   "iosLocationPermission": "Histae uses a one-off location reading to suggest nearby encounters. Your exact location stays private, with no background tracking.",
   "iosPhotoPermission": "Choose your single Histae profile photo. It will only be revealed after mutual consent.",
