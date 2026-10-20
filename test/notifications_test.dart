@@ -19,6 +19,21 @@ import 'support/matches_fixture.dart';
 import 'support/notifications_fixture.dart';
 
 void main() {
+  test('ignores retired trial alerts and still accepts payment failure alerts', () {
+    expect(
+      PushIntent.parse({
+        'notification_id': notificationOne,
+        'type': 'subscription_trial_ending',
+      }),
+      isNull,
+    );
+    final payment = PushIntent.parse({
+      'notification_id': notificationOne,
+      'type': 'billing_payment_failed',
+    });
+    expect(payment?.kind, PushKind.billingPaymentFailed);
+    expect(payment?.matchId, isNull);
+  });
   test('public Firebase configuration defaults off, rejects secrets and inconsistent sender IDs', () {
     const base = 'APP_ENV=production\nAPI_BASE_URL=https://api.example\n';
     final c = AppConfig.fromDotEnv(
