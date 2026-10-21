@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_empty_state.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../continuation/presentation/continuation_balance_card.dart';
 import '../../continuation/presentation/credits_page.dart';
@@ -209,22 +210,33 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(24),
                     children: [
+                      if (!_loading && c.items.isEmpty && c.failure == null)
+                        HistaeEmptyState(
+                          key: const Key('matches-empty'),
+                          title: AppStrings.of(context)
+                              .messages
+                              .matchesEmptyTitle,
+                          body: AppStrings.of(context)
+                              .messages
+                              .matchesPageNoMatchesYetTheyWillAppear,
+                        )
+                      else
+                        EditorialCard(
+                          eyebrow: AppStrings.of(context)
+                              .messages
+                              .discoveryPageTakeYourTime,
+                          title: AppStrings.of(context)
+                              .messages
+                              .matchesPageWordsContinue,
+                          body: AppStrings.of(context)
+                              .messages
+                              .matchesPageMutualInterestThenASpaceTo,
+                        ),
+                      const SizedBox(height: 16),
                       ContinuationBalanceCard(
                         controller: c.continuation,
                         onVideos: _openCredits,
                         loading: _overviewLoads > 0,
-                      ),
-                      const SizedBox(height: 24),
-                      EditorialCard(
-                        eyebrow: AppStrings.of(context)
-                            .messages
-                            .discoveryPageTakeYourTime,
-                        title: AppStrings.of(context)
-                            .messages
-                            .matchesPageWordsContinue,
-                        body: AppStrings.of(context)
-                            .messages
-                            .matchesPageMutualInterestThenASpaceTo,
                       ),
                       const SizedBox(height: 16),
                       if (!c.realtimeConnected)
@@ -251,15 +263,6 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
                               MatchesStrings(AppStrings.of(context))
                                   .failure(error),
                             ),
-                          ),
-                        ),
-                      if (!_loading && c.items.isEmpty && c.failure == null)
-                        Padding(
-                          padding: EdgeInsets.symmetric(vertical: 24),
-                          child: Text(
-                            AppStrings.of(context)
-                                .messages
-                                .matchesPageNoMatchesYetTheyWillAppear,
                           ),
                         ),
                       for (final match in c.items)

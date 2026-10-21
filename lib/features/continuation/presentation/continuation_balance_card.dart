@@ -52,9 +52,34 @@ class ContinuationBalanceCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              AppStrings.of(context).messages.continuationBalanceCardToContinue,
-              style: theme.textTheme.titleMedium,
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 12,
+              runSpacing: 4,
+              children: [
+                Text(
+                  AppStrings.of(context)
+                      .messages
+                      .continuationBalanceCardToContinue,
+                  style: theme.textTheme.titleMedium,
+                ),
+                if (!loading &&
+                    !c.loading &&
+                    q != null &&
+                    c.quotaReadAt != null &&
+                    !q.premium)
+                  TextButton.icon(
+                    key: const Key('open-videos'),
+                    onPressed: onVideos,
+                    icon: const Icon(Icons.play_circle_outline),
+                    label: Text(
+                      AppStrings.of(context)
+                          .messages
+                          .continuationBalanceCardVideos,
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 12),
             if (loading || c.loading) ...[
@@ -128,15 +153,6 @@ class ContinuationBalanceCard extends StatelessWidget {
                     ),
                   ),
                 ],
-              ),
-              const SizedBox(height: 8),
-              TextButton.icon(
-                key: const Key('open-videos'),
-                onPressed: onVideos,
-                icon: const Icon(Icons.play_circle_outline),
-                label: Text(
-                  AppStrings.of(context).messages.continuationBalanceCardVideos,
-                ),
               ),
             ],
           ],

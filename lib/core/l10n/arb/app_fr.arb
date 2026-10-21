@@ -24,11 +24,11 @@
   "@notificationOverlayLater": {
     "description": "Interface: lib/app/notification_overlay.dart"
   },
-  "welcomePageAnotherWayToMeet": "UNE AUTRE FAÇON DE SE RENCONTRER",
+  "welcomePageAnotherWayToMeet": "D’ABORD, UNE CONVERSATION",
   "@welcomePageAnotherWayToMeet": {
     "description": "Interface: lib/app/welcome_page.dart"
   },
-  "welcomePageTimeReciprocityConsent": "Le temps. La réciprocité. Le consentement.",
+  "welcomePageTimeReciprocityConsent": "À votre rythme. Et toujours à deux.",
   "@welcomePageTimeReciprocityConsent": {
     "description": "Interface: lib/app/welcome_page.dart"
   },
@@ -64,15 +64,15 @@
   "@appStringsMySpace": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsVerifyYourNumberWithACode": "Validez votre numéro avec un code reçu par SMS. Ce parcours crée votre compte s’il n’existe pas, ou vous reconnecte sinon.",
+  "appStringsVerifyYourNumberWithACode": "Votre numéro reste privé. Un code reçu par SMS vous permettra de créer votre compte ou de vous reconnecter.",
   "@appStringsVerifyYourNumberWithACode": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsCompleteTheRequiredChoicesIndicatedBy": "Complétez les choix obligatoires indiqués par le serveur avant de poursuivre.",
+  "appStringsCompleteTheRequiredChoicesIndicatedBy": "Avant de continuer, prenez le temps de lire les documents et de compléter les choix nécessaires.",
   "@appStringsCompleteTheRequiredChoicesIndicatedBy": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsWorking": "Action en cours…",
+  "appStringsWorking": "Un instant…",
   "@appStringsWorking": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
@@ -92,7 +92,7 @@
   "@appStringsRequestANewCode": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsResumeThePreviousRequest": "Reprendre la demande précédente",
+  "appStringsResumeThePreviousRequest": "Reprendre l’envoi du code",
   "@appStringsResumeThePreviousRequest": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
@@ -108,15 +108,15 @@
   "@appStringsChangeNumber": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsYourRequestWasAcceptedThisDoes": "La demande a été acceptée. Cela ne confirme pas la réception du SMS.",
+  "appStringsYourRequestWasAcceptedThisDoes": "Votre demande est prise en compte. Saisissez le code dès que vous le recevez.",
   "@appStringsYourRequestWasAcceptedThisDoes": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsVerificationCouldNotBeConfirmedRequest": "La vérification n’a pas pu être confirmée. Demandez un nouveau code pour vous reconnecter ; le précédent peut avoir été consommé.",
+  "appStringsVerificationCouldNotBeConfirmedRequest": "Nous n’avons pas pu terminer la connexion. Demandez un nouveau code pour réessayer.",
   "@appStringsVerificationCouldNotBeConfirmedRequest": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsCheckingYourSession": "Vérification de votre session…",
+  "appStringsCheckingYourSession": "Nous vous retrouvons…",
   "@appStringsCheckingYourSession": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
@@ -184,7 +184,7 @@
   "@appStringsYourChoicesHaveBeenSaved": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsYourHistaeSpace": "Votre espace Histae",
+  "appStringsYourHistaeSpace": "Mon profil",
   "@appStringsYourHistaeSpace": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
@@ -208,15 +208,15 @@
   "@appStringsTheCodeIsInvalidOrHas": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsTheSmsCouldNotBeSent": "L’envoi du SMS n’a pas pu être effectué. Vous pouvez reprendre la demande.",
+  "appStringsTheSmsCouldNotBeSent": "Le SMS n’a pas pu partir. Vous pouvez reprendre l’envoi.",
   "@appStringsTheSmsCouldNotBeSent": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsSmsDeliveryIsUncertainTheCode": "L’envoi du SMS reste incertain. Le code peut encore arriver. Vous pouvez saisir ce code ou reprendre la même demande.",
+  "appStringsSmsDeliveryIsUncertainTheCode": "Nous n’avons pas pu vérifier l’envoi. Le code peut encore arriver : vous pouvez le saisir ou reprendre l’envoi.",
   "@appStringsSmsDeliveryIsUncertainTheCode": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsThisRequestNoLongerMatchesIts": "Cette demande ne correspond plus à son intention d’origine. Demandez un nouveau code.",
+  "appStringsThisRequestNoLongerMatchesIts": "Cette demande ne peut plus être reprise. Demandez un nouveau code.",
   "@appStringsThisRequestNoLongerMatchesIts": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
@@ -228,7 +228,7 @@
   "@appStringsTakeYourTimeToMeet": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsDiscoverSomeoneThroughTheirWordsPhotos": "Découvrez une personne à travers ses mots. Les photos se révèlent lorsque vous le choisissez tous les deux.",
+  "appStringsDiscoverSomeoneThroughTheirWordsPhotos": "Un détail qui fait sourire. Une réponse qui donne envie d’en savoir plus. Ici, les mots passent avant les photos, que vous choisissez de dévoiler à deux.",
   "@appStringsDiscoverSomeoneThroughTheirWordsPhotos": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
@@ -373,7 +373,7 @@
   "@appStringsEachPersonAgreesSeparatelyAndUses": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsTheServerValidatesTheRewardBefore": "Le serveur valide la récompense avant d’attribuer les crédits.",
+  "appStringsTheServerValidatesTheRewardBefore": "Votre crédit s’ajoute après la validation de la vidéo.",
   "@appStringsTheServerValidatesTheRewardBefore": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
@@ -389,19 +389,19 @@
   "@appStringsYourSessionCannotBeRestoredWith": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsTheServiceCannotBeReachedCheck": "Le service est injoignable. Vérifiez votre connexion puis réessayez.",
+  "appStringsTheServiceCannotBeReachedCheck": "Nous n’arrivons pas à joindre Histae. Vérifiez votre connexion et réessayez.",
   "@appStringsTheServiceCannotBeReachedCheck": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsTheServiceIsTakingTooLong": "Le service met trop de temps à répondre. Vous pouvez réessayer.",
+  "appStringsTheServiceIsTakingTooLong": "Cela prend plus de temps que prévu. Vous pouvez réessayer.",
   "@appStringsTheServiceIsTakingTooLong": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsTheServiceResponseCouldNotBe": "La réponse du service n’a pas pu être lue.",
+  "appStringsTheServiceResponseCouldNotBe": "Nous n’avons pas pu lire la réponse. Vérifiez le résultat avant de réessayer.",
   "@appStringsTheServiceResponseCouldNotBe": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsTheServiceDidNotAcceptThe": "La demande n’a pas été acceptée par le service.",
+  "appStringsTheServiceDidNotAcceptThe": "Cette action n’a pas pu aboutir. Vérifiez vos informations et réessayez.",
   "@appStringsTheServiceDidNotAcceptThe": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
@@ -413,7 +413,7 @@
   "@appStringsCompleteTheRequiredConsents": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsCompleteYourProfileToDiscoverPeople": "Votre profil doit être complété pour découvrir des personnes.",
+  "appStringsCompleteYourProfileToDiscoverPeople": "Encore quelques mots sur vous avant de découvrir les autres.",
   "@appStringsCompleteYourProfileToDiscoverPeople": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
@@ -453,7 +453,7 @@
   "@appStringsLoadingWasInterrupted": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsTheServiceReturnedAnUnexpectedResponse": "Le service a renvoyé une réponse inattendue.",
+  "appStringsTheServiceReturnedAnUnexpectedResponse": "Nous n’avons pas pu vérifier le résultat. Actualisez avant de réessayer.",
   "@appStringsTheServiceReturnedAnUnexpectedResponse": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
@@ -865,7 +865,7 @@
   "@rewardedVideoControllerTheVideoWasClosedBeforeThe": {
     "description": "Interface: lib/features/continuation/application/rewarded_video_controller.dart"
   },
-  "rewardedVideoControllerYourAdvertisingPreferencesCouldNotBe": "Vos préférences publicitaires n’ont pas pu être vérifiées. Réessayez ou consultez vos choix de confidentialité.",
+  "rewardedVideoControllerYourAdvertisingPreferencesCouldNotBe": "Nous n’avons pas pu vérifier vos choix de confidentialité. Réessayez, ou ouvrez les préférences des vidéos.",
   "@rewardedVideoControllerYourAdvertisingPreferencesCouldNotBe": {
     "description": "Interface: lib/features/continuation/application/rewarded_video_controller.dart"
   },
@@ -1473,7 +1473,7 @@
   "@discoveryPageTakeYourTime": {
     "description": "Interface: lib/features/discovery/presentation/discovery_page.dart"
   },
-  "discoveryPageAQuietMomentForNow": "Le calme,\npour le moment.",
+  "discoveryPageAQuietMomentForNow": "Vous avez fait le tour, pour l’instant.",
   "@discoveryPageAQuietMomentForNow": {
     "description": "Interface: lib/features/discovery/presentation/discovery_page.dart"
   },
@@ -1481,7 +1481,7 @@
   "@discoveryPageJustAMoment": {
     "description": "Interface: lib/features/discovery/presentation/discovery_page.dart"
   },
-  "discoveryPageYouHaveSeenTheAvailableProfiles": "Vous avez découvert les profils disponibles selon vos préférences. Revenez plus tard ou ajustez vos envies de rencontre.",
+  "discoveryPageYouHaveSeenTheAvailableProfiles": "Vous avez découvert les profils disponibles pour vos envies de rencontre. Revenez plus tard, ou ajustez vos préférences si vous le souhaitez.",
   "@discoveryPageYouHaveSeenTheAvailableProfiles": {
     "description": "Interface: lib/features/discovery/presentation/discovery_page.dart"
   },
@@ -1493,15 +1493,15 @@
   "@discoveryPageLoadingDiscovery": {
     "description": "Interface: lib/features/discovery/presentation/discovery_page.dart"
   },
-  "discoveryPageFindingARecentLocation": "Recherche d’une position récente…",
+  "discoveryPageFindingARecentLocation": "Nous cherchons les rencontres près de vous…",
   "@discoveryPageFindingARecentLocation": {
     "description": "Interface: lib/features/discovery/presentation/discovery_page.dart"
   },
-  "discoveryPageSavingYourChoice": "Enregistrement de votre choix…",
+  "discoveryPageSavingYourChoice": "Nous transmettons votre choix…",
   "@discoveryPageSavingYourChoice": {
     "description": "Interface: lib/features/discovery/presentation/discovery_page.dart"
   },
-  "discoveryPagePreparingEncounters": "Préparation des rencontres…",
+  "discoveryPagePreparingEncounters": "À la découverte de nouvelles personnes…",
   "@discoveryPagePreparingEncounters": {
     "description": "Interface: lib/features/discovery/presentation/discovery_page.dart"
   },
@@ -1562,7 +1562,7 @@
   "@discoveryPauseCardYourProfileIsHiddenFromNew": {
     "description": "Interface: lib/features/discovery/presentation/discovery_pause_card.dart"
   },
-  "discoveryPauseCardTakeABreakFromNewEncounters": "Faites une pause dans les nouvelles rencontres en masquant votre profil. Vos conversations restent accessibles.",
+  "discoveryPauseCardTakeABreakFromNewEncounters": "Envie de souffler ? Masquez votre profil tout en gardant vos conversations.",
   "@discoveryPauseCardTakeABreakFromNewEncounters": {
     "description": "Interface: lib/features/discovery/presentation/discovery_pause_card.dart"
   },
@@ -1632,11 +1632,11 @@
       }
     }
   },
-  "discoveryStatusSectionsTheResponseIsUnconfirmedYourChoice": "La réponse n’est pas confirmée. Votre choix reste en mémoire ; seul le même choix sera renvoyé.",
+  "discoveryStatusSectionsTheResponseIsUnconfirmedYourChoice": "Votre choix est gardé ici, mais nous n’avons pas pu vérifier sa réception. Vous pouvez reprendre ce même choix.",
   "@discoveryStatusSectionsTheResponseIsUnconfirmedYourChoice": {
     "description": "Interface: lib/features/discovery/presentation/discovery_status_sections.dart"
   },
-  "discoveryStatusSectionsYourRequestIsAwaitingConfirmationNo": "Votre demande attend sa confirmation. Aucun autre choix ne sera envoyé pour ce profil.",
+  "discoveryStatusSectionsYourRequestIsAwaitingConfirmationNo": "Nous attendons la confirmation de votre choix avant de passer à la suite.",
   "@discoveryStatusSectionsYourRequestIsAwaitingConfirmationNo": {
     "description": "Interface: lib/features/discovery/presentation/discovery_status_sections.dart"
   },
@@ -1760,7 +1760,7 @@
   "@discoveryStringsLocationSubmissionIsUncertainItsStatus": {
     "description": "Interface: lib/features/discovery/presentation/discovery_strings.dart"
   },
-  "discoveryStringsYourInterestHasBeenRecorded": "Votre intérêt a été enregistré.",
+  "discoveryStringsYourInterestHasBeenRecorded": "Votre « J’aime » a bien été transmis.",
   "@discoveryStringsYourInterestHasBeenRecorded": {
     "description": "Interface: lib/features/discovery/presentation/discovery_strings.dart"
   },
@@ -1949,7 +1949,7 @@
   "@chatPageResumeTheSameRequest": {
     "description": "Interface: lib/features/matches/presentation/chat_page.dart"
   },
-  "chatPageThisMessageIsAwaitingConfirmationResuming": "Cet envoi attend sa confirmation. Reprendre conserve exactement les mêmes mots et la même demande.",
+  "chatPageThisMessageIsAwaitingConfirmationResuming": "Nous n’avons pas encore pu confirmer l’envoi. Reprendre renverra ce même message.",
   "@chatPageThisMessageIsAwaitingConfirmationResuming": {
     "description": "Interface: lib/features/matches/presentation/chat_page.dart"
   },
@@ -2010,15 +2010,15 @@
   "@matchesPageRefreshingMatchesAndCredits": {
     "description": "Interface: lib/features/matches/presentation/matches_page.dart"
   },
-  "matchesPageWordsContinue": "Les mots\ncontinuent.",
+  "matchesPageWordsContinue": "Une conversation à la fois.",
   "@matchesPageWordsContinue": {
     "description": "Interface: lib/features/matches/presentation/matches_page.dart"
   },
-  "matchesPageMutualInterestThenASpaceTo": "Un intérêt réciproque, puis un espace pour faire connaissance.",
+  "matchesPageMutualInterestThenASpaceTo": "Un premier bonjour, puis le plaisir de se découvrir. Retrouvez vos échanges ici.",
   "@matchesPageMutualInterestThenASpaceTo": {
     "description": "Interface: lib/features/matches/presentation/matches_page.dart"
   },
-  "matchesPageReconnectingUpdatesYouCanRefreshYour": "Actualisation en reprise. Vous pouvez relire vos rencontres manuellement.",
+  "matchesPageReconnectingUpdatesYouCanRefreshYour": "La connexion reprend. Actualisez si vos derniers échanges n’apparaissent pas.",
   "@matchesPageReconnectingUpdatesYouCanRefreshYour": {
     "description": "Interface: lib/features/matches/presentation/matches_page.dart"
   },
@@ -2026,7 +2026,7 @@
   "@matchesPageThisMatchHasEnded": {
     "description": "Interface: lib/features/matches/presentation/matches_page.dart"
   },
-  "matchesPageNoMatchesYetTheyWillAppear": "Aucune rencontre pour le moment. Elles apparaîtront après un intérêt réciproque.",
+  "matchesPageNoMatchesYetTheyWillAppear": "Quand l’envie de se connaître est partagée, vous pouvez échanger ici. En attendant, laissez-vous surprendre par les mots du feed.",
   "@matchesPageNoMatchesYetTheyWillAppear": {
     "description": "Interface: lib/features/matches/presentation/matches_page.dart"
   },
@@ -2038,7 +2038,7 @@
   "@matchesStringsThisMatchIsNoLongerAvailable": {
     "description": "Interface: lib/features/matches/presentation/matches_strings.dart"
   },
-  "matchesStringsSendingIsUnavailableInThisMatch": "Les envois ne sont pas disponibles dans l’état actuel de cette rencontre. Actualisez la conversation.",
+  "matchesStringsSendingIsUnavailableInThisMatch": "Vous ne pouvez pas envoyer de message pour le moment. Actualisez la conversation pour savoir où elle en est.",
   "@matchesStringsSendingIsUnavailableInThisMatch": {
     "description": "Interface: lib/features/matches/presentation/matches_strings.dart"
   },
@@ -2046,7 +2046,7 @@
   "@matchesStringsWriteANonEmptyMessageOf": {
     "description": "Interface: lib/features/matches/presentation/matches_strings.dart"
   },
-  "matchesStringsThisSendRequestNoLongerMatches": "Cette demande d’envoi ne correspond plus à ses paramètres d’origine. Aucun nouvel envoi n’a été créé. Actualisez la conversation.",
+  "matchesStringsThisSendRequestNoLongerMatches": "Ce message ne peut plus être renvoyé. Actualisez la conversation avant de continuer.",
   "@matchesStringsThisSendRequestNoLongerMatches": {
     "description": "Interface: lib/features/matches/presentation/matches_strings.dart"
   },
@@ -2148,7 +2148,7 @@
   "@devicesPageThisDeviceSRegistrationStillNeeds": {
     "description": "Interface: lib/features/notifications/presentation/devices_page.dart"
   },
-  "devicesPageThisDeviceIsRegisteredForNotifications": "Cet appareil est enregistré pour les notifications. Leur réception dépend du système et du service.",
+  "devicesPageThisDeviceIsRegisteredForNotifications": "Les notifications sont activées ici. Leur réception dépend aussi des réglages de votre appareil.",
   "@devicesPageThisDeviceIsRegisteredForNotifications": {
     "description": "Interface: lib/features/notifications/presentation/devices_page.dart"
   },
@@ -2172,7 +2172,7 @@
   "@devicesPageReceiveNotifications": {
     "description": "Interface: lib/features/notifications/presentation/devices_page.dart"
   },
-  "devicesPageHistaeWillAskForSystemPermission": "Histae demandera l’autorisation du système puis enregistrera cet appareil auprès du service de notification. Vous pourrez le retirer ici.",
+  "devicesPageHistaeWillAskForSystemPermission": "Autorisez Histae à vous prévenir sur cet appareil. Vous pourrez désactiver les notifications ici à tout moment.",
   "@devicesPageHistaeWillAskForSystemPermission": {
     "description": "Interface: lib/features/notifications/presentation/devices_page.dart"
   },
@@ -3037,7 +3037,7 @@
   "@photoPageYourCurrentPhoto": {
     "description": "Interface: lib/features/profile/presentation/photo_page.dart"
   },
-  "photoPageYourSelectionNotYetConfirmedBy": "Votre sélection, pas encore confirmée par le serveur",
+  "photoPageYourSelectionNotYetConfirmedBy": "Votre sélection, pas encore enregistrée",
   "@photoPageYourSelectionNotYetConfirmedBy": {
     "description": "Interface: lib/features/profile/presentation/photo_page.dart"
   },
@@ -3123,7 +3123,7 @@
   "@profileEditorLeaveWithoutSaving": {
     "description": "Interface: lib/features/profile/presentation/profile_editor.dart"
   },
-  "profileEditorYourDraftWillBeDiscarded": "Votre brouillon sera abandonné.",
+  "profileEditorYourDraftWillBeDiscarded": "Les mots que vous venez d’écrire ne seront pas conservés.",
   "@profileEditorYourDraftWillBeDiscarded": {
     "description": "Interface: lib/features/profile/presentation/profile_editor.dart"
   },
@@ -3135,11 +3135,11 @@
   "@profileEditorSavingOrRefreshing": {
     "description": "Interface: lib/features/profile/presentation/profile_editor.dart"
   },
-  "profileEditorTheResultIsUncertainRefreshThe": "Le résultat reste incertain. Relisez les données : aucune modification ne sera renvoyée automatiquement. Votre brouillon est conservé.",
+  "profileEditorTheResultIsUncertainRefreshThe": "Nous n’avons pas pu vérifier l’enregistrement. Vos mots sont conservés ici. Actualisez avant de réessayer.",
   "@profileEditorTheResultIsUncertainRefreshThe": {
     "description": "Interface: lib/features/profile/presentation/profile_editor.dart"
   },
-  "profileEditorRefreshServerData": "Relire les données serveur",
+  "profileEditorRefreshServerData": "Vérifier l’enregistrement",
   "@profileEditorRefreshServerData": {
     "description": "Interface: lib/features/profile/presentation/profile_editor.dart"
   },
@@ -3167,7 +3167,7 @@
   "@profileFeedPreviewPageDistanceDependsOnTheViewer": {
     "description": "Interface: lib/features/profile/presentation/profile_feed_preview_page.dart"
   },
-  "profilePageYourProfile": "VOTRE PROFIL",
+  "profilePageYourProfile": "VOTRE HISTOIRE",
   "@profilePageYourProfile": {
     "description": "Interface: lib/features/profile/presentation/profile_page.dart"
   },
@@ -3175,7 +3175,7 @@
   "@profilePageAMeetingStartsWithYou": {
     "description": "Interface: lib/features/profile/presentation/profile_page.dart"
   },
-  "profilePageTheWordsOf": "Les mots de\n{arg0}.",
+  "profilePageTheWordsOf": "{arg0}, à votre façon.",
   "@profilePageTheWordsOf": {
     "description": "Interface: lib/features/profile/presentation/profile_page.dart",
     "placeholders": {
@@ -3184,7 +3184,7 @@
       }
     }
   },
-  "profilePageAWayToTellYourStory": "Une façon de vous raconter, avant de vous rencontrer. Votre photo restera absente du feed.",
+  "profilePageAWayToTellYourStory": "Un souvenir, une envie, un petit bonheur. Offrez un point de départ à la conversation.",
   "@profilePageAWayToTellYourStory": {
     "description": "Interface: lib/features/profile/presentation/profile_page.dart"
   },
@@ -3196,7 +3196,7 @@
   "@profilePageLoadingProfile": {
     "description": "Interface: lib/features/profile/presentation/profile_page.dart"
   },
-  "profilePageSavingIsUncertainRefreshTheData": "L’enregistrement reste incertain. Relisez les données avant de renouveler une modification. Une demande photo peut être reprise à l’identique.",
+  "profilePageSavingIsUncertainRefreshTheData": "Nous n’avons pas pu vérifier l’enregistrement. Actualisez votre profil avant de réessayer ; votre photo peut être renvoyée à l’identique.",
   "@profilePageSavingIsUncertainRefreshTheData": {
     "description": "Interface: lib/features/profile/presentation/profile_page.dart"
   },
@@ -3208,11 +3208,11 @@
   "@profilePageTheDetailsThatMatter": {
     "description": "Interface: lib/features/profile/presentation/profile_page.dart"
   },
-  "profilePageYourAccount": "Votre compte",
+  "profilePageYourAccount": "Mes réglages",
   "@profilePageYourAccount": {
     "description": "Interface: lib/features/profile/presentation/profile_page.dart"
   },
-  "profilePageMyContinuationCredits": "Mes crédits de continuation",
+  "profilePageMyContinuationCredits": "Mes crédits",
   "@profilePageMyContinuationCredits": {
     "description": "Interface: lib/features/profile/presentation/profile_page.dart"
   },
@@ -3220,11 +3220,11 @@
   "@profilePanelsYourAnswersCouldNotBeRefreshed": {
     "description": "Interface: lib/features/profile/presentation/profile_panels.dart"
   },
-  "profilePanelsLittleDetailsMakeGreatConversations": "Les petits détails font les grandes conversations.",
+  "profilePanelsLittleDetailsMakeGreatConversations": "Un dimanche parfait, une chanson en boucle, une passion inattendue…",
   "@profilePanelsLittleDetailsMakeGreatConversations": {
     "description": "Interface: lib/features/profile/presentation/profile_panels.dart"
   },
-  "profilePanelsChooseUpToThreeQuestionsTo": "Choisissez jusqu’à trois questions pour raconter ce qui vous anime.",
+  "profilePanelsChooseUpToThreeQuestionsTo": "Choisissez jusqu’à trois questions. Pas besoin d’une réponse parfaite, juste de la vôtre.",
   "@profilePanelsChooseUpToThreeQuestionsTo": {
     "description": "Interface: lib/features/profile/presentation/profile_panels.dart"
   },
@@ -3240,7 +3240,7 @@
   "@profileSectionsYourIntroductionCouldNotBeRefreshed": {
     "description": "Interface: lib/features/profile/presentation/profile_sections.dart"
   },
-  "profileSectionsBooksYouLovePlacesYouFeel": "Les livres que vous aimez, les lieux où vous vous sentez bien… Quelques mots suffisent pour commencer.",
+  "profileSectionsBooksYouLovePlacesYouFeel": "Ce qui vous fait rire, ce qui vous anime, ce que vous aimeriez partager… Quelques mots suffisent pour commencer.",
   "@profileSectionsBooksYouLovePlacesYouFeel": {
     "description": "Interface: lib/features/profile/presentation/profile_sections.dart"
   },
@@ -3284,7 +3284,7 @@
   "@profileSectionsAFewTraitsToShowYour": {
     "description": "Interface: lib/features/profile/presentation/profile_sections.dart"
   },
-  "profileSectionsTheTraitsYouChoseToTell": "Les traits que vous avez choisis pour vous raconter.",
+  "profileSectionsTheTraitsYouChoseToTell": "Vos petites touches personnelles.",
   "@profileSectionsTheTraitsYouChoseToTell": {
     "description": "Interface: lib/features/profile/presentation/profile_sections.dart"
   },
@@ -3763,5 +3763,13 @@
   "viewNotification": "Consulter",
   "@viewNotification": {
     "description": "Open the foreground notification"
+  },
+  "profileAtYourPace": "À votre rythme.",
+  "@profileAtYourPace": {
+    "description": "Friendly interface copy for the profile or matches screen."
+  },
+  "matchesEmptyTitle": "Pas encore de rencontre",
+  "@matchesEmptyTitle": {
+    "description": "Friendly interface copy for the profile or matches screen."
   }
 }

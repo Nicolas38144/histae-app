@@ -111,7 +111,7 @@ void main() {
       });
       await tester.pumpWidget(HistaeApp(sessionController: session));
       await tester.pumpAndSettle();
-      expect(find.text('Votre espace Histae'), findsNothing);
+      expect(find.text('Mon profil'), findsNothing);
       expect(find.text('J’ai déjà un compte'), findsOneWidget);
       await revealAndTap(tester, find.text('Créer mon compte'));
       await tester.enterText(
@@ -120,13 +120,13 @@ void main() {
       );
       await revealAndTap(tester, find.text('Demander un code'));
       expect(
-        find.textContaining('Cela ne confirme pas la réception du SMS.'),
+        find.textContaining('Saisissez le code dès que vous le recevez.'),
         findsOneWidget,
       );
       await tester.enterText(find.byKey(const Key('otp')), '123456');
       await revealAndTap(tester, find.text('Vérifier le code'));
       expect(session.phase, SessionPhase.needsConsents);
-      expect(find.text('Votre espace Histae'), findsNothing);
+      expect(find.text('Mon profil'), findsNothing);
       final boxes = tester.widgetList<SwitchListTile>(
         find.byType(SwitchListTile),
       );
@@ -143,7 +143,7 @@ void main() {
       await revealAndTap(tester, find.text('Enregistrer mes choix'));
       await tester.tap(find.byKey(const Key('main-tab-profile')));
       await tester.pumpAndSettle();
-      expect(find.text('Votre espace Histae'), findsOneWidget);
+      expect(find.text('Mon profil'), findsOneWidget);
       expect(puts, [
         {
           'consents': [
@@ -162,7 +162,7 @@ void main() {
       expect(find.text('Vos consentements'), findsNothing);
       await tester.binding.handlePopRoute();
       await tester.pumpAndSettle();
-      expect(find.text('Votre espace Histae'), findsNothing);
+      expect(find.text('Mon profil'), findsNothing);
       expect(tester.takeException(), isNull);
     },
   );

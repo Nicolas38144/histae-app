@@ -64,6 +64,18 @@ Future<void> mountBenefits(
   await tester.pumpAndSettle();
 }
 
+Future<void> revealSubscription(WidgetTester tester) async {
+  final entry = find.byKey(const Key('profile-subscription'));
+  await tester.scrollUntilVisible(
+    entry,
+    240,
+    maxScrolls: 80,
+    scrollable: find.byType(Scrollable).first,
+  );
+  await tester.ensureVisible(entry);
+  await tester.pumpAndSettle();
+}
+
 void main() {
   testWidgets(
     'Profile keeps its confirmed subscription label while refreshing and applies new results',
@@ -77,6 +89,7 @@ void main() {
       );
       await tester.tap(find.byKey(const Key('main-tab-profile')));
       await tester.pumpAndSettle();
+      await revealSubscription(tester);
       expect(find.text('Premium'), findsOneWidget);
 
       Future<void> refreshWith(
@@ -155,6 +168,7 @@ void main() {
       expect(find.byKey(const Key('open-videos')), findsNothing);
       await tester.tap(find.byKey(const Key('main-tab-profile')));
       await tester.pumpAndSettle();
+      await revealSubscription(tester);
       expect(find.text('Premium'), findsOneWidget);
       expect(find.byKey(const Key('open-videos')), findsNothing);
       await tester.tap(find.byKey(const Key('profile-subscription')));
@@ -164,6 +178,11 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('main-tab-matches')));
       await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('free-credits-remaining')),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(
         tester
             .widget<Text>(find.byKey(const Key('free-credits-remaining')))
@@ -230,6 +249,7 @@ void main() {
       );
       await tester.tap(find.byKey(const Key('main-tab-profile')));
       await tester.pumpAndSettle();
+      await revealSubscription(tester);
       expect(find.text('Mon abonnement'), findsOneWidget);
       expect(find.text('Premium'), findsNothing);
       expect(find.byKey(const Key('open-videos')), findsNothing);
@@ -278,6 +298,7 @@ void main() {
       premium = true;
       await tester.tap(find.byKey(const Key('main-tab-profile')));
       await tester.pumpAndSettle();
+      await revealSubscription(tester);
       expect(find.text('Mon abonnement'), findsOneWidget);
       expect(find.text('Premium'), findsNothing);
       expect(tester.takeException(), isNull);

@@ -141,13 +141,13 @@ abstract class AppMessages {
   /// Interface: lib/app/welcome_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'UNE AUTRE FAÇON DE SE RENCONTRER'**
+  /// **'D’ABORD, UNE CONVERSATION'**
   String get welcomePageAnotherWayToMeet;
 
   /// Interface: lib/app/welcome_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Le temps. La réciprocité. Le consentement.'**
+  /// **'À votre rythme. Et toujours à deux.'**
   String get welcomePageTimeReciprocityConsent;
 
   /// Interface: lib/core/l10n/app_strings.dart
@@ -201,19 +201,19 @@ abstract class AppMessages {
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Validez votre numéro avec un code reçu par SMS. Ce parcours crée votre compte s’il n’existe pas, ou vous reconnecte sinon.'**
+  /// **'Votre numéro reste privé. Un code reçu par SMS vous permettra de créer votre compte ou de vous reconnecter.'**
   String get appStringsVerifyYourNumberWithACode;
 
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Complétez les choix obligatoires indiqués par le serveur avant de poursuivre.'**
+  /// **'Avant de continuer, prenez le temps de lire les documents et de compléter les choix nécessaires.'**
   String get appStringsCompleteTheRequiredChoicesIndicatedBy;
 
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Action en cours…'**
+  /// **'Un instant…'**
   String get appStringsWorking;
 
   /// Interface: lib/core/l10n/app_strings.dart
@@ -243,7 +243,7 @@ abstract class AppMessages {
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Reprendre la demande précédente'**
+  /// **'Reprendre l’envoi du code'**
   String get appStringsResumeThePreviousRequest;
 
   /// Interface: lib/core/l10n/app_strings.dart
@@ -267,19 +267,19 @@ abstract class AppMessages {
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'La demande a été acceptée. Cela ne confirme pas la réception du SMS.'**
+  /// **'Votre demande est prise en compte. Saisissez le code dès que vous le recevez.'**
   String get appStringsYourRequestWasAcceptedThisDoes;
 
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'La vérification n’a pas pu être confirmée. Demandez un nouveau code pour vous reconnecter ; le précédent peut avoir été consommé.'**
+  /// **'Nous n’avons pas pu terminer la connexion. Demandez un nouveau code pour réessayer.'**
   String get appStringsVerificationCouldNotBeConfirmedRequest;
 
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Vérification de votre session…'**
+  /// **'Nous vous retrouvons…'**
   String get appStringsCheckingYourSession;
 
   /// Interface: lib/core/l10n/app_strings.dart
@@ -381,7 +381,7 @@ abstract class AppMessages {
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Votre espace Histae'**
+  /// **'Mon profil'**
   String get appStringsYourHistaeSpace;
 
   /// Interface: lib/core/l10n/app_strings.dart
@@ -417,19 +417,19 @@ abstract class AppMessages {
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'L’envoi du SMS n’a pas pu être effectué. Vous pouvez reprendre la demande.'**
+  /// **'Le SMS n’a pas pu partir. Vous pouvez reprendre l’envoi.'**
   String get appStringsTheSmsCouldNotBeSent;
 
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'L’envoi du SMS reste incertain. Le code peut encore arriver. Vous pouvez saisir ce code ou reprendre la même demande.'**
+  /// **'Nous n’avons pas pu vérifier l’envoi. Le code peut encore arriver : vous pouvez le saisir ou reprendre l’envoi.'**
   String get appStringsSmsDeliveryIsUncertainTheCode;
 
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Cette demande ne correspond plus à son intention d’origine. Demandez un nouveau code.'**
+  /// **'Cette demande ne peut plus être reprise. Demandez un nouveau code.'**
   String get appStringsThisRequestNoLongerMatchesIts;
 
   /// Interface: lib/core/l10n/app_strings.dart
@@ -447,7 +447,7 @@ abstract class AppMessages {
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Découvrez une personne à travers ses mots. Les photos se révèlent lorsque vous le choisissez tous les deux.'**
+  /// **'Un détail qui fait sourire. Une réponse qui donne envie d’en savoir plus. Ici, les mots passent avant les photos, que vous choisissez de dévoiler à deux.'**
   String get appStringsDiscoverSomeoneThroughTheirWordsPhotos;
 
   /// Interface: lib/core/l10n/app_strings.dart
@@ -627,7 +627,7 @@ abstract class AppMessages {
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Le serveur valide la récompense avant d’attribuer les crédits.'**
+  /// **'Votre crédit s’ajoute après la validation de la vidéo.'**
   String get appStringsTheServerValidatesTheRewardBefore;
 
   /// Interface: lib/core/l10n/app_strings.dart
@@ -651,25 +651,25 @@ abstract class AppMessages {
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Le service est injoignable. Vérifiez votre connexion puis réessayez.'**
+  /// **'Nous n’arrivons pas à joindre Histae. Vérifiez votre connexion et réessayez.'**
   String get appStringsTheServiceCannotBeReachedCheck;
 
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Le service met trop de temps à répondre. Vous pouvez réessayer.'**
+  /// **'Cela prend plus de temps que prévu. Vous pouvez réessayer.'**
   String get appStringsTheServiceIsTakingTooLong;
 
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'La réponse du service n’a pas pu être lue.'**
+  /// **'Nous n’avons pas pu lire la réponse. Vérifiez le résultat avant de réessayer.'**
   String get appStringsTheServiceResponseCouldNotBe;
 
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'La demande n’a pas été acceptée par le service.'**
+  /// **'Cette action n’a pas pu aboutir. Vérifiez vos informations et réessayez.'**
   String get appStringsTheServiceDidNotAcceptThe;
 
   /// Interface: lib/core/l10n/app_strings.dart
@@ -687,7 +687,7 @@ abstract class AppMessages {
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Votre profil doit être complété pour découvrir des personnes.'**
+  /// **'Encore quelques mots sur vous avant de découvrir les autres.'**
   String get appStringsCompleteYourProfileToDiscoverPeople;
 
   /// Interface: lib/core/l10n/app_strings.dart
@@ -747,7 +747,7 @@ abstract class AppMessages {
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Le service a renvoyé une réponse inattendue.'**
+  /// **'Nous n’avons pas pu vérifier le résultat. Actualisez avant de réessayer.'**
   String get appStringsTheServiceReturnedAnUnexpectedResponse;
 
   /// Interface: lib/core/widgets/account_benefits_actions.dart
@@ -1305,7 +1305,7 @@ abstract class AppMessages {
   /// Interface: lib/features/continuation/application/rewarded_video_controller.dart
   ///
   /// In fr, this message translates to:
-  /// **'Vos préférences publicitaires n’ont pas pu être vérifiées. Réessayez ou consultez vos choix de confidentialité.'**
+  /// **'Nous n’avons pas pu vérifier vos choix de confidentialité. Réessayez, ou ouvrez les préférences des vidéos.'**
   String get rewardedVideoControllerYourAdvertisingPreferencesCouldNotBe;
 
   /// Interface: lib/features/continuation/application/rewarded_video_controller.dart
@@ -2100,7 +2100,7 @@ abstract class AppMessages {
   /// Interface: lib/features/discovery/presentation/discovery_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Le calme,\npour le moment.'**
+  /// **'Vous avez fait le tour, pour l’instant.'**
   String get discoveryPageAQuietMomentForNow;
 
   /// Interface: lib/features/discovery/presentation/discovery_page.dart
@@ -2112,7 +2112,7 @@ abstract class AppMessages {
   /// Interface: lib/features/discovery/presentation/discovery_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Vous avez découvert les profils disponibles selon vos préférences. Revenez plus tard ou ajustez vos envies de rencontre.'**
+  /// **'Vous avez découvert les profils disponibles pour vos envies de rencontre. Revenez plus tard, ou ajustez vos préférences si vous le souhaitez.'**
   String get discoveryPageYouHaveSeenTheAvailableProfiles;
 
   /// Interface: lib/features/discovery/presentation/discovery_page.dart
@@ -2130,19 +2130,19 @@ abstract class AppMessages {
   /// Interface: lib/features/discovery/presentation/discovery_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Recherche d’une position récente…'**
+  /// **'Nous cherchons les rencontres près de vous…'**
   String get discoveryPageFindingARecentLocation;
 
   /// Interface: lib/features/discovery/presentation/discovery_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Enregistrement de votre choix…'**
+  /// **'Nous transmettons votre choix…'**
   String get discoveryPageSavingYourChoice;
 
   /// Interface: lib/features/discovery/presentation/discovery_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Préparation des rencontres…'**
+  /// **'À la découverte de nouvelles personnes…'**
   String get discoveryPagePreparingEncounters;
 
   /// Interface: lib/features/discovery/presentation/discovery_page.dart
@@ -2226,7 +2226,7 @@ abstract class AppMessages {
   /// Interface: lib/features/discovery/presentation/discovery_pause_card.dart
   ///
   /// In fr, this message translates to:
-  /// **'Faites une pause dans les nouvelles rencontres en masquant votre profil. Vos conversations restent accessibles.'**
+  /// **'Envie de souffler ? Masquez votre profil tout en gardant vos conversations.'**
   String get discoveryPauseCardTakeABreakFromNewEncounters;
 
   /// Interface: lib/features/discovery/presentation/discovery_pause_card.dart
@@ -2316,13 +2316,13 @@ abstract class AppMessages {
   /// Interface: lib/features/discovery/presentation/discovery_status_sections.dart
   ///
   /// In fr, this message translates to:
-  /// **'La réponse n’est pas confirmée. Votre choix reste en mémoire ; seul le même choix sera renvoyé.'**
+  /// **'Votre choix est gardé ici, mais nous n’avons pas pu vérifier sa réception. Vous pouvez reprendre ce même choix.'**
   String get discoveryStatusSectionsTheResponseIsUnconfirmedYourChoice;
 
   /// Interface: lib/features/discovery/presentation/discovery_status_sections.dart
   ///
   /// In fr, this message translates to:
-  /// **'Votre demande attend sa confirmation. Aucun autre choix ne sera envoyé pour ce profil.'**
+  /// **'Nous attendons la confirmation de votre choix avant de passer à la suite.'**
   String get discoveryStatusSectionsYourRequestIsAwaitingConfirmationNo;
 
   /// Interface: lib/features/discovery/presentation/discovery_strings.dart
@@ -2508,7 +2508,7 @@ abstract class AppMessages {
   /// Interface: lib/features/discovery/presentation/discovery_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Votre intérêt a été enregistré.'**
+  /// **'Votre « J’aime » a bien été transmis.'**
   String get discoveryStringsYourInterestHasBeenRecorded;
 
   /// Interface: lib/features/discovery/presentation/discovery_strings.dart
@@ -2784,7 +2784,7 @@ abstract class AppMessages {
   /// Interface: lib/features/matches/presentation/chat_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Cet envoi attend sa confirmation. Reprendre conserve exactement les mêmes mots et la même demande.'**
+  /// **'Nous n’avons pas encore pu confirmer l’envoi. Reprendre renverra ce même message.'**
   String get chatPageThisMessageIsAwaitingConfirmationResuming;
 
   /// Interface: lib/features/matches/presentation/chat_page.dart
@@ -2868,19 +2868,19 @@ abstract class AppMessages {
   /// Interface: lib/features/matches/presentation/matches_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Les mots\ncontinuent.'**
+  /// **'Une conversation à la fois.'**
   String get matchesPageWordsContinue;
 
   /// Interface: lib/features/matches/presentation/matches_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Un intérêt réciproque, puis un espace pour faire connaissance.'**
+  /// **'Un premier bonjour, puis le plaisir de se découvrir. Retrouvez vos échanges ici.'**
   String get matchesPageMutualInterestThenASpaceTo;
 
   /// Interface: lib/features/matches/presentation/matches_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Actualisation en reprise. Vous pouvez relire vos rencontres manuellement.'**
+  /// **'La connexion reprend. Actualisez si vos derniers échanges n’apparaissent pas.'**
   String get matchesPageReconnectingUpdatesYouCanRefreshYour;
 
   /// Interface: lib/features/matches/presentation/matches_page.dart
@@ -2892,7 +2892,7 @@ abstract class AppMessages {
   /// Interface: lib/features/matches/presentation/matches_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Aucune rencontre pour le moment. Elles apparaîtront après un intérêt réciproque.'**
+  /// **'Quand l’envie de se connaître est partagée, vous pouvez échanger ici. En attendant, laissez-vous surprendre par les mots du feed.'**
   String get matchesPageNoMatchesYetTheyWillAppear;
 
   /// Interface: lib/features/matches/presentation/matches_page.dart
@@ -2910,7 +2910,7 @@ abstract class AppMessages {
   /// Interface: lib/features/matches/presentation/matches_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Les envois ne sont pas disponibles dans l’état actuel de cette rencontre. Actualisez la conversation.'**
+  /// **'Vous ne pouvez pas envoyer de message pour le moment. Actualisez la conversation pour savoir où elle en est.'**
   String get matchesStringsSendingIsUnavailableInThisMatch;
 
   /// Interface: lib/features/matches/presentation/matches_strings.dart
@@ -2922,7 +2922,7 @@ abstract class AppMessages {
   /// Interface: lib/features/matches/presentation/matches_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Cette demande d’envoi ne correspond plus à ses paramètres d’origine. Aucun nouvel envoi n’a été créé. Actualisez la conversation.'**
+  /// **'Ce message ne peut plus être renvoyé. Actualisez la conversation avant de continuer.'**
   String get matchesStringsThisSendRequestNoLongerMatches;
 
   /// Interface: lib/features/matches/presentation/matches_strings.dart
@@ -3060,7 +3060,7 @@ abstract class AppMessages {
   /// Interface: lib/features/notifications/presentation/devices_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Cet appareil est enregistré pour les notifications. Leur réception dépend du système et du service.'**
+  /// **'Les notifications sont activées ici. Leur réception dépend aussi des réglages de votre appareil.'**
   String get devicesPageThisDeviceIsRegisteredForNotifications;
 
   /// Interface: lib/features/notifications/presentation/devices_page.dart
@@ -3096,7 +3096,7 @@ abstract class AppMessages {
   /// Interface: lib/features/notifications/presentation/devices_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Histae demandera l’autorisation du système puis enregistrera cet appareil auprès du service de notification. Vous pourrez le retirer ici.'**
+  /// **'Autorisez Histae à vous prévenir sur cet appareil. Vous pourrez désactiver les notifications ici à tout moment.'**
   String get devicesPageHistaeWillAskForSystemPermission;
 
   /// Interface: lib/features/notifications/presentation/devices_page.dart
@@ -4296,7 +4296,7 @@ abstract class AppMessages {
   /// Interface: lib/features/profile/presentation/photo_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Votre sélection, pas encore confirmée par le serveur'**
+  /// **'Votre sélection, pas encore enregistrée'**
   String get photoPageYourSelectionNotYetConfirmedBy;
 
   /// Interface: lib/features/profile/presentation/photo_page.dart
@@ -4410,7 +4410,7 @@ abstract class AppMessages {
   /// Interface: lib/features/profile/presentation/profile_editor.dart
   ///
   /// In fr, this message translates to:
-  /// **'Votre brouillon sera abandonné.'**
+  /// **'Les mots que vous venez d’écrire ne seront pas conservés.'**
   String get profileEditorYourDraftWillBeDiscarded;
 
   /// Interface: lib/features/profile/presentation/profile_editor.dart
@@ -4428,13 +4428,13 @@ abstract class AppMessages {
   /// Interface: lib/features/profile/presentation/profile_editor.dart
   ///
   /// In fr, this message translates to:
-  /// **'Le résultat reste incertain. Relisez les données : aucune modification ne sera renvoyée automatiquement. Votre brouillon est conservé.'**
+  /// **'Nous n’avons pas pu vérifier l’enregistrement. Vos mots sont conservés ici. Actualisez avant de réessayer.'**
   String get profileEditorTheResultIsUncertainRefreshThe;
 
   /// Interface: lib/features/profile/presentation/profile_editor.dart
   ///
   /// In fr, this message translates to:
-  /// **'Relire les données serveur'**
+  /// **'Vérifier l’enregistrement'**
   String get profileEditorRefreshServerData;
 
   /// Interface: lib/features/profile/presentation/profile_feed_preview_page.dart
@@ -4476,7 +4476,7 @@ abstract class AppMessages {
   /// Interface: lib/features/profile/presentation/profile_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'VOTRE PROFIL'**
+  /// **'VOTRE HISTOIRE'**
   String get profilePageYourProfile;
 
   /// Interface: lib/features/profile/presentation/profile_page.dart
@@ -4488,13 +4488,13 @@ abstract class AppMessages {
   /// Interface: lib/features/profile/presentation/profile_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Les mots de\n{arg0}.'**
+  /// **'{arg0}, à votre façon.'**
   String profilePageTheWordsOf(Object arg0);
 
   /// Interface: lib/features/profile/presentation/profile_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Une façon de vous raconter, avant de vous rencontrer. Votre photo restera absente du feed.'**
+  /// **'Un souvenir, une envie, un petit bonheur. Offrez un point de départ à la conversation.'**
   String get profilePageAWayToTellYourStory;
 
   /// Interface: lib/features/profile/presentation/profile_page.dart
@@ -4512,7 +4512,7 @@ abstract class AppMessages {
   /// Interface: lib/features/profile/presentation/profile_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'L’enregistrement reste incertain. Relisez les données avant de renouveler une modification. Une demande photo peut être reprise à l’identique.'**
+  /// **'Nous n’avons pas pu vérifier l’enregistrement. Actualisez votre profil avant de réessayer ; votre photo peut être renvoyée à l’identique.'**
   String get profilePageSavingIsUncertainRefreshTheData;
 
   /// Interface: lib/features/profile/presentation/profile_page.dart
@@ -4530,13 +4530,13 @@ abstract class AppMessages {
   /// Interface: lib/features/profile/presentation/profile_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Votre compte'**
+  /// **'Mes réglages'**
   String get profilePageYourAccount;
 
   /// Interface: lib/features/profile/presentation/profile_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Mes crédits de continuation'**
+  /// **'Mes crédits'**
   String get profilePageMyContinuationCredits;
 
   /// Interface: lib/features/profile/presentation/profile_panels.dart
@@ -4548,13 +4548,13 @@ abstract class AppMessages {
   /// Interface: lib/features/profile/presentation/profile_panels.dart
   ///
   /// In fr, this message translates to:
-  /// **'Les petits détails font les grandes conversations.'**
+  /// **'Un dimanche parfait, une chanson en boucle, une passion inattendue…'**
   String get profilePanelsLittleDetailsMakeGreatConversations;
 
   /// Interface: lib/features/profile/presentation/profile_panels.dart
   ///
   /// In fr, this message translates to:
-  /// **'Choisissez jusqu’à trois questions pour raconter ce qui vous anime.'**
+  /// **'Choisissez jusqu’à trois questions. Pas besoin d’une réponse parfaite, juste de la vôtre.'**
   String get profilePanelsChooseUpToThreeQuestionsTo;
 
   /// Interface: lib/features/profile/presentation/profile_sections.dart
@@ -4578,7 +4578,7 @@ abstract class AppMessages {
   /// Interface: lib/features/profile/presentation/profile_sections.dart
   ///
   /// In fr, this message translates to:
-  /// **'Les livres que vous aimez, les lieux où vous vous sentez bien… Quelques mots suffisent pour commencer.'**
+  /// **'Ce qui vous fait rire, ce qui vous anime, ce que vous aimeriez partager… Quelques mots suffisent pour commencer.'**
   String get profileSectionsBooksYouLovePlacesYouFeel;
 
   /// Interface: lib/features/profile/presentation/profile_sections.dart
@@ -4644,7 +4644,7 @@ abstract class AppMessages {
   /// Interface: lib/features/profile/presentation/profile_sections.dart
   ///
   /// In fr, this message translates to:
-  /// **'Les traits que vous avez choisis pour vous raconter.'**
+  /// **'Vos petites touches personnelles.'**
   String get profileSectionsTheTraitsYouChoseToTell;
 
   /// Interface: lib/features/profile/presentation/profile_sections.dart
@@ -5227,6 +5227,18 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Consulter'**
   String get viewNotification;
+
+  /// Friendly interface copy for the profile or matches screen.
+  ///
+  /// In fr, this message translates to:
+  /// **'À votre rythme.'**
+  String get profileAtYourPace;
+
+  /// Friendly interface copy for the profile or matches screen.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas encore de rencontre'**
+  String get matchesEmptyTitle;
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

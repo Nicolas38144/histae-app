@@ -29,11 +29,11 @@ class AppMessagesIt extends AppMessages {
   String get notificationOverlayLater => 'Più tardi';
 
   @override
-  String get welcomePageAnotherWayToMeet => 'UN ALTRO MODO DI INCONTRARSI';
+  String get welcomePageAnotherWayToMeet => 'PRIMA, UNA CONVERSAZIONE';
 
   @override
   String get welcomePageTimeReciprocityConsent =>
-      'Tempo. Reciprocità. Consenso.';
+      'Con i vostri tempi. Sempre in due.';
 
   @override
   String get appStringsWordsFirst => 'PRIMA LE PAROLE';
@@ -61,14 +61,14 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get appStringsVerifyYourNumberWithACode =>
-      'Verifica il numero con un codice ricevuto via SMS. Verrà creato un account se non esiste, oppure accederai a quello esistente.';
+      'Il vostro numero resta privato. Un codice via SMS permette di creare un account o di accedere di nuovo.';
 
   @override
   String get appStringsCompleteTheRequiredChoicesIndicatedBy =>
-      'Completa le scelte obbligatorie indicate dal servizio prima di proseguire.';
+      'Prima di continuare, leggete i documenti e completate le scelte necessarie.';
 
   @override
-  String get appStringsWorking => 'Operazione in corso…';
+  String get appStringsWorking => 'Un momento…';
 
   @override
   String get appStringsFrenchPhoneNumberStartingWith33 =>
@@ -86,7 +86,7 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get appStringsResumeThePreviousRequest =>
-      'Riprendi la richiesta precedente';
+      'Riprendere l’invio del codice';
 
   @override
   String get appStrings6DigitVerificationCode => 'Codice di verifica a 6 cifre';
@@ -99,14 +99,15 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get appStringsYourRequestWasAcceptedThisDoes =>
-      'La richiesta è stata accettata. Questo non conferma la ricezione dell’SMS.';
+      'La richiesta è stata ricevuta. Inserite il codice quando arriva.';
 
   @override
   String get appStringsVerificationCouldNotBeConfirmedRequest =>
-      'Non è stato possibile confermare la verifica. Richiedi un nuovo codice per accedere; il precedente potrebbe essere già stato utilizzato.';
+      'Non è stato possibile completare l’accesso. Richiedete un nuovo codice per riprovare.';
 
   @override
-  String get appStringsCheckingYourSession => 'Verifica della sessione…';
+  String get appStringsCheckingYourSession =>
+      'Stiamo recuperando la vostra sessione…';
 
   @override
   String get appStringsYourSessionIsUnavailable =>
@@ -164,7 +165,7 @@ class AppMessagesIt extends AppMessages {
       'Le tue scelte sono state salvate.';
 
   @override
-  String get appStringsYourHistaeSpace => 'Il tuo spazio Histae';
+  String get appStringsYourHistaeSpace => 'Il mio profilo';
 
   @override
   String get appStringsYourAccountIsCreatedAndYour =>
@@ -188,15 +189,15 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get appStringsTheSmsCouldNotBeSent =>
-      'Impossibile inviare l’SMS. Puoi riprendere la richiesta.';
+      'Non è stato possibile inviare l’SMS. Potete riprendere l’invio.';
 
   @override
   String get appStringsSmsDeliveryIsUncertainTheCode =>
-      'L’invio dell’SMS è incerto. Il codice potrebbe ancora arrivare. Puoi inserirlo o riprendere la stessa richiesta.';
+      'Non è stato possibile verificare l’invio. Il codice potrebbe ancora arrivare: potete inserirlo o riprendere l’invio.';
 
   @override
   String get appStringsThisRequestNoLongerMatchesIts =>
-      'Questa richiesta non corrisponde più a quella originale. Richiedi un nuovo codice.';
+      'Questa richiesta non può più essere ripresa. Richiedete un nuovo codice.';
 
   @override
   String get appStringsThisAccountIsUnavailable =>
@@ -207,7 +208,7 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get appStringsDiscoverSomeoneThroughTheirWordsPhotos =>
-      'Scopri una persona attraverso le sue parole. Le foto si svelano quando lo scegliete entrambi.';
+      'Un dettaglio che fa sorridere. Una risposta che incuriosisce. Qui le parole vengono prima delle foto, che scegliete di svelare insieme.';
 
   @override
   String get appStringsExplorePlans => 'Scopri i piani';
@@ -319,7 +320,7 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get appStringsTheServerValidatesTheRewardBefore =>
-      'Il server convalida la ricompensa prima di assegnare i crediti.';
+      'Il credito viene aggiunto dopo la verifica della ricompensa del video.';
 
   @override
   String get appStringsThisPlanRemovesAds =>
@@ -335,19 +336,19 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get appStringsTheServiceCannotBeReachedCheck =>
-      'Il servizio non è raggiungibile. Controlla la connessione e riprova.';
+      'Non riusciamo a raggiungere Histae. Controllate la connessione e riprovate.';
 
   @override
   String get appStringsTheServiceIsTakingTooLong =>
-      'Il servizio impiega troppo tempo a rispondere. Puoi riprovare.';
+      'Ci sta volendo più tempo del previsto. Potete riprovare.';
 
   @override
   String get appStringsTheServiceResponseCouldNotBe =>
-      'Impossibile leggere la risposta del servizio.';
+      'Non è stato possibile leggere la risposta. Controllate il risultato prima di riprovare.';
 
   @override
   String get appStringsTheServiceDidNotAcceptThe =>
-      'Il servizio non ha accettato la richiesta.';
+      'Non è stato possibile completare questa azione. Controllate i dati e riprovate.';
 
   @override
   String get appStringsPleaseSignInToYourAccount =>
@@ -359,7 +360,7 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get appStringsCompleteYourProfileToDiscoverPeople =>
-      'Completa il profilo per scoprire altre persone.';
+      'Raccontateci ancora qualcosa di voi prima di scoprire le altre persone.';
 
   @override
   String get appStringsYourAvailableAllowanceDoesNotPermit =>
@@ -398,7 +399,7 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get appStringsTheServiceReturnedAnUnexpectedResponse =>
-      'Il servizio ha restituito una risposta inattesa.';
+      'Non è stato possibile verificare il risultato. Aggiornate prima di riprovare.';
 
   @override
   String get accountBenefitsActionsPremium => 'Premium';
@@ -740,7 +741,7 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get rewardedVideoControllerYourAdvertisingPreferencesCouldNotBe =>
-      'Impossibile verificare le preferenze pubblicitarie. Riprova o consulta le scelte sulla privacy.';
+      'Non è stato possibile verificare le scelte di privacy. Riprovate oppure aprite le preferenze dei video.';
 
   @override
   String get rewardedVideoControllerTheVideoPrivacyFormIsNot =>
@@ -1301,14 +1302,15 @@ class AppMessagesIt extends AppMessages {
   String get discoveryPageTakeYourTime => 'PRENDITI IL TUO TEMPO';
 
   @override
-  String get discoveryPageAQuietMomentForNow => 'Un po’ di calma,\nper ora.';
+  String get discoveryPageAQuietMomentForNow =>
+      'Per ora avete visto tutti i profili.';
 
   @override
   String get discoveryPageJustAMoment => 'Ancora un istante.';
 
   @override
   String get discoveryPageYouHaveSeenTheAvailableProfiles =>
-      'Hai scoperto i profili disponibili secondo le tue preferenze. Torna più tardi o modifica le preferenze.';
+      'Avete scoperto i profili disponibili secondo le vostre preferenze. Tornate più tardi, oppure modificate le preferenze se vi va.';
 
   @override
   String get discoveryPageTheSearchCanContinueLoadMore =>
@@ -1319,13 +1321,14 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get discoveryPageFindingARecentLocation =>
-      'Ricerca di una posizione recente…';
+      'Cerchiamo persone vicino a voi…';
 
   @override
-  String get discoveryPageSavingYourChoice => 'Salvataggio della scelta…';
+  String get discoveryPageSavingYourChoice => 'Trasmettiamo la vostra scelta…';
 
   @override
-  String get discoveryPagePreparingEncounters => 'Preparazione degli incontri…';
+  String get discoveryPagePreparingEncounters =>
+      'Alla scoperta di nuove persone…';
 
   @override
   String get discoveryPageOpenYourDeviceSLocationSettings =>
@@ -1373,7 +1376,7 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get discoveryPauseCardTakeABreakFromNewEncounters =>
-      'Fai una pausa dai nuovi incontri nascondendo il profilo. Le conversazioni restano accessibili.';
+      'Voglia di una pausa? Nascondete il profilo e mantenete le conversazioni.';
 
   @override
   String get discoveryPauseCardCheckingYourVisibility =>
@@ -1432,11 +1435,11 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get discoveryStatusSectionsTheResponseIsUnconfirmedYourChoice =>
-      'La risposta non è confermata. La scelta è conservata; verrà reinviata soltanto la stessa scelta.';
+      'La vostra scelta è conservata qui, ma non è stato possibile verificarne la ricezione. Potete riprendere la stessa scelta.';
 
   @override
   String get discoveryStatusSectionsYourRequestIsAwaitingConfirmationNo =>
-      'La richiesta attende conferma. Nessun’altra scelta verrà inviata per questo profilo.';
+      'Aspettiamo la conferma della vostra scelta prima di proseguire.';
 
   @override
   String get discoveryStringsYourDiscoveryConditionsHaveChangedRefresh =>
@@ -1555,7 +1558,7 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get discoveryStringsYourInterestHasBeenRecorded =>
-      'Il tuo interesse è stato registrato.';
+      'Il vostro «Mi piace» è stato inviato.';
 
   @override
   String get discoveryStringsYouPassedOnThisProfile =>
@@ -1711,7 +1714,7 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get chatPageThisMessageIsAwaitingConfirmationResuming =>
-      'Questo invio attende conferma. Riprenderlo mantiene esattamente le stesse parole e la stessa richiesta.';
+      'Non è ancora stato possibile confermare l’invio. Riprendendo, verrà inviato lo stesso messaggio.';
 
   @override
   String get chatPageSending => 'Invio in corso…';
@@ -1760,22 +1763,22 @@ class AppMessagesIt extends AppMessages {
       'Aggiornamento di incontri e crediti';
 
   @override
-  String get matchesPageWordsContinue => 'Le parole\ncontinuano.';
+  String get matchesPageWordsContinue => 'Una conversazione alla volta.';
 
   @override
   String get matchesPageMutualInterestThenASpaceTo =>
-      'Un interesse reciproco, poi uno spazio per conoscersi.';
+      'Un primo saluto, poi il piacere di conoscersi. Le vostre conversazioni sono qui.';
 
   @override
   String get matchesPageReconnectingUpdatesYouCanRefreshYour =>
-      'Ripresa degli aggiornamenti. Puoi aggiornare manualmente gli incontri.';
+      'Connessione in ripresa. Aggiornate se non compaiono le ultime conversazioni.';
 
   @override
   String get matchesPageThisMatchHasEnded => 'Questo incontro è terminato.';
 
   @override
   String get matchesPageNoMatchesYetTheyWillAppear =>
-      'Nessun incontro per ora. Appariranno dopo un interesse reciproco.';
+      'Quando il desiderio di conoscersi è reciproco, potete parlare qui. Nel frattempo, lasciatevi sorprendere dalle parole nel feed.';
 
   @override
   String get matchesPageViewMoreMatches => 'Vedi altri incontri';
@@ -1786,7 +1789,7 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get matchesStringsSendingIsUnavailableInThisMatch =>
-      'L’invio non è disponibile nello stato attuale dell’incontro. Aggiorna la conversazione.';
+      'Al momento non potete inviare messaggi. Aggiornate la conversazione per verificarne lo stato.';
 
   @override
   String get matchesStringsWriteANonEmptyMessageOf =>
@@ -1794,7 +1797,7 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get matchesStringsThisSendRequestNoLongerMatches =>
-      'La richiesta d’invio non corrisponde più ai parametri originali. Nessun nuovo invio è stato creato. Aggiorna la conversazione.';
+      'Questo messaggio non può più essere inviato di nuovo. Aggiornate la conversazione prima di continuare.';
 
   @override
   String get matchesStringsThisMessageIsNoLongerAvailable =>
@@ -1881,7 +1884,7 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get devicesPageThisDeviceIsRegisteredForNotifications =>
-      'Il dispositivo è registrato per le notifiche. La ricezione dipende dal sistema e dal servizio.';
+      'Le notifiche sono attive qui. La ricezione dipende anche dalle impostazioni del dispositivo.';
 
   @override
   String get devicesPageNotificationsAreNotEnabledForThis =>
@@ -1904,7 +1907,7 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get devicesPageHistaeWillAskForSystemPermission =>
-      'Histae richiederà il permesso di sistema e registrerà il dispositivo nel servizio notifiche. Potrai rimuoverlo qui.';
+      'Consentite a Histae di avvisarvi su questo dispositivo. Potete disattivare le notifiche qui in qualsiasi momento.';
 
   @override
   String get devicesPageContinue => 'Continua';
@@ -2625,7 +2628,7 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get photoPageYourSelectionNotYetConfirmedBy =>
-      'La selezione, non ancora confermata dal server';
+      'La vostra scelta, non ancora salvata';
 
   @override
   String get photoPagePreviewUnavailable => 'Anteprima non disponibile';
@@ -2692,7 +2695,7 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get profileEditorYourDraftWillBeDiscarded =>
-      'La bozza verrà abbandonata.';
+      'Le parole che avete appena scritto non saranno conservate.';
 
   @override
   String get profileEditorLeave => 'Esci';
@@ -2703,10 +2706,10 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get profileEditorTheResultIsUncertainRefreshThe =>
-      'Il risultato è incerto. Rileggi i dati: nessuna modifica verrà reinviata automaticamente. La bozza è conservata.';
+      'Non è stato possibile verificare il salvataggio. Le vostre parole sono ancora qui. Aggiornate prima di riprovare.';
 
   @override
-  String get profileEditorRefreshServerData => 'Rileggi i dati del server';
+  String get profileEditorRefreshServerData => 'Verificare il salvataggio';
 
   @override
   String get profileFeedPreviewPageMyProfileInTheFeed =>
@@ -2733,19 +2736,19 @@ class AppMessagesIt extends AppMessages {
       'Distanza in base a chi guarda';
 
   @override
-  String get profilePageYourProfile => 'IL TUO PROFILO';
+  String get profilePageYourProfile => 'LA VOSTRA STORIA';
 
   @override
   String get profilePageAMeetingStartsWithYou => 'Un incontro\ninizia da te.';
 
   @override
   String profilePageTheWordsOf(Object arg0) {
-    return 'Le parole di\n$arg0.';
+    return '$arg0, a modo vostro.';
   }
 
   @override
   String get profilePageAWayToTellYourStory =>
-      'Un modo di raccontarti, prima di incontrarvi. La foto resta assente dal feed.';
+      'Un ricordo, un desiderio, una piccola gioia. Offrite uno spunto per iniziare una conversazione.';
 
   @override
   String get profilePagePreviewMyProfile => 'Anteprima del mio profilo';
@@ -2755,7 +2758,7 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get profilePageSavingIsUncertainRefreshTheData =>
-      'Il salvataggio è incerto. Rileggi i dati prima di una nuova modifica. Una richiesta foto può essere ripresa senza cambiamenti.';
+      'Non è stato possibile verificare il salvataggio. Aggiornate il profilo prima di riprovare; potete riprendere l’invio della stessa foto.';
 
   @override
   String get profilePageRefreshMyProfile => 'Aggiorna il mio profilo';
@@ -2764,11 +2767,10 @@ class AppMessagesIt extends AppMessages {
   String get profilePageTheDetailsThatMatter => 'I dettagli che contano.';
 
   @override
-  String get profilePageYourAccount => 'Il tuo account';
+  String get profilePageYourAccount => 'Le mie impostazioni';
 
   @override
-  String get profilePageMyContinuationCredits =>
-      'I miei crediti di proseguimento';
+  String get profilePageMyContinuationCredits => 'I miei crediti';
 
   @override
   String get profilePanelsYourAnswersCouldNotBeRefreshed =>
@@ -2776,11 +2778,11 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get profilePanelsLittleDetailsMakeGreatConversations =>
-      'I piccoli dettagli fanno le grandi conversazioni.';
+      'Una domenica perfetta, una canzone in loop, una passione inattesa…';
 
   @override
   String get profilePanelsChooseUpToThreeQuestionsTo =>
-      'Scegli fino a tre domande per raccontare cosa ti appassiona.';
+      'Scegliete fino a tre domande. Non serve una risposta perfetta, basta la vostra.';
 
   @override
   String get profileSectionsCreateMyProfile => 'Crea il mio profilo';
@@ -2795,7 +2797,7 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get profileSectionsBooksYouLovePlacesYouFeel =>
-      'I libri che ami, i luoghi dove ti senti bene… Bastano poche parole per iniziare.';
+      'Cosa vi fa ridere, cosa vi appassiona, cosa vorreste condividere… Bastano poche parole per iniziare.';
 
   @override
   String get profileSectionsConversationStarters => 'Spunti di conversazione';
@@ -2833,7 +2835,7 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get profileSectionsTheTraitsYouChoseToTell =>
-      'I tratti che hai scelto per raccontarti.';
+      'I vostri piccoli tocchi personali.';
 
   @override
   String get profileSectionsChooseMyTraits => 'Scegli i miei tratti';
@@ -3198,4 +3200,10 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get viewNotification => 'Consulta';
+
+  @override
+  String get profileAtYourPace => 'Con i vostri tempi.';
+
+  @override
+  String get matchesEmptyTitle => 'Ancora nessun incontro';
 }

@@ -4,25 +4,29 @@ import '../theme/histae_tokens.dart';
 
 /// Vector interpretation of the site's two threads meeting in a point of light.
 class ConnectionArtwork extends StatelessWidget {
-  const ConnectionArtwork({super.key, this.height = 160});
+  const ConnectionArtwork({super.key, this.height = 160, this.framed = true});
   final double height;
+  final bool framed;
 
   @override
   Widget build(BuildContext context) => ExcludeSemantics(
     child: DecoratedBox(
       decoration: BoxDecoration(
-        gradient: HistaeTokens.panelGradient(context),
+        gradient: framed ? HistaeTokens.panelGradient(context) : null,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.18),
-        ),
+        border: framed
+            ? Border.all(
+                color: Theme.of(context).colorScheme.primary
+                    .withValues(alpha: 0.18),
+              )
+            : null,
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
         child: SizedBox(
           height: height,
           width: double.infinity,
-          child: const CustomPaint(painter: _ConnectionPainter()),
+          child: CustomPaint(painter: _ConnectionPainter(framed: framed)),
         ),
       ),
     ),
@@ -30,29 +34,26 @@ class ConnectionArtwork extends StatelessWidget {
 }
 
 class _ConnectionPainter extends CustomPainter {
-  const _ConnectionPainter();
+  const _ConnectionPainter({required this.framed});
+  final bool framed;
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width * 0.52, size.height * 0.54);
     final rect = Offset.zero & size;
-    canvas.drawRect(
-      rect,
-      Paint()
-        ..shader = RadialGradient(
-          center: const Alignment(-0.95, 0.95),
-          radius: 1.25,
-          colors: [
-            HistaeTokens.lavender.withValues(alpha: 0.14),
-            Colors.transparent,
-          ],
-        ).createShader(rect),
-    );
-    final dots = Paint()..color = HistaeTokens.ink.withValues(alpha: 0.045);
-    for (var x = 18.0; x < size.width; x += 19) {
-      for (var y = 18.0; y < size.height; y += 19) {
-        canvas.drawCircle(Offset(x, y), 0.6, dots);
-      }
+    if (framed) {
+      canvas.drawRect(
+        rect,
+        Paint()
+          ..shader = RadialGradient(
+            center: const Alignment(-0.95, 0.95),
+            radius: 1.25,
+            colors: [
+              HistaeTokens.lavender.withValues(alpha: 0.14),
+              Colors.transparent,
+            ],
+          ).createShader(rect),
+      );
     }
     final orbit = Paint()
       ..style = PaintingStyle.stroke
@@ -68,20 +69,28 @@ class _ConnectionPainter extends CustomPainter {
       size.width * 0.38,
       orbit,
     );
-    final frame = RRect.fromRectAndRadius(
-      rect.deflate(14),
-      const Radius.circular(14),
-    );
-    canvas.drawRRect(
-      frame,
+    final leftThread = Path()
+      ..moveTo(-10, size.height * 0.72)
+      ..cubicTo(
+        size.width * 0.12,
+        size.height * 0.82,
+        size.width * 0.18,
+        size.height * 0.12,
+        size.width * 0.33,
+        size.height * 0.32,
+      )
+      ..quadraticBezierTo(
+        size.width * 0.43,
+        size.height * 0.39,
+        center.dx,
+        center.dy,
+      );
+    canvas.drawPath(
+      leftThread,
       Paint()
         ..style = PaintingStyle.stroke
-        ..color = HistaeTokens.ink.withValues(alpha: 0.055),
-    );
-    canvas.drawLine(
-      Offset(-10, size.height * 0.17),
-      center,
-      Paint()
+        ..strokeWidth = 1.8
+        ..strokeCap = StrokeCap.round
         ..shader = LinearGradient(
           colors: [
             Colors.transparent,
@@ -89,12 +98,33 @@ class _ConnectionPainter extends CustomPainter {
           ],
         ).createShader(rect),
     );
-    canvas.drawLine(
-      Offset(size.width + 10, size.height * 0.8),
-      center,
+    final rightThread = Path()
+      ..moveTo(size.width + 10, size.height * 0.22)
+      ..cubicTo(
+        size.width * 0.85,
+        size.height * 0.12,
+        size.width * 0.83,
+        size.height * 0.9,
+        size.width * 0.66,
+        size.height * 0.7,
+      )
+      ..quadraticBezierTo(
+        size.width * 0.58,
+        size.height * 0.64,
+        center.dx,
+        center.dy,
+      );
+    canvas.drawPath(
+      rightThread,
       Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.8
+        ..strokeCap = StrokeCap.round
         ..shader = LinearGradient(
-          colors: [HistaeTokens.ink.withValues(alpha: 0.5), Colors.transparent],
+          colors: [
+            HistaeTokens.coral.withValues(alpha: 0.8),
+            Colors.transparent,
+          ],
         ).createShader(rect),
     );
     canvas.drawCircle(
@@ -117,5 +147,6 @@ class _ConnectionPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_ConnectionPainter oldDelegate) => false;
+  bool shouldRepaint(_ConnectionPainter oldDelegate) =>
+      framed != oldDelegate.framed;
 }

@@ -49,7 +49,7 @@ void main() {
       await tester.tap(find.byKey(const Key('main-tab-profile')));
       await tester.pumpAndSettle();
       expect(matches.active, isFalse);
-      expect(find.text('Votre espace Histae'), findsOneWidget);
+      expect(find.text('Mon profil'), findsOneWidget);
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
       await tester.pumpAndSettle();

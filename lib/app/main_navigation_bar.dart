@@ -14,6 +14,7 @@ class MainNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final largeText = MediaQuery.textScalerOf(context).scale(12) > 18;
     final destinations = [
       (
         key: 'discovery',
@@ -50,6 +51,7 @@ class MainNavigationBar extends StatelessWidget {
             children: [
               for (var index = 0; index < destinations.length; index++)
                 Expanded(
+                  flex: largeText ? destinations[index].label.runes.length : 1,
                   child: Semantics(
                     button: true,
                     selected: index == selectedIndex,

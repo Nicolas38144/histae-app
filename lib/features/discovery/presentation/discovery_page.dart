@@ -6,6 +6,7 @@ import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_empty_state.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../../core/widgets/histae_wordmark.dart';
 import '../../consents/presentation/consents_page.dart';
@@ -267,21 +268,25 @@ class _DiscoveryPageState extends State<DiscoveryPage>
             ),
         ],
         if (c.ready && profile == null && !c.loading && c.failure == null)
-          EditorialCard(
-            eyebrow: AppStrings.of(context).messages.discoveryPageTakeYourTime,
-            title: c.exhausted
-                ? AppStrings.of(context)
-                      .messages
-                      .discoveryPageAQuietMomentForNow
-                : AppStrings.of(context).messages.discoveryPageJustAMoment,
-            body: c.exhausted
-                ? AppStrings.of(context)
-                      .messages
-                      .discoveryPageYouHaveSeenTheAvailableProfiles
-                : AppStrings.of(context)
-                      .messages
-                      .discoveryPageTheSearchCanContinueLoadMore,
-          ),
+          if (c.exhausted)
+            HistaeEmptyState(
+              title: AppStrings.of(context)
+                  .messages
+                  .discoveryPageAQuietMomentForNow,
+              body: AppStrings.of(context)
+                  .messages
+                  .discoveryPageYouHaveSeenTheAvailableProfiles,
+            )
+          else
+            EditorialCard(
+              eyebrow: AppStrings.of(context)
+                  .messages
+                  .discoveryPageTakeYourTime,
+              title: AppStrings.of(context).messages.discoveryPageJustAMoment,
+              body: AppStrings.of(context)
+                  .messages
+                  .discoveryPageTheSearchCanContinueLoadMore,
+            ),
         if (c.pending case final intent?)
           DiscoveryPendingChoiceCard(
             intent: intent,

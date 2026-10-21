@@ -1,5 +1,17 @@
 # Direction artistique Histae
 
+## Voix et rythme — 21 octobre 2026
+
+L’app et le site partagent un ton simple, chaleureux et concret, en gardant le vouvoiement en français. Les textes parlent des personnes, de leurs mots et de ce qu’elles peuvent faire ensuite. Les références au serveur et aux mécanismes de requête sortent des messages courants ; un résultat incertain reste explicitement présenté comme tel, sans annoncer un enregistrement, un paiement ou un crédit non confirmé. Les bios et messages des personnes ne sont pas réécrits.
+
+Le profil commence par la présentation et l’aperçu public. Le mode pause et les réglages, dont Premium/Mon abonnement, suivent les contenus personnels. L’actualisation reste disponible dans l’en-tête et par un geste vers le bas. Dans les rencontres, l’introduction précède une réserve de crédits plus compacte ; un état vide présente une invitation illustrée à la place de l’introduction habituelle. Le feed conserve sa place et ses contrôles existants.
+
+Le motif de rencontre utilise des courbes statiques. Les états vides ne simulent aucune activité, aucune personne et aucun délai. Sur le site, l’échange Camille/Noa est explicitement présenté comme fictif. Les listes de fonctionnalités ont moins d’encadrements et de numéros décoratifs. Le bleu nuit, le livre, les accents lavande/abricot et les préférences de taille du texte restent les repères de la marque.
+
+Les changements de copie sont présents dans les catalogues français, anglais, espagnol et italien des deux dépôts. Les confirmations de confidentialité, les règles de continuation, les états de paiement et les documents juridiques gardent leurs distinctions nécessaires. Aucune nouvelle dépendance ou animation continue n’est ajoutée.
+
+Validation : 30 contrôles existants ciblés réussis, analyse Flutter sans problème et 40 captures avec données simulées dans `build/previews/localization`, dont des états à 200 %. Les libellés de navigation disposent de largeurs adaptées aux traductions en grand texte. Le site passe TypeScript, ESLint et la compilation statique ; son contrôle d’export valide les 56 pages localisées. Revue du nouvel accueil sur ordinateur et à 320/390 px, sans défilement horizontal dans les quatre langues. Aucun déploiement n’est effectué.
+
 Référence depuis le 18 octobre 2026 : [histae.com/fr](https://www.histae.com/fr/) et le dépôt voisin `histae-site`, notamment `app/globals.css`, `components/site-header.tsx` et `components/home-page.tsx`. La référence du site remplace la précédente palette forêt/papier ; la navigation à trois onglets et les gestes du feed sont conservés.
 
 ## Identité commune

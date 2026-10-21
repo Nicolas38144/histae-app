@@ -111,21 +111,26 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
       return HistaeScaffold(
         appBar: AppBar(
           title: Text(strings.accountTitle),
-          actions: const [LanguageButton()],
+          actions: [
+            IconButton(
+              tooltip: c.retrySeconds > 0
+                  ? strings.retryIn(c.retrySeconds)
+                  : strings.messages.profilePageRefreshMyProfile,
+              onPressed: c.loading || c.saving || c.retrySeconds > 0
+                  ? null
+                  : c.load,
+              icon: const Icon(Icons.refresh_rounded),
+            ),
+            const LanguageButton(),
+          ],
         ),
         body: SafeArea(
           child: RefreshIndicator(
             onRefresh: _load,
             child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(24),
               children: [
-                AccountBenefitsActions(
-                  isPremium: widget.continuation.quotaReadAt == null
-                      ? null
-                      : widget.continuation.quota?.premium,
-                  onSubscription: _openSubscription,
-                ),
-                const SizedBox(height: 24),
                 EditorialCard(
                   eyebrow: AppStrings.of(context)
                       .messages
@@ -175,26 +180,6 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                         .messages
                         .profilePageSavingIsUncertainRefreshTheData,
                   ),
-                if (widget.visibility case final visibility?) ...[
-                  DiscoveryPauseCard(controller: visibility),
-                  const SizedBox(height: 16),
-                ],
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton.icon(
-                    onPressed: c.loading || c.saving || c.retrySeconds > 0
-                        ? null
-                        : c.load,
-                    icon: const Icon(Icons.refresh),
-                    label: Text(
-                      c.retrySeconds > 0
-                          ? strings.retryIn(c.retrySeconds)
-                          : AppStrings.of(context)
-                                .messages
-                                .profilePageRefreshMyProfile,
-                    ),
-                  ),
-                ),
                 ProfileIntroductionCard(
                   controller: c,
                   onEdit: () => _open(IdentityEditor(controller: c)),
@@ -228,40 +213,64 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                   controller: c,
                   onEdit: () => _open(PhotoPage(controller: c)),
                 ),
+                if (widget.visibility case final visibility?) ...[
+                  const EditorialDivider(),
+                  Semantics(
+                    header: true,
+                    child: Text(
+                      strings.messages.profileAtYourPace,
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  DiscoveryPauseCard(controller: visibility),
+                ],
                 const EditorialDivider(),
                 Text(
                   AppStrings.of(context).messages.profilePageYourAccount,
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 16),
-                TextButton(
-                  onPressed: () =>
-                      _open(CreditsPage(controller: widget.continuation)),
-                  child: Text(
-                    AppStrings.of(context)
-                        .messages
-                        .profilePageMyContinuationCredits,
+                AccountBenefitsActions(
+                  isPremium: widget.continuation.quotaReadAt == null
+                      ? null
+                      : widget.continuation.quota?.premium,
+                  onSubscription: _openSubscription,
+                ),
+                const SizedBox(height: 16),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.bookmark_border_rounded),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  title: Text(
+                    strings.messages.profilePageMyContinuationCredits,
                   ),
+                  onTap: () =>
+                      _open(CreditsPage(controller: widget.continuation)),
                 ),
-                TextButton(
-                  onPressed: () =>
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.shield_outlined),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  title: Text(strings.privacyTitle),
+                  onTap: () =>
                       _open(PrivacyHubPage(session: controller.session)),
-                  child: Text(strings.privacyTitle),
                 ),
-                TextButton.icon(
-                  onPressed: () => _open(
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.notifications_none),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  title: Text(
+                    strings.messages.devicesPageDevicesAndNotifications,
+                  ),
+                  onTap: () => _open(
                     DevicesPage(
                       session: controller.session,
                       push: PushScope.maybeOf(context),
                     ),
                   ),
-                  icon: const Icon(Icons.notifications_none),
-                  label: Text(
-                    AppStrings.of(context)
-                        .messages
-                        .devicesPageDevicesAndNotifications,
-                  ),
                 ),
+                const SizedBox(height: 12),
                 TextButton(
                   onPressed: controller.session.logout,
                   child: Text(strings.logout),

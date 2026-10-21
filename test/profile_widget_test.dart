@@ -35,6 +35,7 @@ Future<void> tapVisible(WidgetTester tester, Finder finder) async {
   await tester.scrollUntilVisible(
     finder,
     180,
+    maxScrolls: 80,
     scrollable: find.byType(Scrollable).first,
   );
   await tester.ensureVisible(finder);
@@ -165,7 +166,7 @@ void main() {
         'sex': null,
         'bio': null,
       });
-      expect(find.text('Votre espace Histae'), findsOneWidget);
+      expect(find.text('Mon profil'), findsOneWidget);
     },
   );
   testWidgets('profile edits never silently erase sex or bio', (tester) async {
@@ -192,7 +193,7 @@ void main() {
     expect(patch?['firstname'], 'Alex');
     expect(patch?['sex'], 'female');
     expect(patch?['bio'], ownerJson()['bio']);
-    expect(find.text('Votre espace Histae'), findsOneWidget);
+    expect(find.text('Mon profil'), findsOneWidget);
   });
   testWidgets(
     'minor birthdate is rejected before network and unsaved edits ask before leaving',
@@ -356,7 +357,7 @@ void main() {
       sensitive = false;
       await session.synchronize();
       await tester.pumpAndSettle();
-      expect(find.text('Votre espace Histae'), findsOneWidget);
+      expect(find.text('Mon profil'), findsOneWidget);
       expect(find.text('Brouillon privé'), findsNothing);
     },
   );

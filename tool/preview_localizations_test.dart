@@ -72,11 +72,15 @@ void main() {
 
       final privateLocale = LocaleController();
       await privateLocale.select(language);
-      final session = testSession(
-        (request) async => request.url.path == '/api/plans'
+      var emptyMatches = false;
+      final session = testSession((request) async {
+        if (emptyMatches && request.url.path == '/api/matches/me') {
+          return jsonResponse({'matches': <Object?>[], 'next_cursor': null});
+        }
+        return request.url.path == '/api/plans'
             ? jsonResponse(rewardedCatalogJson())
-            : defaultContinuationResponse(request),
-      );
+            : defaultContinuationResponse(request);
+      });
       await session.establish(testTokens);
       await tester.pumpWidget(
         RepaintBoundary(
@@ -91,11 +95,25 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('main-tab-profile')));
       await capture('$language-profile');
+      tester.view.physicalSize = const Size(320, 568);
+      tester.platformDispatcher.textScaleFactorTestValue = 2;
+      await capture('$language-profile-large');
+      tester.view.physicalSize = const Size(390, 844);
+      tester.platformDispatcher.clearTextScaleFactorTestValue();
       await tester.tap(find.byKey(const Key('main-tab-matches')));
       await tester.pumpAndSettle();
+      await capture('$language-matches');
       final matches = tester
           .widget<MatchesPage>(find.byType(MatchesPage))
           .controller;
+      emptyMatches = true;
+      await matches.refresh();
+      await capture('$language-matches-empty');
+      tester.view.physicalSize = const Size(320, 568);
+      tester.platformDispatcher.textScaleFactorTestValue = 2;
+      await capture('$language-matches-empty-large');
+      tester.view.physicalSize = const Size(390, 844);
+      tester.platformDispatcher.clearTextScaleFactorTestValue();
       final context = tester.element(find.byType(MatchesPage));
       unawaited(
         Navigator.of(context).push(

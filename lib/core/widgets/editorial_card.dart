@@ -40,7 +40,7 @@ class EditorialCard extends StatelessWidget {
                 color: theme.colorScheme.primary,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
           ],
           Semantics(
             header: true,
@@ -49,7 +49,7 @@ class EditorialCard extends StatelessWidget {
               style: theme.textTheme.headlineLarge,
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 12),
           Text(
             body,
             style: theme.textTheme.bodyLarge?.copyWith(
