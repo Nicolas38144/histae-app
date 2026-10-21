@@ -8,12 +8,19 @@ import '../features/catalog/data/catalog_repository.dart';
 import '../features/consents/presentation/consents_page.dart';
 import '../features/privacy/presentation/privacy_strings.dart';
 import 'main_shell.dart';
+import 'session_repositories.dart';
 import 'welcome_page.dart';
 
 class SessionGate extends StatelessWidget {
-  const SessionGate({super.key, required this.session, this.catalog});
+  const SessionGate({
+    super.key,
+    required this.session,
+    this.catalog,
+    this.repositories,
+  });
   final SessionController session;
   final CatalogRepository? catalog;
+  final SessionRepositories? repositories;
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +35,7 @@ class SessionGate extends StatelessWidget {
           key: ValueKey(session.resourceKey),
           session: session,
           catalog: catalog,
+          repositories: repositories,
         );
       case SessionPhase.restoring:
       case SessionPhase.synchronizing:

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/network/read_snapshots.dart';
 import '../../../core/network/retry_after.dart';
 import '../../auth/domain/authenticated_session.dart';
 import '../data/privacy_models.dart';
@@ -158,7 +159,7 @@ class PrivacyController extends ChangeNotifier {
     }
     failure = null;
     notice = null;
-    await load();
+    await load(policy: ReadPolicy.cached);
   }
 
   Future<void> clearExport() async {
@@ -179,7 +180,10 @@ class PrivacyController extends ChangeNotifier {
     if (value == PrivacySection.export) unawaited(_cleanExport());
   }
 
-  Future<void> load({bool more = false}) async {
+  Future<void> load({
+    bool more = false,
+    ReadPolicy policy = ReadPolicy.refresh,
+  }) async {
     if (!active || loading || busy || retrySeconds > 0 || section == null) {
       return;
     }
@@ -203,7 +207,11 @@ class PrivacyController extends ChangeNotifier {
             cursors = <String>{};
         var next = more ? cursor : null;
         do {
-          final page = await repository.sessions(_scope, cursor: next);
+          final page = await repository.sessions(
+            _scope,
+            cursor: next,
+            policy: policy,
+          );
           if (!_alive(epoch) || section != current) return;
           for (final item in page.items) {
             if (seen.add(item.id)) result.add(item);
@@ -225,7 +233,7 @@ class PrivacyController extends ChangeNotifier {
           pendingRevoke = null;
         }
       } else if (current == PrivacySection.blocks) {
-        final list = await repository.blocks(_scope);
+        final list = await repository.blocks(_scope, policy: policy);
         if (!_alive(epoch) || section != current) return;
         _blocks
           ..clear()
@@ -235,7 +243,7 @@ class PrivacyController extends ChangeNotifier {
           pendingUnblock = null;
         }
       } else {
-        final list = await repository.rights(_scope);
+        final list = await repository.rights(_scope, policy: policy);
         if (!_alive(epoch) || section != current) return;
         _rights
           ..clear()

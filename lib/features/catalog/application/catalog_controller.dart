@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../../../core/l10n/api_language.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/network/read_snapshots.dart';
 import '../../../core/network/retry_after.dart';
 import '../data/catalog_repository.dart';
 import '../data/plan_catalog.dart';
@@ -50,7 +51,9 @@ class CatalogController extends ChangeNotifier {
 
   int get retrySeconds => retrySecondsUntil(failure?.retryAt, now: _now());
 
-  Future<void> load() async {
+  Future<void> ensureLoaded() => load(policy: ReadPolicy.cached);
+
+  Future<void> load({ReadPolicy policy = ReadPolicy.refresh}) async {
     if (_disposed || status == CatalogStatus.loading || retrySeconds > 0) {
       return;
     }
@@ -62,7 +65,7 @@ class CatalogController extends ChangeNotifier {
     failure = null;
     notifyListeners();
     try {
-      final result = await _repository.load(request);
+      final result = await _repository.load(request, policy: policy);
       if (_disposed || request.isCancelled) return;
       plans = result.plans;
       offers = result.offers;

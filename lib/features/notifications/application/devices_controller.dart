@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/network/read_snapshots.dart';
 import '../../../core/network/retry_after.dart';
 import '../../auth/domain/authenticated_session.dart';
 import '../data/device_repository.dart';
@@ -86,14 +87,16 @@ class DevicesController extends ChangeNotifier {
     _notify();
   }
 
-  Future<void> load() async {
+  Future<void> ensureLoaded() => load(policy: ReadPolicy.cached);
+
+  Future<void> load({ReadPolicy policy = ReadPolicy.refresh}) async {
     if (!active || loading || removing || retrySeconds > 0) return;
     final epoch = _epoch;
     loading = true;
     failure = null;
     _notify();
     try {
-      final result = await repository.list(_scope);
+      final result = await repository.list(_scope, policy: policy);
       if (!_alive(epoch)) return;
       final ids = <String>{};
       _devices

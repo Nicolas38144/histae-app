@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_failure.dart';
-import '../../../core/network/read_snapshots.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../../core/widgets/status_view.dart';
@@ -31,7 +30,7 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     if (widget.repository case final repository?) {
       _controller = CatalogController(repository);
-      unawaited(ReadSnapshots.forView(_controller!.load));
+      unawaited(_controller!.ensureLoaded());
     }
   }
 
@@ -43,7 +42,7 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
       _controller?.suspend();
     } else if (state == AppLifecycleState.resumed &&
         _controller?.status == CatalogStatus.idle) {
-      unawaited(ReadSnapshots.forView(_controller!.load));
+      unawaited(_controller!.ensureLoaded());
     }
   }
 

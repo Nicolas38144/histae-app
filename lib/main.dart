@@ -17,6 +17,7 @@ Future<void> main() async {
       pushController: dependencies.push,
       billingController: dependencies.billing,
       rewardedVideoGateway: dependencies.videos,
+      repositories: dependencies.repositories,
     ),
   );
 }

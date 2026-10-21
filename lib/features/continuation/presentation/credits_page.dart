@@ -78,8 +78,7 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
   }
 
   Future<void> _refresh() async {
-    await c.activate();
-    await c.loadQuota();
+    await c.refreshQuota();
     if (c.rewards.intent != null) await c.rewards.refresh();
   }
 

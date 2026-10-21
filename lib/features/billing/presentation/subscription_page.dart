@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
-import '../../../core/network/read_snapshots.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
@@ -46,9 +45,9 @@ class _SubscriptionPageState extends State<SubscriptionPage>
     WidgetsBinding.instance.addObserver(this);
     if (widget.catalog case final repository?) {
       _catalog = CatalogController(repository);
-      unawaited(ReadSnapshots.forView(_catalog!.load));
+      unawaited(_catalog!.ensureLoaded());
     }
-    unawaited(c.activate());
+    unawaited(c.activate(refresh: widget.notificationFlow));
   }
 
   @override
@@ -83,7 +82,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
         ModalRoute.of(context)?.isCurrent == true) {
       unawaited(c.resume());
       if (_catalog?.status == CatalogStatus.idle) {
-        unawaited(ReadSnapshots.forView(_catalog!.load));
+        unawaited(_catalog!.ensureLoaded());
       }
     }
   }

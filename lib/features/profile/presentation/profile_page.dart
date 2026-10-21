@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/l10n/language_picker.dart';
-import '../../../core/network/read_snapshots.dart';
 import '../../../core/widgets/account_benefits_actions.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_scaffold.dart';
@@ -17,8 +16,10 @@ import '../../continuation/application/continuation_controller.dart';
 import '../../continuation/presentation/credits_page.dart';
 import '../../discovery/application/discovery_visibility_controller.dart';
 import '../../discovery/presentation/discovery_pause_card.dart';
+import '../../notifications/data/device_repository.dart';
 import '../../notifications/presentation/devices_page.dart';
 import '../../notifications/presentation/push_scope.dart';
+import '../../privacy/data/privacy_repository.dart';
 import '../../privacy/presentation/privacy_hub_page.dart';
 import '../application/profile_controller.dart';
 import 'photo_page.dart';
@@ -34,10 +35,14 @@ class ProfilePage extends StatefulWidget {
     required this.continuation,
     this.catalog,
     this.visibility,
+    this.privacyRepository,
+    this.deviceRepository,
   });
   final ProfileController controller;
   final ContinuationController continuation;
   final CatalogRepository? catalog;
+  final PrivacyRepository? privacyRepository;
+  final DeviceRepository? deviceRepository;
   final DiscoveryVisibilityController? visibility;
 
   @override
@@ -51,8 +56,16 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) unawaited(ReadSnapshots.forView(_load));
+      if (mounted) unawaited(_ensureLoaded());
     });
+  }
+
+  Future<void> _ensureLoaded() async {
+    await Future.wait([
+      controller.ensureLoaded(),
+      widget.continuation.activate(),
+      if (widget.visibility case final visibility?) visibility.ensureLoaded(),
+    ]);
   }
 
   Future<void> _load() async {
@@ -64,9 +77,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _loadBalance() async {
-    final hadQuota = widget.continuation.quota != null;
-    await widget.continuation.activate();
-    if (hadQuota) await widget.continuation.loadQuota();
+    await widget.continuation.refreshQuota();
   }
 
   @override
@@ -252,8 +263,13 @@ class _ProfilePageState extends State<ProfilePage> {
                   leading: const Icon(Icons.shield_outlined),
                   trailing: const Icon(Icons.chevron_right_rounded),
                   title: Text(strings.privacyTitle),
-                  onTap: () =>
-                      _open(PrivacyHubPage(session: controller.session)),
+                  onTap: () => _open(
+                    PrivacyHubPage(
+                      session: controller.session,
+                      repository: widget.privacyRepository,
+                      deviceRepository: widget.deviceRepository,
+                    ),
+                  ),
                 ),
                 ListTile(
                   contentPadding: EdgeInsets.zero,
@@ -265,6 +281,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   onTap: () => _open(
                     DevicesPage(
                       session: controller.session,
+                      repository: widget.deviceRepository,
                       push: PushScope.maybeOf(context),
                     ),
                   ),

@@ -25,11 +25,7 @@ class PushDevice {
   final DateTime? lastUsedAt;
 }
 
-enum PushKind {
-  newMatch,
-  newMessage,
-  billingPaymentFailed,
-}
+enum PushKind { newMatch, newMessage, billingPaymentFailed }
 
 class PushIntent {
   const PushIntent(this.id, this.kind, this.matchId);

@@ -97,13 +97,18 @@ void main() {
   testWidgets('mutual encounter opens an authorized chat in the matches tab', (
     tester,
   ) async {
+    var matched = false;
     final session = testSession((r) async {
       if (r.url.path == '/api/swipes') {
+        matched = true;
         return jsonResponse({
           'decision': 'like',
           'matched': true,
           'match': {...matchJson(candidateOne), 'id': testMatch},
         }, 201);
+      }
+      if (!matched && r.url.path == '/api/matches/me') {
+        return jsonResponse({'matches': <Object?>[], 'next_cursor': null});
       }
       return defaultMatchesResponse(r);
     });

@@ -353,4 +353,74 @@ void main() {
     expect(c.subscription!.accessGranted, isFalse);
     expect(c.subscription!.status, 'canceled');
   });
+  test('returning from an opened portal verifies once; later focus changes reuse the subscription', () async {
+    var reads = 0;
+    final session = testSession((r) async {
+      if (r.url.path.endsWith('/portal')) {
+        return jsonResponse({
+          'url': 'https://billing.stripe.com/p/session/synthetic',
+        }, 201);
+      }
+      if (r.url.path == '/api/users/me/subscription') {
+        reads++;
+        return jsonResponse(subscriptionJson(portal: true));
+      }
+      return defaultAuthResponse(r, complete: true);
+    });
+    addTearDown(session.dispose);
+    await session.establish(testTokens);
+    final c = BillingController(
+      BillingRepository(session),
+      testBillingConfig,
+      MemoryCheckoutVault(),
+      FakeBillingGateway(),
+      realtime: QuietRealtime(session),
+    );
+    addTearDown(c.dispose);
+    await c.activate();
+    expect(reads, 1);
+    await c.portal();
+    c.suspend();
+    await c.resume();
+    expect(reads, 2);
+    c.suspend();
+    await c.resume();
+    expect(reads, 2);
+  });
+
+  testWidgets(
+    'a cached subscription rearms its original access deadline after suspension',
+    (tester) async {
+      debugDefaultTargetPlatformOverride = null;
+      var reads = 0;
+      final end = DateTime.now().toUtc().add(const Duration(minutes: 1));
+      final session = testSession((r) async {
+        if (r.url.path == '/api/users/me/subscription') {
+          reads++;
+          return jsonResponse({
+            ...subscriptionJson(access: true),
+            'current_period_ends_at': end.toIso8601String(),
+          });
+        }
+        return defaultAuthResponse(r, complete: true);
+      });
+      await session.establish(testTokens);
+      final c = BillingController(
+        BillingRepository(session),
+        testBillingConfig,
+        MemoryCheckoutVault(),
+        FakeBillingGateway(),
+        realtime: QuietRealtime(session),
+      );
+      await c.activate();
+      expect(c.fresh, isTrue);
+      c.suspend();
+      await c.activate();
+      expect(reads, 1);
+      await tester.pump(const Duration(seconds: 61));
+      expect(c.fresh, isFalse);
+      c.dispose();
+      session.dispose();
+    },
+  );
 }

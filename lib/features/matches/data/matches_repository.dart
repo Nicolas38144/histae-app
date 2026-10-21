@@ -1,22 +1,32 @@
 import '../../../core/network/api_client.dart';
 import '../../../core/network/json_fields.dart';
+import '../../../core/network/read_snapshots.dart';
 import '../../auth/domain/authenticated_session.dart';
 import 'match_models.dart';
 
 abstract interface class MatchesRepository {
-  factory MatchesRepository(AuthenticatedSession session) =
-      ApiMatchesRepository;
+  factory MatchesRepository(
+    AuthenticatedSession session, {
+    ReadSnapshots? cache,
+  }) = ApiMatchesRepository;
 
   AuthenticatedSession get session;
 
   String get owner;
+  DateTime? get matchesReadAt;
+  void invalidate({String? matchId});
 
-  Future<MatchPage> matches(RequestCancellation scope, {String? cursor});
+  Future<MatchPage> matches(
+    RequestCancellation scope, {
+    String? cursor,
+    ReadPolicy policy = ReadPolicy.refresh,
+  });
 
   Future<MessagePage> messages(
     UserMatch match,
     RequestCancellation scope, {
     String? cursor,
+    ReadPolicy policy = ReadPolicy.refresh,
   });
 
   Future<ChatMessage> send(
@@ -39,9 +49,22 @@ abstract interface class MatchesRepository {
 }
 
 final class ApiMatchesRepository implements MatchesRepository {
-  ApiMatchesRepository(this.session);
+  ApiMatchesRepository(this.session, {ReadSnapshots? cache})
+    : _reads = cache ?? ReadSnapshots();
+  final ReadSnapshots _reads;
+  String get _scopeKey => '${session.resourceKey}:${session.language.code}';
   @override
   final AuthenticatedSession session;
+  @override
+  DateTime? get matchesReadAt => _reads.readAt((DataResource.matches, null));
+  @override
+  void invalidate({String? matchId}) => _reads.invalidate({
+    DataResource.matches,
+    if (matchId == null)
+      DataResource.messages
+    else
+      (DataResource.messages, matchId),
+  });
 
   @override
   String get owner => session.identity?.userId ?? invalidResponse();
@@ -54,19 +77,56 @@ final class ApiMatchesRepository implements MatchesRepository {
     String? key,
     Map<String, String>? query,
     int status = 200,
-  }) => session.request(
-    method,
-    path,
-    body: body,
-    idempotencyKey: key,
-    query: query,
-    expectedStatus: status,
-    replayAfterRefresh: true,
-    cancellation: scope,
-  );
+  }) => method == 'GET'
+      ? session.request(
+          method,
+          path,
+          body: body,
+          idempotencyKey: key,
+          query: query,
+          expectedStatus: status,
+          replayAfterRefresh: true,
+          cancellation: scope,
+        )
+      : _reads.mutate(
+          {
+            DataResource.matches,
+            if (path.startsWith('/api/matches/'))
+              (DataResource.messages, path.split('/')[3])
+            else
+              DataResource.messages,
+            if (path.startsWith('/api/users/me/blocks')) DataResource.blocks,
+          },
+          () => session.request(
+            method,
+            path,
+            body: body,
+            idempotencyKey: key,
+            query: query,
+            expectedStatus: status,
+            replayAfterRefresh: true,
+            cancellation: scope,
+          ),
+        );
 
   @override
-  Future<MatchPage> matches(RequestCancellation scope, {String? cursor}) async {
+  Future<MatchPage> matches(
+    RequestCancellation scope, {
+    String? cursor,
+    ReadPolicy policy = ReadPolicy.refresh,
+  }) => _reads.read(
+    scope: _scopeKey,
+    key: (DataResource.matches, cursor),
+    policy: policy,
+    tags: {DataResource.matches},
+    cancellation: scope,
+    fetch: () => _fetchMatches(scope, cursor: cursor),
+  );
+
+  Future<MatchPage> _fetchMatches(
+    RequestCancellation scope, {
+    String? cursor,
+  }) async {
     final j = jsonObject(
       await _request(
         'GET',
@@ -93,6 +153,20 @@ final class ApiMatchesRepository implements MatchesRepository {
 
   @override
   Future<MessagePage> messages(
+    UserMatch match,
+    RequestCancellation scope, {
+    String? cursor,
+    ReadPolicy policy = ReadPolicy.refresh,
+  }) => _reads.read(
+    scope: _scopeKey,
+    key: (DataResource.messages, match.id, cursor),
+    policy: policy,
+    tags: {DataResource.messages, (DataResource.messages, match.id)},
+    cancellation: scope,
+    fetch: () => _fetchMessages(match, scope, cursor: cursor),
+  );
+
+  Future<MessagePage> _fetchMessages(
     UserMatch match,
     RequestCancellation scope, {
     String? cursor,

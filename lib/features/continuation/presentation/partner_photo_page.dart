@@ -29,6 +29,7 @@ class _PartnerPhotoPageState extends State<PartnerPhotoPage>
   late final _key = c.session.resourceKey;
   ImageProvider? _image;
   String? _url, _error;
+  DateTime? _readAt;
   SignedPhotoDownload? _download;
   Timer? _expiry;
   int _epoch = 0;
@@ -65,6 +66,7 @@ class _PartnerPhotoPageState extends State<PartnerPhotoPage>
     if (_image case final image?) unawaited(image.evict());
     _image = null;
     _url = null;
+    _readAt = null;
     _loading = false;
   }
 
@@ -75,15 +77,23 @@ class _PartnerPhotoPageState extends State<PartnerPhotoPage>
       setState(_purge);
       return;
     }
-    if (url == _url) return;
-    _purge();
-    _url = url;
-    _error = null;
-    _expiry = Timer(const Duration(minutes: 4), () {
+    if (url == _url && _readAt == c.readAt) return;
+    final sameImage = url == _url;
+    if (!sameImage) _purge();
+    _expiry?.cancel();
+    _readAt = c.readAt;
+    final remaining = _readAt!
+        .add(const Duration(minutes: 4))
+        .difference(DateTime.now().toUtc());
+    _expiry = Timer(remaining.isNegative ? Duration.zero : remaining, () {
       if (!mounted) return;
       setState(_purge);
     });
-    unawaited(_fetch(url));
+    if (!sameImage) {
+      _url = url;
+      _error = null;
+      unawaited(_fetch(url));
+    }
   }
 
   Future<void> _fetch(String url) async {

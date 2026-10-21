@@ -19,6 +19,7 @@ import 'app_opening.dart';
 import 'notification_navigation.dart';
 import 'notification_overlay.dart';
 import 'session_gate.dart';
+import 'session_repositories.dart';
 import 'theme.dart';
 import 'welcome_page.dart';
 
@@ -31,6 +32,7 @@ class HistaeApp extends StatefulWidget {
     this.pushController,
     this.billingController,
     this.rewardedVideoGateway,
+    this.repositories,
   });
   // Ownership is transferred to the app; requests close when it is disposed.
   final CatalogRepository? catalogRepository;
@@ -39,6 +41,7 @@ class HistaeApp extends StatefulWidget {
   final PushController? pushController;
   final BillingController? billingController;
   final RewardedVideoGateway? rewardedVideoGateway;
+  final SessionRepositories? repositories;
 
   @override
   State<HistaeApp> createState() => _HistaeAppState();
@@ -52,14 +55,24 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
   int _resourceRevision = 0;
   SessionPhase? _previousPhase;
   late final NotificationNavigation _notifications;
+  SessionRepositories? _repositories;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     widget.sessionController?.addListener(_sessionChanged);
+    if (widget.sessionController case final session?) {
+      _repositories =
+          widget.repositories ??
+          SessionRepositories(
+            session,
+            devices: widget.pushController?.repository,
+          );
+    }
     _notifications = NotificationNavigation(
       navigator: _navigator,
+      repositories: _repositories,
       pushController: widget.pushController,
       sessionController: widget.sessionController,
       catalogRepository: widget.catalogRepository,
@@ -121,6 +134,7 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
     _accountLanguage?.dispose();
     widget.pushController?.dispose();
     widget.billingController?.dispose();
+    _repositories?.dispose();
     widget.sessionController?.dispose();
     widget.catalogRepository?.close();
     _locale.dispose();
@@ -168,6 +182,7 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
                 builder: (context, _) => SessionGate(
                   session: widget.sessionController!,
                   catalog: widget.catalogRepository,
+                  repositories: _repositories,
                 ),
               ),
       ),

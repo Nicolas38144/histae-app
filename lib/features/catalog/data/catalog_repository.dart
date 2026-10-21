@@ -13,7 +13,10 @@ abstract interface class CatalogRepository {
   ApiLanguage get language;
   Listenable? get languageChanges;
 
-  Future<PlanCatalog> load(RequestCancellation cancellation);
+  Future<PlanCatalog> load(
+    RequestCancellation cancellation, {
+    ReadPolicy policy = ReadPolicy.refresh,
+  });
 
   void close();
 }
@@ -28,20 +31,27 @@ final class ApiCatalogRepository implements CatalogRepository {
   final _reads = ReadSnapshots();
 
   @override
-  Future<PlanCatalog> load(RequestCancellation cancellation) async {
-    final body = await _reads.read(
-      scope: language.code,
-      key: '/api/plans',
-      cancellation: cancellation,
-      fetch: () => _api.getJson('/api/plans', cancellation: cancellation),
-    );
-    try {
-      return PlanCatalog.fromJson(body);
-    } on FormatException {
-      throw const ApiFailure(ApiFailureKind.invalidResponse);
-    }
-  }
+  Future<PlanCatalog> load(
+    RequestCancellation cancellation, {
+    ReadPolicy policy = ReadPolicy.refresh,
+  }) => _reads.read(
+    scope: language.code,
+    key: DataResource.plans,
+    policy: policy,
+    cancellation: cancellation,
+    fetch: () async {
+      final body = await _api.getJson('/api/plans', cancellation: cancellation);
+      try {
+        return PlanCatalog.fromJson(body);
+      } on FormatException {
+        throw const ApiFailure(ApiFailureKind.invalidResponse);
+      }
+    },
+  );
 
   @override
-  void close() => _api.close();
+  void close() {
+    _reads.clear();
+    _api.close();
+  }
 }

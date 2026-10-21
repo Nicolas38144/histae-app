@@ -1,11 +1,14 @@
 import '../../../core/network/api_client.dart';
 import '../../../core/network/json_fields.dart';
+import '../../../core/network/read_snapshots.dart';
 import '../../auth/domain/authenticated_session.dart';
 import 'discovery_models.dart';
 
 abstract interface class DiscoveryRepository {
-  factory DiscoveryRepository(AuthenticatedSession session) =
-      ApiDiscoveryRepository;
+  factory DiscoveryRepository(
+    AuthenticatedSession session, {
+    ReadSnapshots? cache,
+  }) = ApiDiscoveryRepository;
 
   AuthenticatedSession get session;
 
@@ -25,7 +28,9 @@ abstract interface class DiscoveryRepository {
 }
 
 final class ApiDiscoveryRepository implements DiscoveryRepository {
-  ApiDiscoveryRepository(this.session);
+  ApiDiscoveryRepository(this.session, {ReadSnapshots? cache})
+    : _reads = cache ?? ReadSnapshots();
+  final ReadSnapshots _reads;
   @override
   final AuthenticatedSession session;
 
@@ -36,14 +41,21 @@ final class ApiDiscoveryRepository implements DiscoveryRepository {
     Object? body,
     Map<String, String>? query,
     int status = 200,
-  }) => session.request(
-    method,
-    path,
-    body: body,
-    query: query,
-    expectedStatus: status,
-    replayAfterRefresh: true,
-    cancellation: scope,
+  }) => _reads.mutate(
+    path.startsWith('/api/users/me/blocks')
+        ? {DataResource.blocks, DataResource.matches, DataResource.messages}
+        : path == '/api/swipes'
+        ? {DataResource.matches}
+        : {},
+    () => session.request(
+      method,
+      path,
+      body: body,
+      query: query,
+      expectedStatus: status,
+      replayAfterRefresh: true,
+      cancellation: scope,
+    ),
   );
 
   @override

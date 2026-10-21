@@ -166,7 +166,14 @@ class ContinuationController extends ChangeNotifier {
     _notify();
   }
 
-  Future<void> activate() async {
+  Future<void> activate() => _activate(loadIfMissing: true);
+
+  Future<void> refreshQuota() async {
+    await _activate(loadIfMissing: false);
+    await loadQuota();
+  }
+
+  Future<void> _activate({required bool loadIfMissing}) async {
     if (!accessible) return;
     if (!_active) {
       _active = true;
@@ -174,7 +181,9 @@ class ContinuationController extends ChangeNotifier {
     }
     final epoch = _epoch;
     await _load;
-    if (_alive(epoch) && quota == null && failure == null) await loadQuota();
+    if (loadIfMissing && _alive(epoch) && quota == null && failure == null) {
+      await loadQuota();
+    }
   }
 
   void forgetMatch(String id) {

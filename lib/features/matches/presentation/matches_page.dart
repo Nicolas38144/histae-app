@@ -62,7 +62,7 @@ class _MatchesPageState extends State<MatchesPage> {
   Future<void> _start() async {
     final initialMatchId = widget.initialMatchId;
     widget.onInitialMatchHandled?.call();
-    await c.activate();
+    await c.activate(refresh: widget.notificationFlow);
     if (mounted && initialMatchId != null && c.accessible) {
       await _open(initialMatchId);
     }
@@ -112,8 +112,7 @@ class _MatchesPageState extends State<MatchesPage> {
       c.continuation.suspend();
       await c.refresh();
       if (mounted && c.active && c.session.resourceKey == _key) {
-        await c.continuation.activate();
-        await c.continuation.loadQuota();
+        await c.continuation.refreshQuota();
       }
     });
   }

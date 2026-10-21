@@ -190,7 +190,7 @@ void main() {
     expect(c.encounter, isNull);
   });
   testWidgets(
-    'server presence deadline triggers a diagnostic read without requesting native location',
+    'presence expiry hides stale feed locally until manual refresh without requesting native location',
     (tester) async {
       var now = DateTime.utc(2026, 10, 16, 12);
       final expires = now.add(const Duration(seconds: 2));
@@ -217,9 +217,13 @@ void main() {
       now = expires;
       await tester.pump(const Duration(seconds: 2));
       await tester.pump();
-      expect(reads, 2);
+      expect(reads, 1);
       expect(c.ready, isFalse);
       expect(c.current, isNull);
+      expect(source.calls, 0);
+      await c.refresh();
+      expect(reads, 2);
+      expect(c.ready, isFalse);
       expect(source.calls, 0);
     },
   );

@@ -28,7 +28,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     session.addListener(_sessionChanged);
     this.realtime.onSignal = _signal;
     this.realtime.onState = (connected, error) {
-      if (!active) return;
+      if (!active || !_realtimeEnabled) return;
       realtimeConnected = connected;
       realtimeFailure = error;
       _notify();
@@ -59,6 +59,22 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   }
 
   final RealtimeClient realtime;
+  bool _realtimeEnabled = true;
+
+  void setRealtimeEnabled(bool enabled) {
+    if (_realtimeEnabled == enabled) return;
+    _realtimeEnabled = enabled;
+    if (!enabled) {
+      realtime.stop();
+      _debounce?.cancel();
+      _dirty = false;
+      realtimeConnected = false;
+    } else if (active && retrySeconds == 0) {
+      realtime.start();
+      unawaited(_read(ReadPolicy.cached));
+    }
+  }
+
   final DateTime Function() _now;
   final void Function(String)? onRemoved;
 
@@ -206,7 +222,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     _notify();
   }
 
-  Future<void> activate() async {
+  Future<void> activate({bool refresh = false}) async {
     if (!accessible || _active) return;
     if (!_active) {
       _active = true;
@@ -216,8 +232,8 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     final epoch = _epoch;
     await _sync;
     if (!_alive(epoch)) return;
-    await refresh();
-    if (active && retrySeconds == 0) realtime.start();
+    await _read(refresh ? ReadPolicy.refresh : ReadPolicy.cached);
+    if (active && _realtimeEnabled && retrySeconds == 0) realtime.start();
   }
 
   void suspend({bool notify = true}) {
@@ -259,7 +275,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   }
 
   void _purge(String id, {bool remove = false}) {
-    session.invalidateReadSnapshots(prefix: '/api/matches/');
+    repository.invalidate(matchId: id);
     _continuation?.forgetMatch(id);
     _outbox.forget(id);
     _readAttempted.removeWhere((key) => key.startsWith('$id:'));
@@ -284,13 +300,13 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   }
 
   void _signal(MobileSignal signal) {
-    if (!active) return;
+    if (!active || !_realtimeEnabled) return;
     if (signal.serverTime case final time?) {
       _clockOffset = time.difference(_now().toUtc());
       _armDeadline();
     }
     if (signal.type == 'heartbeat') return;
-    session.invalidateReadSnapshots(prefix: '/api/matches/');
+    repository.invalidate(matchId: signal.matchId);
     if (signal.ended && signal.matchId != null) {
       _purge(signal.matchId!, remove: true);
       notice = 'ended';
@@ -327,7 +343,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   }
 
   void _schedule() {
-    if (!active) return;
+    if (!active || !_realtimeEnabled) return;
     if (_sync != null || listLoading || historyLoading) {
       _dirty = true;
       return;
@@ -373,14 +389,16 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   }
 
   @override
-  Future<void> refresh() {
+  Future<void> refresh() => _read(ReadPolicy.refresh);
+
+  Future<void> _read(ReadPolicy policy) {
     if (_sync case final pending?) return pending;
     if (!active || retrySeconds > 0) return Future.value();
     if (listLoading || historyLoading) {
       _dirty = true;
       return Future.value();
     }
-    final task = _refresh();
+    final task = _refresh(policy);
     _sync = task;
     return task.whenComplete(() {
       if (identical(_sync, task)) _sync = null;
@@ -391,7 +409,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     });
   }
 
-  Future<void> _refresh() async {
+  Future<void> _refresh(ReadPolicy policy) async {
     final epoch = _epoch, chatEpoch = _chatEpoch;
     final languageRevision = session.localizationRevision;
     final target = selectedId;
@@ -406,7 +424,11 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       final seen = <String>{}, cursors = <String>{};
       String? cursor;
       do {
-        final page = await repository.matches(scope, cursor: cursor);
+        final page = await repository.matches(
+          scope,
+          cursor: cursor,
+          policy: policy,
+        );
         if (!_alive(epoch)) return;
         if (languageRevision != session.localizationRevision) {
           _dirty = true;
@@ -430,7 +452,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
         ..addAll(items);
       listCursor = cursor;
       readRevision++;
-      readAt = ReadSnapshots.reusedAt('/api/matches/me') ?? _now().toUtc();
+      readAt = repository.matchesReadAt;
       if (cursor == null) {
         for (final id in {..._outbox.matchIds, ..._closures.keys}) {
           if (!seen.contains(id)) _purge(id);
@@ -443,7 +465,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
           _purge(target);
           notice = 'ended';
         } else {
-          await _refreshHistory(match, epoch, chatEpoch);
+          await _refreshHistory(match, epoch, chatEpoch, policy);
         }
       }
     } on ApiFailure catch (e) {
@@ -460,6 +482,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     UserMatch match,
     int epoch,
     int chatEpoch,
+    ReadPolicy policy,
   ) async {
     final result = <ChatMessage>[];
     final seen = <String>{}, cursors = <String>{};
@@ -467,7 +490,12 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     final scope = _chatScope;
     try {
       for (var pageNumber = 0; pageNumber < _historyPages; pageNumber++) {
-        final page = await repository.messages(match, scope, cursor: cursor);
+        final page = await repository.messages(
+          match,
+          scope,
+          cursor: cursor,
+          policy: policy,
+        );
         if (!_chatAlive(epoch, chatEpoch, match.id)) return;
         for (final message in page.items) {
           if (seen.add(message.id)) result.add(message);
@@ -576,7 +604,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     validation = null;
     _notify();
     await _sync;
-    if (active && selectedId == id) await ReadSnapshots.forView(refresh);
+    if (active && selectedId == id) await _read(ReadPolicy.cached);
   }
 
   void closeChat(String id, {bool notify = true}) {

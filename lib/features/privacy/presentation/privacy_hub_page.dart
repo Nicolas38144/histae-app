@@ -8,6 +8,7 @@ import '../../../core/widgets/histae_scaffold.dart';
 import '../../auth/domain/authenticated_session.dart';
 import '../../consents/presentation/consents_page.dart';
 import '../../continuation/presentation/rewarded_video_scope.dart';
+import '../../notifications/data/device_repository.dart';
 import '../../notifications/presentation/devices_page.dart';
 import '../../notifications/presentation/push_scope.dart';
 import '../application/privacy_controller.dart';
@@ -19,9 +20,17 @@ import 'privacy_frame.dart';
 export 'privacy_detail_page.dart' show PrivacyDetailPage;
 
 class PrivacyHubPage extends StatefulWidget {
-  const PrivacyHubPage({super.key, required this.session, this.exportStore});
+  const PrivacyHubPage({
+    super.key,
+    required this.session,
+    this.exportStore,
+    this.repository,
+    this.deviceRepository,
+  });
   final AuthenticatedSession session;
   final PrivateExportStore? exportStore;
+  final PrivacyRepository? repository;
+  final DeviceRepository? deviceRepository;
 
   @override
   State<PrivacyHubPage> createState() => _PrivacyHubPageState();
@@ -30,7 +39,7 @@ class PrivacyHubPage extends StatefulWidget {
 class _PrivacyHubPageState extends State<PrivacyHubPage>
     with WidgetsBindingObserver {
   late final c = PrivacyController(
-    PrivacyRepository(widget.session),
+    widget.repository ?? PrivacyRepository(widget.session),
     exportStore: widget.exportStore,
   );
   late final Future<void> _startup;
@@ -159,6 +168,7 @@ class _PrivacyHubPageState extends State<PrivacyHubPage>
                 MaterialPageRoute<void>(
                   builder: (_) => DevicesPage(
                     session: widget.session,
+                    repository: widget.deviceRepository,
                     push: PushScope.maybeOf(context),
                   ),
                 ),

@@ -6,37 +6,44 @@ import '../features/catalog/data/catalog_repository.dart';
 import '../features/discovery/application/discovery_controller.dart';
 import '../features/discovery/application/discovery_visibility_controller.dart';
 import '../features/discovery/data/device_location.dart';
-import '../features/discovery/data/discovery_repository.dart';
 import '../features/discovery/presentation/discovery_page.dart';
 import '../features/matches/application/matches_controller.dart';
-import '../features/matches/data/matches_repository.dart';
 import '../features/matches/presentation/matches_page.dart';
 import '../features/notifications/application/push_controller.dart';
 import '../features/notifications/presentation/push_scope.dart';
 import '../features/profile/application/profile_controller.dart';
-import '../features/profile/data/profile_repository.dart';
 import '../features/profile/presentation/profile_page.dart';
 import 'main_navigation_bar.dart';
+import 'session_repositories.dart';
 
 /// Keeps the three main views and their data alive for the current session.
 class MainShell extends StatefulWidget {
-  const MainShell({super.key, required this.session, this.catalog});
+  const MainShell({
+    super.key,
+    required this.session,
+    this.catalog,
+    this.repositories,
+  });
   final AuthenticatedSession session;
   final CatalogRepository? catalog;
+  final SessionRepositories? repositories;
 
   @override
   State<MainShell> createState() => _MainShellState();
 }
 
 class _MainShellState extends State<MainShell> {
+  late final _repositories =
+      widget.repositories ?? SessionRepositories(widget.session);
   late final _visibility = DiscoveryVisibilityController(widget.session);
-  late final _profile = ProfileController(ProfileRepository(widget.session));
+  late final _profile = ProfileController(_repositories.profile);
   late final _discovery = DiscoveryController(
-    DiscoveryRepository(widget.session),
+    _repositories.discovery,
     DeviceLocation(),
   );
   late final _matches = MatchesController(
-    MatchesRepository(widget.session),
+    _repositories.matches,
+    realtime: _repositories.realtime.channel(),
     onRemoved: _discovery.forgetEncounter,
   );
   final _pageStorage = PageStorageBucket();
@@ -73,11 +80,13 @@ class _MainShellState extends State<MainShell> {
     _push = next;
     _push?.addListener(_pushRouteChanged);
     _covered = _push?.coversMainFlow == true;
+    _matches.setRealtimeEnabled(!_covered);
   }
 
   void _pushRouteChanged() {
     final covered = _push?.coversMainFlow == true;
     if (covered == _covered) return;
+    _matches.setRealtimeEnabled(!covered);
     setState(() => _covered = covered);
   }
 
@@ -109,6 +118,7 @@ class _MainShellState extends State<MainShell> {
     _discovery.dispose();
     _visibility.dispose();
     _profile.dispose();
+    if (widget.repositories == null) _repositories.dispose();
     super.dispose();
   }
 
@@ -137,6 +147,8 @@ class _MainShellState extends State<MainShell> {
             ProfilePage(
               key: const PageStorageKey('main-profile'),
               controller: _profile,
+              privacyRepository: _repositories.privacy,
+              deviceRepository: _repositories.devices,
               continuation: _matches.continuation,
               catalog: widget.catalog,
               visibility: _visibility,

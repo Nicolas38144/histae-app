@@ -11,6 +11,7 @@ import '../features/matches/application/matches_controller.dart';
 import '../features/matches/data/matches_repository.dart';
 import '../features/matches/presentation/matches_page.dart';
 import '../features/notifications/application/push_controller.dart';
+import 'session_repositories.dart';
 
 /// Owns only the temporary notification route and its scoped chat state.
 /// Session reset navigation remains the responsibility of HistaeApp.
@@ -22,6 +23,7 @@ class NotificationNavigation {
     required this.catalogRepository,
     required this.billingController,
     required this.isMounted,
+    this.repositories,
   }) {
     pushController?.addListener(_pushChanged);
   }
@@ -31,6 +33,7 @@ class NotificationNavigation {
   final CatalogRepository? catalogRepository;
   final BillingController? billingController;
   final bool Function() isMounted;
+  final SessionRepositories? repositories;
   bool _disposed = false;
 
   bool get mounted => !_disposed && isMounted();
@@ -79,7 +82,8 @@ class NotificationNavigation {
       push.coverMainFlow(true);
       if (intent.matchId != null) {
         final matches = _pushMatches ??= MatchesController(
-          MatchesRepository(session),
+          repositories?.matches ?? MatchesRepository(session),
+          realtime: repositories?.realtime.channel(),
         );
         _pushRoute = MaterialPageRoute<void>(
           settings: const RouteSettings(name: '/notification/match'),

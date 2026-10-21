@@ -1,25 +1,38 @@
 import '../../../core/network/api_client.dart';
 import '../../../core/network/json_fields.dart';
+import '../../../core/network/read_snapshots.dart';
 import '../../auth/domain/authenticated_session.dart';
 import 'privacy_models.dart';
 
 abstract interface class PrivacyRepository {
-  factory PrivacyRepository(AuthenticatedSession session) =
-      ApiPrivacyRepository;
+  factory PrivacyRepository(
+    AuthenticatedSession session, {
+    ReadSnapshots? cache,
+  }) = ApiPrivacyRepository;
 
   AuthenticatedSession get session;
 
   String get owner;
 
-  Future<SessionPage> sessions(RequestCancellation scope, {String? cursor});
+  Future<SessionPage> sessions(
+    RequestCancellation scope, {
+    String? cursor,
+    ReadPolicy policy = ReadPolicy.refresh,
+  });
 
   Future<void> revoke(String id, RequestCancellation scope);
 
-  Future<List<BlockedPerson>> blocks(RequestCancellation scope);
+  Future<List<BlockedPerson>> blocks(
+    RequestCancellation scope, {
+    ReadPolicy policy = ReadPolicy.refresh,
+  });
 
   Future<void> block(String id, bool blocked, RequestCancellation scope);
 
-  Future<List<RightsRequest>> rights(RequestCancellation scope);
+  Future<List<RightsRequest>> rights(
+    RequestCancellation scope, {
+    ReadPolicy policy = ReadPolicy.refresh,
+  });
 
   Future<RightsRequest> requestRight(DataRight type, RequestCancellation scope);
 
@@ -29,7 +42,10 @@ abstract interface class PrivacyRepository {
 }
 
 final class ApiPrivacyRepository implements PrivacyRepository {
-  ApiPrivacyRepository(this.session);
+  ApiPrivacyRepository(this.session, {ReadSnapshots? cache})
+    : _reads = cache ?? ReadSnapshots();
+  final ReadSnapshots _reads;
+  String get _scopeKey => '${session.resourceKey}:${session.language.code}';
   @override
   final AuthenticatedSession session;
 
@@ -43,18 +59,55 @@ final class ApiPrivacyRepository implements PrivacyRepository {
     Object? body,
     int status = 200,
     Map<String, String>? query,
-  }) => session.request(
-    method,
-    path,
-    body: body,
-    expectedStatus: status,
-    replayAfterRefresh: true,
-    cancellation: scope,
-    query: query,
-  );
+  }) => method == 'GET'
+      ? session.request(
+          method,
+          path,
+          body: body,
+          expectedStatus: status,
+          replayAfterRefresh: true,
+          cancellation: scope,
+          query: query,
+        )
+      : _reads.mutate(
+          _affected(path),
+          () => session.request(
+            method,
+            path,
+            body: body,
+            expectedStatus: status,
+            replayAfterRefresh: true,
+            cancellation: scope,
+            query: query,
+          ),
+        );
+
+  Set<Object> _affected(String path) => switch (path) {
+    _ when path.startsWith('/api/auth/sessions') => {DataResource.sessions},
+    _ when path.startsWith('/api/users/me/blocks') => {
+      DataResource.blocks,
+      DataResource.matches,
+      DataResource.messages,
+    },
+    '/api/users/me/data-subject-requests' => {DataResource.rights},
+    _ => {},
+  };
 
   @override
   Future<SessionPage> sessions(
+    RequestCancellation scope, {
+    String? cursor,
+    ReadPolicy policy = ReadPolicy.refresh,
+  }) => _reads.read(
+    scope: _scopeKey,
+    key: (DataResource.sessions, cursor),
+    policy: policy,
+    tags: {DataResource.sessions},
+    cancellation: scope,
+    fetch: () => _fetchSessions(scope, cursor: cursor),
+  );
+
+  Future<SessionPage> _fetchSessions(
     RequestCancellation scope, {
     String? cursor,
   }) async => SessionPage(
@@ -75,7 +128,19 @@ final class ApiPrivacyRepository implements PrivacyRepository {
   }
 
   @override
-  Future<List<BlockedPerson>> blocks(RequestCancellation scope) async =>
+  Future<List<BlockedPerson>> blocks(
+    RequestCancellation scope, {
+    ReadPolicy policy = ReadPolicy.refresh,
+  }) => _reads.read(
+    scope: _scopeKey,
+    key: DataResource.blocks,
+    policy: policy,
+    tags: {DataResource.blocks},
+    cancellation: scope,
+    fetch: () => _fetchBlocks(scope),
+  );
+
+  Future<List<BlockedPerson>> _fetchBlocks(RequestCancellation scope) async =>
       List.unmodifiable(
         jsonField<List<dynamic>>(
           jsonObject(await _request('GET', '/api/users/me/blocks', scope)),
@@ -95,7 +160,19 @@ final class ApiPrivacyRepository implements PrivacyRepository {
   }
 
   @override
-  Future<List<RightsRequest>> rights(RequestCancellation scope) async =>
+  Future<List<RightsRequest>> rights(
+    RequestCancellation scope, {
+    ReadPolicy policy = ReadPolicy.refresh,
+  }) => _reads.read(
+    scope: _scopeKey,
+    key: DataResource.rights,
+    policy: policy,
+    tags: {DataResource.rights},
+    cancellation: scope,
+    fetch: () => _fetchRights(scope),
+  );
+
+  Future<List<RightsRequest>> _fetchRights(RequestCancellation scope) async =>
       List.unmodifiable(
         jsonField<List<dynamic>>(
           jsonObject(

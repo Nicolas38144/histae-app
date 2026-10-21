@@ -6,7 +6,6 @@ import '../../../core/l10n/api_language.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/network/json_fields.dart';
-import '../../../core/network/read_snapshots.dart';
 import '../../../core/network/retry_after.dart';
 import '../../consents/domain/consent_state.dart';
 import '../data/auth_repository.dart';
@@ -21,10 +20,6 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
     _lastLanguage = language;
     languageChanges?.addListener(_languageChanged);
   }
-  final _reads = ReadSnapshots();
-  @override
-  void invalidateReadSnapshots({String? prefix}) =>
-      _reads.clear(prefix: prefix);
   final Listenable? _languageChanges;
   late ApiLanguage _lastLanguage;
   int _localizationRevision = 0;
@@ -202,7 +197,6 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
       await _write('ready', tokens.refreshToken);
       if (_disposed) return;
       _generation++;
-      _reads.clear();
       _scope.cancel();
       _scope = RequestCancellation();
       _tokens = tokens;
@@ -353,7 +347,7 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
     required bool replayAfterRefresh,
     RequestCancellation? cancellation,
   }) {
-    Future<Object?> send() => _authorized(
+    return _authorized(
       method,
       path,
       body: body,
@@ -364,22 +358,6 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
       expectedStatus: expectedStatus,
       replayAfterRefresh: replayAfterRefresh,
       cancellation: cancellation,
-    );
-    if (method != 'GET') {
-      // Even an uncertain write makes previous view snapshots unsuitable.
-      _reads.clear();
-      return send();
-    }
-    final entries = query?.entries.toList() ?? <MapEntry<String, String>>[];
-    entries.sort((a, b) => a.key.compareTo(b.key));
-    return _reads.read(
-      scope: '$resourceKey:${(language ?? this.language).code}',
-      key: Uri(
-        path: path,
-        queryParameters: Map.fromEntries(entries),
-      ).toString(),
-      cancellation: cancellation,
-      fetch: send,
     );
   }
 
@@ -468,7 +446,6 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
       await _write('closing');
     } on ApiFailure catch (e) {
       _generation++;
-      _reads.clear();
       _tokens = null;
       identity = null;
       consents = null;
@@ -556,7 +533,6 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
         .join('|');
     if (_consentFingerprint != null && _consentFingerprint != fingerprint) {
       resourceRevision++;
-      _reads.clear();
     }
     _consentFingerprint = fingerprint;
     consents = state;
@@ -712,7 +688,6 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
 
   Future<void> _invalidate(ApiFailure reason) async {
     _generation++;
-    _reads.clear();
     _scope.cancel();
     _scope = RequestCancellation();
     _tokens = null;
@@ -769,7 +744,6 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
 
   @override
   void dispose() {
-    _reads.clear();
     _disposed = true;
     _retryTimer.cancel();
     _scope.cancel();

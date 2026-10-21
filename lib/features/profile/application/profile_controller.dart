@@ -120,7 +120,6 @@ class ProfileController extends ChangeNotifier {
     retryAt = null;
     _timer.cancel();
     _notify();
-    if (accessible) unawaited(load());
   }
 
   void _cooldown(ApiFailure e) {
@@ -134,7 +133,9 @@ class ProfileController extends ChangeNotifier {
     }
   }
 
-  Future<void> load() async {
+  Future<void> ensureLoaded() => load(policy: ReadPolicy.cached);
+
+  Future<void> load({ReadPolicy policy = ReadPolicy.refresh}) async {
     if (_disposed || !accessible || loading || saving || retrySeconds > 0) {
       return;
     }
@@ -171,27 +172,35 @@ class ProfileController extends ChangeNotifier {
     }
 
     await Future.wait([
-      read('profile', () => repository.profile(scope), (p) {
+      read('profile', () => repository.profile(scope, policy: policy), (p) {
         profile = p;
-        photoReadAt = ReadSnapshots.reusedAt('/api/users/me') ?? DateTime.now();
+        photoReadAt = repository.profileReadAt;
       }),
       read(
         'preferences',
-        () => repository.preferences(scope),
+        () => repository.preferences(scope, policy: policy),
         (p) => preferences = p,
       ),
-      read('traits', () => repository.traits(scope), (v) => _traits = v),
+      read(
+        'traits',
+        () => repository.traits(scope, policy: policy),
+        (v) => _traits = v,
+      ),
       read(
         'selectedTraits',
-        () => repository.selectedTraits(scope),
+        () => repository.selectedTraits(scope, policy: policy),
         (v) => _selectedTraits = v,
       ),
       read(
         'questions',
-        () => repository.questions(scope),
+        () => repository.questions(scope, policy: policy),
         (v) => _questions = v,
       ),
-      read('answers', () => repository.answers(scope), (v) => _answers = v),
+      read(
+        'answers',
+        () => repository.answers(scope, policy: policy),
+        (v) => _answers = v,
+      ),
     ]);
     if (_disposed || generation != _generation) return;
     if (readRevision != _readRevision) return;

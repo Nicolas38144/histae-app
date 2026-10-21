@@ -1,38 +1,66 @@
-import 'dart:async';
-import 'dart:convert';
-
 import 'api_failure.dart';
 import 'request_cancellation.dart';
 
-/// Only initial view reads opt in. Refreshes, events and mutation verification
-/// always go to the server. Snapshots live in memory for one session only.
+enum ReadPolicy { cached, refresh }
+
+enum DataResource {
+  profile,
+  preferences,
+  traits,
+  selectedTraits,
+  questions,
+  answers,
+  matches,
+  messages,
+  devices,
+  sessions,
+  blocks,
+  rights,
+  plans,
+}
+
+final class _Snapshot<T> {
+  _Snapshot(this.value, this.readAt, this.tags);
+  final T value;
+  final DateTime readAt;
+  final Set<Object> tags;
+}
+
+/// Repository-owned, typed snapshots. Only validated models enter this cache.
+/// Policy is explicit; refreshes and writes never depend on a widget's Zone.
 final class ReadSnapshots {
-  static final _viewKey = Object();
-  static Future<T> forView<T>(Future<T> Function() read) =>
-      runZoned(read, zoneValues: {_viewKey: <String, DateTime>{}});
-
-  /// Reusing a view must never extend a signed photo URL's lifetime.
-  static DateTime? reusedAt(String path) =>
-      (Zone.current[_viewKey] as Map<String, DateTime>?)?[path];
-
-  final _values = <String, (String, DateTime)>{};
-  final _pending = <String, Object>{};
+  final _values = <Object, _Snapshot<Object?>>{};
+  final _pending = <Object, (Object, Set<Object>)>{};
   String? _scope;
-  int _revision = 0;
 
-  void clear({String? prefix}) {
-    _revision++;
-    if (prefix == null) {
-      _values.clear();
-    } else {
-      _values.removeWhere((key, _) => key.startsWith(prefix));
+  DateTime? readAt(Object key) => _values[key]?.readAt;
+
+  void clear() {
+    _values.clear();
+    _pending.clear();
+  }
+
+  void invalidate(Set<Object> tags) {
+    _values.removeWhere((_, value) => value.tags.any(tags.contains));
+    _pending.removeWhere((_, value) => value.$2.any(tags.contains));
+  }
+
+  Future<T> mutate<T>(Set<Object> tags, Future<T> Function() write) async {
+    invalidate(tags);
+    try {
+      return await write();
+    } finally {
+      // Lost responses also make earlier snapshots unsuitable for reuse.
+      invalidate(tags);
     }
   }
 
-  Future<Object?> read({
+  Future<T> read<T>({
     required String scope,
-    required String key,
-    required Future<Object?> Function() fetch,
+    required Object key,
+    required Future<T> Function() fetch,
+    ReadPolicy policy = ReadPolicy.refresh,
+    Set<Object> tags = const {},
     RequestCancellation? cancellation,
   }) async {
     if (_scope != scope) {
@@ -42,30 +70,30 @@ final class ReadSnapshots {
     if (cancellation?.isCancelled == true) {
       throw const ApiFailure(ApiFailureKind.cancelled);
     }
-    if (Zone.current[_viewKey] case final Map<String, DateTime> reused) {
-      if (_values[key] case final value?) {
-        reused[Uri.parse(key).path] = value.$2;
-        return jsonDecode(value.$1);
-      }
+    final value = _values[key];
+    if (policy == ReadPolicy.cached && value != null) {
+      return value.value as T;
     }
     // A failed refresh must not leave a previously successful view reusable.
     _values.remove(key);
     final pending = Object();
-    _pending[key] = pending;
-    final revision = _revision;
+    _pending[key] = (pending, Set.unmodifiable(tags));
     try {
       final result = await fetch();
-      if (revision == _revision &&
-          identical(_pending[key], pending) &&
+      if (identical(_pending[key]?.$1, pending) &&
           cancellation?.isCancelled != true) {
-        _values[key] = (jsonEncode(result), DateTime.now().toUtc());
+        _values[key] = _Snapshot(
+          result,
+          DateTime.now().toUtc(),
+          Set.unmodifiable(tags),
+        );
         while (_values.length > 128) {
           _values.remove(_values.keys.first);
         }
       }
       return result;
     } finally {
-      if (identical(_pending[key], pending)) _pending.remove(key);
+      if (identical(_pending[key]?.$1, pending)) _pending.remove(key);
     }
   }
 }

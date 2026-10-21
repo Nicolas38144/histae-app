@@ -3,26 +3,48 @@ import 'dart:typed_data';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/network/json_fields.dart';
+import '../../../core/network/read_snapshots.dart';
 import '../../auth/domain/authenticated_session.dart';
 import 'profile_models.dart';
 
 abstract interface class ProfileRepository {
-  factory ProfileRepository(AuthenticatedSession session) =
-      ApiProfileRepository;
+  factory ProfileRepository(
+    AuthenticatedSession session, {
+    ReadSnapshots? cache,
+  }) = ApiProfileRepository;
 
   AuthenticatedSession get session;
+  DateTime? get profileReadAt;
 
-  Future<OwnerProfile?> profile(RequestCancellation scope);
+  Future<OwnerProfile?> profile(
+    RequestCancellation scope, {
+    ReadPolicy policy = ReadPolicy.refresh,
+  });
 
-  Future<Preferences?> preferences(RequestCancellation scope);
+  Future<Preferences?> preferences(
+    RequestCancellation scope, {
+    ReadPolicy policy = ReadPolicy.refresh,
+  });
 
-  Future<List<ProfileTrait>> traits(RequestCancellation scope);
+  Future<List<ProfileTrait>> traits(
+    RequestCancellation scope, {
+    ReadPolicy policy = ReadPolicy.refresh,
+  });
 
-  Future<List<ProfileTrait>> selectedTraits(RequestCancellation scope);
+  Future<List<ProfileTrait>> selectedTraits(
+    RequestCancellation scope, {
+    ReadPolicy policy = ReadPolicy.refresh,
+  });
 
-  Future<List<ProfileQuestion>> questions(RequestCancellation scope);
+  Future<List<ProfileQuestion>> questions(
+    RequestCancellation scope, {
+    ReadPolicy policy = ReadPolicy.refresh,
+  });
 
-  Future<List<ProfileAnswer>> answers(RequestCancellation scope);
+  Future<List<ProfileAnswer>> answers(
+    RequestCancellation scope, {
+    ReadPolicy policy = ReadPolicy.refresh,
+  });
 
   Future<void> saveProfile(ProfileDraft draft);
 
@@ -38,9 +60,14 @@ abstract interface class ProfileRepository {
 }
 
 final class ApiProfileRepository implements ProfileRepository {
-  ApiProfileRepository(this.session);
+  ApiProfileRepository(this.session, {ReadSnapshots? cache})
+    : _reads = cache ?? ReadSnapshots();
+  final ReadSnapshots _reads;
+  String get _scopeKey => '${session.resourceKey}:${session.language.code}';
   @override
   final AuthenticatedSession session;
+  @override
+  DateTime? get profileReadAt => _reads.readAt(DataResource.profile);
 
   Future<Object?> _request(
     String method,
@@ -50,21 +77,56 @@ final class ApiProfileRepository implements ProfileRepository {
     String? key,
     int status = 200,
     RequestCancellation? cancellation,
-  }) => session.request(
-    method,
-    path,
-    body: body,
-    photo: photo,
-    idempotencyKey: key,
-    expectedStatus: status,
-    replayAfterRefresh: true,
-    cancellation: cancellation,
-  );
+  }) => method == 'GET'
+      ? session.request(
+          method,
+          path,
+          body: body,
+          photo: photo,
+          idempotencyKey: key,
+          expectedStatus: status,
+          replayAfterRefresh: true,
+          cancellation: cancellation,
+        )
+      : _reads.mutate(
+          _affected(path),
+          () => session.request(
+            method,
+            path,
+            body: body,
+            photo: photo,
+            idempotencyKey: key,
+            expectedStatus: status,
+            replayAfterRefresh: true,
+            cancellation: cancellation,
+          ),
+        );
+
+  Set<Object> _affected(String path) => switch (path) {
+    '/api/users/me/preferences' => {DataResource.preferences},
+    '/api/users/me/profile-answers' => {DataResource.answers},
+    _ when path.startsWith('/api/users/me/traits') => {
+      DataResource.selectedTraits,
+    },
+    _ => {DataResource.profile},
+  };
   // An expired-access 401 is a definitive rejection before mutation. This is the
   // only automatic replay; lost responses always return control to the user.
 
   @override
-  Future<OwnerProfile?> profile(RequestCancellation scope) async {
+  Future<OwnerProfile?> profile(
+    RequestCancellation scope, {
+    ReadPolicy policy = ReadPolicy.refresh,
+  }) => _reads.read(
+    scope: _scopeKey,
+    key: DataResource.profile,
+    policy: policy,
+    tags: {DataResource.profile},
+    cancellation: scope,
+    fetch: () => _fetchProfile(scope),
+  );
+
+  Future<OwnerProfile?> _fetchProfile(RequestCancellation scope) async {
     try {
       final p = OwnerProfile.fromJson(
         await _request('GET', '/api/users/me', cancellation: scope),
@@ -78,7 +140,19 @@ final class ApiProfileRepository implements ProfileRepository {
   }
 
   @override
-  Future<Preferences?> preferences(RequestCancellation scope) async {
+  Future<Preferences?> preferences(
+    RequestCancellation scope, {
+    ReadPolicy policy = ReadPolicy.refresh,
+  }) => _reads.read(
+    scope: _scopeKey,
+    key: DataResource.preferences,
+    policy: policy,
+    tags: {DataResource.preferences},
+    cancellation: scope,
+    fetch: () => _fetchPreferences(scope),
+  );
+
+  Future<Preferences?> _fetchPreferences(RequestCancellation scope) async {
     try {
       final value = jsonObject(
         await _request('GET', '/api/users/me/preferences', cancellation: scope),
@@ -106,19 +180,67 @@ final class ApiProfileRepository implements ProfileRepository {
   );
 
   @override
-  Future<List<ProfileTrait>> traits(RequestCancellation s) =>
+  Future<List<ProfileTrait>> traits(
+    RequestCancellation scope, {
+    ReadPolicy policy = ReadPolicy.refresh,
+  }) => _reads.read(
+    scope: _scopeKey,
+    key: DataResource.traits,
+    policy: policy,
+    tags: {DataResource.traits},
+    cancellation: scope,
+    fetch: () => _fetchTraits(scope),
+  );
+
+  Future<List<ProfileTrait>> _fetchTraits(RequestCancellation s) =>
       _list('/api/traits', 'traits', ProfileTrait.fromJson, s);
 
   @override
-  Future<List<ProfileTrait>> selectedTraits(RequestCancellation s) =>
+  Future<List<ProfileTrait>> selectedTraits(
+    RequestCancellation scope, {
+    ReadPolicy policy = ReadPolicy.refresh,
+  }) => _reads.read(
+    scope: _scopeKey,
+    key: DataResource.selectedTraits,
+    policy: policy,
+    tags: {DataResource.selectedTraits},
+    cancellation: scope,
+    fetch: () => _fetchSelectedTraits(scope),
+  );
+
+  Future<List<ProfileTrait>> _fetchSelectedTraits(RequestCancellation s) =>
       _list('/api/users/me/traits', 'traits', ProfileTrait.fromJson, s);
 
   @override
-  Future<List<ProfileQuestion>> questions(RequestCancellation s) =>
+  Future<List<ProfileQuestion>> questions(
+    RequestCancellation scope, {
+    ReadPolicy policy = ReadPolicy.refresh,
+  }) => _reads.read(
+    scope: _scopeKey,
+    key: DataResource.questions,
+    policy: policy,
+    tags: {DataResource.questions},
+    cancellation: scope,
+    fetch: () => _fetchQuestions(scope),
+  );
+
+  Future<List<ProfileQuestion>> _fetchQuestions(RequestCancellation s) =>
       _list('/api/profile-questions', 'questions', ProfileQuestion.fromJson, s);
 
   @override
-  Future<List<ProfileAnswer>> answers(RequestCancellation s) => _list(
+  Future<List<ProfileAnswer>> answers(
+    RequestCancellation scope, {
+    ReadPolicy policy = ReadPolicy.refresh,
+  }) => _reads.read(
+    scope: _scopeKey,
+    key: DataResource.answers,
+    policy: policy,
+    tags: {DataResource.answers},
+    cancellation: scope,
+    fetch: () => _fetchAnswers(scope),
+  );
+
+  Future<List<ProfileAnswer>> _fetchAnswers(RequestCancellation s) => _list(
     '/api/users/me/profile-answers',
     'answers',
     ProfileAnswer.fromJson,

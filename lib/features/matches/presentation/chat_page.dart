@@ -23,7 +23,7 @@ class ChatPage extends StatefulWidget {
   State<ChatPage> createState() => _ChatPageState();
 }
 
-class _ChatPageState extends State<ChatPage> {
+class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   MatchesController get c => widget.controller;
   late final _text = TextEditingController(text: c.draftFor(widget.matchId));
   late final _key = c.session.resourceKey;
@@ -32,10 +32,14 @@ class _ChatPageState extends State<ChatPage> {
   final _incoming = <String, GlobalKey>{};
   Timer? _readTimer;
   String? _head;
+  bool get _foreground =>
+      WidgetsBinding.instance.lifecycleState == null ||
+      WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     c.addListener(_changed);
     _scroll.addListener(_scheduleRead);
     _scheduleRead();
@@ -77,12 +81,19 @@ class _ChatPageState extends State<ChatPage> {
 
   void _scheduleRead() {
     _readTimer?.cancel();
-    if (!mounted) return;
+    if (!mounted || !_foreground) return;
     _readTimer = Timer(const Duration(milliseconds: 450), _readVisible);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _readTimer?.cancel();
+    if (state == AppLifecycleState.resumed) _scheduleRead();
   }
 
   void _readVisible({bool explicitRetry = false}) {
     if (!mounted ||
+        !_foreground ||
         ModalRoute.of(context)?.isCurrent != true ||
         !c.canRead ||
         c.selectedId != widget.matchId) {
@@ -158,6 +169,7 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _readTimer?.cancel();
     c.removeListener(_changed);
     _scroll.removeListener(_scheduleRead);

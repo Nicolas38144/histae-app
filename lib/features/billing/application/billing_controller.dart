@@ -47,7 +47,7 @@ class BillingController extends ChangeNotifier {
   String? _owner, _key;
   bool _disposed = false, _active = false, restored = false;
   bool loading = false, busy = false, fresh = false;
-  bool _invalidated = false;
+  bool _invalidated = false, _externalReturnPending = false;
   int _epoch = 0;
   RequestCancellation _scope = RequestCancellation();
   final _storage = SerialExecutor();
@@ -113,6 +113,7 @@ class BillingController extends ChangeNotifier {
       failure = null;
       notice = null;
       restored = false;
+      _externalReturnPending = false;
       _key = null;
       _owner = null;
       _restore = null;
@@ -155,7 +156,7 @@ class BillingController extends ChangeNotifier {
     _notify();
   }
 
-  Future<void> activate() async {
+  Future<void> activate({bool refresh = false}) async {
     if (active) return;
     if (_disposed) return;
     _changed();
@@ -170,9 +171,8 @@ class BillingController extends ChangeNotifier {
     if (_disposed || epoch != _epoch || !accessible || !restored) return;
     _active = true;
     if (_scope.isCancelled) _scope = RequestCancellation();
-    if (subscription == null && failure == null) await load();
-    final end = subscription?.periodEnd;
-    if (end != null && !end.isAfter(DateTime.now())) fresh = false;
+    if (refresh || (subscription == null && failure == null)) await load();
+    _armExpiry();
     _notify();
     if (_alive(epoch)) _realtime.start();
   }
@@ -190,7 +190,10 @@ class BillingController extends ChangeNotifier {
 
   Future<void> resume() async {
     await activate();
-    if (pending != null || notice == 'portal_opened') await load();
+    if (_externalReturnPending && active && !busy && !loading) {
+      _externalReturnPending = false;
+      await load();
+    }
   }
 
   Future<void> load() async {
@@ -211,20 +214,7 @@ class BillingController extends ChangeNotifier {
         pending = null;
         notice = 'confirmed';
       }
-      _expiry?.cancel();
-      final end = result.periodEnd;
-      if (result.accessGranted && end != null) {
-        final delay = end.difference(DateTime.now());
-        if (delay > Duration.zero) {
-          _expiry = Timer(delay, () {
-            fresh = false;
-            _notify();
-          });
-        } else {
-          // Do not grant cached access beyond an already passed period.
-          fresh = false;
-        }
-      }
+      _armExpiry();
     } on ApiFailure catch (e) {
       if (_alive(epoch)) {
         fresh = false;
@@ -245,6 +235,21 @@ class BillingController extends ChangeNotifier {
         }
       }
     }
+  }
+
+  void _armExpiry() {
+    _expiry?.cancel();
+    final end = subscription?.periodEnd;
+    if (subscription?.accessGranted != true || end == null) return;
+    final delay = end.difference(DateTime.now());
+    if (delay <= Duration.zero) {
+      fresh = false;
+      return;
+    }
+    _expiry = Timer(delay, () {
+      fresh = false;
+      _notify();
+    });
   }
 
   Future<void> checkout(BillingPeriod period) async {
@@ -283,7 +288,9 @@ class BillingController extends ChangeNotifier {
       }
       notice = 'awaiting_confirmation';
       _notify();
+      _externalReturnPending = true;
       if (!await gateway.open(link.url, portal: false)) {
+        _externalReturnPending = false;
         throw const ApiFailure(
           ApiFailureKind.unavailable,
           code: 'browser_unavailable',
@@ -345,7 +352,9 @@ class BillingController extends ChangeNotifier {
       final url = await repository.portal(_scope);
       if (!_alive(epoch)) return;
       notice = 'portal_opened';
+      _externalReturnPending = true;
       if (!await gateway.open(url, portal: true)) {
+        _externalReturnPending = false;
         throw const ApiFailure(
           ApiFailureKind.unavailable,
           code: 'browser_unavailable',

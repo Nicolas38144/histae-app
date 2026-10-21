@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_failure.dart';
-import '../../../core/network/read_snapshots.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
@@ -28,16 +27,26 @@ String notificationFailure(
 };
 
 class DevicesPage extends StatefulWidget {
-  const DevicesPage({super.key, required this.session, this.push});
+  const DevicesPage({
+    super.key,
+    required this.session,
+    this.push,
+    this.repository,
+  });
   final AuthenticatedSession session;
   final PushController? push;
+  final DeviceRepository? repository;
 
   @override
   State<DevicesPage> createState() => _DevicesPageState();
 }
 
 class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
-  late final c = DevicesController(DeviceRepository(widget.session));
+  late final c = DevicesController(
+    widget.repository ??
+        widget.push?.repository ??
+        DeviceRepository(widget.session),
+  );
 
   PushController? get p => widget.push;
 
@@ -46,7 +55,7 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) unawaited(ReadSnapshots.forView(c.load));
+      if (mounted) unawaited(c.ensureLoaded());
     });
   }
 
