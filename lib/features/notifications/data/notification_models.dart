@@ -29,7 +29,6 @@ enum PushKind {
   newMatch,
   newMessage,
   billingPaymentFailed,
-  subscriptionTrialEnding,
 }
 
 class PushIntent {
@@ -42,7 +41,6 @@ class PushIntent {
         'new_match' => PushKind.newMatch,
         'new_message' => PushKind.newMessage,
         'billing_payment_failed' => PushKind.billingPaymentFailed,
-        'subscription_trial_ending' => PushKind.subscriptionTrialEnding,
         _ => null,
       };
       if (kind == null) return null;
