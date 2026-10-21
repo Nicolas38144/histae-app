@@ -1,16 +1,37 @@
 # Traductions de l’interface
 
-Les catalogues `arb/app_fr.arb`, `app_en.arb`, `app_es.arb` et `app_it.arb` sont la source des textes. Aucun libellé, message de validation, confirmation ou texte d’accessibilité ne doit être ajouté dans un widget, un contrôleur ou un modèle.
+Les sources sont les quatre catalogues [ARB](arb/) : français, anglais, espagnol et italien. Les textes d’interface, validations, confirmations et libellés d’accessibilité doivent y être déclarés.
 
-Ajouter une clé descriptive dans les quatre catalogues, avec ses paramètres dans les métadonnées du français, puis exécuter `flutter gen-l10n`. Ne pas modifier les fichiers `generated/` : les chaînes Dart qu’ils contiennent sont produites par Flutter. Utiliser `AppStrings.of(context).messages` pour la copie et `AppStrings` pour les dates, nombres, prix et erreurs métier. Les pluriels sont des messages ICU complets, sans suffixe concaténé.
+## Ajouter ou modifier un texte
 
-Les couches de données et d’état renvoient des codes/énumérations (`ApiFailure`, `ClientMessage`), jamais une phrase traduite. La présentation choisit le texte au rendu ; un changement de langue traduit aussi une erreur déjà affichée. Les catalogues de questions, traits, offres et documents sont localisés par l’API selon `Accept-Language`, avec son repli français. Les bios, réponses et messages des personnes ne sont jamais traduits par le client.
+1. Ajouter une clé descriptive dans les quatre catalogues, avec les paramètres et métadonnées nécessaires dans le français.
+2. Utiliser un message ICU pour les pluriels ; éviter les phrases et suffixes assemblés dans le code.
+3. Régénérer les classes Flutter :
 
-`LocaleController` possède la préférence explicite d’appareil. Sans choix local enregistré, `AccountLanguageBinding` peut reprendre la préférence du compte vérifié ; une sélection connectée est aussi enregistrée via le dépôt de langue. Le français est conservé au premier lancement ; l’accueil et le profil donnent accès au choix français, anglais, espagnol, italien ou langue de l’appareil. Une variante régionale prise en charge utilise sa langue principale ; une langue non prise en charge revient au français. La préférence est restaurée avant `runApp`, enregistrée sous une clé séparée et conservée à la déconnexion. Une erreur d’enregistrement est affichée sans prétendre que le choix a été mémorisé. Le changement ne recrée ni la session, ni le navigateur, ni les brouillons.
+```bash
+flutter gen-l10n
+```
 
-Les permissions iOS sont aussi décrites dans les ARB. Après modification, exécuter `dart run tool/generate_native_localizations.dart` pour actualiser les ressources natives `InfoPlist.strings` des quatre langues. Les dialogues du système et des fournisseurs suivent leurs propres réglages de langue ; le choix Flutter ne modifie pas les réglages du téléphone ni directement la langue des dialogues natifs. Les nouvelles demandes Stripe utilisent la langue transmise à l’API ; une tentative Checkout reprise conserve sa langue d’origine.
+Utiliser `AppStrings.of(context).messages` pour les textes et `AppStrings` pour les formats de dates, nombres, prix et erreurs. Les couches de données et d’état renvoient des codes ou `ClientMessage`, traduits par la présentation. Ne pas éditer les fichiers de [generated](generated/) à la main.
 
-Vérification ciblée : `flutter test test/localization_test.dart`. Elle contrôle la complétude des catalogues, les paramètres, les pluriels, l’encodage, les libellés en dur dans les widgets, le stockage et la conservation de la navigation et du brouillon. Revue visuelle avec données simulées : `flutter test tool/preview_localizations_test.dart --update-goldens`, captures dans `build/previews/localization/`.
+## Préférence et contenus
 
-Les règles réseau, les documents réellement présentés, le stockage des intentions et les validations
-à lancer sans fournisseur réel sont décrits dans [le guide des langues API](../../../docs/api-languages.md).
+`LocaleController` possède la préférence d’appareil, restaurée avant le premier rendu. Sans choix explicite, le compte vérifié peut fournir sa langue via `AccountLanguageBinding`. Le français est le repli ; le mode appareil résout la langue principale du système. Changer de langue conserve la navigation et les brouillons.
+
+L’API localise ses catalogues et documents selon `Accept-Language`. Les textes personnels ne sont pas traduits automatiquement. La langue d’un document effectivement présenté et celle de son acceptation restent distinctes de la préférence d’interface. Voir le [guide des langues API](../../../docs/api-languages.md).
+
+Les dialogues du système et des fournisseurs suivent leurs réglages natifs. Si les textes de permission iOS des ARB changent, régénérer également leurs ressources :
+
+```bash
+dart run tool/generate_native_localizations.dart
+```
+
+## Vérification ciblée
+
+Depuis la racine de l’app :
+
+```bash
+flutter test test/localization_test.dart
+```
+
+Ce contrôle vérifie notamment la complétude des catalogues, les paramètres, les pluriels et l’absence de libellés en dur. Pour une revue visuelle des quatre langues, utiliser `tool/preview_localizations_test.dart` et examiner les longues traductions, le texte agrandi et le clavier. Les commandes communes sont dans le [README principal](../../../README.md).

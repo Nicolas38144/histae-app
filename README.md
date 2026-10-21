@@ -115,7 +115,9 @@ Les tests simulés et une compilation locale ne valident pas les services réels
 | --- | --- |
 | [Architecture](ARCHITECTURE.md) | Responsabilités, état, dépendances et gestion des ressources. |
 | [Système visuel](DESIGN_SYSTEM.md) | Logo, couleurs, typographies et composants. |
-| [Roadmap](roadmap.md) et [résumé du projet](resume.md) | Périmètre des lots et suivi fonctionnel. |
+| [Résumé fonctionnel](resume.md) | Parcours et règles d’intégration mobile. |
+| [Roadmap](roadmap.md) | État des lots, routes couvertes et validations restantes. |
+| [Traductions](lib/core/l10n/README.md) | Contribution aux catalogues ARB et génération. |
 | [Langues et API](docs/api-languages.md) | Préférences de langue, documents et reprises réseau. |
 | [Contrat HTTP](../histae-api-rust/docs/http-contract.md) | Routes et contrats de l’API Rust de référence. |
 | [Développement API](../histae-api-rust/docs/development.md) | Installation et lancement du backend. |

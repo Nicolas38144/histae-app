@@ -1,95 +1,47 @@
-# Langues des appels API mobiles
+# Langues des appels API
 
-## Comportement
+Les codes échangés sont `fr`, `en`, `es` et `it`. Les clients HTTP utilisent la langue résolue par `LocaleController` ; JSON, multipart, export et ouverture SSE portent `Accept-Language`. Les corps métier conservent leur contrat.
 
-Les codes transmis sont exactement `fr`, `en`, `es`, `it`. Les deux `ApiClient` de la composition
-racine partagent la source `LocaleController`, restaurée avant leur construction. Les requêtes JSON,
-les uploads multipart et les ouvertures SSE/export portent `Accept-Language`. Aucun paramètre
-`language` n’est ajouté aux corps qui ne l’acceptent pas. Les noms d’événements et les données
-personnelles restent ceux du contrat ; les messages d’erreur utilisent toujours `error.code`.
+## Préférence du compte et de l’appareil
 
-Le français reste la langue initiale anonyme. Une préférence locale enregistrée (y compris « langue
-de l’appareil ») prime. Sans préférence locale, la première identité authentifiée permet de lire
-`GET /api/users/me/language` et d’adopter la préférence du compte pour cette session. Cette lecture
-n’écrit ni la préférence locale ni celle du compte. Une déconnexion efface seulement ce repli
-éphémère ; un choix explicite de cet appareil reste conservé.
+Le français est la langue initiale. Une préférence d’appareil enregistrée, y compris le mode système, prime. Sans choix local, `AccountLanguageBinding` lit `GET /api/users/me/language` pour adopter la préférence du compte vérifié ; cette lecture n’écrit aucune préférence.
 
-Un choix explicite connecté applique la langue localement puis appelle `PATCH /api/users/me/language`
-avec `{ "language": "it" }`. Un échec distant laisse la langue locale utilisable et affiche l’échec
-via l’état du sélecteur. Sélectionner à nouveau permet une nouvelle tentative volontaire. Le délai
-`Retry-After` d’un échec est conservé pour ne pas marteler cette route. La restauration et un
-changement des réglages système ne réécrivent pas silencieusement la préférence du compte.
+Un choix explicite connecté s’applique à l’interface et appelle `PATCH /api/users/me/language` avec, par exemple, `{ "language": "it" }`. Un échec distant laisse l’interface utilisable, affiche l’échec et respecte `Retry-After` avant une nouvelle tentative volontaire. Restaurer l’app ou changer la langue du système ne réécrit pas silencieusement la préférence du compte.
 
-Le mode appareil résout sa langue principale ; une langue non prise en charge revient au français,
-comme l’interface Flutter. `didChangeLocales` invalide les lectures et l’exception push de l’appareil
-quand cette résolution change. Les dialogues natifs suivent leurs propres réglages.
+La déconnexion retire le repli du compte, tout en conservant un choix explicite d’appareil. Une langue non prise en charge revient au français.
 
-## Routes couvertes
+## Adaptation des parcours
 
-| Routes | Adaptation mobile |
+| Parcours | Règle |
 | --- | --- |
-| `GET /api/plans` | En-tête courant, invalidation et relecture du catalogue public après changement de langue. |
-| `GET /api/traits`, `GET /api/profile-questions`, `GET /api/users/me/traits` | En-tête courant ; profils et catalogues relus sans réinitialiser les formulaires. |
-| `GET /api/users/me`, `GET` et `PUT /api/users/me/profile-answers` | Questions localisées ; réponses personnelles et UUID conservés. |
-| `GET /api/feed`, `GET /api/matches/me` | En-tête courant, rejet des lectures d’une ancienne langue et reprise de la pagination au début. Les intentions de swipe et brouillons de chat sont conservés. |
-| `GET`, `PATCH /api/users/me/language` | Lecture et écriture typées de la préférence du compte via `LanguageRepository` et `AccountLanguageBinding`. |
-| `GET`, `PUT /api/users/me/consents` | URL, version, `document_language` et `accepted_document_language` décodés ; précontrôle du document réellement présenté avant une décision. |
-| `POST /api/auth/otp/send` | Langue figée avec le numéro et la clé d’idempotence pour toute reprise technique. Un renvoi volontaire crée une nouvelle intention dans la langue courante. Les numéros restent français `+33`. |
-| `GET`, `POST /api/users/me/devices` | Exception de langue nullable décodée et envoyée. Réenregistrement d’un appareil déjà activé après changement ; aucun nouvel accord de notification n’est fabriqué. |
-| `POST /api/users/me/subscription/checkout` | Langue figée et sauvegardée avec la tentative avant le premier POST. La période et la clé ne changent pas à la reprise. |
-| `POST /api/users/me/subscription/portal` | Langue courante dans l’en-tête ; l’API choisit la locale Stripe et les URL de retour autorisées. |
-| `GET /api/users/me/data-export` | En-tête courant ; conservation intégrale des clés, préférences et preuves historiques de l’export. |
-| `GET /api/users/me/events` | En-tête à l’ouverture ; protocole SSE et contenus personnels inchangés. |
+| Catalogue, profil, traits, questions, feed et matchs | Lectures localisées ; réponses d’une ancienne révision ignorées et pagination reprise au début si nécessaire. |
+| Consentements | Vérifier version, URL et `document_language` du document présenté avant écriture. Conserver `accepted_document_language` comme preuve historique. |
+| OTP | La langue est figée avec le téléphone et la clé d’idempotence ; un renvoi volontaire crée une nouvelle intention. |
+| Checkout | La tentative conserve sa langue, sa période et sa clé lors d’une reprise, y compris après restauration. |
+| Portail Stripe | La requête utilise la langue courante ; l’API choisit la locale et les URL autorisées. |
+| Appareil push | L’exception de langue suit l’enregistrement ; `null` permet de suivre le compte. Un appareil déjà activé peut être réenregistré après un changement explicite. |
+| Export et SSE | Langue transmise à l’ouverture ; clés d’export, protocole d’événements et contenus personnels conservés. |
 
-Toutes les autres routes JSON/multipart passent aussi par le même transport, sans changement de leur
-payload métier. Les photos sur URL signée conservent leur transport séparé sans Bearer.
+Les bios, réponses et messages des personnes ne sont jamais traduits par le client. Les photos signées utilisent un transport distinct, sans Bearer. Les dialogues natifs gardent leurs propres réglages.
 
-## Cohérence et sécurité
+## Cohérence des requêtes
 
-- Une reprise après un **401 d’expiration confirmé** garde la langue de la requête d’origine.
-  Aucun retry général n’est ajouté après timeout ou résultat incertain.
-- Le changement de langue a sa propre révision, distincte de `resourceKey` : il ne détruit pas
-  la navigation, les brouillons, les crédits, les photos autorisées ou les intentions en attente.
-- Les réponses de lecture d’une ancienne langue sont ignorées. Une indisponibilité pendant la
-  relecture des consentements ne ferme pas la session ; une révocation ou un rejet d’authentification
-  continue à purger les données comme auparavant.
-- Une nouvelle URL ou langue documentaire invalide les choix non confirmés, même si la version
-  juridique est inchangée. La requête PUT utilise la langue de son précontrôle. La langue du document
-  disponible peut rester française par repli ; elle est distincte de la préférence d’interface et
-  de la langue historique d’acceptation. Aucun changement de langue ne vaut consentement.
-- Les notifications utilisent l’exception explicite de cet appareil ; `language: null` permet à
-  un enregistrement sans exception de suivre le compte. Une intention de réenregistrement conserve
-  sa langue pendant une reprise et converge ensuite vers le choix courant.
-- Les anciens enregistrements Checkout sans champ de langue restent lisibles ; l’API conserve
-  l’autorité sur la locale et les URL de toute tentative qu’elle possède déjà.
-- Les requêtes et retours tardifs restent liés à l’identité et à l’origine d’API. Aucun jeton,
-  numéro, texte privé ou URL de paiement n’est ajouté aux logs ou à un nouveau stockage.
+La révision de localisation est distincte de `resourceKey`. Changer de langue renouvelle les lectures concernées sans supprimer navigation, brouillons, crédits ou intentions d’écriture. Les données mises en cache dans une autre langue ne sont pas réutilisées.
 
-## Validation sur une machine avec Flutter
+Une reprise après un `401` d’expiration confirmé garde la langue de la requête d’origine. Un timeout ne déclenche pas de nouvelle mutation automatique. Une intention push ou Checkout déjà engagée conserve ses paramètres jusqu’à sa résolution.
 
-Flutter et Dart ne sont pas installés sur la machine ayant préparé ce changement. **Aucune analyse
-Dart, suite Flutter ou compilation n’y a été exécutée.** Les vérifications locales portent sur
-les imports relatifs, les ressources ARB, l’inventaire des routes et la revue des signatures et flux.
+Les choix de consentement non confirmés sont invalidés si le document présenté change, même à version juridique identique. Un changement de langue ne vaut pas consentement. Une lecture documentaire indisponible ne simule pas une déconnexion ; un rejet d’authentification conserve les protections de session habituelles.
 
-Les sources ARB ont été actualisées. Les fichiers `generated/` n’ont pas été modifiés à la main :
-les régénérer sur la machine Flutter avec la version compatible avec `pubspec.yaml` et le lockfile.
+Les anciens enregistrements Checkout sans champ de langue restent lisibles. L’API conserve l’autorité sur les URL et tentatives qu’elle possède déjà.
+
+## Vérification
+
+Après modification des ARB, suivre le [guide de traduction](../lib/core/l10n/README.md). Adapter les contrôles au parcours modifié ; pour le transport et la préférence de langue :
 
 ```bash
-cd histae-app
-flutter pub get
-flutter gen-l10n
-dart format lib test
-flutter analyze
-flutter test test/api_language_test.dart test/localization_test.dart test/otp_test.dart test/session_test.dart test/billing_test.dart test/notifications_test.dart
-flutter test
-flutter build apk --debug
+flutter test test/api_language_test.dart test/localization_test.dart
 ```
 
-Les nouveaux tests utilisent exclusivement des comptes et transports simulés : codes exacts, en-tête
-sur JSON/multipart, reprise 401, OTP figé, Checkout restauré, documents et consentements, appareils
-push, lecture/écriture du compte, résultat tardif après déconnexion, catalogue concurrent et brouillons.
-Aucun SMS, paiement ou push réel n’est nécessaire.
+Ajouter les tests existants OTP, session, facturation ou notifications uniquement si ces parcours sont concernés. Les simulations ne nécessitent ni SMS, ni paiement, ni push réels.
 
-Sur appareil, vérifier aussi un choix sur l’accueil avant OTP, le mode système avec variante régionale,
-le changement connecté depuis Profil, le retour d’un document juridique, une tentative Checkout
-reprise après changement de langue et le réenregistrement push d’un appareil déjà autorisé.
+Sur appareil, vérifier le choix avant connexion, le mode système, les documents juridiques, la reprise d’une tentative Checkout et la langue d’un appareil push déjà activé. Les contrôles communs sont dans le [README](../README.md) et les validations de livraison dans la [roadmap](../roadmap.md).

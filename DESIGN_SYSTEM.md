@@ -1,109 +1,66 @@
-# Direction artistique Histae
+# Système visuel Histae
 
-## Voix et rythme — 21 octobre 2026
+L’app reprend l’identité du [site Histae](https://www.histae.com/fr/) : livre ouvert, bleu nuit, lavande, touches abricot et titres à empattements. Le mode nuit est appliqué par défaut.
 
-L’app et le site partagent un ton simple, chaleureux et concret, en gardant le vouvoiement en français. Les textes parlent des personnes, de leurs mots et de ce qu’elles peuvent faire ensuite. Les références au serveur et aux mécanismes de requête sortent des messages courants ; un résultat incertain reste explicitement présenté comme tel, sans annoncer un enregistrement, un paiement ou un crédit non confirmé. Les bios et messages des personnes ne sont pas réécrits.
+## Ton et contenu
 
-Le profil commence par la présentation et l’aperçu public. Le mode pause et les réglages, dont Premium/Mon abonnement, suivent les contenus personnels. L’actualisation reste disponible dans l’en-tête et par un geste vers le bas. Dans les rencontres, l’introduction précède une réserve de crédits plus compacte ; un état vide présente une invitation illustrée à la place de l’introduction habituelle. Le feed conserve sa place et ses contrôles existants.
+Écrire simplement, avec chaleur et des actions concrètes. Garder le vouvoiement en français. Les messages courants parlent des personnes et de leurs possibilités, sans exposer les mécanismes réseau. Un résultat incertain reste présenté comme incertain : aucun enregistrement, paiement ou crédit ne doit être annoncé sans confirmation.
 
-Le motif de rencontre utilise des courbes statiques. Les états vides ne simulent aucune activité, aucune personne et aucun délai. Sur le site, l’échange Camille/Noa est explicitement présenté comme fictif. Les listes de fonctionnalités ont moins d’encadrements et de numéros décoratifs. Le bleu nuit, le livre, les accents lavande/abricot et les préférences de taille du texte restent les repères de la marque.
+Laisser de la place aux bios longues et aux réponses. Les contenus des personnes ne sont ni réécrits ni traduits automatiquement. Les exemples et captures de démonstration utilisent des profils fictifs identifiés comme tels. Les états vides proposent une action utile sans simuler d’activité.
 
-Les changements de copie sont présents dans les catalogues français, anglais, espagnol et italien des deux dépôts. Les confirmations de confidentialité, les règles de continuation, les états de paiement et les documents juridiques gardent leurs distinctions nécessaires. Aucune nouvelle dépendance ou animation continue n’est ajoutée.
+## Couleurs et typographie
 
-Validation : 30 contrôles existants ciblés réussis, analyse Flutter sans problème et 40 captures avec données simulées dans `build/previews/localization`, dont des états à 200 %. Les libellés de navigation disposent de largeurs adaptées aux traductions en grand texte. Le site passe TypeScript, ESLint et la compilation statique ; son contrôle d’export valide les 56 pages localisées. Revue du nouvel accueil sur ordinateur et à 320/390 px, sans défilement horizontal dans les quatre langues. Aucun déploiement n’est effectué.
+Les valeurs de référence sont dans [HistaeTokens](lib/core/theme/histae_tokens.dart), appliquées par le [thème Flutter](lib/app/theme.dart).
 
-Référence depuis le 18 octobre 2026 : [histae.com/fr](https://www.histae.com/fr/) et le dépôt voisin `histae-site`, notamment `app/globals.css`, `components/site-header.tsx` et `components/home-page.tsx`. La référence du site remplace la précédente palette forêt/papier ; la navigation à trois onglets et les gestes du feed sont conservés.
-
-## Identité commune
-
-| Usage | Valeur du site reprise dans l'app |
+| Usage | Valeur |
 | --- | --- |
-| Fond bleu nuit | `#0D1421` |
-| Surface secondaire | `#141D2D` |
+| Fond principal | `#0D1421` |
+| Fond secondaire | `#141D2D` |
+| Panneau | `#1A2231` |
 | Texte principal | `#F9F7F2` |
 | Texte secondaire | `#C6C1D3` |
 | Accent lavande | `#B69CFF` |
 | Accent abricot | `#F09A82` |
-| Prune | `#392243` |
-| Action principale | Dégradé `#F2A48C` → `#D8B3F7`, texte bleu nuit |
+| Action principale | Dégradé `#F2A48C` → `#D8B3F7`, texte bleu nuit. |
 
-Les valeurs communes sont regroupées dans `lib/core/theme/histae_tokens.dart` et utilisées par `lib/app/theme.dart`. Les cartes utilisent des surfaces légèrement relevées, des bordures fines et des angles de 20 px. Les boutons sont arrondis en pilule. Les halos restent discrets ; ils n'utilisent ni filtre de flou coûteux ni animation continue.
+**Inter** porte les textes, boutons et formulaires ; **Source Serif 4** porte les titres. Les tailles s’adaptent à la largeur et à la préférence de texte du système. Les cartes utilisent des bordures fines et un rayon courant de 20 px ; les actions principales sont arrondies en pilule.
 
-Le mot-symbole reprend « Histae. », avec son point abricot. Le motif des deux lignes qui se rejoignent, présent sur le site, est adapté au format mobile et dessiné avec Flutter. Il n'introduit ni requête réseau ni image distante.
+Les polices sont embarquées avec leurs licences : [Inter](assets/fonts/inter/OFL.txt), [Source Serif 4](assets/fonts/source_serif_4/OFL.txt) et la famille historique [DM Serif Display](assets/fonts/dm_serif_display/OFL.txt).
 
-## Typographie
+## Logo et ouverture
 
-Le site déclare Inter pour le texte courant et Georgia pour les titres. L'app embarque **Inter** et **Source Serif 4**, cette dernière conservant l'esprit des titres Georgia sur les deux plateformes sans distribuer une police système propriétaire. Les fichiers variables et leurs licences SIL OFL proviennent du dépôt officiel Google Fonts. Les licences sont déclarées dans le registre Flutter. Les anciens fichiers DM Serif Display sont conservés pour respecter la consigne de ne supprimer aucun fichier ; les écrans refondus utilisent les nouvelles familles.
+Le logo est le **livre ouvert**, seul ou accompagné du nom Histae. La source produit est [histae-logo.svg](assets/branding/histae-logo.svg). Les signatures sombre et claire, leurs PNG et l’icône native sont dans [assets/branding](assets/branding/).
 
-Les titres de section ont une taille habituelle de 28 à 38 px, le titre d'accueil 46 px, les paragraphes 15 à 17 px. Les corps, boutons et formulaires restent en Inter. Les titres suivent la largeur disponible ; les sauts de ligne décoratifs des anciens en-têtes ne sont plus imposés.
+Les icônes Android/iOS montrent uniquement le livre, avec une marge adaptée aux masques natifs. Android dispose aussi de calques adaptatifs et monochromes. Les proportions de l’icône sont distinctes de celles des en-têtes. Le [guide de lancement iOS](ios/Runner/Assets.xcassets/LaunchImage.imageset/README.md) précise les ressources de l’écran natif.
 
-## Composants et écrans
+À l’ouverture, **H.** se sépare pour dévoiler **istae**, puis le livre apparaît. Cette animation de 1 480 ms ne joue qu’au montage ; elle est ignorée si les animations sont désactivées et se termine lors d’une suspension. Le contenu, la session et la navigation conservent leur état.
 
-- `HistaeScaffold` applique le fond et l'en-tête à toutes les pages en conservant le comportement de `Scaffold`, du clavier et de la navigation.
-- `HistaeButton` conserve les états, le focus et les interactions de `FilledButton` sur le dégradé du site. Une action désactivée garde un fond neutre.
-- `EditorialCard` conserve son ancien point d'entrée et présente désormais un en-tête de section libre, comme ceux du site. Les séparateurs deviennent de simples lignes fines.
-- L'accueil, le feed, les cartes de matchs, les formulaires du profil, le catalogue et les bulles du chat ont une composition adaptée. Les réglages du compte suivent les sections de modification du profil.
-- Consentements, appareils, vie privée, signalement, crédits, continuation, photos et abonnement utilisent le même socle visuel. Prix, états, autorisations et décisions restent issus des contrôleurs et de l'API.
-- La barre **Feed / Matchs / Profil** demeure commune aux trois espaces, avec un indicateur lavande pour l'onglet choisi.
+Le [générateur d’assets](tool/generate_brand_assets.cjs) nécessite Node.js, Sharp et les sources SVG locales de `pictures/logos/nouvelle-da/02-les-pages/`. Il régénère les fichiers produit et les tailles natives ; son option `--site` exporte aussi les assets du site.
 
-Avec le clavier ou le texte agrandi, l'en-tête du chat devient compact. Le bouton d'information ouvre un dialogue défilable contenant l'état et l'échéance reçus du serveur. Les choix de photo et de continuation restent accessibles dans leur parcours existant. Les champs, pages et confirmations conservent le défilement ; aucune réduction globale des préférences de taille du texte n'est appliquée. Seul le mot-symbole décoratif s'adapte à l'espace disponible.
+## Composition des écrans
 
-Les fonds de lancement Android et iOS reprennent le bleu nuit. Les barres système suivent le thème. L'app reste en mode nuit par défaut.
+Le **Feed** réserve l’espace aux profils, sans bouton commercial. Les bios et réponses restent entièrement lisibles ; faire défiler un texte long ne doit pas déclencher un passage accidentel au profil suivant.
 
-## Vérification
+Dans **Matchs**, l’introduction précède une réserve de crédits compacte et défilante. Free voit les crédits gratuits et publicitaires disponibles ainsi que l’action Vidéos. Premium dispose d’un message adapté, sans bouton vidéo. Une lecture inconnue ou échouée ne produit pas un faux solde nul.
 
-Les aperçus de `tool/preview_app_test.dart` et `tool/preview_billing_test.dart` emploient des comptes et réponses simulés. Les contrôles existants pertinents sont réutilisés ; aucun test n'est ajouté pour la seule modification de couleurs ou de décoration. Une compilation Android ne valide pas le rendu iOS : le lancement et les polices sur appareil réel restent à vérifier lors de L10.
+Le **Profil** commence par la présentation, les réponses et l’aperçu public, puis regroupe les détails, le mode pause et les réglages du compte. Un seul accès affiche Premium pour Free ou Mon abonnement pour Premium ; l’état de chargement reste neutre.
 
-Validation du 18 octobre : **52 contrôles ciblés réussis**, dix scénarios visuels et **44 aperçus générés et inspectés**, formatage sans changement restant, analyse Flutter sans problème et APK Android debug compilé. Les vues à 200 % et le clavier du chat font partie de la revue. Aperçu d'ensemble local : `build/previews/site-redesign-overview.png`.
+L’éditeur de réponses distingue la question, le texte, son ordre et les actions de retrait/déplacement. La sélection recherche dans les questions disponibles ; l’enregistrement du remplacement complet est explicite. Les consentements sensibles et de localisation utilisent des interrupteurs, séparés des documents CGU et notice.
 
-Sources des polices : [Inter](https://github.com/google/fonts/tree/main/ofl/inter), [Source Serif 4](https://github.com/google/fonts/tree/main/ofl/sourceserif4).
+## Composants et accessibilité
 
-## Logo retenu et ouverture
+`HistaeScaffold`, `HistaeButton`, les cartes et les séparateurs composent des widgets Flutter standards. La décoration conserve les états désactivés, le focus, la sémantique et le comportement du clavier. Les valeurs et droits affichés restent fournis par les contrôleurs.
 
-Le **livre ouvert** de la piste originale **02 / Les pages** est le logo Histae. Le nom peut l'accompagner ; il n'est pas une partie obligatoire du symbole. Les autres pistes et les variantes de lettres sont conservées comme recherches graphiques.
+La barre Feed / Matchs / Profil occupe aussi la zone de sécurité inférieure ; les barres système suivent le thème. Avec un petit écran, le clavier ou du texte à 200 %, garder le défilement et les mots entiers. L’en-tête du chat devient compact ; les détails et confirmations restent défilables. Ne pas réduire globalement l’échelle de texte choisie par la personne.
 
-- Source du livre : `pictures/logos/nouvelle-da/02-les-pages/symbole.svg` ; copie produit : `assets/branding/histae-logo.svg`.
-- Signature livre + nom : `assets/branding/histae-signature-dark.svg` et `histae-signature-light.svg`. Lettres vectorisées ; dérivés PNG en double résolution utilisés dans les en-têtes Flutter, sans dépendance SVG supplémentaire.
-- Icône native : livre seul sur un carré opaque bleu nuit, sans coins arrondis dessinés dans le fichier. Les cinq densités Android et les dix-neuf entrées iOS sont générées depuis cette source.
-- Android propose aussi des calques vectoriels adaptatifs et une version monochrome pour les icônes thématiques. Le livre tient dans la zone centrale protégée de 66 dp d'un calque de 108 dp.
-- Site : en-tête et pied de page accompagnent le livre du nom ; jusqu'à 360 px, l'en-tête affiche le livre seul. Favicon SVG/PNG, icône Apple et manifeste partagent ce symbole. Le minimum fixe de largeur du body a été retiré pour éviter un débordement avec la barre de défilement.
+## Vérification visuelle
 
-L'ouverture Flutter dure **1 480 ms** : une courte tenue de **H.**, une séparation horizontale qui dévoile **istae**, l'apparition du livre au-dessus, puis un fondu vers l'écran courant. Elle ne joue qu'au montage de l'app. La session et les notifications se préparent en parallèle ; le contenu garde son état et ses routes. Les interactions et sa lecture par un lecteur d'écran restent suspendues pendant l'ouverture. Si les animations sont désactivées, l'app s'affiche directement. Une mise en arrière-plan termine l'ouverture, sans la rejouer à la reprise.
+Les scénarios `tool/preview_*_test.dart` produisent des aperçus des vrais widgets avec données simulées sous `build/previews/`. Pour l’ouverture, par exemple :
 
-`tool/generate_brand_assets.cjs` régénère les exports avec Node et Sharp disponible dans le chemin de modules de l'outil, sans l'ajouter aux dépendances mobiles. L'option `--site <chemin-histae-site>` exporte également les fichiers du site. `tool/preview_brand_test.dart --update-goldens` capture les étapes réelles de l'ouverture ; la planche animée est dans `pictures/branding`.
+```bash
+flutter test tool/preview_brand_test.dart --update-goldens
+```
 
-Validation : **21 contrôles ciblés**, dont trois nouveaux sur l'ouverture (contenu vivant et interactions, réduction des animations, cycle de vie), analyse Flutter sans problème, APK Android debug compilé et présence des assets dans l'APK vérifiée. Dimensions et absence d'alpha des icônes iOS contrôlées. Site : types, lint et compilation/export validés ; rendu sur ordinateur et petit écran revu. Les essais natifs Android/iOS, notamment le masque d'icône et le démarrage à froid, restent à effectuer sur appareil. Le site a été modifié localement, sans déploiement.
+Selon l’outil, définir `FLUTTER_ROOT` vers le SDK local. Examiner les états utiles, les longues traductions, le texte à 200 %, le clavier et les zones système. Ajouter un test seulement si le comportement modifié le justifie. Les masques d’icône, polices et démarrages natifs restent à contrôler sur Android et iOS.
 
-Références : [icônes adaptatives Android](https://developer.android.com/develop/ui/compose/system/icon_design_adaptive), [préférence Flutter de réduction des animations](https://api.flutter.dev/flutter/widgets/MediaQueryData/disableAnimations.html).
-
-## Ajustements mobiles du 19 octobre
-
-`MainNavigationBar` peint maintenant une surface bleu nuit autour de la barre, y compris l’inset de sécurité inférieur. Une annotation racine reprend les styles système du thème ; la ligne de séparation native est transparente et le contraste automatique de la barre Android est désactivé pour éviter un voile ajouté sur le fond. Le rendu edge-to-edge reste pris en charge, sans revenir à un ancien mode Android.
-
-Les deux raccourcis Premium/Vidéos utilisent les composants existants, avec icônes et libellés. À grande taille de texte, ils occupent deux lignes complètes pour conserver les mots entiers. Le contenu du feed garde son propre défilement.
-
-L’icône Android adaptative garde la même géométrie et les mêmes couleurs ; son échelle passe de 0,65 à 0,52, recentrée dans le calque de 108 dp. La largeur visible est d’environ 52 dp. Les exports PNG natifs passent d’une échelle SVG de 6,5 à 5,5 sur 1 024 px. Les en-têtes, l’animation d’ouverture et le site ne changent pas de proportions.
-
-Vérification visuelle : six captures dans `build/previews/benefits`, dont les marges système 24/34 px et 320 × 568 à 200 %. [Comportement edge-to-edge Flutter](https://docs.flutter.dev/release/breaking-changes/default-systemuimode-edge-to-edge).
-
-## Emplacements et formules
-
-Le feed conserve toute la surface disponible au-dessus de la barre de navigation, sans action commerciale. Le profil réserve un bouton pleine largeur à la formule, avec libellé Premium pour Free et Mon abonnement pour Premium. L’encart Pour continuer est placé en tête de Matchs : deux soldes disponibles avec libellés distincts et Vidéos pour Free ; message Premium sans action vidéo pour les abonnés.
-
-Les compteurs passent sur deux lignes distinctes avec de grandes polices, en gardant les mots entiers. Les libellés de navigation disposent de toute la largeur de leur onglet pour éviter la coupure de Matchs à 200 %. L’encart reste dans la liste défilante pour ne pas bloquer les rencontres sur petit écran. Aperçu : `pictures/branding/repartition-acces.png`.
-
-
-## Vos crédits
-
-L’écran présente une carte principale teintée de lavande : disponible réel en grand, puis deux sous-cartes Gratuits/Vidéos (réservations exclues). La progression hebdomadaire reste distincte du solde. La carte vidéo emploie le corail, annonce la récompense et une action en dégradé ; elle affiche les états d’attente, de réserve pleine et d’erreur dans son contexte. Les détails et règles sont repliables. Premium propose un panneau sans publicité. Les valeurs inconnues restent inconnues et une relecture échouée masque l’ancien solde. Les cartes s’empilent en grande police et conservent un défilement complet.
-
-Aperçus réels Flutter avec polices et fournisseur simulé : `build/previews/credits`, six états à 390 × 844 et 320 × 568 à 200 %. Planche : `pictures/branding/vos-credits-refonte.png`.
-
-
-## Espace profil et réponses
-
-La présentation et les débuts de conversation possèdent des panneaux de lecture, avec les réponses ordonnées et leur état de validation. Les détails de rencontre utilisent des cartes plus compactes ; les traits sont visibles en pastilles. L’accès Premium/Mon abonnement reste unique dans le profil et le feed reste dégagé.
-
-L’éditeur distingue chaque réponse par son numéro et sa question, avec compteur, déplacement et retrait. Les nouvelles questions se choisissent dans une feuille avec recherche, sans répéter celles déjà sélectionnées. L’action d’enregistrement reste au bas de l’écran, avec défilement indépendant des cartes. À grande police, le titre de la feuille devient plus compact et les libellés d’action gardent leurs mots entiers.
-
-Les consentements modifiables sont montrés avant les documents nécessaires dans l’espace de gestion. Le libellé **Retirer mon consentement** rend l’action explicite, et l’absence de retrait des documents nécessaires est expliquée. Aperçus avec les polices réelles dans `build/previews/profile` (12 captures, dont 320 × 568 à 200 % et clavier).
+Voir le [README](README.md) pour les commandes communes et la [roadmap](roadmap.md) pour les validations restantes.
