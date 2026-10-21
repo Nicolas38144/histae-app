@@ -138,7 +138,7 @@ class _ChatPageState extends State<ChatPage> {
         ),
       ),
     );
-    if (mounted && c.active) unawaited(c.refresh());
+    if (mounted) await c.continuation.activate();
   }
 
   Future<void> _report() async {
@@ -154,7 +154,6 @@ class _ChatPageState extends State<ChatPage> {
         ),
       ),
     );
-    if (mounted && c.active) unawaited(c.refresh());
   }
 
   @override

@@ -17,7 +17,11 @@ void main() {
   testWidgets(
     'matches and quota keep one fixed loading indicator through initial read and realtime revalidation',
     (tester) async {
-      final matches = [Completer<http.Response>(), Completer<http.Response>()];
+      final matches = [
+        Completer<http.Response>(),
+        Completer<http.Response>(),
+        Completer<http.Response>(),
+      ];
       final quotas = [Completer<http.Response>(), Completer<http.Response>()];
       var matchReads = 0, quotaReads = 0;
       final session = testSession((r) async {
@@ -80,6 +84,23 @@ void main() {
       await tester.pump(const Duration(milliseconds: 180));
       fixedIndicator();
       matches[1].complete(
+        jsonResponse({
+          'matches': [publicMatchJson()],
+          'next_cursor': null,
+        }),
+      );
+      await tester.pump();
+      await tester.pump();
+      expect(quotaReads, 1);
+      expect(find.byType(LinearProgressIndicator), findsNothing);
+      // Realtime updates messages/matches, not the independent credit balance.
+      unawaited(
+        tester
+            .widget<RefreshIndicator>(find.byType(RefreshIndicator))
+            .onRefresh(),
+      );
+      await tester.pump();
+      matches[2].complete(
         jsonResponse({
           'matches': [publicMatchJson()],
           'next_cursor': null,

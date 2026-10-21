@@ -18,8 +18,7 @@ import '../features/profile/data/profile_repository.dart';
 import '../features/profile/presentation/profile_page.dart';
 import 'main_navigation_bar.dart';
 
-/// Owns the private tabs and their session-scoped controllers. Only the visible
-/// tab is mounted, so hidden tabs cannot restart discovery or realtime work.
+/// Keeps the three main views and their data alive for the current session.
 class MainShell extends StatefulWidget {
   const MainShell({super.key, required this.session, this.catalog});
   final AuthenticatedSession session;
@@ -43,7 +42,7 @@ class _MainShellState extends State<MainShell> {
   final _pageStorage = PageStorageBucket();
   PushController? _push;
   bool _covered = false;
-  int _selected = 0, _matchRequest = 0;
+  int _selected = 0;
   String? _initialMatchId;
   bool? _lastPaused;
 
@@ -56,10 +55,11 @@ class _MainShellState extends State<MainShell> {
   void _visibilityChanged() {
     final paused = _visibility.paused;
     if (paused == _lastPaused) return;
+    final initial = _lastPaused == null;
     _lastPaused = paused;
-    if (paused == null) return;
+    if (paused == null || initial) return;
     _discovery.deactivate();
-    if (_selected == 0 && !_covered) {
+    if (!_covered) {
       Future.microtask(_discovery.activate);
     }
   }
@@ -78,17 +78,11 @@ class _MainShellState extends State<MainShell> {
   void _pushRouteChanged() {
     final covered = _push?.coversMainFlow == true;
     if (covered == _covered) return;
-    if (covered) {
-      _discovery.deactivate();
-      _matches.suspend();
-    }
     setState(() => _covered = covered);
   }
 
   void _select(int index) {
     if (_selected == index) return;
-    if (_selected == 0) _discovery.deactivate();
-    if (_selected == 1) _matches.suspend();
     setState(() {
       _selected = index;
       _initialMatchId = null;
@@ -102,11 +96,9 @@ class _MainShellState extends State<MainShell> {
       return;
     }
     Navigator.of(context).popUntil((route) => route.isFirst);
-    _discovery.deactivate();
     setState(() {
       _selected = 1;
       _initialMatchId = id;
-      _matchRequest++;
     });
   }
 
@@ -124,30 +116,34 @@ class _MainShellState extends State<MainShell> {
   Widget build(BuildContext context) => HistaeScaffold(
     body: PageStorage(
       bucket: _pageStorage,
-      child: _covered
-          ? const SizedBox.shrink()
-          : switch (_selected) {
-              0 => DiscoveryPage(
-                key: const PageStorageKey('main-discovery'),
-                controller: _discovery,
-                profile: _profile,
-                visibility: _visibility,
-                openMatches: _openMatches,
-              ),
-              1 => MatchesPage(
-                key: PageStorageKey('main-matches-$_matchRequest'),
-                controller: _matches,
-                initialMatchId: _initialMatchId,
-                onInitialMatchHandled: () => _initialMatchId = null,
-              ),
-              _ => ProfilePage(
-                key: const PageStorageKey('main-profile'),
-                controller: _profile,
-                continuation: _matches.continuation,
-                catalog: widget.catalog,
-                visibility: _visibility,
-              ),
-            },
+      child: Offstage(
+        offstage: _covered,
+        child: IndexedStack(
+          index: _selected,
+          children: [
+            DiscoveryPage(
+              key: const PageStorageKey('main-discovery'),
+              controller: _discovery,
+              profile: _profile,
+              visibility: _visibility,
+              openMatches: _openMatches,
+            ),
+            MatchesPage(
+              key: const PageStorageKey('main-matches'),
+              controller: _matches,
+              initialMatchId: _initialMatchId,
+              onInitialMatchHandled: () => _initialMatchId = null,
+            ),
+            ProfilePage(
+              key: const PageStorageKey('main-profile'),
+              controller: _profile,
+              continuation: _matches.continuation,
+              catalog: widget.catalog,
+              visibility: _visibility,
+            ),
+          ],
+        ),
+      ),
     ),
     bottomNavigationBar: MainNavigationBar(
       selectedIndex: _selected,

@@ -24,7 +24,11 @@ class SessionGate extends StatelessWidget {
       case SessionPhase.needsConsents:
         return ConsentsPage(session: session, onboarding: true);
       case SessionPhase.ready:
-        return MainShell(session: session, catalog: catalog);
+        return MainShell(
+          key: ValueKey(session.resourceKey),
+          session: session,
+          catalog: catalog,
+        );
       case SessionPhase.restoring:
       case SessionPhase.synchronizing:
         return HistaeScaffold(

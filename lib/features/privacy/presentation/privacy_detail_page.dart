@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/network/read_snapshots.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
@@ -36,7 +37,9 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) unawaited(c.enter(widget.section));
+      if (mounted) {
+        unawaited(ReadSnapshots.forView(() => c.enter(widget.section)));
+      }
     });
   }
 

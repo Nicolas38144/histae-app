@@ -187,7 +187,7 @@ class DiscoveryController extends ChangeNotifier {
     _expiryTimer = Timer(wait.isNegative ? Duration.zero : wait, () {
       if (!active) return;
       _checkedExpiry = expires;
-      // The local deadline invalidates the displayed batch and triggers a read;
+      // The local deadline invalidates the displayed batch without a read;
       // it never manufactures a server readiness result or publishes GPS.
       _epoch++;
       _scope.cancel();
@@ -201,7 +201,6 @@ class DiscoveryController extends ChangeNotifier {
       locating = false;
       sending = false;
       _notify();
-      unawaited(refresh());
     });
   }
 

@@ -7,12 +7,13 @@ import 'package:histae_app/features/matches/presentation/chat_page.dart';
 import 'package:histae_app/features/matches/presentation/matches_page.dart';
 
 import 'support/auth_fixture.dart';
+import 'support/continuation_fixture.dart';
 import 'support/discovery_fixture.dart';
 import 'support/matches_fixture.dart';
 
 void main() {
   testWidgets(
-    'private tabs share one root, suspend hidden resources and stay usable at 200 percent text',
+    'private tabs retain data without reads on navigation or focus and stay usable at 200 percent text',
     (tester) async {
       tester.view.physicalSize = const Size(320, 568);
       tester.view.devicePixelRatio = 1;
@@ -20,7 +21,13 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
       addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
-      final session = testSession((r) async => defaultMatchesResponse(r));
+      final reads = <String, int>{};
+      final session = testSession((r) async {
+        if (r.method == 'GET' && !r.url.path.endsWith('/events')) {
+          reads.update(r.url.path, (count) => count + 1, ifAbsent: () => 1);
+        }
+        return defaultContinuationResponse(r);
+      });
       await session.establish(testTokens);
       await tester.pumpWidget(HistaeApp(sessionController: session));
       await tester.pumpAndSettle();
@@ -28,6 +35,7 @@ void main() {
           .widget<DiscoveryPage>(find.byType(DiscoveryPage))
           .controller;
       expect(discovery.active, isTrue);
+      final initialReads = Map<String, int>.from(reads);
       expect(
         tester
             .widget<MainNavigationBar>(find.byType(MainNavigationBar))
@@ -41,20 +49,20 @@ void main() {
       final matches = tester
           .widget<MatchesPage>(find.byType(MatchesPage))
           .controller;
-      expect(discovery.active, isFalse);
+      expect(discovery.active, isTrue);
       expect(matches.active, isTrue);
       expect(find.byType(DiscoveryPage), findsNothing);
       expect(find.byType(BackButton), findsNothing);
 
       await tester.tap(find.byKey(const Key('main-tab-profile')));
       await tester.pumpAndSettle();
-      expect(matches.active, isFalse);
+      expect(matches.active, isTrue);
       expect(find.text('Mon profil'), findsOneWidget);
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
       await tester.pumpAndSettle();
-      expect(matches.active, isFalse);
-      expect(discovery.active, isFalse);
+      expect(matches.active, isTrue);
+      expect(discovery.active, isTrue);
 
       await tester.tap(find.byKey(const Key('main-tab-discovery')));
       await tester.pumpAndSettle();
@@ -63,12 +71,19 @@ void main() {
         same(discovery),
       );
       expect(discovery.active, isTrue);
-      expect(matches.active, isFalse);
+      expect(matches.active, isTrue);
       for (final tab in ['discovery', 'matches', 'profile']) {
         final size = tester.getSize(find.byKey(Key('main-tab-$tab')));
         expect(size.width, greaterThanOrEqualTo(48));
         expect(size.height, greaterThanOrEqualTo(48));
       }
+      expect(reads, initialReads);
+      // The same visible profile refresh control still performs a real read.
+      await tester.tap(find.byKey(const Key('main-tab-profile')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Actualiser mon profil'));
+      await tester.pumpAndSettle();
+      expect(reads['/api/users/me'], initialReads['/api/users/me']! + 1);
       expect(tester.takeException(), isNull);
       await session.logout();
       await tester.pumpAndSettle();
@@ -113,7 +128,7 @@ void main() {
     expect(find.byTooltip('Actualiser la conversation'), findsOneWidget);
     final chatContext = tester.element(find.byType(ChatPage));
     expect(ModalRoute.of(chatContext)?.isFirst, isFalse);
-    expect(discovery.active, isFalse);
+    expect(discovery.active, isTrue);
     final chat = tester.widget<ChatPage>(find.byType(ChatPage)).controller;
     for (final state in [
       AppLifecycleState.inactive,
@@ -123,7 +138,7 @@ void main() {
       tester.binding.handleAppLifecycleStateChanged(state);
     }
     await tester.pump();
-    expect(chat.active, isFalse);
+    expect(chat.active, isTrue);
     for (final state in [
       AppLifecycleState.hidden,
       AppLifecycleState.inactive,

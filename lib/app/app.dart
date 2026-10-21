@@ -111,15 +111,6 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
     ].contains(state)) {
       push?.suspend();
     }
-    final session = widget.sessionController;
-    if (state == AppLifecycleState.resumed &&
-        session != null &&
-        !session.isSaving &&
-        (session.phase == SessionPhase.ready ||
-            session.phase == SessionPhase.needsConsents ||
-            session.phase == SessionPhase.unavailable)) {
-      unawaited(session.synchronize());
-    }
   }
 
   @override

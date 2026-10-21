@@ -156,7 +156,6 @@ class ContinuationController extends ChangeNotifier {
         }
         if (m.myRevealed) _pendingReveal.remove(m.id);
       }
-      if (active && !busy) unawaited(loadQuota());
     }
     if (!access.active && busy) {
       _epoch++;
@@ -175,7 +174,7 @@ class ContinuationController extends ChangeNotifier {
     }
     final epoch = _epoch;
     await _load;
-    if (_alive(epoch)) await loadQuota();
+    if (_alive(epoch) && quota == null && failure == null) await loadQuota();
   }
 
   void forgetMatch(String id) {

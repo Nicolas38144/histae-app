@@ -33,7 +33,7 @@ L'interface observe un contrôleur et déclenche ses méthodes. Les règles d'au
 
 Les formulaires de profil sont répartis en quatre pages. Le socle `ProfileEditorState` garde les comportements de brouillon, de sortie confirmée et de perte d'accès. Les confirmations communes utilisent une boîte de dialogue défilable. Le hub de confidentialité, son détail, le profil du partenaire, la carte de formule, le résumé et le choix de formule d'abonnement sont des composants distincts.
 
-Depuis le complément de navigation du 18 octobre, `MainShell` possède les contrôleurs de profil, découverte et matchs. `ProfilePage` les reçoit via son contrôleur et celui de continuation, sans les détruire. Seul l'onglet visible est monté : un écran caché ne reçoit donc plus les reprises du cycle de vie. Les positions de défilement utilisent `PageStorage`, les brouillons de chat restent dans le contrôleur de matchs, et le feed relit sa préparation lors de sa réouverture. La couverture par une notification suspend et démonte l'onglet principal jusqu'au retour. La destruction du feed suspend son contrôleur sans notifier les routes de rencontre en cours de destruction. Le passage d'une rencontre à son chat sélectionne l'onglet Matchs puis vérifie l'appartenance et l'accès à l'historique via le contrôleur existant.
+`MainShell` possède les contrôleurs de profil, découverte et matchs. Un `IndexedStack` monte les trois vues au démarrage et conserve leur état, leurs positions de lecture et leurs données pendant la session. Le changement d’onglet et la couverture par une route ne les détruisent plus. La clé du shell suit `session.resourceKey` : un changement de compte ou de consentement détruit les anciennes vues privées. Les conversations restent synchronisées par les événements serveur. L’ouverture d’un écran secondaire réutilise sa dernière lecture en mémoire lorsqu’elle existe ; sa première ouverture charge uniquement les données qui lui manquent. Les boutons et gestes d’actualisation font des lectures réseau explicites.
 
 Le chat conserve une seule copie de la liste des messages par reconstruction d'écran. `MessageOutbox` possède les brouillons et les intentions d'envoi : la clé et le contenu d'un message en attente ne peuvent pas changer. La purge de la conversation ou du compte efface ces deux catégories de données.
 
@@ -75,7 +75,7 @@ Validation finale du 18 octobre : analyse stricte sans problème, formatage de 1
 
 Les écrans Profil et Matchs utilisent le `ContinuationController` de leur `MatchesController` de session, sans nouveau stockage ni calcul local de droits. `ContinuationBalanceCard` affiche `freeRemaining` et `advertisingRemaining`, et traite chargement, indisponibilité et Premium. Le profil adapte son unique accès d’abonnement à la formule effective du quota ; une ancienne lecture n’est pas utilisée comme autorité après échec.
 
-L’activation à l’entrée d’un onglet se fait après la première frame, lorsque la suspension et le démontage de l’onglet précédent sont achevés. Au retour de CreditsPage ou SubscriptionPage, la route attend sa transition complète avant de réactiver la lecture partagée. Le parcours de crédits suspend le contrôleur de liste ; la reprise de la conversation reste portée par son MatchesPage et n’est pas bloquée par l’encart.
+L’activation du quota est idempotente : elle initialise le solde une fois et réactive les actions sans relecture au retour d’une route. Le quota ne suit plus automatiquement chaque lecture de match ou d’historique. Les actualisations explicites, les validations après une dépense/récompense et les changements d’abonnement confirmés relisent le solde. Les coûts de continuation restent vérifiés au serveur avant acceptation, même lorsqu’un écran utilise les données conservées.
 
 
 ## Lecture récompensée
@@ -127,3 +127,25 @@ leurs délais de reprise et leur propriété des annulations. Les consentements 
 et la langue du document présenté ; leur relecture pour traduction ne simule pas une reconnexion.
 
 Voir [les routes couvertes et la validation à réaliser avec Flutter](docs/api-languages.md).
+
+
+## Politique de lecture pendant une session
+
+`ReadSnapshots.forView` est réservé à l’initialisation des vues secondaires et à
+la réouverture d’un historique. `SessionController.request` mémorise les GET JSON
+réussis (128 entrées au maximum, sans stockage disque), séparés par compte,
+révision de consentement, langue, chemin et paramètres. Les lectures ordinaires
+restent fraîches : actualisation manuelle, pagination demandée, vérification après
+écriture et événements temps réel. Les écritures, même incertaines, invalident les
+instantanés ; les événements de match invalident les seuls chemins concernés.
+Les refus, erreurs et réponses annulées ne sont pas mémorisés, et un échec
+d’actualisation ne permet pas de restaurer un ancien succès. La déconnexion et les
+changements de périmètre privé purgent la mémoire. Les téléchargements d’export,
+l’authentification et les flux SSE ne passent jamais par ce cache.
+
+Les reprises de fenêtre ne synchronisent plus automatiquement le compte, le
+profil, le catalogue, le quota, les appareils ou les listes de confidentialité.
+Le retour d’un paiement réellement ouvert reste une vérification explicite.
+Les échéances locales désactivent les actions sans déclencher de lecture. Une
+réutilisation conserve la date de lecture initiale des URL de photo signées :
+ouvrir de nouveau une vue ne prolonge jamais leur durée de validité.

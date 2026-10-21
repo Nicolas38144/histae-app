@@ -19,21 +19,24 @@ import 'support/matches_fixture.dart';
 import 'support/notifications_fixture.dart';
 
 void main() {
-  test('ignores retired trial alerts and still accepts payment failure alerts', () {
-    expect(
-      PushIntent.parse({
+  test(
+    'ignores retired trial alerts and still accepts payment failure alerts',
+    () {
+      expect(
+        PushIntent.parse({
+          'notification_id': notificationOne,
+          'type': 'subscription_trial_ending',
+        }),
+        isNull,
+      );
+      final payment = PushIntent.parse({
         'notification_id': notificationOne,
-        'type': 'subscription_trial_ending',
-      }),
-      isNull,
-    );
-    final payment = PushIntent.parse({
-      'notification_id': notificationOne,
-      'type': 'billing_payment_failed',
-    });
-    expect(payment?.kind, PushKind.billingPaymentFailed);
-    expect(payment?.matchId, isNull);
-  });
+        'type': 'billing_payment_failed',
+      });
+      expect(payment?.kind, PushKind.billingPaymentFailed);
+      expect(payment?.matchId, isNull);
+    },
+  );
   test('public Firebase configuration defaults off, rejects secrets and inconsistent sender IDs', () {
     const base = 'APP_ENV=production\nAPI_BASE_URL=https://api.example\n';
     final c = AppConfig.fromDotEnv(
@@ -263,12 +266,15 @@ void main() {
         'test-refresh-old',
       ).encode();
     final me = Completer<http.Response>();
-    final restoring = testSession(
-      (r) async => r.url.path == '/api/auth/me'
+    var deviceReads = 0;
+    final restoring = testSession((r) async {
+      if (r.method == 'GET' && r.url.path.endsWith('/devices')) {
+        deviceReads++;
+      }
+      return r.url.path == '/api/auth/me'
           ? me.future
-          : defaultNotificationsResponse(r),
-      vault: authVault,
-    );
+          : defaultNotificationsResponse(r);
+    }, vault: authVault);
     final gateway = FakePushGateway()
       ..first = const PushIntent(notificationTwo, PushKind.newMatch, testMatch);
     final vault = MemoryPushVault()
@@ -291,6 +297,10 @@ void main() {
     await bootstrap;
     await pumpEventQueue();
     expect(push.enabled, isTrue);
+    final startupReads = deviceReads;
+    push.suspend();
+    await push.resume();
+    expect(deviceReads, startupReads, reason: 'focus does not reread devices');
     expect((await push.authorizeOpen())?.id, notificationTwo);
     push.dispose();
     restoring.dispose();

@@ -8,7 +8,6 @@ import '../../../core/widgets/histae_empty_state.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../continuation/presentation/continuation_balance_card.dart';
 import '../../continuation/presentation/credits_page.dart';
-import '../../notifications/presentation/push_scope.dart';
 import '../application/matches_controller.dart';
 import 'chat_page.dart';
 import 'match_preview_card.dart';
@@ -31,11 +30,10 @@ class MatchesPage extends StatefulWidget {
   State<MatchesPage> createState() => _MatchesPageState();
 }
 
-class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
+class _MatchesPageState extends State<MatchesPage> {
   MatchesController get c => widget.controller;
   late final _key = c.session.resourceKey;
   bool _opening = false;
-  bool _creditsOpen = false;
   int _overviewLoads = 1;
 
   bool get _loading =>
@@ -44,10 +42,21 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) unawaited(_start().whenComplete(_endOverview));
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant MatchesPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final id = widget.initialMatchId;
+    if (id != null && id != oldWidget.initialMatchId) {
+      widget.onInitialMatchHandled?.call();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(_open(id));
+      });
+    }
   }
 
   Future<void> _start() async {
@@ -77,9 +86,9 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
           builder: (_) => ChatPage(controller: c, matchId: id),
         ),
       );
-      if (mounted && c.active) await _refresh(afterChat: true);
     } finally {
       _opening = false;
+      if (mounted) await c.continuation.activate();
     }
   }
 
@@ -97,13 +106,14 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
     }
   }
 
-  Future<void> _refresh({bool afterChat = false}) async {
-    if (_overviewLoads > 0 && !afterChat) return;
+  Future<void> _refresh() async {
+    if (_overviewLoads > 0) return;
     await _withOverview(() async {
       c.continuation.suspend();
       await c.refresh();
       if (mounted && c.active && c.session.resourceKey == _key) {
         await c.continuation.activate();
+        await c.continuation.loadQuota();
       }
     });
   }
@@ -111,9 +121,6 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
   Future<void> _openCredits() async {
     if (_opening) return;
     _opening = true;
-    _creditsOpen = true;
-    c.continuation.suspend();
-    c.suspend();
     try {
       final route = MaterialPageRoute<void>(
         builder: (_) => CreditsPage(controller: c.continuation),
@@ -121,44 +128,13 @@ class _MatchesPageState extends State<MatchesPage> with WidgetsBindingObserver {
       await Navigator.of(context).push(route);
       await route.completed;
     } finally {
-      _creditsOpen = false;
       _opening = false;
-      if (mounted && c.session.resourceKey == _key) await _resume();
+      if (mounted) await c.continuation.activate();
     }
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (_creditsOpen) return; // CreditsPage owns native ad/consent lifecycle.
-    if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.hidden ||
-        state == AppLifecycleState.detached) {
-      c.suspend();
-      c.continuation.suspend();
-    }
-    if (state == AppLifecycleState.resumed) unawaited(_resume());
-  }
-
-  Future<void> _resume() async {
-    if (_creditsOpen) return;
-    if (!widget.notificationFlow &&
-        PushScope.maybeOf(context)?.coversMainFlow == true) {
-      return;
-    }
-    await _withOverview(() async {
-      await c.session.synchronize();
-      if (mounted && c.session.resourceKey == _key) {
-        await c.activate();
-        if (mounted && c.active && ModalRoute.of(context)?.isCurrent == true) {
-          await c.continuation.activate();
-        }
-      }
-    });
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     c.suspend(notify: false);
     c.continuation.suspend(notify: false);
     super.dispose();

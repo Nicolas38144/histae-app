@@ -69,6 +69,8 @@ void main() {
     c.suspend();
     premium = true;
     await c.activate();
+    expect(c.quota!.premium, isFalse, reason: 'navigation keeps the last read');
+    await c.loadQuota();
     expect(c.quota!.premium, isTrue);
     expect(c.pendingCost, 1);
     expect(costs, [1]);

@@ -10,7 +10,6 @@ import '../../../core/widgets/histae_empty_state.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../../core/widgets/histae_wordmark.dart';
 import '../../consents/presentation/consents_page.dart';
-import '../../notifications/presentation/push_scope.dart';
 import '../../privacy/presentation/report_page.dart';
 import '../../profile/application/profile_controller.dart';
 import '../../profile/presentation/profile_editors.dart';
@@ -40,8 +39,7 @@ class DiscoveryPage extends StatefulWidget {
   State<DiscoveryPage> createState() => _DiscoveryPageState();
 }
 
-class _DiscoveryPageState extends State<DiscoveryPage>
-    with WidgetsBindingObserver {
+class _DiscoveryPageState extends State<DiscoveryPage> {
   DiscoveryController get c => widget.controller;
   late final _key = c.session.resourceKey;
   String? _message;
@@ -50,48 +48,21 @@ class _DiscoveryPageState extends State<DiscoveryPage>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     unawaited(c.activate());
-    if (widget.visibility case final visibility?) unawaited(visibility.load());
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.hidden ||
-        state == AppLifecycleState.detached) {
-      c.deactivate();
-    } else if (state == AppLifecycleState.resumed &&
-        ModalRoute.of(context)?.isCurrent == true) {
-      unawaited(_resume());
-    }
-  }
-
-  Future<void> _resume() async {
-    if (PushScope.maybeOf(context)?.coversMainFlow == true) return;
-    await c.session.synchronize();
-    await widget.visibility?.load();
-    if (mounted && c.session.resourceKey == _key) {
-      if (c.active) {
-        await c.refresh();
-      } else {
-        await c.activate();
-      }
+    if (widget.visibility case final visibility?) {
+      unawaited(visibility.ensureLoaded());
     }
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     c.deactivate(notify: false);
     super.dispose();
   }
 
   Future<void> _open(Widget page) async {
-    c.deactivate();
     await Navigator.of(context)
         .push(MaterialPageRoute<void>(builder: (_) => page));
-    if (mounted) await _resume();
   }
 
   Future<void> _repair(DiscoveryAction action) async {
@@ -191,7 +162,6 @@ class _DiscoveryPageState extends State<DiscoveryPage>
         ),
       ),
     );
-    if (mounted) await _resume();
   }
 
   Future<void> _choose(SwipeDecision decision) async {
@@ -236,7 +206,6 @@ class _DiscoveryPageState extends State<DiscoveryPage>
         ),
       ),
     );
-    if (mounted) await _resume();
   }
 
   @override
@@ -257,6 +226,12 @@ class _DiscoveryPageState extends State<DiscoveryPage>
           c.failure == null;
       final enabled = !c.busy && c.retrySeconds == 0;
       final statusBody = <Widget>[
+        if (c.status == null && !c.busy && c.failure == null)
+          Text(
+            AppStrings.of(context)
+                .messages
+                .discoveryStringsThisPageHasExpiredRefreshProfiles,
+          ),
         if (!c.ready && c.status != null) ...[
           DiscoveryReadinessIntro(
             paused: required.contains(DiscoveryAction.resumeDiscovery),

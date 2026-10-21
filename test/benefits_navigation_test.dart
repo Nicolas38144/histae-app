@@ -163,7 +163,7 @@ void main() {
           }
         },
       );
-      expect(quotaReads, 0);
+      expect(quotaReads, 1);
       expect(find.byKey(const Key('profile-subscription')), findsNothing);
       expect(find.byKey(const Key('open-videos')), findsNothing);
       await tester.tap(find.byKey(const Key('main-tab-profile')));
@@ -214,6 +214,15 @@ void main() {
       ads = 2;
       await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();
+      // Returning alone keeps the balance; only a manual refresh reads it.
+      expect(
+        tester
+            .widget<Text>(find.byKey(const Key('free-credits-remaining')))
+            .data,
+        '2',
+      );
+      await tester.tap(find.byTooltip('Actualiser les rencontres'));
+      await tester.pumpAndSettle();
       expect(
         tester
             .widget<Text>(find.byKey(const Key('free-credits-remaining')))
@@ -258,9 +267,16 @@ void main() {
       premium = false;
       await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();
+      expect(find.text('Mon abonnement'), findsOneWidget);
+      await tester
+          .widget<RefreshIndicator>(find.byType(RefreshIndicator))
+          .onRefresh();
+      await tester.pumpAndSettle();
       expect(find.text('Premium'), findsOneWidget);
       premium = true;
       await tester.tap(find.byKey(const Key('main-tab-matches')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Actualiser les rencontres'));
       await tester.pumpAndSettle();
       expect(
         find.text('Vos continuations ne n\u00e9cessitent aucun cr\u00e9dit.'),
@@ -299,6 +315,10 @@ void main() {
       await tester.tap(find.byKey(const Key('main-tab-profile')));
       await tester.pumpAndSettle();
       await revealSubscription(tester);
+      await tester
+          .widget<RefreshIndicator>(find.byType(RefreshIndicator))
+          .onRefresh();
+      await tester.pumpAndSettle();
       expect(find.text('Mon abonnement'), findsOneWidget);
       expect(find.text('Premium'), findsNothing);
       expect(tester.takeException(), isNull);

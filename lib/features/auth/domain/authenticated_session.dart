@@ -40,6 +40,9 @@ abstract interface class AuthenticatedSession implements Listenable {
 
   Future<void> synchronize();
 
+  /// Discards view snapshots when the server announces changed private data.
+  void invalidateReadSnapshots({String? prefix});
+
   Future<void> saveConsents(
     Map<ConsentType, bool> changes,
     Map<ConsentType, String> displayedVersions, {

@@ -42,7 +42,6 @@ class _ContinuationPageState extends State<ContinuationPage>
   }
 
   Future<void> _start() async {
-    await c.access.refresh();
     if (mounted && c.access.session.resourceKey == _key) await c.activate();
   }
 
@@ -347,7 +346,11 @@ class _ContinuationPageState extends State<ContinuationPage>
                 OutlinedButton.icon(
                   onPressed: c.busy || c.loading || c.retrySeconds > 0
                       ? null
-                      : _start,
+                      : () async {
+                          await c.access.refresh();
+                          await c.activate();
+                          await c.loadQuota();
+                        },
                   icon: const Icon(Icons.refresh),
                   label: Text(
                     AppStrings.of(context)

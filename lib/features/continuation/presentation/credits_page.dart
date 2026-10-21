@@ -66,7 +66,6 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
   }
 
   Future<void> _resume() async {
-    await c.access.session.synchronize();
     if (mounted && c.access.session.resourceKey == _key) await _start();
   }
 
@@ -80,6 +79,7 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
 
   Future<void> _refresh() async {
     await c.activate();
+    await c.loadQuota();
     if (c.rewards.intent != null) await c.rewards.refresh();
   }
 

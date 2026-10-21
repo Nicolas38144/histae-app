@@ -5,6 +5,7 @@ import 'package:flutter/painting.dart';
 
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/network/read_snapshots.dart';
 import '../../../core/network/retry_after.dart';
 import '../../auth/domain/authenticated_session.dart';
 import '../../consents/domain/consent_state.dart';
@@ -172,7 +173,7 @@ class ProfileController extends ChangeNotifier {
     await Future.wait([
       read('profile', () => repository.profile(scope), (p) {
         profile = p;
-        photoReadAt = DateTime.now();
+        photoReadAt = ReadSnapshots.reusedAt('/api/users/me') ?? DateTime.now();
       }),
       read(
         'preferences',

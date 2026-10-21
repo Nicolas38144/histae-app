@@ -11,6 +11,7 @@ import 'package:histae_app/features/matches/data/matches_repository.dart';
 import 'package:histae_app/features/matches/data/realtime_client.dart';
 import 'package:histae_app/features/matches/presentation/chat_page.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'support/auth_fixture.dart';
 import 'support/discovery_fixture.dart';
@@ -18,6 +19,7 @@ import 'support/matches_fixture.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  setUpAll(() => initializeDateFormatting('fr'));
   test('lost message keeps one immutable intention through navigation and explicit replay, then deduplicates', () async {
     final writes = <(String?, Object?)>[];
     var lost = true;
@@ -108,7 +110,7 @@ void main() {
     addTearDown(c.dispose);
     await c.activate();
     await c.openChat(testMatch);
-    expect(queries, [null, null, cursor]);
+    expect(queries, [null, cursor]);
     expect(c.canSend, isTrue);
     await c.older();
     expect(c.messages.map((m) => m.id), [incomingId, outgoingId]);

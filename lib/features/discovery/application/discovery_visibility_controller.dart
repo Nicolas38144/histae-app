@@ -80,6 +80,10 @@ class DiscoveryVisibilityController extends ChangeNotifier {
     if (retrySeconds > 0) _ticker.restart();
   }
 
+  Future<void> ensureLoaded() async {
+    if (_paused == null && _failure == null) await load();
+  }
+
   Future<void> load() async {
     if (!accessible || _loading || _saving || retrySeconds > 0) return;
     final epoch = _epoch;

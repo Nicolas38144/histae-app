@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/l10n/language_picker.dart';
+import '../../../core/network/read_snapshots.dart';
 import '../../../core/widgets/account_benefits_actions.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_scaffold.dart';
@@ -43,61 +44,59 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
+class _ProfilePageState extends State<ProfilePage> {
   ProfileController get controller => widget.controller;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) unawaited(_load());
+      if (mounted) unawaited(ReadSnapshots.forView(_load));
     });
   }
 
   Future<void> _load() async {
     await Future.wait([
       controller.load(),
-      widget.continuation.activate(),
+      _loadBalance(),
       if (widget.visibility case final visibility?) visibility.load(),
     ]);
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    // A credits route owns its quota while native consent/video UI is visible.
-    if (ModalRoute.of(context)?.isCurrent != true) return;
-    if (state == AppLifecycleState.resumed) {
-      unawaited(_load());
-    } else if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.hidden ||
-        state == AppLifecycleState.detached) {
-      widget.continuation.suspend();
-    }
+  Future<void> _loadBalance() async {
+    final hadQuota = widget.continuation.quota != null;
+    await widget.continuation.activate();
+    if (hadQuota) await widget.continuation.loadQuota();
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     widget.continuation.suspend(notify: false);
     super.dispose();
   }
 
   Future<void> _open(Widget page) async {
-    widget.continuation.suspend();
     final route = MaterialPageRoute<void>(builder: (_) => page);
     await Navigator.of(context).push(route);
     await route.completed;
-    if (mounted) unawaited(_load());
+    if (mounted) await widget.continuation.activate();
   }
 
-  void _openSubscription() {
+  Future<void> _openSubscription() async {
     final billing = BillingScope.maybeOf(context);
-    _open(
+    await _open(
       billing == null
           ? CatalogPage(repository: widget.catalog)
           : SubscriptionPage(controller: billing, catalog: widget.catalog),
     );
+    if (mounted &&
+        billing?.subscription != null &&
+        billing!.fresh &&
+        billing.subscription!.accessGranted !=
+            widget.continuation.quota?.premium) {
+      await widget.continuation.activate();
+      await widget.continuation.loadQuota();
+    }
   }
 
   @override
@@ -118,7 +117,7 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
                   : strings.messages.profilePageRefreshMyProfile,
               onPressed: c.loading || c.saving || c.retrySeconds > 0
                   ? null
-                  : c.load,
+                  : _load,
               icon: const Icon(Icons.refresh_rounded),
             ),
             const LanguageButton(),

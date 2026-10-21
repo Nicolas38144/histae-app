@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../../../core/models/client_message.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/network/read_snapshots.dart';
 import '../../../core/network/retry_after.dart';
 import '../../auth/domain/authenticated_session.dart';
 import '../../continuation/application/continuation_controller.dart';
@@ -206,7 +207,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   }
 
   Future<void> activate() async {
-    if (!accessible) return;
+    if (!accessible || _active) return;
     if (!_active) {
       _active = true;
       _scope = RequestCancellation();
@@ -258,6 +259,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   }
 
   void _purge(String id, {bool remove = false}) {
+    session.invalidateReadSnapshots(prefix: '/api/matches/');
     _continuation?.forgetMatch(id);
     _outbox.forget(id);
     _readAttempted.removeWhere((key) => key.startsWith('$id:'));
@@ -288,6 +290,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       _armDeadline();
     }
     if (signal.type == 'heartbeat') return;
+    session.invalidateReadSnapshots(prefix: '/api/matches/');
     if (signal.ended && signal.matchId != null) {
       _purge(signal.matchId!, remove: true);
       notice = 'ended';
@@ -366,7 +369,6 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       }
       _verified = false;
       _notify();
-      _schedule();
     });
   }
 
@@ -428,7 +430,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
         ..addAll(items);
       listCursor = cursor;
       readRevision++;
-      readAt = _now().toUtc();
+      readAt = ReadSnapshots.reusedAt('/api/matches/me') ?? _now().toUtc();
       if (cursor == null) {
         for (final id in {..._outbox.matchIds, ..._closures.keys}) {
           if (!seen.contains(id)) _purge(id);
@@ -574,7 +576,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     validation = null;
     _notify();
     await _sync;
-    if (active && selectedId == id) await refresh();
+    if (active && selectedId == id) await ReadSnapshots.forView(refresh);
   }
 
   void closeChat(String id, {bool notify = true}) {

@@ -133,7 +133,6 @@ class PrivacyController extends ChangeNotifier {
   }
 
   Future<void> resume() async {
-    await session.synchronize();
     if (!accessible) return;
     _active = true;
     _scope = RequestCancellation();
@@ -141,7 +140,7 @@ class PrivacyController extends ChangeNotifier {
       _sharePendingCleanup = false;
       await _cleanExport();
     }
-    await load();
+    _notify();
   }
 
   Future<void> enter(PrivacySection value) async {

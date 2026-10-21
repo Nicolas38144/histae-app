@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/network/read_snapshots.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
@@ -45,7 +46,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
     WidgetsBinding.instance.addObserver(this);
     if (widget.catalog case final repository?) {
       _catalog = CatalogController(repository);
-      unawaited(_catalog!.load());
+      unawaited(ReadSnapshots.forView(_catalog!.load));
     }
     unawaited(c.activate());
   }
@@ -81,7 +82,9 @@ class _SubscriptionPageState extends State<SubscriptionPage>
     } else if (state == AppLifecycleState.resumed &&
         ModalRoute.of(context)?.isCurrent == true) {
       unawaited(c.resume());
-      if (_catalog?.status == CatalogStatus.idle) unawaited(_catalog!.load());
+      if (_catalog?.status == CatalogStatus.idle) {
+        unawaited(ReadSnapshots.forView(_catalog!.load));
+      }
     }
   }
 
@@ -134,11 +137,9 @@ class _SubscriptionPageState extends State<SubscriptionPage>
   }
 
   Future<void> _refresh() async {
-    if (!c.active) {
-      await c.activate();
-    } else {
-      await c.load();
-    }
+    await c.activate();
+    await c.load();
+    await _catalog?.load();
   }
 
   @override

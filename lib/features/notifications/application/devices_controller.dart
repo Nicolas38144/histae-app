@@ -80,11 +80,10 @@ class DevicesController extends ChangeNotifier {
   }
 
   Future<void> resume() async {
-    await session.synchronize();
     if (!accessible) return;
     _active = true;
     _scope = RequestCancellation();
-    await load();
+    _notify();
   }
 
   Future<void> load() async {

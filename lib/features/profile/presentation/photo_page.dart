@@ -48,11 +48,9 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     c.addListener(_changed);
     unawaited(_recover());
-    unawaited(
-      c.load().then((_) {
-        if (mounted) _changed();
-      }),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _changed();
+    });
   }
 
   Future<void> _recover() async {
@@ -106,7 +104,6 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
         _expiry = Timer(remaining, () {
           if (mounted) {
             setState(_purgeRemote);
-            unawaited(c.load());
           }
         });
         unawaited(_fetch(url));
@@ -156,11 +153,7 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
     if (!_active) {
       setState(_purgeRemote);
     } else {
-      unawaited(
-        c.load().then((_) {
-          if (mounted) _changed();
-        }),
-      );
+      _changed();
     }
   }
 

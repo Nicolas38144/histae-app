@@ -52,11 +52,7 @@ class _PartnerPhotoPageState extends State<PartnerPhotoPage>
     c.addListener(_changed);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        unawaited(
-          c.refresh().then((_) {
-            if (mounted) _changed();
-          }),
-        );
+        _changed();
       }
     });
   }
@@ -86,7 +82,6 @@ class _PartnerPhotoPageState extends State<PartnerPhotoPage>
     _expiry = Timer(const Duration(minutes: 4), () {
       if (!mounted) return;
       setState(_purge);
-      unawaited(c.refresh());
     });
     unawaited(_fetch(url));
   }
@@ -131,7 +126,7 @@ class _PartnerPhotoPageState extends State<PartnerPhotoPage>
     if (!_foreground) {
       setState(_purge);
     } else {
-      unawaited(c.refresh());
+      _changed();
     }
   }
 

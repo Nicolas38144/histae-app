@@ -24,7 +24,8 @@ class BillingController extends ChangeNotifier {
   }) {
     _realtime = realtime ?? RealtimeClient(session);
     _realtime.onSignal = (signal) {
-      if (signal.type == 'subscription.updated' || signal.type == 'connected') {
+      if (signal.type == 'subscription.updated' ||
+          (signal.type == 'connected' && pending != null)) {
         fresh = false;
         if (busy || loading) {
           _invalidated = true;
@@ -155,6 +156,7 @@ class BillingController extends ChangeNotifier {
   }
 
   Future<void> activate() async {
+    if (active) return;
     if (_disposed) return;
     _changed();
     final epoch = _epoch;
@@ -168,7 +170,10 @@ class BillingController extends ChangeNotifier {
     if (_disposed || epoch != _epoch || !accessible || !restored) return;
     _active = true;
     if (_scope.isCancelled) _scope = RequestCancellation();
-    await load();
+    if (subscription == null && failure == null) await load();
+    final end = subscription?.periodEnd;
+    if (end != null && !end.isAfter(DateTime.now())) fresh = false;
+    _notify();
     if (_alive(epoch)) _realtime.start();
   }
 
@@ -180,15 +185,12 @@ class BillingController extends ChangeNotifier {
     _expiry?.cancel();
     loading = false;
     busy = false;
-    fresh = false;
     _invalidated = false;
   }
 
   Future<void> resume() async {
-    final epoch = _epoch;
-    await session.synchronize();
-    if (_disposed || epoch != _epoch) return;
     await activate();
+    if (pending != null || notice == 'portal_opened') await load();
   }
 
   Future<void> load() async {
@@ -215,7 +217,8 @@ class BillingController extends ChangeNotifier {
         final delay = end.difference(DateTime.now());
         if (delay > Duration.zero) {
           _expiry = Timer(delay, () {
-            if (active) unawaited(load());
+            fresh = false;
+            _notify();
           });
         } else {
           // Do not grant cached access beyond an already passed period.

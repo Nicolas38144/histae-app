@@ -95,7 +95,12 @@ class ContinuationBalanceCard extends StatelessWidget {
                     .continuationBalanceCardYourBalanceCannotBeCheckedRight,
               ),
               TextButton.icon(
-                onPressed: c.retrySeconds > 0 ? null : c.activate,
+                onPressed: c.retrySeconds > 0
+                    ? null
+                    : () async {
+                        await c.activate();
+                        await c.loadQuota();
+                      },
                 icon: const Icon(Icons.refresh),
                 label: Text(
                   c.retrySeconds > 0

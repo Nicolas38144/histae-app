@@ -571,13 +571,6 @@ class PushController extends ChangeNotifier {
           await _disable(epoch);
           return;
         }
-        final devices = await repository.list(_scope);
-        if (!_alive(epoch)) return;
-        if (deviceId != null && !devices.any((d) => d.id == deviceId)) {
-          await _disable(epoch);
-          notice = 'removed_elsewhere';
-          return;
-        }
         await _cleanObsolete(epoch);
         if ((deviceId == null || _languageDirty) && pending == null) {
           await _newRegistration(epoch);
