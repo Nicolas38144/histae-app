@@ -99,7 +99,7 @@ ThemeData histaeTheme(Brightness brightness) {
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: dark ? Brightness.light : Brightness.dark,
         statusBarBrightness: brightness,
-        systemNavigationBarColor: colors.surface,
+        systemNavigationBarColor: Colors.transparent,
         systemNavigationBarDividerColor: Colors.transparent,
         systemNavigationBarContrastEnforced: false,
         systemNavigationBarIconBrightness: dark
@@ -141,19 +141,38 @@ ThemeData histaeTheme(Brightness brightness) {
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        foregroundColor: colors.onSurface,
-        minimumSize: const Size(48, 52),
-        shape: pill,
-        side: BorderSide(color: colors.outline),
-        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
-        textStyle: textTheme.labelLarge,
-      ),
+      style:
+          OutlinedButton.styleFrom(
+            foregroundColor: colors.primary,
+            backgroundColor: colors.primary.withValues(
+              alpha: dark ? 0.08 : 0.05,
+            ),
+            disabledForegroundColor: colors.onSurface.withValues(alpha: 0.38),
+            disabledBackgroundColor: colors.onSurface.withValues(alpha: 0.03),
+            minimumSize: const Size(48, 52),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            textStyle: textTheme.labelLarge,
+          ).copyWith(
+            side: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.focused)) {
+                return const BorderSide(color: HistaeTokens.focus, width: 2);
+              }
+              return BorderSide(
+                color: colors.primary.withValues(
+                  alpha: states.contains(WidgetState.disabled) ? 0.07 : 0.22,
+                ),
+              );
+            }),
+          ),
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: colors.primary,
         minimumSize: const Size(48, 48),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         textStyle: textTheme.labelLarge,
       ),

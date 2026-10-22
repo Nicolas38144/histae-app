@@ -918,6 +918,10 @@
     "description": "Interface: lib/features/continuation/data/rewarded_video_gateway.dart"
   },
   "continuationBalanceCardToContinue": "Pour continuer",
+  "continuationBalanceCardViewCredits": "Voir mes crédits",
+  "@continuationBalanceCardViewCredits": {
+    "description": "Action visible ouvrant le détail des crédits depuis la carte dans Matchs."
+  },
   "@continuationBalanceCardToContinue": {
     "description": "Interface: lib/features/continuation/presentation/continuation_balance_card.dart"
   },

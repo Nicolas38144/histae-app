@@ -124,6 +124,7 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) => HistaeScaffold(
+    extendBody: true,
     body: PageStorage(
       bucket: _pageStorage,
       child: Offstage(

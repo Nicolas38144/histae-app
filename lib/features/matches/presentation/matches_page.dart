@@ -210,7 +210,7 @@ class _MatchesPageState extends State<MatchesPage> {
                       const SizedBox(height: 16),
                       ContinuationBalanceCard(
                         controller: c.continuation,
-                        onVideos: _openCredits,
+                        onOpenCredits: _openCredits,
                         loading: _overviewLoads > 0,
                       ),
                       const SizedBox(height: 16),

@@ -174,6 +174,7 @@ void main() {
       await tester.tap(find.byKey(const Key('profile-subscription')));
       await tester.pumpAndSettle();
       expect(find.byType(SubscriptionPage), findsOneWidget);
+      expect(find.text(testUser), findsNothing);
       await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('main-tab-matches')));
@@ -193,9 +194,10 @@ void main() {
         tester.widget<Text>(find.byKey(const Key('ad-credits-remaining'))).data,
         '1',
       );
-      await tester.ensureVisible(find.byKey(const Key('open-videos')));
+      expect(find.byKey(const Key('open-videos')), findsOneWidget);
+      await tester.ensureVisible(find.text('Voir mes crédits'));
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('open-videos')));
+      await tester.tap(find.text('Voir mes crédits'));
       await tester.pumpAndSettle();
       expect(find.byType(CreditsPage), findsOneWidget);
       await tester.scrollUntilVisible(

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
-import '../../../core/widgets/account_identifier.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
@@ -221,12 +220,13 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                         ),
                       ),
                     ],
-                    const SizedBox(height: 16),
-                    OutlinedButton(
+                    const SizedBox(height: 20),
+                    OutlinedButton.icon(
                       onPressed: c.loading || c.busy || c.retrySeconds > 0
                           ? null
                           : _refresh,
-                      child: Text(
+                      icon: const Icon(Icons.refresh_rounded, size: 20),
+                      label: Text(
                         c.retrySeconds > 0
                             ? AppStrings.of(context).retryIn(c.retrySeconds)
                             : AppStrings.of(context)
@@ -242,19 +242,20 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                       ),
                     if (c.purchasePending)
                       Text(AppStrings.of(context).messages.billingStorePending),
-                    if (c.config.available)
-                      OutlinedButton(
+                    if (c.config.available) ...[
+                      const SizedBox(height: 12),
+                      OutlinedButton.icon(
                         onPressed: c.busy || c.loading
                             ? null
                             : c.restorePurchases,
-                        child: Text(
+                        icon: const Icon(Icons.restore_rounded, size: 20),
+                        label: Text(
                           AppStrings.of(context)
                               .messages
                               .billingRestorePurchases,
                         ),
                       ),
-                    if (c.session.identity case final identity?)
-                      AccountIdentifier(userId: identity.userId),
+                    ],
                     if (c.subscription?.provider == 'stripe')
                       Text(
                         AppStrings.of(context).messages.billingStoreManagedWeb,

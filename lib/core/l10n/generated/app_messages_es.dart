@@ -792,6 +792,9 @@ class AppMessagesEs extends AppMessages {
   String get continuationBalanceCardToContinue => 'Para continuar';
 
   @override
+  String get continuationBalanceCardViewCredits => 'Ver mis créditos';
+
+  @override
   String get continuationBalanceCardRefreshingYourCredits =>
       'Actualizando tus créditos…';
 

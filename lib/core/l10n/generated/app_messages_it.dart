@@ -795,6 +795,9 @@ class AppMessagesIt extends AppMessages {
   String get continuationBalanceCardToContinue => 'Per proseguire';
 
   @override
+  String get continuationBalanceCardViewCredits => 'Vedi i miei crediti';
+
+  @override
   String get continuationBalanceCardRefreshingYourCredits =>
       'Aggiornamento dei crediti…';
 

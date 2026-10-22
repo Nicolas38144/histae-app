@@ -1386,6 +1386,12 @@ abstract class AppMessages {
   /// **'Pour continuer'**
   String get continuationBalanceCardToContinue;
 
+  /// Action visible ouvrant le détail des crédits depuis la carte dans Matchs.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir mes crédits'**
+  String get continuationBalanceCardViewCredits;
+
   /// Interface: lib/features/continuation/presentation/continuation_balance_card.dart
   ///
   /// In fr, this message translates to:

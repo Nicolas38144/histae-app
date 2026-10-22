@@ -10,10 +10,12 @@ class HistaeScaffold extends StatelessWidget {
     this.appBar,
     this.body,
     this.bottomNavigationBar,
+    this.extendBody = false,
   });
   final PreferredSizeWidget? appBar;
   final Widget? body;
   final Widget? bottomNavigationBar;
+  final bool extendBody;
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +47,7 @@ class HistaeScaffold extends StatelessWidget {
           ),
           child: Scaffold(
             backgroundColor: Colors.transparent,
+            extendBody: extendBody,
             appBar: appBar == null
                 ? null
                 : PreferredSize(

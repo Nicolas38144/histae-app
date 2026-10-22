@@ -43,6 +43,8 @@ Le **Feed** réserve l’espace aux profils, sans bouton commercial. Les bios et
 
 Dans **Matchs**, l’introduction précède une réserve de crédits compacte et défilante. Free voit les crédits gratuits et publicitaires disponibles ainsi que l’action Vidéos. Premium dispose d’un message adapté, sans bouton vidéo. Une lecture inconnue ou échouée ne produit pas un faux solde nul.
 
+La réserve est une carte cliquable avec l’action explicite **Voir mes crédits** et une flèche. L’identifiant de compte reste exclusivement dans **Mon profil**, sans répétition dans l’abonnement.
+
 Le **Profil** commence par la présentation, les réponses et l’aperçu public, puis regroupe les détails, le mode pause et les réglages du compte. Un seul accès affiche Premium pour Free ou Mon abonnement pour Premium ; l’état de chargement reste neutre.
 
 L’éditeur de réponses distingue la question, le texte, son ordre et les actions de retrait/déplacement. La sélection recherche dans les questions disponibles ; l’enregistrement du remplacement complet est explicite. Les consentements sensibles et de localisation utilisent des interrupteurs, séparés des documents CGU et notice.
@@ -51,7 +53,9 @@ L’éditeur de réponses distingue la question, le texte, son ordre et les acti
 
 `HistaeScaffold`, `HistaeButton`, les cartes et les séparateurs composent des widgets Flutter standards. La décoration conserve les états désactivés, le focus, la sémantique et le comportement du clavier. Les valeurs et droits affichés restent fournis par les contrôleurs.
 
-La barre Feed / Matchs / Profil occupe aussi la zone de sécurité inférieure ; les barres système suivent le thème. Avec un petit écran, le clavier ou du texte à 200 %, garder le défilement et les mots entiers. L’en-tête du chat devient compact ; les détails et confirmations restent défilables. Ne pas réduire globalement l’échelle de texte choisie par la personne.
+Les boutons principaux conservent le dégradé abricot-lavande. Les boutons secondaires utilisent une surface lavande discrète, un contour léger et des angles de 16 px ; les actions textuelles sont plus légères. Séparer les actions empilées pour conserver leur lisibilité.
+
+La barre Feed / Matchs / Profil est transparente, sans panneau, ombre, socle coloré ni ligne de séparation. Les icônes mesurent 24 px ; l’onglet actif utilise un cercle lavande de 44 px autour de l’icône, avec le libellé en dessous et une cible tactile conservée sur tout l’onglet. La réduction des animations supprime la transition du cercle. Les barres système sont transparentes et le contenu défilant garde son espace inférieur. Avec un petit écran, le clavier ou du texte à 200 %, garder le défilement et les mots entiers. L’en-tête du chat devient compact ; les détails et confirmations restent défilables. Ne pas réduire globalement l’échelle de texte choisie par la personne.
 
 ## Vérification visuelle
 

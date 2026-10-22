@@ -76,7 +76,7 @@ L’API reste l’autorité pour les consentements, matchs, quotas, récompenses
 
 ## Identifiant du compte
 
-Dans **Mon compte**, le profil affiche l’UUID du compte authentifié avec sélection du texte et bouton de copie. Le même composant est utilisé dans l’abonnement ; il n’est pas ajouté à l’aperçu public. Les confirmations et erreurs de copie sont traduites dans les quatre langues.
+Dans **Mon compte**, le profil affiche l’UUID du compte authentifié avec sélection du texte et bouton de copie. Cet identifiant reste uniquement dans le profil, sans apparaître dans l’abonnement ni l’aperçu public. Les confirmations et erreurs de copie sont traduites dans les quatre langues.
 
 ## Organisation du code
 

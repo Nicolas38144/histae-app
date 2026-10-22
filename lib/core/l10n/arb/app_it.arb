@@ -214,6 +214,7 @@
   "rewardedVideoGatewayVideosAreAvailableOnAndroidAnd": "I video sono disponibili su Android e iOS.",
   "rewardedVideoGatewayVideosAreNotYetConfiguredFor": "I video non sono ancora configurati per questo dispositivo.",
   "continuationBalanceCardToContinue": "Per proseguire",
+  "continuationBalanceCardViewCredits": "Vedi i miei crediti",
   "continuationBalanceCardRefreshingYourCredits": "Aggiornamento dei crediti…",
   "continuationBalanceCardYourBalanceCannotBeCheckedRight": "Impossibile verificare il saldo al momento.",
   "continuationBalanceCardTryAgainInS": "Riprova tra {arg0} s",
