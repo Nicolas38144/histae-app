@@ -5,6 +5,8 @@ import '../../../core/widgets/histae_button.dart';
 import '../../catalog/application/catalog_controller.dart';
 import '../../catalog/data/plan_catalog.dart';
 import '../../catalog/presentation/plan_card.dart';
+import '../data/billing_gateway.dart';
+import '../data/billing_models.dart';
 
 class SubscriptionPlans extends StatelessWidget {
   const SubscriptionPlans({
@@ -15,10 +17,24 @@ class SubscriptionPlans extends StatelessWidget {
     required this.hasPending,
     required this.canAct,
     required this.onChoose,
+    required this.storeOffers,
   });
   final CatalogController catalog;
+  final List<StoreOffer> storeOffers;
   final bool paymentsAvailable, canSubscribe, hasPending, canAct;
   final Future<void> Function(SubscriptionOffer offer) onChoose;
+
+  String? _price(BuildContext context, SubscriptionOffer offer) {
+    if (offer.billingPeriod == null) return null;
+    final native = storeOffers
+        .where((item) => item.product.period == offer.billingPeriod)
+        .firstOrNull;
+    final copy = AppStrings.of(context).messages;
+    if (native == null) return copy.billingStorePriceUnavailable;
+    return offer.billingPeriod == BillingPeriod.monthly
+        ? copy.billingStorePricePerMonth(native.price)
+        : copy.billingStorePricePerYear(native.price);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +80,7 @@ class SubscriptionPlans extends StatelessWidget {
               (plan) => plan.code == offer.planCode,
             ),
             offer: offer,
+            priceLabel: _price(context, offer),
             action:
                 offer.billingPeriod != null &&
                     paymentsAvailable &&

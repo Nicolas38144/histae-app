@@ -166,7 +166,7 @@ void main() {
         'sex': null,
         'bio': null,
       });
-      expect(find.text('Mon profil'), findsOneWidget);
+      expect(find.byType(IdentityEditor), findsNothing);
     },
   );
   testWidgets('profile edits never silently erase sex or bio', (tester) async {
@@ -193,7 +193,7 @@ void main() {
     expect(patch?['firstname'], 'Alex');
     expect(patch?['sex'], 'female');
     expect(patch?['bio'], ownerJson()['bio']);
-    expect(find.text('Mon profil'), findsOneWidget);
+    expect(find.byType(IdentityEditor), findsNothing);
   });
   testWidgets(
     'minor birthdate is rejected before network and unsaved edits ask before leaving',
@@ -357,12 +357,12 @@ void main() {
       sensitive = false;
       await session.synchronize();
       await tester.pumpAndSettle();
-      expect(find.text('Mon profil'), findsOneWidget);
+      expect(find.byType(IdentityEditor), findsNothing);
       expect(find.text('Brouillon privé'), findsNothing);
     },
   );
   testWidgets(
-    'owner signed URL is fetched without Bearer and refreshed before its five minute expiry',
+    'owner signed URL is fetched without Bearer, purged on deadline and refreshed explicitly',
     (tester) async {
       var reads = 0, downloads = 0;
       final session = testSession((r) async {
@@ -405,6 +405,11 @@ void main() {
       final downloadsBefore = downloads;
       expect(downloads, greaterThan(0));
       await tester.pump(const Duration(minutes: 4));
+      await tester.pumpAndSettle();
+      expect(reads, before);
+      expect(downloads, downloadsBefore);
+      expect(find.byType(Image), findsNothing);
+      await c.load();
       await tester.pumpAndSettle();
       expect(reads, greaterThan(before));
       expect(downloads, greaterThan(downloadsBefore));

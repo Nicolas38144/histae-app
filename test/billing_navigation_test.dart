@@ -21,13 +21,16 @@ import 'support/notifications_fixture.dart';
 
 void main() {
   testWidgets(
-    'checkout requires explicit terms confirmation, uses catalog prices and never grants access after browser launch',
+    'native purchase requires explicit confirmation and uses the store price',
     (tester) async {
       var posts = 0;
       final session = testSession((r) async {
-        if (r.url.path.endsWith('/checkout')) {
+        if (r.url.path.endsWith('/purchase-intents')) {
           posts++;
-          return jsonResponse(checkoutJson(), 201);
+          return jsonResponse(storeIntentJson());
+        }
+        if (r.url.path == '/api/billing/store-products') {
+          return jsonResponse(storeProductsJson());
         }
         if (r.url.path == '/api/users/me/subscription') {
           return jsonResponse(subscriptionJson());
@@ -37,10 +40,10 @@ void main() {
       addTearDown(session.dispose);
       await session.establish(testTokens);
       final gateway = FakeBillingGateway();
+      addTearDown(gateway.stream.close);
       final c = BillingController(
         BillingRepository(session),
         testBillingConfig,
-        MemoryCheckoutVault(),
         gateway,
         realtime: QuietRealtime(session),
       );
@@ -72,17 +75,17 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text(annualChoice));
       await tester.pumpAndSettle();
-      expect(find.textContaining(RegExp(r'123,45\sEUR')), findsWidgets);
+      expect(find.textContaining(RegExp(r'48,00\sEUR')), findsWidgets);
       expect(posts, 0);
       await tester.tap(find.text('Plus tard'));
       await tester.pumpAndSettle();
       expect(posts, 0);
       await tester.tap(find.text(annualChoice));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Continuer dans le navigateur'));
+      await tester.tap(find.text('Continuer dans le store'));
       await tester.pumpAndSettle();
       expect(posts, 1);
-      expect(gateway.opened, hasLength(1));
+      expect(gateway.bought, hasLength(1));
       expect(c.subscription!.accessGranted, isFalse);
       await tester.pumpWidget(const SizedBox());
     },
@@ -95,6 +98,9 @@ void main() {
         if (r.url.path == '/api/users/me/subscription') {
           reads++;
           return jsonResponse(subscriptionJson());
+        }
+        if (r.url.path == '/api/billing/store-products') {
+          return jsonResponse(storeProductsJson());
         }
         return defaultNotificationsResponse(r);
       });
@@ -122,7 +128,6 @@ void main() {
       final c = BillingController(
         BillingRepository(session),
         testBillingConfig,
-        MemoryCheckoutVault(),
         FakeBillingGateway(),
         realtime: QuietRealtime(session),
       );

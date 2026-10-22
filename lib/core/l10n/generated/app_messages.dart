@@ -5239,6 +5239,144 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Pas encore de rencontre'**
   String get matchesEmptyTitle;
+
+  /// No description provided for @billingRestorePurchases.
+  ///
+  /// In fr, this message translates to:
+  /// **'Restaurer mes achats'**
+  String get billingRestorePurchases;
+
+  /// No description provided for @billingCopyAccountId.
+  ///
+  /// In fr, this message translates to:
+  /// **'Copier mon identifiant de compte'**
+  String get billingCopyAccountId;
+
+  /// No description provided for @billingStorePriceUnavailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prix du store indisponible'**
+  String get billingStorePriceUnavailable;
+
+  /// No description provided for @billingStoreManagedWeb.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cet abonnement a été souscrit sur le site. Sa gestion s’effectue sur le site Histae.'**
+  String get billingStoreManagedWeb;
+
+  /// No description provided for @billingStorePending.
+  ///
+  /// In fr, this message translates to:
+  /// **'Achat en attente de confirmation par le store.'**
+  String get billingStorePending;
+
+  /// No description provided for @billingStorePurchaseFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'L’achat ne peut pas être confirmé pour ce compte.'**
+  String get billingStorePurchaseFailed;
+
+  /// No description provided for @billingStoreVerifying.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérification de l’achat…'**
+  String get billingStoreVerifying;
+
+  /// No description provided for @billingStoreApple.
+  ///
+  /// In fr, this message translates to:
+  /// **'App Store'**
+  String get billingStoreApple;
+
+  /// No description provided for @billingStoreGoogle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Google Play'**
+  String get billingStoreGoogle;
+
+  /// No description provided for @billingStoreWeb.
+  ///
+  /// In fr, this message translates to:
+  /// **'Site Histae'**
+  String get billingStoreWeb;
+
+  /// No description provided for @billingStoreGrace.
+  ///
+  /// In fr, this message translates to:
+  /// **'Délai de grâce de paiement'**
+  String get billingStoreGrace;
+
+  /// No description provided for @billingStoreRevoked.
+  ///
+  /// In fr, this message translates to:
+  /// **'Abonnement révoqué'**
+  String get billingStoreRevoked;
+
+  /// No description provided for @billingStoreOnHold.
+  ///
+  /// In fr, this message translates to:
+  /// **'Abonnement suspendu pour incident de paiement'**
+  String get billingStoreOnHold;
+
+  /// No description provided for @billingStorePricePerMonth.
+  ///
+  /// In fr, this message translates to:
+  /// **'{price} par mois'**
+  String billingStorePricePerMonth(String price);
+
+  /// No description provided for @billingStorePricePerYear.
+  ///
+  /// In fr, this message translates to:
+  /// **'{price} par an'**
+  String billingStorePricePerYear(String price);
+
+  /// No description provided for @billingStoreContinue.
+  ///
+  /// In fr, this message translates to:
+  /// **'Continuer dans le store'**
+  String get billingStoreContinue;
+
+  /// No description provided for @billingStoreConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Abonnement à renouvellement automatique, sans période d’essai : {price}. Le store confirmera le montant avant le paiement.'**
+  String billingStoreConfirm(String price);
+
+  /// No description provided for @billingStorePriceInSubscription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le prix de cette offre est affiché dans Mon abonnement.'**
+  String get billingStorePriceInSubscription;
+
+  /// No description provided for @billingStoreDeletionNotice.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer votre compte Histae ne résilie pas un abonnement App Store ou Google Play. Gérez ou annulez cet abonnement dans le store avant de supprimer le compte.'**
+  String get billingStoreDeletionNotice;
+
+  /// No description provided for @accountIdentifierTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Identifiant de mon compte'**
+  String get accountIdentifierTitle;
+
+  /// No description provided for @accountIdentifierCopy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Copier mon identifiant'**
+  String get accountIdentifierCopy;
+
+  /// No description provided for @accountIdentifierCopied.
+  ///
+  /// In fr, this message translates to:
+  /// **'Identifiant copié'**
+  String get accountIdentifierCopied;
+
+  /// No description provided for @accountIdentifierCopyFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de copier l’identifiant'**
+  String get accountIdentifierCopyFailed;
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

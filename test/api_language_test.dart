@@ -9,9 +9,6 @@ import 'package:histae_app/core/l10n/locale_controller.dart';
 import 'package:histae_app/core/network/api_client.dart';
 import 'package:histae_app/core/network/api_failure.dart';
 import 'package:histae_app/features/auth/application/otp_controller.dart';
-import 'package:histae_app/features/billing/data/billing_models.dart';
-import 'package:histae_app/features/billing/data/billing_repository.dart';
-import 'package:histae_app/features/billing/data/checkout_vault.dart';
 import 'package:histae_app/features/catalog/application/catalog_controller.dart';
 import 'package:histae_app/features/catalog/data/catalog_repository.dart';
 import 'package:histae_app/features/consents/domain/consent_state.dart';
@@ -126,43 +123,6 @@ void main() {
     expect(headers, ['it', 'it', 'en']);
     expect(keys[0], keys[1]);
     expect(keys[2], isNot(keys[1]));
-  });
-
-  test('persists Checkout locale with its immutable intent, including legacy records', () async {
-    final intent = CheckoutAttempt.create(
-      'https://api.example',
-      testUser,
-      BillingPeriod.annual,
-      language: ApiLanguage.es,
-    );
-    final restored = CheckoutAttempt.decode(intent.encode())!;
-    expect(restored.language, ApiLanguage.es);
-    expect(restored.key, intent.key);
-    final legacy = jsonDecode(intent.encode()) as Map<String, dynamic>;
-    legacy.remove('language');
-    expect(CheckoutAttempt.decode(jsonEncode(legacy))!.language, isNull);
-    expect(
-      () => CheckoutAttempt.decode(jsonEncode({...legacy, 'language': 'xx'})),
-      throwsA(isA<ApiFailure>()),
-    );
-    var language = ApiLanguage.it;
-    final session = testSession((request) async {
-      if (request.url.path.endsWith('/subscription/checkout')) {
-        expect(request.headers['Accept-Language'], 'es');
-        expect(request.headers['Idempotency-Key'], intent.key);
-        expect(jsonDecode(request.body), {'billing_period': 'annual'});
-        return jsonResponse({
-          'session_id': 'synthetic-checkout',
-          'url': 'https://checkout.stripe.com/c/pay/synthetic',
-          'expires_at': '2099-01-01T00:00:00Z',
-        }, 201);
-      }
-      return defaultAuthResponse(request, complete: true);
-    }, language: () => language);
-    addTearDown(session.dispose);
-    await session.establish(testTokens);
-    language = ApiLanguage.en;
-    await BillingRepository(session).checkout(restored, RequestCancellation());
   });
 
   test('models device overrides and explicit null to follow the account', () {

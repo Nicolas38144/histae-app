@@ -3206,4 +3206,87 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get matchesEmptyTitle => 'Ancora nessun incontro';
+
+  @override
+  String get billingRestorePurchases => 'Ripristina i miei acquisti';
+
+  @override
+  String get billingCopyAccountId => 'Copia il mio identificativo account';
+
+  @override
+  String get billingStorePriceUnavailable =>
+      'Prezzo dello store non disponibile';
+
+  @override
+  String get billingStoreManagedWeb =>
+      'Questo abbonamento è stato acquistato sul sito. Gestiscilo sul sito Histae.';
+
+  @override
+  String get billingStorePending =>
+      'Acquisto in attesa di conferma dallo store.';
+
+  @override
+  String get billingStorePurchaseFailed =>
+      'Impossibile confermare l’acquisto per questo account.';
+
+  @override
+  String get billingStoreVerifying => 'Verifica dell’acquisto…';
+
+  @override
+  String get billingStoreApple => 'App Store';
+
+  @override
+  String get billingStoreGoogle => 'Google Play';
+
+  @override
+  String get billingStoreWeb => 'Sito Histae';
+
+  @override
+  String get billingStoreGrace => 'Periodo di tolleranza del pagamento';
+
+  @override
+  String get billingStoreRevoked => 'Abbonamento revocato';
+
+  @override
+  String get billingStoreOnHold =>
+      'Abbonamento sospeso per un problema di pagamento';
+
+  @override
+  String billingStorePricePerMonth(String price) {
+    return '$price al mese';
+  }
+
+  @override
+  String billingStorePricePerYear(String price) {
+    return '$price all’anno';
+  }
+
+  @override
+  String get billingStoreContinue => 'Continua nello store';
+
+  @override
+  String billingStoreConfirm(String price) {
+    return 'Abbonamento con rinnovo automatico e senza prova gratuita: $price. Lo store confermerà l’importo prima del pagamento.';
+  }
+
+  @override
+  String get billingStorePriceInSubscription =>
+      'Il prezzo di questa offerta viene mostrato in Il mio abbonamento.';
+
+  @override
+  String get billingStoreDeletionNotice =>
+      'Eliminare il tuo account Histae non annulla un abbonamento App Store o Google Play. Gestisci o annulla l’abbonamento nello store prima di eliminare l’account.';
+
+  @override
+  String get accountIdentifierTitle => 'Identificativo del mio account';
+
+  @override
+  String get accountIdentifierCopy => 'Copia il mio identificativo';
+
+  @override
+  String get accountIdentifierCopied => 'Identificativo copiato';
+
+  @override
+  String get accountIdentifierCopyFailed =>
+      'Impossibile copiare l’identificativo';
 }

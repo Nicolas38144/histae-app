@@ -59,8 +59,12 @@ void main() {
       expect(find.text('Free'), findsOneWidget);
       expect(find.text('Premium Mensuel'), findsOneWidget);
       expect(find.text('Premium Annuel'), findsOneWidget);
-      expect(find.text('12,34 EUR / mois'), findsOneWidget);
-      expect(find.text('98,76 EUR / an'), findsOneWidget);
+      expect(
+        find.text('Le prix de cette offre est affiché dans Mon abonnement.'),
+        findsNWidgets(2),
+      );
+      expect(find.text('12,34 EUR / mois'), findsNothing);
+      expect(find.text('98,76 EUR / an'), findsNothing);
       expect(find.text('Crédits inclus par semaine : 3'), findsOneWidget);
       expect(find.text('Messagerie'), findsOneWidget);
       expect(find.text('Messaging'), findsNothing);

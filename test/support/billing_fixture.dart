@@ -1,57 +1,101 @@
+import 'dart:async';
+
 import 'package:histae_app/core/config/billing_config.dart';
 import 'package:histae_app/features/billing/data/billing_gateway.dart';
-import 'package:histae_app/features/billing/data/checkout_vault.dart';
+import 'package:histae_app/features/billing/data/store_models.dart';
 
-final testBillingConfig = BillingConfig.fromValues({
-  'BILLING_ENABLED': 'true',
-  'BILLING_DISTRIBUTION': 'android_external',
-  'BILLING_SUCCESS_URL':
-      'https://return.example/success?session_id={CHECKOUT_SESSION_ID}',
-  'BILLING_CANCEL_URL': 'https://return.example/cancel',
-  'BILLING_PORTAL_RETURN_URL': 'https://return.example/account',
-});
+final testBillingConfig = BillingConfig.fromValues({'BILLING_ENABLED': 'true'});
 Map<String, Object?> subscriptionJson({
   bool access = false,
   String? status,
+  String? provider = 'google_play',
   bool cancel = false,
   bool portal = false,
 }) => {
   'plan': access ? 'premium' : 'free',
-  'provider': status == null ? null : 'stripe',
+  'provider': status == null ? null : provider,
   'status': status,
   'access_granted': access,
   'billing_period': status == null ? null : 'monthly',
   'cancel_at_period_end': cancel,
   'current_period_starts_at': status == null ? null : '2026-10-01T00:00:00Z',
   'current_period_ends_at': status == null ? null : '2099-11-01T00:00:00Z',
-  'trial_ends_at': status == 'trialing' ? '2099-10-25T00:00:00Z' : null,
+  'trial_ends_at': null,
   'canceled_at': status == 'canceled' ? '2026-10-15T00:00:00Z' : null,
   'customer_portal_available': portal,
+  'management_url': null,
 };
-Map<String, Object?> checkoutJson({String? url}) => {
-  'session_id': 'cs_test_synthetic',
-  'url': url ?? 'https://checkout.stripe.com/c/pay/synthetic',
-  'expires_at': '2099-10-17T10:00:00Z',
+Map<String, Object?> storeProductsJson() => {
+  'offers': [
+    {
+      'billing_period': 'monthly',
+      'product_id': 'premium',
+      'base_plan_id': 'monthly',
+    },
+    {
+      'billing_period': 'annual',
+      'product_id': 'premium',
+      'base_plan_id': 'annual',
+    },
+  ],
 };
-
-class MemoryCheckoutVault implements CheckoutVault {
-  String? raw;
-  bool fail = false;
-  @override
-  Future<CheckoutAttempt?> read() async => CheckoutAttempt.decode(raw);
-  @override
-  Future<void> write(CheckoutAttempt? attempt) async {
-    if (fail) throw StateError('Synthetic locked storage');
-    raw = attempt?.encode() ?? '{}';
-  }
-}
+Map<String, Object?> storeIntentJson() => {
+  ...storeProductsJson(),
+  'provider': 'google_play',
+  'account_binding': 'a' * 64,
+};
+StorePurchase storePurchase({
+  String id = 'receipt',
+  StorePurchaseStatus status = StorePurchaseStatus.purchased,
+}) =>
+    StorePurchase(reference: id, status: status, pendingCompletePurchase: true);
 
 class FakeBillingGateway implements BillingGateway {
-  final opened = <Uri>[];
+  // Test owners close this stream with addTearDown.
+  // ignore: close_sinks
+  final stream = StreamController<List<StorePurchase>>.broadcast(sync: true);
+  final bought = <StoreOffer>[];
+  final completed = <StorePurchase>[];
+  final managed = <String>[];
   bool accepted = true;
+  int restores = 0;
   @override
-  Future<bool> open(Uri url, {required bool portal}) async {
-    opened.add(url);
+  StoreProvider get provider => StoreProvider.googlePlay;
+  @override
+  Stream<List<StorePurchase>> get updates => stream.stream;
+  @override
+  Future<bool> available() async => true;
+  @override
+  Future<List<StoreOffer>> products(List<StoreProduct> products) async =>
+      products
+          .map(
+            (product) => StoreOffer(
+              product,
+              product.period.name == 'annual' ? '48,00 EUR' : '5,00 EUR',
+            ),
+          )
+          .toList();
+  @override
+  Future<bool> buy(StoreOffer offer, String accountBinding) async {
+    bought.add(offer);
     return accepted;
+  }
+
+  @override
+  String reference(StorePurchase purchase) => purchase.reference;
+  @override
+  Future<void> complete(StorePurchase purchase) async {
+    completed.add(purchase);
+  }
+
+  @override
+  Future<void> restore() async {
+    restores++;
+  }
+
+  @override
+  Future<bool> manage(String provider) async {
+    managed.add(provider);
+    return true;
   }
 }

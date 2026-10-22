@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/l10n/language_picker.dart';
 import '../../../core/widgets/account_benefits_actions.dart';
+import '../../../core/widgets/account_identifier.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../billing/presentation/billing_scope.dart';
@@ -241,6 +242,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 16),
+                if (c.session.identity case final identity?) ...[
+                  AccountIdentifier(userId: identity.userId),
+                  const SizedBox(height: 16),
+                ],
                 AccountBenefitsActions(
                   isPremium: widget.continuation.quotaReadAt == null
                       ? null

@@ -5,9 +5,8 @@ import '../features/auth/application/session_controller.dart';
 import '../features/auth/data/auth_repository.dart';
 import '../features/auth/data/session_vault.dart';
 import '../features/billing/application/billing_controller.dart';
-import '../features/billing/data/billing_gateway.dart';
 import '../features/billing/data/billing_repository.dart';
-import '../features/billing/data/checkout_vault.dart';
+import '../features/billing/data/native_billing_gateway.dart';
 import '../features/catalog/data/catalog_repository.dart';
 import '../features/continuation/data/rewarded_video_gateway.dart';
 import '../features/notifications/application/push_controller.dart';
@@ -58,8 +57,7 @@ class AppDependencies {
       billing: BillingController(
         BillingRepository(session),
         config.billing,
-        SecureCheckoutVault(),
-        ExternalBillingGateway(),
+        NativeBillingGateway(),
         realtime: repositories.realtime.channel(),
       ),
     );

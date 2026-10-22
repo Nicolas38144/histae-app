@@ -17,8 +17,8 @@ La déconnexion retire le repli du compte, tout en conservant un choix explicite
 | Catalogue, profil, traits, questions, feed et matchs | Lectures localisées ; réponses d’une ancienne révision ignorées et pagination reprise au début si nécessaire. |
 | Consentements | Vérifier version, URL et `document_language` du document présenté avant écriture. Conserver `accepted_document_language` comme preuve historique. |
 | OTP | La langue est figée avec le téléphone et la clé d’idempotence ; un renvoi volontaire crée une nouvelle intention. |
-| Checkout | La tentative conserve sa langue, sa période et sa clé lors d’une reprise, y compris après restauration. |
-| Portail Stripe | La requête utilise la langue courante ; l’API choisit la locale et les URL autorisées. |
+| Achats natifs | Les intentions et vérifications utilisent l’en-tête courant ; le SDK du store fournit ses prix localisés. |
+| Gestion de l’abonnement | Ouverture du store d’origine ; un abonnement Stripe existant se gère sur le site Histae. |
 | Appareil push | L’exception de langue suit l’enregistrement ; `null` permet de suivre le compte. Un appareil déjà activé peut être réenregistré après un changement explicite. |
 | Export et SSE | Langue transmise à l’ouverture ; clés d’export, protocole d’événements et contenus personnels conservés. |
 
@@ -28,11 +28,23 @@ Les bios, réponses et messages des personnes ne sont jamais traduits par le cli
 
 La révision de localisation est distincte de `resourceKey`. Changer de langue renouvelle les lectures concernées sans supprimer navigation, brouillons, crédits ou intentions d’écriture. Les données mises en cache dans une autre langue ne sont pas réutilisées.
 
-Une reprise après un `401` d’expiration confirmé garde la langue de la requête d’origine. Un timeout ne déclenche pas de nouvelle mutation automatique. Une intention push ou Checkout déjà engagée conserve ses paramètres jusqu’à sa résolution.
+Une reprise après un `401` d’expiration confirmé garde la langue de la requête d’origine. Un timeout ne déclenche pas de nouvelle mutation automatique. Une intention push déjà engagée conserve ses paramètres jusqu’à sa résolution. Un changement de langue ne réinitialise pas un achat natif en cours ni sa vérification.
 
 Les choix de consentement non confirmés sont invalidés si le document présenté change, même à version juridique identique. Un changement de langue ne vaut pas consentement. Une lecture documentaire indisponible ne simule pas une déconnexion ; un rejet d’authentification conserve les protections de session habituelles.
 
-Les anciens enregistrements Checkout sans champ de langue restent lisibles. L’API conserve l’autorité sur les URL et tentatives qu’elle possède déjà.
+## Achats natifs et site
+
+Les appels suivants utilisent le transport API commun et son en-tête `Accept-Language` :
+
+- `GET /api/billing/store-products?provider=app_store|google_play` ;
+- `POST /api/users/me/subscription/purchase-intents` ;
+- `POST /api/users/me/subscription/apple/verify` ;
+- `POST /api/users/me/subscription/google-play/verify` ;
+- `GET /api/users/me/subscription` pour relire les droits effectifs.
+
+Le catalogue technique fournit les identifiants des produits ; le SDK du store fournit les prix selon le compte du store, indépendamment de la langue de l’API. Les dialogues et pages natifs suivent leurs propres réglages. Une restauration repasse par la vérification serveur et ne réattribue pas l’achat à un autre compte.
+
+Les anciennes routes mobiles Stripe Checkout/portail répondent `410 billing_web_only`. Le site possède son propre parcours UUID + téléphone + OTP et un cookie de paiement ; il n’utilise pas la session mobile. Les variantes linguistiques du paiement et leurs reprises sont décrites dans le [guide serveur](../../histae-api-rust/docs/store-billing.md).
 
 ## Vérification
 
@@ -44,4 +56,4 @@ flutter test test/api_language_test.dart test/localization_test.dart
 
 Ajouter les tests existants OTP, session, facturation ou notifications uniquement si ces parcours sont concernés. Les simulations ne nécessitent ni SMS, ni paiement, ni push réels.
 
-Sur appareil, vérifier le choix avant connexion, le mode système, les documents juridiques, la reprise d’une tentative Checkout et la langue d’un appareil push déjà activé. Les contrôles communs sont dans le [README](../README.md) et les validations de livraison dans la [roadmap](../roadmap.md).
+Sur appareil, vérifier le choix avant connexion, le mode système, les documents juridiques, la restauration d’un achat natif et la langue d’un appareil push déjà activé. Les contrôles communs sont dans le [README](../README.md) et les validations de livraison dans la [roadmap](../roadmap.md).

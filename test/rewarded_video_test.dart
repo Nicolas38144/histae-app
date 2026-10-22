@@ -264,7 +264,7 @@ void main() {
         await tester.pumpAndSettle();
         final openCredits = entry == 'matches'
             ? find.byKey(const Key('open-videos'))
-            : find.text('Mes crédits de continuation');
+            : find.text('Mes crédits');
         await tester.scrollUntilVisible(openCredits, 200);
         await tester.pumpAndSettle();
         await tester.ensureVisible(openCredits);

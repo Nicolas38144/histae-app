@@ -489,6 +489,8 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
   ];
 
   List<Widget> _delete() => [
+    Text(AppStrings.of(context).messages.billingStoreDeletionNotice),
+    const SizedBox(height: 16),
     EditorialCard(
       eyebrow: AppStrings.of(context)
           .messages

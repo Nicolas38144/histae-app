@@ -1,30 +1,31 @@
 import '../../../core/network/api_client.dart';
+import '../../../core/network/api_failure.dart';
 import '../../../core/network/json_fields.dart';
 import '../../auth/domain/authenticated_session.dart';
 import 'billing_models.dart';
-import 'checkout_vault.dart';
+import 'store_models.dart';
 
 abstract interface class BillingRepository {
   factory BillingRepository(AuthenticatedSession session) =
       ApiBillingRepository;
-
   AuthenticatedSession get session;
-
   Future<SubscriptionState> load(RequestCancellation scope);
-
-  Future<CheckoutLink> checkout(
-    CheckoutAttempt attempt,
+  Future<List<StoreProduct>> products(
+    StoreProvider provider,
     RequestCancellation scope,
   );
-
-  Future<Uri> portal(RequestCancellation scope);
+  Future<StoreIntent> intent(StoreProvider provider, RequestCancellation scope);
+  Future<void> verify(
+    StoreProvider provider,
+    String reference,
+    RequestCancellation scope,
+  );
 }
 
 final class ApiBillingRepository implements BillingRepository {
   ApiBillingRepository(this.session);
   @override
   final AuthenticatedSession session;
-
   @override
   Future<SubscriptionState> load(RequestCancellation scope) async =>
       SubscriptionState.fromJson(
@@ -36,35 +37,53 @@ final class ApiBillingRepository implements BillingRepository {
           cancellation: scope,
         ),
       );
-
   @override
-  Future<CheckoutLink> checkout(
-    CheckoutAttempt attempt,
+  Future<List<StoreProduct>> products(
+    StoreProvider provider,
     RequestCancellation scope,
-  ) async => CheckoutLink.fromJson(
-    await session.request(
-      'POST',
-      '/api/users/me/subscription/checkout',
-      expectedStatus: 201,
-      replayAfterRefresh: true,
-      cancellation: scope,
-      idempotencyKey: attempt.key,
-      language: attempt.language,
-      body: {'billing_period': attempt.period.name},
-    ),
-  );
-
-  @override
-  Future<Uri> portal(RequestCancellation scope) async => stripeUrl(
-    jsonObject(
+  ) async {
+    final json = jsonObject(
       await session.request(
-        'POST',
-        '/api/users/me/subscription/portal',
-        expectedStatus: 201,
+        'GET',
+        '/api/billing/store-products',
+        query: {'provider': provider.wire},
+        expectedStatus: 200,
         replayAfterRefresh: true,
         cancellation: scope,
       ),
-    )['url'],
-    portal: true,
+    );
+    final offers = json['offers'];
+    if (offers is! List) throw const ApiFailure(ApiFailureKind.invalidResponse);
+    return offers.map(StoreProduct.fromJson).toList(growable: false);
+  }
+
+  @override
+  Future<StoreIntent> intent(
+    StoreProvider provider,
+    RequestCancellation scope,
+  ) async => StoreIntent.fromJson(
+    await session.request(
+      'POST',
+      '/api/users/me/subscription/purchase-intents',
+      expectedStatus: 200,
+      replayAfterRefresh: true,
+      cancellation: scope,
+      body: {'provider': provider.wire},
+    ),
   );
+  @override
+  Future<void> verify(
+    StoreProvider provider,
+    String reference,
+    RequestCancellation scope,
+  ) async {
+    await session.request(
+      'POST',
+      '/api/users/me/subscription/${provider == StoreProvider.appStore ? 'apple' : 'google-play'}/verify',
+      expectedStatus: 204,
+      replayAfterRefresh: true,
+      cancellation: scope,
+      body: {'reference': reference},
+    );
+  }
 }

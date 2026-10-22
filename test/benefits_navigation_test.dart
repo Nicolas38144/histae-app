@@ -44,7 +44,6 @@ Future<void> mountBenefits(
   final billing = BillingController(
     BillingRepository(session),
     testBillingConfig,
-    MemoryCheckoutVault(),
     FakeBillingGateway(),
     realtime: QuietRealtime(session),
   );
@@ -90,6 +89,7 @@ void main() {
       await tester.tap(find.byKey(const Key('main-tab-profile')));
       await tester.pumpAndSettle();
       await revealSubscription(tester);
+      expect(find.text(testUser), findsOneWidget);
       expect(find.text('Premium'), findsOneWidget);
 
       Future<void> refreshWith(

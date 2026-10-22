@@ -3771,5 +3771,49 @@
   "matchesEmptyTitle": "Pas encore de rencontre",
   "@matchesEmptyTitle": {
     "description": "Friendly interface copy for the profile or matches screen."
-  }
+  },
+  "billingRestorePurchases": "Restaurer mes achats",
+  "billingCopyAccountId": "Copier mon identifiant de compte",
+  "billingStorePriceUnavailable": "Prix du store indisponible",
+  "billingStoreManagedWeb": "Cet abonnement a été souscrit sur le site. Sa gestion s’effectue sur le site Histae.",
+  "billingStorePending": "Achat en attente de confirmation par le store.",
+  "billingStorePurchaseFailed": "L’achat ne peut pas être confirmé pour ce compte.",
+  "billingStoreVerifying": "Vérification de l’achat…",
+  "billingStoreApple": "App Store",
+  "billingStoreGoogle": "Google Play",
+  "billingStoreWeb": "Site Histae",
+  "billingStoreGrace": "Délai de grâce de paiement",
+  "billingStoreRevoked": "Abonnement révoqué",
+  "billingStoreOnHold": "Abonnement suspendu pour incident de paiement",
+  "billingStorePricePerMonth": "{price} par mois",
+  "billingStorePricePerYear": "{price} par an",
+  "billingStoreContinue": "Continuer dans le store",
+  "billingStoreConfirm": "Abonnement à renouvellement automatique, sans période d’essai : {price}. Le store confirmera le montant avant le paiement.",
+  "billingStorePriceInSubscription": "Le prix de cette offre est affiché dans Mon abonnement.",
+  "@billingStorePricePerMonth": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "@billingStorePricePerYear": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "@billingStoreConfirm": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "billingStoreDeletionNotice": "Supprimer votre compte Histae ne résilie pas un abonnement App Store ou Google Play. Gérez ou annulez cet abonnement dans le store avant de supprimer le compte.",
+  "accountIdentifierTitle": "Identifiant de mon compte",
+  "accountIdentifierCopy": "Copier mon identifiant",
+  "accountIdentifierCopied": "Identifiant copié",
+  "accountIdentifierCopyFailed": "Impossible de copier l’identifiant"
 }

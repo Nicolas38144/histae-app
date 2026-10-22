@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/widgets/account_identifier.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
@@ -99,10 +100,15 @@ class _SubscriptionPageState extends State<SubscriptionPage>
   Future<void> _choose(SubscriptionOffer offer) async {
     final period = offer.billingPeriod;
     if (period == null) return;
-    final strings = AppStrings.of(context);
+    final native = c.offers
+        .where((item) => item.product.period == period)
+        .firstOrNull;
+    if (native == null) return;
     final price = period == BillingPeriod.monthly
-        ? strings.monthly(offer.priceCents, offer.currency)
-        : strings.annual(offer.priceCents, offer.currency);
+        ? AppStrings.of(context).messages
+              .billingStorePricePerMonth(native.price)
+        : AppStrings.of(context).messages
+              .billingStorePricePerYear(native.price);
     final accepted = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -112,8 +118,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
         ),
         content: SingleChildScrollView(
           child: Text(
-            AppStrings.of(context).messages
-                .subscriptionPageAutoRenewingSubscriptionWithNoTrial(price),
+            AppStrings.of(context).messages.billingStoreConfirm(price),
           ),
         ),
         actions: [
@@ -125,9 +130,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
           ),
           HistaeButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text(
-              AppStrings.of(context).messages.subscriptionPageContinueInBrowser,
-            ),
+            child: Text(AppStrings.of(context).messages.billingStoreContinue),
           ),
         ],
       ),
@@ -235,35 +238,27 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                       LinearProgressIndicator(
                         semanticsLabel: AppStrings.of(context)
                             .messages
-                            .subscriptionPageOpeningBrowser,
+                            .billingStoreVerifying,
                       ),
-                    if (c.pending case final attempt?) ...[
-                      const SizedBox(height: 16),
-                      Text(
-                        AppStrings.of(context).messages
-                            .subscriptionPageAAttemptIsAwaitingVerificationResume(
-                              attempt.period == BillingPeriod.monthly
-                                  ? AppStrings.of(context)
-                                        .messages
-                                        .subscriptionPageMonthly
-                                  : AppStrings.of(context)
-                                        .messages
-                                        .subscriptionPageAnnual,
-                            ),
-                      ),
-                      if (c.paymentsAvailable &&
-                          c.subscription?.accessGranted != true)
-                        OutlinedButton(
-                          onPressed: _canAct
-                              ? () => c.checkout(attempt.period)
-                              : null,
-                          child: Text(
-                            AppStrings.of(context)
-                                .messages
-                                .subscriptionPageResumeThisAttempt,
-                          ),
+                    if (c.purchasePending)
+                      Text(AppStrings.of(context).messages.billingStorePending),
+                    if (c.config.available)
+                      OutlinedButton(
+                        onPressed: c.busy || c.loading
+                            ? null
+                            : c.restorePurchases,
+                        child: Text(
+                          AppStrings.of(context)
+                              .messages
+                              .billingRestorePurchases,
                         ),
-                    ],
+                      ),
+                    if (c.session.identity case final identity?)
+                      AccountIdentifier(userId: identity.userId),
+                    if (c.subscription?.provider == 'stripe')
+                      Text(
+                        AppStrings.of(context).messages.billingStoreManagedWeb,
+                      ),
                     if (!c.paymentsAvailable) ...[
                       const EditorialDivider(),
                       Text(
@@ -272,8 +267,10 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                             .subscriptionPageSignUpAndPaymentManagementAre,
                       ),
                     ],
-                    if (c.subscription?.portalAvailable == true &&
-                        c.paymentsAvailable)
+                    if ([
+                      'app_store',
+                      'google_play',
+                    ].contains(c.subscription?.provider))
                       OutlinedButton.icon(
                         onPressed: _canAct ? c.portal : null,
                         icon: const Icon(Icons.open_in_new),
@@ -297,7 +294,8 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                         catalog: catalog,
                         paymentsAvailable: c.paymentsAvailable,
                         canSubscribe: c.subscription?.accessGranted == false,
-                        hasPending: c.pending != null,
+                        hasPending: c.purchasePending,
+                        storeOffers: c.offers,
                         canAct: _canAct,
                         onChoose: _choose,
                       ),

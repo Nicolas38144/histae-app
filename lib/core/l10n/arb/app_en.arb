@@ -860,5 +860,28 @@
   "matchesEmptyTitle": "No matches yet",
   "@matchesEmptyTitle": {
     "description": "Friendly interface copy for the profile or matches screen."
-  }
+  },
+  "billingRestorePurchases": "Restore my purchases",
+  "billingCopyAccountId": "Copy my account identifier",
+  "billingStorePriceUnavailable": "Store price unavailable",
+  "billingStoreManagedWeb": "This subscription was purchased on the website. Manage it on the Histae website.",
+  "billingStorePending": "Purchase awaiting confirmation from the store.",
+  "billingStorePurchaseFailed": "The purchase cannot be confirmed for this account.",
+  "billingStoreVerifying": "Verifying purchase…",
+  "billingStoreApple": "App Store",
+  "billingStoreGoogle": "Google Play",
+  "billingStoreWeb": "Histae website",
+  "billingStoreGrace": "Payment grace period",
+  "billingStoreRevoked": "Subscription revoked",
+  "billingStoreOnHold": "Subscription on hold due to a payment issue",
+  "billingStorePricePerMonth": "{price} per month",
+  "billingStorePricePerYear": "{price} per year",
+  "billingStoreContinue": "Continue in the store",
+  "billingStoreConfirm": "Auto-renewing subscription with no free trial: {price}. The store will confirm the amount before payment.",
+  "billingStorePriceInSubscription": "The price of this offer is shown in My subscription.",
+  "billingStoreDeletionNotice": "Deleting your Histae account does not cancel an App Store or Google Play subscription. Manage or cancel that subscription in its store before deleting your account.",
+  "accountIdentifierTitle": "My account ID",
+  "accountIdentifierCopy": "Copy my account ID",
+  "accountIdentifierCopied": "Account ID copied",
+  "accountIdentifierCopyFailed": "Unable to copy the account ID"
 }

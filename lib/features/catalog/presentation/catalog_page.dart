@@ -112,6 +112,11 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
           const SizedBox(height: 16),
           for (final offer in controller.offers)
             PlanCard(
+              priceLabel: offer.billingPeriod == null
+                  ? null
+                  : AppStrings.of(context)
+                        .messages
+                        .billingStorePriceInSubscription,
               plan: controller.plans.firstWhere(
                 (plan) => plan.code == offer.planCode,
               ),

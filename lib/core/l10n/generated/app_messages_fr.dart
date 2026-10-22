@@ -3205,4 +3205,86 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get matchesEmptyTitle => 'Pas encore de rencontre';
+
+  @override
+  String get billingRestorePurchases => 'Restaurer mes achats';
+
+  @override
+  String get billingCopyAccountId => 'Copier mon identifiant de compte';
+
+  @override
+  String get billingStorePriceUnavailable => 'Prix du store indisponible';
+
+  @override
+  String get billingStoreManagedWeb =>
+      'Cet abonnement a été souscrit sur le site. Sa gestion s’effectue sur le site Histae.';
+
+  @override
+  String get billingStorePending =>
+      'Achat en attente de confirmation par le store.';
+
+  @override
+  String get billingStorePurchaseFailed =>
+      'L’achat ne peut pas être confirmé pour ce compte.';
+
+  @override
+  String get billingStoreVerifying => 'Vérification de l’achat…';
+
+  @override
+  String get billingStoreApple => 'App Store';
+
+  @override
+  String get billingStoreGoogle => 'Google Play';
+
+  @override
+  String get billingStoreWeb => 'Site Histae';
+
+  @override
+  String get billingStoreGrace => 'Délai de grâce de paiement';
+
+  @override
+  String get billingStoreRevoked => 'Abonnement révoqué';
+
+  @override
+  String get billingStoreOnHold =>
+      'Abonnement suspendu pour incident de paiement';
+
+  @override
+  String billingStorePricePerMonth(String price) {
+    return '$price par mois';
+  }
+
+  @override
+  String billingStorePricePerYear(String price) {
+    return '$price par an';
+  }
+
+  @override
+  String get billingStoreContinue => 'Continuer dans le store';
+
+  @override
+  String billingStoreConfirm(String price) {
+    return 'Abonnement à renouvellement automatique, sans période d’essai : $price. Le store confirmera le montant avant le paiement.';
+  }
+
+  @override
+  String get billingStorePriceInSubscription =>
+      'Le prix de cette offre est affiché dans Mon abonnement.';
+
+  @override
+  String get billingStoreDeletionNotice =>
+      'Supprimer votre compte Histae ne résilie pas un abonnement App Store ou Google Play. Gérez ou annulez cet abonnement dans le store avant de supprimer le compte.';
+
+  @override
+  String get accountIdentifierTitle => 'Identifiant de mon compte';
+
+  @override
+  String get accountIdentifierCopy => 'Copier mon identifiant';
+
+  @override
+  String get accountIdentifierCopied => 'Identifiant copié';
+
+  @override
+  String get accountIdentifierCopyFailed =>
+      'Impossible de copier l’identifiant';
 }

@@ -860,5 +860,28 @@
   "matchesEmptyTitle": "Aún no hay encuentros",
   "@matchesEmptyTitle": {
     "description": "Friendly interface copy for the profile or matches screen."
-  }
+  },
+  "billingRestorePurchases": "Restaurar mis compras",
+  "billingCopyAccountId": "Copiar mi identificador de cuenta",
+  "billingStorePriceUnavailable": "Precio del store no disponible",
+  "billingStoreManagedWeb": "Esta suscripción se compró en el sitio web. Gestiónala en el sitio de Histae.",
+  "billingStorePending": "Compra pendiente de confirmación del store.",
+  "billingStorePurchaseFailed": "No se puede confirmar la compra para esta cuenta.",
+  "billingStoreVerifying": "Verificando la compra…",
+  "billingStoreApple": "App Store",
+  "billingStoreGoogle": "Google Play",
+  "billingStoreWeb": "Sitio web de Histae",
+  "billingStoreGrace": "Periodo de gracia del pago",
+  "billingStoreRevoked": "Suscripción revocada",
+  "billingStoreOnHold": "Suscripción suspendida por un problema de pago",
+  "billingStorePricePerMonth": "{price} al mes",
+  "billingStorePricePerYear": "{price} al año",
+  "billingStoreContinue": "Continuar en el store",
+  "billingStoreConfirm": "Suscripción con renovación automática y sin prueba gratuita: {price}. El store confirmará el importe antes del pago.",
+  "billingStorePriceInSubscription": "El precio de esta oferta aparece en Mi suscripción.",
+  "billingStoreDeletionNotice": "Eliminar tu cuenta de Histae no cancela una suscripción de App Store o Google Play. Gestiona o cancela la suscripción en su tienda antes de eliminar la cuenta.",
+  "accountIdentifierTitle": "Identificador de mi cuenta",
+  "accountIdentifierCopy": "Copiar mi identificador",
+  "accountIdentifierCopied": "Identificador copiado",
+  "accountIdentifierCopyFailed": "No se ha podido copiar el identificador"
 }

@@ -1,19 +1,33 @@
-import 'package:url_launcher/url_launcher.dart';
+import 'store_models.dart';
 
-import 'billing_models.dart';
+enum StorePurchaseStatus { pending, purchased, restored, error, canceled }
 
-abstract interface class BillingGateway {
-  Future<bool> open(Uri url, {required bool portal});
+class StorePurchase {
+  const StorePurchase({
+    required this.reference,
+    required this.status,
+    required this.pendingCompletePurchase,
+  });
+  final String reference;
+  final StorePurchaseStatus status;
+  final bool pendingCompletePurchase;
 }
 
-class ExternalBillingGateway implements BillingGateway {
-  @override
-  Future<bool> open(Uri url, {required bool portal}) async {
-    try {
-      stripeUrl(url.toString(), portal: portal);
-      return await launchUrl(url, mode: LaunchMode.externalApplication);
-    } catch (_) {
-      return false;
-    }
-  }
+class StoreOffer {
+  const StoreOffer(this.product, this.price);
+  final StoreProduct product;
+  final String price;
+}
+
+/// Native billing boundary, independent of Flutter purchase SDK objects.
+abstract interface class BillingGateway {
+  StoreProvider get provider;
+  Stream<List<StorePurchase>> get updates;
+  Future<bool> available();
+  Future<List<StoreOffer>> products(List<StoreProduct> products);
+  Future<bool> buy(StoreOffer offer, String accountBinding);
+  String reference(StorePurchase purchase);
+  Future<void> complete(StorePurchase purchase);
+  Future<void> restore();
+  Future<bool> manage(String provider);
 }

@@ -3165,4 +3165,85 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get matchesEmptyTitle => 'No matches yet';
+
+  @override
+  String get billingRestorePurchases => 'Restore my purchases';
+
+  @override
+  String get billingCopyAccountId => 'Copy my account identifier';
+
+  @override
+  String get billingStorePriceUnavailable => 'Store price unavailable';
+
+  @override
+  String get billingStoreManagedWeb =>
+      'This subscription was purchased on the website. Manage it on the Histae website.';
+
+  @override
+  String get billingStorePending =>
+      'Purchase awaiting confirmation from the store.';
+
+  @override
+  String get billingStorePurchaseFailed =>
+      'The purchase cannot be confirmed for this account.';
+
+  @override
+  String get billingStoreVerifying => 'Verifying purchase…';
+
+  @override
+  String get billingStoreApple => 'App Store';
+
+  @override
+  String get billingStoreGoogle => 'Google Play';
+
+  @override
+  String get billingStoreWeb => 'Histae website';
+
+  @override
+  String get billingStoreGrace => 'Payment grace period';
+
+  @override
+  String get billingStoreRevoked => 'Subscription revoked';
+
+  @override
+  String get billingStoreOnHold =>
+      'Subscription on hold due to a payment issue';
+
+  @override
+  String billingStorePricePerMonth(String price) {
+    return '$price per month';
+  }
+
+  @override
+  String billingStorePricePerYear(String price) {
+    return '$price per year';
+  }
+
+  @override
+  String get billingStoreContinue => 'Continue in the store';
+
+  @override
+  String billingStoreConfirm(String price) {
+    return 'Auto-renewing subscription with no free trial: $price. The store will confirm the amount before payment.';
+  }
+
+  @override
+  String get billingStorePriceInSubscription =>
+      'The price of this offer is shown in My subscription.';
+
+  @override
+  String get billingStoreDeletionNotice =>
+      'Deleting your Histae account does not cancel an App Store or Google Play subscription. Manage or cancel that subscription in its store before deleting your account.';
+
+  @override
+  String get accountIdentifierTitle => 'My account ID';
+
+  @override
+  String get accountIdentifierCopy => 'Copy my account ID';
+
+  @override
+  String get accountIdentifierCopied => 'Account ID copied';
+
+  @override
+  String get accountIdentifierCopyFailed => 'Unable to copy the account ID';
 }

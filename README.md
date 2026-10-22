@@ -52,12 +52,8 @@ FIREBASE_IOS_API_KEY=
 FIREBASE_IOS_APP_ID=
 FIREBASE_IOS_BUNDLE_ID=
 
-# Paiements Stripe
+# Achats natifs Google Play / App Store
 BILLING_ENABLED=false
-BILLING_DISTRIBUTION=disabled
-BILLING_SUCCESS_URL=
-BILLING_CANCEL_URL=
-BILLING_PORTAL_RETURN_URL=
 ```
 
 </details>
@@ -66,15 +62,21 @@ BILLING_PORTAL_RETURN_URL=
 
 **Firebase** nécessite les paramètres publics du projet et de l’application native concernée, puis `PUSH_ENABLED=true`. La gestion des appareils enregistrés reste accessible quand les push sont désactivés. L’envoi des notifications se configure séparément côté API et worker.
 
-**Stripe** est actuellement intégré pour Android hors Play Store, avec `BILLING_DISTRIBUTION=android_external` et `BILLING_ENABLED=true`. Les trois URL HTTPS doivent correspondre à celles de l’API ; l’URL de succès doit contenir `{CHECKOUT_SESSION_ID}`. Seule la réponse de l’API confirme les droits Premium. La facturation des versions Play Store/App Store reste à intégrer.
+**Achats natifs** : Android utilise Google Play Billing, iOS utilise StoreKit. Les prix affichés viennent du SDK du store ; les droits Premium appartiennent au compte Histae et sont confirmés par l’API avant finalisation. L’app propose la restauration et ouvre le store d’origine pour la gestion. Aucun essai ni offre d’introduction n’est proposé. Activer `BILLING_ENABLED=true` après configuration des produits et validation sur appareils Sandbox / Play test.
+
+**Stripe** est réservé au site Histae, après connexion par UUID + téléphone + OTP. Un abonnement Stripe existant est indiqué comme géré sur le site, sans bouton de paiement externe dans l’app. Les anciennes variables de distribution et de retour Stripe du `.env` mobile ne sont plus utilisées. Voir le [guide de facturation](../histae-api-rust/docs/store-billing.md) pour les produits, credentials serveur, notifications et étapes d’activation.
 
 ## Fonctionnement
 
-Après connexion par code SMS et validation des documents nécessaires à l’accès au compte, trois onglets donnent accès au **Feed**, aux **Matchs** et au **Profil**. Le profil rassemble les informations personnelles, les réponses, l’aperçu dans le feed, le mode pause et les réglages du compte. Les crédits et les vidéos sont accessibles depuis Matchs ; l’accès Premium ou Mon abonnement se trouve dans le profil.
+Après connexion par code SMS et validation des documents nécessaires à l’accès au compte, trois onglets donnent accès au **Feed**, aux **Matchs** et au **Profil**. Le profil rassemble les informations personnelles, les réponses, l’aperçu dans le feed, le mode pause, l’UUID copiable et les réglages du compte. Les crédits et les vidéos sont accessibles depuis Matchs ; l’accès Premium ou Mon abonnement se trouve dans le profil.
 
 Les trois onglets chargent leurs données au démarrage et conservent leur état pendant la session. Changer d’onglet ou revenir dans l’app réutilise les données ; les gestes et boutons d’actualisation lancent une nouvelle lecture. Les écrans secondaires chargent leurs données à la première ouverture. Les messages restent reçus en direct, et les actions ou événements serveur peuvent déclencher les vérifications nécessaires.
 
 L’API reste l’autorité pour les consentements, matchs, quotas, récompenses et abonnements. Le mode pause est un réglage serveur : sa disponibilité dépend du déploiement de `GET/PATCH /api/users/me/discovery-settings`.
+
+## Identifiant du compte
+
+Dans **Mon compte**, le profil affiche l’UUID du compte authentifié avec sélection du texte et bouton de copie. Le même composant est utilisé dans l’abonnement ; il n’est pas ajouté à l’aperçu public. Les confirmations et erreurs de copie sont traduites dans les quatre langues.
 
 ## Organisation du code
 
@@ -86,6 +88,8 @@ L’API reste l’autorité pour les consentements, matchs, quotas, récompenses
 | `test/` et `tool/` | Tests ciblés et aperçus avec des données simulées. |
 
 Les widgets déclenchent les commandes des contrôleurs et observent leur état avec `ChangeNotifier`. Les repositories possèdent le cache en mémoire et invalident les ressources concernées après une écriture. `SessionController` gère l’authentification ; `SessionRepositories` compose les données privées et leur purge. Les parcours de rencontres, notifications et abonnement partagent le transport temps réel. Voir [ARCHITECTURE.md](ARCHITECTURE.md).
+
+`BillingController` manipule les valeurs immuables et le contrat `BillingGateway`. Seul `NativeBillingGateway` connaît les types et paramètres des SDK Apple/Google. Le dépôt HTTP valide les DTO ; les widgets observent l’état et déclenchent les intentions. Les réponses tardives après déconnexion sont ignorées ; restauration, reprise et événements serveur relisent les droits.
 
 ## Développement et vérifications
 
@@ -109,6 +113,10 @@ Conventions pour les contributions et le travail assisté :
 
 Les tests simulés et une compilation locale ne valident pas les services réels. Les parcours SMS, permissions natives, push, vidéos récompensées et paiements restent à vérifier sur appareils avec les environnements fournisseurs appropriés. La préparation bêta est suivie dans la roadmap.
 
+### Validation de la facturation et du profil — 22 octobre 2026
+
+Analyse Flutter sans problème et **236 tests réussis** avec fournisseurs simulés, dont vérification avant finalisation, restauration, changement de compte, copie à 200 % dans les quatre langues, profil dégradé, logout et parcours vidéo. Aucun SMS ni paiement réel. Les builds Android/iOS et achats réels restent à valider sur les appareils prévus ; les tests ont utilisé un SDK Flutter temporaire sur le poste de développement.
+
 ## Documentation
 
 | Document | Contenu |
@@ -120,6 +128,7 @@ Les tests simulés et une compilation locale ne valident pas les services réels
 | [Traductions](lib/core/l10n/README.md) | Contribution aux catalogues ARB et génération. |
 | [Langues et API](docs/api-languages.md) | Préférences de langue, documents et reprises réseau. |
 | [Contrat HTTP](../histae-api-rust/docs/http-contract.md) | Routes et contrats de l’API Rust de référence. |
+| [Achats multicanaux](../histae-api-rust/docs/store-billing.md) | Achats natifs, paiement sur le site et activation. |
 | [Développement API](../histae-api-rust/docs/development.md) | Installation et lancement du backend. |
 
 ## Licence

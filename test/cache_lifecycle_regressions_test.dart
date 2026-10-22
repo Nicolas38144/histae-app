@@ -164,7 +164,6 @@ void main() {
       final billing = BillingController(
         BillingRepository(session),
         testBillingConfig,
-        MemoryCheckoutVault(),
         FakeBillingGateway(),
         realtime: repositories.realtime.channel(),
       );

@@ -12,10 +12,12 @@ class PlanCard extends StatelessWidget {
     required this.plan,
     required this.offer,
     this.action,
+    this.priceLabel,
   });
   final SubscriptionPlan plan;
   final SubscriptionOffer offer;
   final Widget? action;
+  final String? priceLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -78,17 +80,21 @@ class PlanCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              Text(switch (offer.billingPeriod) {
-                BillingPeriod.monthly => strings.monthly(
-                  offer.priceCents,
-                  offer.currency,
-                ),
-                BillingPeriod.annual => strings.annual(
-                  offer.priceCents,
-                  offer.currency,
-                ),
-                null => strings.money(offer.priceCents, offer.currency),
-              }, style: theme.textTheme.headlineSmall),
+              Text(
+                priceLabel ??
+                    switch (offer.billingPeriod) {
+                      BillingPeriod.monthly => strings.monthly(
+                        offer.priceCents,
+                        offer.currency,
+                      ),
+                      BillingPeriod.annual => strings.annual(
+                        offer.priceCents,
+                        offer.currency,
+                      ),
+                      null => strings.money(offer.priceCents, offer.currency),
+                    },
+                style: theme.textTheme.headlineSmall,
+              ),
               const SizedBox(height: 6),
               Text(
                 switch (offer.billingPeriod) {
@@ -106,7 +112,8 @@ class PlanCard extends StatelessWidget {
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
-              if (offer.billingPeriod == BillingPeriod.annual) ...[
+              if (offer.billingPeriod == BillingPeriod.annual &&
+                  priceLabel == null) ...[
                 const SizedBox(height: 6),
                 Text(
                   AppStrings.of(context).messages.planCardEquivalentToAbout(

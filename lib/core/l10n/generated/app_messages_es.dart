@@ -3197,4 +3197,86 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get matchesEmptyTitle => 'Aún no hay encuentros';
+
+  @override
+  String get billingRestorePurchases => 'Restaurar mis compras';
+
+  @override
+  String get billingCopyAccountId => 'Copiar mi identificador de cuenta';
+
+  @override
+  String get billingStorePriceUnavailable => 'Precio del store no disponible';
+
+  @override
+  String get billingStoreManagedWeb =>
+      'Esta suscripción se compró en el sitio web. Gestiónala en el sitio de Histae.';
+
+  @override
+  String get billingStorePending =>
+      'Compra pendiente de confirmación del store.';
+
+  @override
+  String get billingStorePurchaseFailed =>
+      'No se puede confirmar la compra para esta cuenta.';
+
+  @override
+  String get billingStoreVerifying => 'Verificando la compra…';
+
+  @override
+  String get billingStoreApple => 'App Store';
+
+  @override
+  String get billingStoreGoogle => 'Google Play';
+
+  @override
+  String get billingStoreWeb => 'Sitio web de Histae';
+
+  @override
+  String get billingStoreGrace => 'Periodo de gracia del pago';
+
+  @override
+  String get billingStoreRevoked => 'Suscripción revocada';
+
+  @override
+  String get billingStoreOnHold =>
+      'Suscripción suspendida por un problema de pago';
+
+  @override
+  String billingStorePricePerMonth(String price) {
+    return '$price al mes';
+  }
+
+  @override
+  String billingStorePricePerYear(String price) {
+    return '$price al año';
+  }
+
+  @override
+  String get billingStoreContinue => 'Continuar en el store';
+
+  @override
+  String billingStoreConfirm(String price) {
+    return 'Suscripción con renovación automática y sin prueba gratuita: $price. El store confirmará el importe antes del pago.';
+  }
+
+  @override
+  String get billingStorePriceInSubscription =>
+      'El precio de esta oferta aparece en Mi suscripción.';
+
+  @override
+  String get billingStoreDeletionNotice =>
+      'Eliminar tu cuenta de Histae no cancela una suscripción de App Store o Google Play. Gestiona o cancela la suscripción en su tienda antes de eliminar la cuenta.';
+
+  @override
+  String get accountIdentifierTitle => 'Identificador de mi cuenta';
+
+  @override
+  String get accountIdentifierCopy => 'Copiar mi identificador';
+
+  @override
+  String get accountIdentifierCopied => 'Identificador copiado';
+
+  @override
+  String get accountIdentifierCopyFailed =>
+      'No se ha podido copiar el identificador';
 }

@@ -66,8 +66,7 @@ void main() {
     final billing = BillingController(
       BillingRepository(session),
       testBillingConfig,
-      MemoryCheckoutVault(),
-      FakeBillingGateway(),
+        FakeBillingGateway(),
       realtime: QuietRealtime(session),
     );
     final catalog = CatalogRepository(

@@ -16,6 +16,11 @@ class BillingStrings {
     'canceled' => strings.messages.billingStringsSubscriptionCanceled,
     'unpaid' => strings.messages.billingStringsUnpaid,
     'paused' => strings.messages.billingStringsSubscriptionPaused,
+    'pending' => strings.messages.billingStorePending,
+    'grace_period' => strings.messages.billingStoreGrace,
+    'expired' => strings.messages.billingStringsSubscriptionExpired,
+    'revoked' => strings.messages.billingStoreRevoked,
+    'on_hold' => strings.messages.billingStoreOnHold,
     _ => strings.messages.billingStringsYourCurrentPlan,
   };
 
@@ -32,6 +37,10 @@ class BillingStrings {
   };
 
   String error(ApiFailure e) => switch (e.code) {
+    'store_purchase_account_conflict' ||
+    'invalid_store_purchase' => strings.messages.billingStorePurchaseFailed,
+    'store_unavailable' || 'store_purchase_failed' =>
+      strings.messages.billingStringsPaymentIsTemporarilyUnavailableYourAttempt,
     'subscription_already_active' =>
       strings.messages.billingStringsASubscriptionAlreadyExistsRefreshYour,
     'checkout_already_in_progress' =>

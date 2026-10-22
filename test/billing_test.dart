@@ -1,78 +1,60 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:histae_app/core/config/app_config.dart';
 import 'package:histae_app/core/config/billing_config.dart';
 import 'package:histae_app/core/network/api_failure.dart';
 import 'package:histae_app/features/billing/application/billing_controller.dart';
+import 'package:histae_app/features/billing/data/billing_gateway.dart';
 import 'package:histae_app/features/billing/data/billing_models.dart';
 import 'package:histae_app/features/billing/data/billing_repository.dart';
-import 'package:histae_app/features/billing/data/checkout_vault.dart';
-import 'package:histae_app/features/matches/data/realtime_client.dart';
+import 'package:histae_app/features/billing/data/store_models.dart';
 import 'package:http/http.dart' as http;
 
 import 'support/auth_fixture.dart';
 import 'support/billing_fixture.dart';
 import 'support/matches_fixture.dart';
 
+Future<void> flush() async {
+  for (var i = 0; i < 8; i++) {
+    await Future<void>.delayed(Duration.zero);
+  }
+}
+
 void main() {
   setUp(() => debugDefaultTargetPlatformOverride = TargetPlatform.android);
   tearDown(() => debugDefaultTargetPlatformOverride = null);
-  test('public deployment gate is default off, Android external only and requires complete HTTPS return configuration', () {
-    expect(
-      AppConfig.fromDotEnv(
-        'APP_ENV=production\nAPI_BASE_URL=https://api.example',
-        isDebug: false,
-      ).billing.available,
-      isFalse,
-    );
+  test('native billing is opt-in on Android and iOS only', () {
+    expect(const BillingConfig().available, isFalse);
     expect(testBillingConfig.available, isTrue);
-    expect(testBillingConfig.allows(TargetPlatform.iOS), isFalse);
+    expect(testBillingConfig.allows(TargetPlatform.iOS), isTrue);
     expect(
       testBillingConfig.allows(TargetPlatform.android, web: true),
       isFalse,
     );
-    expect(
-      () => BillingConfig.fromValues({'BILLING_ENABLED': 'true'}),
-      throwsFormatException,
-    );
-    expect(
-      () => BillingConfig.fromValues({
-        'BILLING_CANCEL_URL': 'http://return.example',
-      }),
-      throwsFormatException,
-    );
-    expect(
-      () => AppConfig.fromDotEnv(
-        'APP_ENV=production\nAPI_BASE_URL=https://api.example\nSTRIPE_SECRET_KEY=secret',
-        isDebug: false,
-      ),
-      throwsFormatException,
-    );
+    expect(testBillingConfig.allows(TargetPlatform.linux), isFalse);
   });
-  test('access comes from effective API plan, never from status or launch; dates and nullable provider support administrative access', () {
+  test('effective access is never inferred from native status; invalid owner binding is rejected', () {
+    for (final provider in ['stripe', 'app_store', 'google_play']) {
+      expect(
+        SubscriptionState.fromJson(
+          subscriptionJson(status: 'active', provider: provider),
+        ).accessGranted,
+        isFalse,
+      );
+      expect(
+        SubscriptionState.fromJson(
+          subscriptionJson(status: 'active', provider: provider, access: true),
+        ).accessGranted,
+        isTrue,
+      );
+    }
     expect(
-      SubscriptionState.fromJson(subscriptionJson(status: 'active'))
-          .accessGranted,
-      isFalse,
-    );
-    expect(
-      SubscriptionState.fromJson(
-        subscriptionJson(access: true, status: 'past_due'),
-      ).accessGranted,
-      isTrue,
-    );
-    expect(
-      SubscriptionState.fromJson(subscriptionJson(access: true)).provider,
-      isNull,
-    );
-    expect(
-      SubscriptionState.fromJson(subscriptionJson(status: 'canceled'))
-          .canceledAt,
-      isNotNull,
+      () => StoreIntent.fromJson({
+        ...storeIntentJson(),
+        'account_binding': testUser,
+      }),
+      throwsA(isA<ApiFailure>()),
     );
     expect(
       () => SubscriptionState.fromJson({
@@ -81,130 +63,72 @@ void main() {
       }),
       throwsA(isA<ApiFailure>()),
     );
-    expect(
-      () => SubscriptionState.fromJson({
-        ...subscriptionJson(),
-        'trial_ends_at': '2026-10-20',
-      }),
-      throwsA(isA<ApiFailure>()),
-    );
-    for (final url in [
-      'https://checkout.stripe.com.evil.example/c/pay/x',
-      'https://user@checkout.stripe.com/c/pay/x',
-      'http://checkout.stripe.com/c/pay/x',
-      'https://checkout.stripe.com:444/c/pay/x',
-      'histae://success',
-    ]) {
-      expect(
-        () => CheckoutLink.fromJson(checkoutJson(url: url)),
-        throwsA(isA<ApiFailure>()),
-      );
-    }
   });
-  test('disabled billing permits authenticated subscription reads but sends no checkout or portal POST', () async {
-    final calls = <http.Request>[];
+  test('purchase requires intent, prevents double taps and verifies server before finishing', () async {
+    final calls = <String>[];
+    final verification = Completer<http.Response>();
+    var premium = false;
     final session = testSession((r) async {
-      calls.add(r);
+      calls.add(r.url.path);
+      if (r.url.path.endsWith('/purchase-intents')) {
+        return jsonResponse(storeIntentJson());
+      }
+      if (r.url.path.endsWith('/google-play/verify')) {
+        return verification.future;
+      }
+      if (r.url.path == '/api/billing/store-products') {
+        return jsonResponse(storeProductsJson());
+      }
       if (r.url.path == '/api/users/me/subscription') {
-        return jsonResponse(subscriptionJson(portal: true));
+        return jsonResponse(
+          subscriptionJson(access: premium, status: premium ? 'active' : null),
+        );
       }
       return defaultAuthResponse(r, complete: true);
     });
     addTearDown(session.dispose);
     await session.establish(testTokens);
+    final gateway = FakeBillingGateway();
+    addTearDown(gateway.stream.close);
     final c = BillingController(
       BillingRepository(session),
-      const BillingConfig(),
-      MemoryCheckoutVault(),
-      FakeBillingGateway(),
+      testBillingConfig,
+      gateway,
       realtime: QuietRealtime(session),
     );
     addTearDown(c.dispose);
     await c.activate();
-    expect(c.fresh, isTrue);
+    expect(c.paymentsAvailable, isTrue);
     await c.checkout(BillingPeriod.monthly);
-    await c.portal();
+    await c.checkout(BillingPeriod.annual);
+    expect(gateway.bought, hasLength(1));
+    expect(c.subscription!.accessGranted, isFalse);
+    gateway.stream.add([storePurchase()]);
+    await flush();
+    expect(gateway.completed, isEmpty);
+    expect(calls, contains('/api/users/me/subscription/google-play/verify'));
+    premium = true;
+    verification.complete(http.Response('', 204));
+    await flush();
+    expect(gateway.completed, hasLength(1));
+    expect(c.subscription!.accessGranted, isTrue);
     expect(
       calls.where(
-        (r) => r.url.path.contains('/subscription') && r.method == 'POST',
+        (path) => path.endsWith('/checkout') || path.endsWith('/portal'),
       ),
       isEmpty,
     );
-    expect(
-      calls.last.headers['Authorization'],
-      'Bearer ${testTokens.accessToken}',
-    );
   });
-  test('durable immutable intent prevents double taps, survives lost response and restart, and only GET confirms access', () async {
-    final posts = <http.Request>[];
-    final response = Completer<http.Response>();
-    var premium = false;
-    final vault = MemoryCheckoutVault(), browser = FakeBillingGateway();
+  test('unverified purchases stay unfinished; restore can retry without buying again', () async {
+    var unavailable = true;
     final session = testSession((r) async {
-      if (r.url.path.endsWith('/checkout')) {
-        expect(vault.raw, isNotNull);
-        posts.add(r);
-        if (posts.length == 1) return response.future;
-        return jsonResponse(checkoutJson(), 201);
+      if (r.url.path.endsWith('/google-play/verify')) {
+        return unavailable
+            ? apiError(503, 'store_unavailable')
+            : http.Response('', 204);
       }
-      if (r.url.path == '/api/users/me/subscription') {
-        return jsonResponse(
-          subscriptionJson(
-            access: premium,
-            status: premium ? 'trialing' : null,
-          ),
-        );
-      }
-      return defaultAuthResponse(r, complete: true);
-    });
-    addTearDown(session.dispose);
-    await session.establish(testTokens);
-    BillingController make() => BillingController(
-      BillingRepository(session),
-      testBillingConfig,
-      vault,
-      browser,
-      realtime: QuietRealtime(session),
-    );
-    var c = make();
-    await c.activate();
-    final first = c.checkout(BillingPeriod.monthly);
-    await Future<void>.delayed(Duration.zero);
-    await c.checkout(BillingPeriod.annual);
-    expect(posts, hasLength(1));
-    response.completeError(const SocketException('Synthetic response lost'));
-    await first;
-    final key = c.pending!.key;
-    expect(jsonDecode(posts.single.body), {'billing_period': 'monthly'});
-    expect(vault.raw, isNot(contains('stripe')));
-    c.dispose();
-    c = make();
-    addTearDown(c.dispose);
-    await c.activate();
-    expect(c.pending!.key, key);
-    await c.checkout(BillingPeriod.annual);
-    expect(posts, hasLength(1));
-    await c.checkout(BillingPeriod.monthly);
-    expect(posts.last.headers['Idempotency-Key'], key);
-    expect(browser.opened, hasLength(1));
-    expect(c.subscription!.accessGranted, isFalse);
-    c.suspend();
-    premium = true;
-    await c.resume();
-    expect(c.subscription!.accessGranted, isTrue);
-    expect(c.pending, isNull);
-    expect(vault.raw, '{}');
-  });
-  test('secure storage failure blocks POST and invalid hosted URL never opens a browser; explicit retry retains key', () async {
-    var count = 0;
-    final vault = MemoryCheckoutVault(), browser = FakeBillingGateway();
-    final session = testSession((r) async {
-      if (r.url.path.endsWith('/checkout')) {
-        count++;
-        return jsonResponse(
-          checkoutJson(url: 'https://untrusted.example/pay'),
-          201,
-        );
+      if (r.url.path == '/api/billing/store-products') {
+        return jsonResponse(storeProductsJson());
       }
       if (r.url.path == '/api/users/me/subscription') {
         return jsonResponse(subscriptionJson());
@@ -213,70 +137,35 @@ void main() {
     });
     addTearDown(session.dispose);
     await session.establish(testTokens);
+    final gateway = FakeBillingGateway();
+    addTearDown(gateway.stream.close);
     final c = BillingController(
       BillingRepository(session),
       testBillingConfig,
-      vault,
-      browser,
+      gateway,
       realtime: QuietRealtime(session),
     );
     addTearDown(c.dispose);
     await c.activate();
-    vault.fail = true;
-    await c.checkout(BillingPeriod.annual);
-    expect(count, 0);
-    final key = c.pending!.key;
-    vault.fail = false;
-    await c.checkout(BillingPeriod.annual);
-    expect(c.pending!.key, key);
-    expect(c.failure!.kind, ApiFailureKind.invalidResponse);
-    expect(browser.opened, isEmpty);
+    gateway.stream.add([storePurchase()]);
+    await flush();
+    expect(gateway.completed, isEmpty);
+    expect(c.failure, isNotNull);
+    unavailable = false;
+    await c.restorePurchases();
+    await flush();
+    expect(gateway.completed, hasLength(1));
+    expect(gateway.bought, isEmpty);
   });
-  test('server consumed key requires entitlement reread before another intent; Retry-After blocks every billing mutation', () async {
-    final posts = <http.Request>[];
-    var consumed = true;
+  test('late verification after logout cannot finish purchase or restore old account state', () async {
+    final verification = Completer<http.Response>();
     final session = testSession((r) async {
-      if (r.url.path.endsWith('/checkout')) {
-        posts.add(r);
-        return consumed
-            ? apiError(409, 'idempotency_key_consumed')
-            : apiError(429, 'billing_rate_limit_exceeded', retryAfter: '60');
+      if (r.url.path.endsWith('/google-play/verify')) {
+        return verification.future;
       }
-      if (r.url.path == '/api/users/me/subscription') {
-        return jsonResponse(subscriptionJson(portal: true));
+      if (r.url.path == '/api/billing/store-products') {
+        return jsonResponse(storeProductsJson());
       }
-      return defaultAuthResponse(r, complete: true);
-    });
-    addTearDown(session.dispose);
-    await session.establish(testTokens);
-    final c = BillingController(
-      BillingRepository(session),
-      testBillingConfig,
-      MemoryCheckoutVault(),
-      FakeBillingGateway(),
-      realtime: QuietRealtime(session),
-    );
-    addTearDown(c.dispose);
-    await c.activate();
-    await c.checkout(BillingPeriod.monthly);
-    expect(c.pending, isNull);
-    expect(c.notice, 'attempt_closed');
-    consumed = false;
-    await c.checkout(BillingPeriod.annual);
-    expect(
-      posts[0].headers['Idempotency-Key'],
-      isNot(posts[1].headers['Idempotency-Key']),
-    );
-    expect(c.retrySeconds, greaterThan(0));
-    await c.checkout(BillingPeriod.annual);
-    await c.portal();
-    expect(posts, hasLength(2));
-  });
-  test('logout purges subscription and intent, ignores late checkout, and never restores another owner intent', () async {
-    final response = Completer<http.Response>();
-    final vault = MemoryCheckoutVault(), browser = FakeBillingGateway();
-    final session = testSession((r) async {
-      if (r.url.path.endsWith('/checkout')) return response.future;
       if (r.url.path == '/api/users/me/subscription') {
         return jsonResponse(subscriptionJson());
       }
@@ -284,143 +173,58 @@ void main() {
     });
     addTearDown(session.dispose);
     await session.establish(testTokens);
+    final gateway = FakeBillingGateway();
+    addTearDown(gateway.stream.close);
     final c = BillingController(
       BillingRepository(session),
       testBillingConfig,
-      vault,
-      browser,
+      gateway,
       realtime: QuietRealtime(session),
     );
     addTearDown(c.dispose);
     await c.activate();
-    final task = c.checkout(BillingPeriod.monthly);
-    await Future<void>.delayed(Duration.zero);
+    gateway.stream.add([storePurchase()]);
+    await flush();
     await session.logout();
-    response.complete(jsonResponse(checkoutJson(), 201));
-    await task;
-    await Future<void>.delayed(Duration.zero);
-    expect(c.pending, isNull);
+    verification.complete(http.Response('', 204));
+    await flush();
+    expect(gateway.completed, isEmpty);
     expect(c.subscription, isNull);
-    expect(vault.raw, '{}');
-    expect(browser.opened, isEmpty);
-    vault.raw = CheckoutAttempt.create(
-      'https://api.example',
-      '22222222-2222-4222-8222-222222222222',
-      BillingPeriod.annual,
-    ).encode();
-    await session.establish(testTokens);
-    await c.activate();
-    expect(c.pending, isNull);
-    expect(vault.raw, '{}');
   });
-  test('subscription events invalidate and reread status; portal uses no body or amount and does not grant access', () async {
-    final calls = <http.Request>[];
-    var state = subscriptionJson(
-      status: 'past_due',
-      access: true,
-      portal: true,
-    );
-    final session = testSession((r) async {
-      calls.add(r);
-      if (r.url.path.endsWith('/portal')) {
-        return jsonResponse({
-          'url': 'https://billing.stripe.com/p/session/synthetic',
-        }, 201);
-      }
-      if (r.url.path == '/api/users/me/subscription') {
-        return jsonResponse(state);
-      }
-      return defaultAuthResponse(r, complete: true);
-    });
-    addTearDown(session.dispose);
-    await session.establish(testTokens);
-    final realtime = QuietRealtime(session), browser = FakeBillingGateway();
-    final c = BillingController(
-      BillingRepository(session),
-      testBillingConfig,
-      MemoryCheckoutVault(),
-      browser,
-      realtime: realtime,
-    );
-    addTearDown(c.dispose);
-    await c.activate();
-    await c.portal();
-    expect(calls.last.body, isEmpty);
-    expect(browser.opened.single.host, 'billing.stripe.com');
-    state = subscriptionJson(status: 'canceled', portal: true);
-    realtime.emit(const MobileSignal('subscription.updated'));
-    await Future<void>.delayed(Duration.zero);
-    expect(c.subscription!.accessGranted, isFalse);
-    expect(c.subscription!.status, 'canceled');
-  });
-  test('returning from an opened portal verifies once; later focus changes reuse the subscription', () async {
-    var reads = 0;
-    final session = testSession((r) async {
-      if (r.url.path.endsWith('/portal')) {
-        return jsonResponse({
-          'url': 'https://billing.stripe.com/p/session/synthetic',
-        }, 201);
-      }
-      if (r.url.path == '/api/users/me/subscription') {
-        reads++;
-        return jsonResponse(subscriptionJson(portal: true));
-      }
-      return defaultAuthResponse(r, complete: true);
-    });
-    addTearDown(session.dispose);
-    await session.establish(testTokens);
-    final c = BillingController(
-      BillingRepository(session),
-      testBillingConfig,
-      MemoryCheckoutVault(),
-      FakeBillingGateway(),
-      realtime: QuietRealtime(session),
-    );
-    addTearDown(c.dispose);
-    await c.activate();
-    expect(reads, 1);
-    await c.portal();
-    c.suspend();
-    await c.resume();
-    expect(reads, 2);
-    c.suspend();
-    await c.resume();
-    expect(reads, 2);
-  });
-
-  testWidgets(
-    'a cached subscription rearms its original access deadline after suspension',
-    (tester) async {
-      debugDefaultTargetPlatformOverride = null;
-      var reads = 0;
-      final end = DateTime.now().toUtc().add(const Duration(minutes: 1));
+  test(
+    'pending and canceled purchases never call verification or finish',
+    () async {
+      final calls = <String>[];
       final session = testSession((r) async {
+        calls.add(r.url.path);
+        if (r.url.path == '/api/billing/store-products') {
+          return jsonResponse(storeProductsJson());
+        }
         if (r.url.path == '/api/users/me/subscription') {
-          reads++;
-          return jsonResponse({
-            ...subscriptionJson(access: true),
-            'current_period_ends_at': end.toIso8601String(),
-          });
+          return jsonResponse(subscriptionJson());
         }
         return defaultAuthResponse(r, complete: true);
       });
+      addTearDown(session.dispose);
       await session.establish(testTokens);
+      final gateway = FakeBillingGateway();
+      addTearDown(gateway.stream.close);
       final c = BillingController(
         BillingRepository(session),
         testBillingConfig,
-        MemoryCheckoutVault(),
-        FakeBillingGateway(),
+        gateway,
         realtime: QuietRealtime(session),
       );
+      addTearDown(c.dispose);
       await c.activate();
-      expect(c.fresh, isTrue);
-      c.suspend();
-      await c.activate();
-      expect(reads, 1);
-      await tester.pump(const Duration(seconds: 61));
-      expect(c.fresh, isFalse);
-      c.dispose();
-      session.dispose();
+      gateway.stream.add([storePurchase(status: StorePurchaseStatus.pending)]);
+      await flush();
+      expect(c.purchasePending, isTrue);
+      gateway.stream.add([storePurchase(status: StorePurchaseStatus.canceled)]);
+      await flush();
+      expect(c.purchasePending, isFalse);
+      expect(calls.where((path) => path.endsWith('/verify')), isEmpty);
+      expect(gateway.completed, isEmpty);
     },
   );
 }

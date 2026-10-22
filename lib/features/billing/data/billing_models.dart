@@ -11,7 +11,7 @@ class SubscriptionState {
     status = _nullable(j, 'status');
     final period = _nullable(j, 'billing_period');
     if (!['free', 'premium'].contains(plan) ||
-        ![null, 'stripe'].contains(provider) ||
+        ![null, 'stripe', 'app_store', 'google_play'].contains(provider) ||
         ![
           null,
           'incomplete',
@@ -22,6 +22,11 @@ class SubscriptionState {
           'canceled',
           'unpaid',
           'paused',
+          'pending',
+          'grace_period',
+          'on_hold',
+          'expired',
+          'revoked',
         ].contains(status) ||
         ![null, 'monthly', 'annual'].contains(period)) {
       _invalid();
@@ -56,33 +61,3 @@ String? _nullable(Map<String, dynamic> j, String key) {
 }
 
 Never _invalid() => throw const ApiFailure(ApiFailureKind.invalidResponse);
-
-Uri stripeUrl(Object? raw, {required bool portal}) {
-  if (raw is! String || raw.length > 8192) _invalid();
-  final u = Uri.tryParse(raw);
-  if (u == null ||
-      u.scheme != 'https' ||
-      u.userInfo.isNotEmpty ||
-      u.hasFragment ||
-      (u.hasPort && u.port != 443) ||
-      u.host != (portal ? 'billing.stripe.com' : 'checkout.stripe.com') ||
-      u.path.isEmpty ||
-      u.path == '/') {
-    _invalid();
-  }
-  return u;
-}
-
-class CheckoutLink {
-  CheckoutLink.fromJson(Object? value) {
-    final j = jsonObject(value);
-    jsonString(j, 'session_id'); // Not stored or used as entitlement proof.
-    url = stripeUrl(j['url'], portal: false);
-    expiresAt = wireTime(j['expires_at']);
-  }
-  late final Uri url;
-  late final DateTime expiresAt;
-
-  @override
-  String toString() => 'CheckoutLink(redacted)';
-}

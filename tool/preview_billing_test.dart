@@ -69,8 +69,11 @@ void main() {
       addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
       var state = subscriptionJson();
       final session = testSession((r) async {
-        if (r.url.path.endsWith('/checkout')) {
+        if (r.url.path.endsWith('/purchase-intents')) {
           throw const SocketException('Synthetic lost response');
+        }
+        if (r.url.path == '/api/billing/store-products') {
+          return jsonResponse(storeProductsJson());
         }
         if (r.url.path == '/api/users/me/subscription') {
           return jsonResponse(state);
@@ -111,7 +114,6 @@ void main() {
       var c = BillingController(
         BillingRepository(session),
         const BillingConfig(),
-        MemoryCheckoutVault(),
         FakeBillingGateway(),
         realtime: QuietRealtime(session),
       );
@@ -137,7 +139,6 @@ void main() {
       c = BillingController(
         BillingRepository(session),
         testBillingConfig,
-        MemoryCheckoutVault(),
         FakeBillingGateway(),
         realtime: QuietRealtime(session),
       );
@@ -146,37 +147,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Choisir Premium Annuel'));
       await screenshot('subscription-confirmation');
-      await tester.tap(find.text('Continuer dans le navigateur'));
-      await tester.pumpAndSettle();
-      await tester.drag(find.byType(ListView).first, const Offset(0, 2000));
-      await tester.scrollUntilVisible(
-        find.textContaining('Une tentative annuelle'),
-        100,
-      );
-      await tester.pumpAndSettle();
-      await Scrollable.ensureVisible(
-        tester.element(find.textContaining('Une tentative annuelle')),
-        alignment: .5,
-      );
-      await screenshot('subscription-pending');
-      tester.view.physicalSize = const Size(320, 640);
-      tester.platformDispatcher.textScaleFactorTestValue = 1.6;
-      await tester.pumpAndSettle();
-      tester
-          .state<ScrollableState>(find.byType(Scrollable).first)
-          .position
-          .jumpTo(0);
-      await tester.pumpAndSettle();
-      await tester.scrollUntilVisible(
-        find.textContaining('Une tentative annuelle'),
-        150,
-      );
-      await tester.pumpAndSettle();
-      await Scrollable.ensureVisible(
-        tester.element(find.textContaining('Une tentative annuelle')),
-        alignment: .4,
-      );
-      await screenshot('subscription-accessible');
+      await tester.tap(find.text('Plus tard'));
       await tester.pumpWidget(const SizedBox());
       c.dispose();
       catalog.close();
