@@ -1,0 +1,957 @@
+{
+  "reviewed_on": "2026-10-23",
+  "repository": "histae-app",
+  "scope": "Declared licenses of resolved packages, including build/test and optional platforms; not a release SBOM or full license-text bundle.",
+  "limitations": [
+    "Registry metadata and local license inspection are not a certification of compliance.",
+    "Native SDKs, complete container contents, model weights and historical grants require separate review.",
+    "Python inventory covers direct pinned requirements only."
+  ],
+  "packages": [
+    {
+      "name": "_fe_analyzer_shared",
+      "version": "96.0.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "_flutterfire_internals",
+      "version": "1.3.78",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "analyzer",
+      "version": "10.2.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "args",
+      "version": "2.7.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "async",
+      "version": "2.13.1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "boolean_selector",
+      "version": "2.1.2",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "characters",
+      "version": "1.4.1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "clock",
+      "version": "1.1.3",
+      "license": "Apache-2.0",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "code_assets",
+      "version": "2.1.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "collection",
+      "version": "1.19.1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "convert",
+      "version": "3.1.2",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "cross_file",
+      "version": "0.3.5+5",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "crypto",
+      "version": "3.0.7",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "cupertino_icons",
+      "version": "2.0.0",
+      "license": "MIT",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "dbus",
+      "version": "0.7.15",
+      "license": "MPL-2.0",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "fake_async",
+      "version": "1.3.3",
+      "license": "Apache-2.0",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "ffi",
+      "version": "2.2.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "ffi_leak_tracker",
+      "version": "0.1.2",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "file",
+      "version": "7.0.1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "file_selector_linux",
+      "version": "0.9.4+1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "file_selector_macos",
+      "version": "0.9.5+1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "file_selector_platform_interface",
+      "version": "2.7.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "file_selector_windows",
+      "version": "0.9.3+6",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "firebase_core",
+      "version": "5.0.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "firebase_core_platform_interface",
+      "version": "8.1.1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "firebase_core_web",
+      "version": "4.0.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "firebase_messaging",
+      "version": "17.0.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "firebase_messaging_platform_interface",
+      "version": "4.11.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "firebase_messaging_web",
+      "version": "4.3.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "fixnum",
+      "version": "1.1.1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "flutter",
+      "version": "SDK",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "flutter_image_compress",
+      "version": "2.5.1",
+      "license": "MIT",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "flutter_image_compress_common",
+      "version": "1.1.1",
+      "license": "MIT",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "flutter_image_compress_macos",
+      "version": "1.1.0",
+      "license": "MIT",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "flutter_image_compress_ohos",
+      "version": "0.0.3+1",
+      "license": "MIT",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "flutter_image_compress_platform_interface",
+      "version": "1.1.0",
+      "license": "MIT",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "flutter_image_compress_web",
+      "version": "0.1.5+1",
+      "license": "MIT",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "flutter_lints",
+      "version": "6.0.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "flutter_localizations",
+      "version": "SDK",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "flutter_plugin_android_lifecycle",
+      "version": "2.0.35",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "flutter_secure_storage",
+      "version": "11.2.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "flutter_secure_storage_darwin",
+      "version": "0.4.3",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "flutter_secure_storage_linux",
+      "version": "3.0.3",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "flutter_secure_storage_platform_interface",
+      "version": "2.1.1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "flutter_secure_storage_web",
+      "version": "2.1.1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "flutter_secure_storage_windows",
+      "version": "4.2.2",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "flutter_test",
+      "version": "SDK",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "flutter_web_plugins",
+      "version": "SDK",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "geoclue",
+      "version": "0.1.1",
+      "license": "MPL-2.0",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "geolocator",
+      "version": "14.1.1",
+      "license": "MIT",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "geolocator_android",
+      "version": "5.1.1+1",
+      "license": "MIT",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "geolocator_apple",
+      "version": "2.3.15",
+      "license": "MIT",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "geolocator_linux",
+      "version": "0.2.6",
+      "license": "MIT",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "geolocator_platform_interface",
+      "version": "4.4.0",
+      "license": "MIT",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "geolocator_web",
+      "version": "4.1.4",
+      "license": "MIT",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "geolocator_windows",
+      "version": "0.2.5",
+      "license": "MIT",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "glob",
+      "version": "2.2.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "google_mobile_ads",
+      "version": "9.1.0",
+      "license": "Apache-2.0",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "gsettings",
+      "version": "0.2.8",
+      "license": "MPL-2.0",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "hooks",
+      "version": "2.2.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "http",
+      "version": "1.6.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "http_parser",
+      "version": "4.1.2",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "image_picker",
+      "version": "1.2.4",
+      "license": "Apache-2.0",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "image_picker_android",
+      "version": "0.8.13+25",
+      "license": "Apache-2.0",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "image_picker_for_web",
+      "version": "3.1.1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "image_picker_ios",
+      "version": "0.8.13+12",
+      "license": "Apache-2.0",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "image_picker_linux",
+      "version": "0.2.2",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "image_picker_macos",
+      "version": "0.2.2+1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "image_picker_platform_interface",
+      "version": "2.11.2",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "image_picker_windows",
+      "version": "0.2.2",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "in_app_purchase",
+      "version": "3.3.1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "in_app_purchase_android",
+      "version": "0.5.5",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "in_app_purchase_platform_interface",
+      "version": "1.4.1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "in_app_purchase_storekit",
+      "version": "0.4.15",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "intl",
+      "version": "0.20.3",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "jni",
+      "version": "1.1.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "jni_flutter",
+      "version": "1.0.4+1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "jni_util",
+      "version": "1.0.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "json_annotation",
+      "version": "4.12.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "leak_tracker",
+      "version": "11.0.2",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "leak_tracker_flutter_testing",
+      "version": "3.0.10",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "leak_tracker_testing",
+      "version": "3.0.2",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "lints",
+      "version": "6.1.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "logging",
+      "version": "1.3.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "matcher",
+      "version": "0.12.20",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "material_color_utilities",
+      "version": "0.13.0",
+      "license": "Apache-2.0",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "meta",
+      "version": "1.19.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "mime",
+      "version": "2.1.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "objective_c",
+      "version": "9.6.2",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "package_config",
+      "version": "2.2.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "package_info_plus",
+      "version": "10.2.2",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "package_info_plus_platform_interface",
+      "version": "4.1.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "path",
+      "version": "1.9.1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "path_provider",
+      "version": "2.1.6",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "path_provider_android",
+      "version": "2.3.1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "path_provider_foundation",
+      "version": "2.6.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "path_provider_linux",
+      "version": "2.2.2",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "path_provider_platform_interface",
+      "version": "2.1.3",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "path_provider_windows",
+      "version": "2.3.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "petitparser",
+      "version": "7.1.0",
+      "license": "MIT",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "platform",
+      "version": "3.2.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "plugin_platform_interface",
+      "version": "2.1.8",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "pub_semver",
+      "version": "2.2.1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "record_use",
+      "version": "1.1.1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "share_plus",
+      "version": "13.3.1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "share_plus_platform_interface",
+      "version": "7.2.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "sky_engine",
+      "version": "SDK",
+      "license": "Apache-2.0",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "source_span",
+      "version": "1.10.2",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "stack_trace",
+      "version": "1.12.2",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "stream_channel",
+      "version": "2.1.4",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "string_scanner",
+      "version": "1.4.1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "term_glyph",
+      "version": "1.2.2",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "test_api",
+      "version": "0.7.12",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "typed_data",
+      "version": "1.4.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "url_launcher",
+      "version": "6.3.3",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "url_launcher_android",
+      "version": "6.3.33",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "url_launcher_ios",
+      "version": "6.4.2",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "url_launcher_linux",
+      "version": "3.2.3",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "url_launcher_macos",
+      "version": "3.2.6",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "url_launcher_platform_interface",
+      "version": "2.3.2",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "url_launcher_web",
+      "version": "2.4.3",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "url_launcher_windows",
+      "version": "3.1.6",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "uuid",
+      "version": "4.6.0",
+      "license": "MIT",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "vector_math",
+      "version": "2.4.3",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "vm_service",
+      "version": "15.4.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "watcher",
+      "version": "1.2.1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "web",
+      "version": "1.1.1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "webview_flutter",
+      "version": "4.14.1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "webview_flutter_android",
+      "version": "4.14.1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "webview_flutter_platform_interface",
+      "version": "2.15.1",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "webview_flutter_wkwebview",
+      "version": "3.27.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "win32",
+      "version": "6.4.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "xdg_directories",
+      "version": "1.1.0",
+      "license": "BSD-3-Clause",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "xml",
+      "version": "7.1.0",
+      "license": "MIT",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    },
+    {
+      "name": "yaml",
+      "version": "3.1.4",
+      "license": "MIT",
+      "ecosystem": "Dart",
+      "metadata_source": "Resolved package LICENSE files and Flutter SDK LICENSE"
+    }
+  ]
+}

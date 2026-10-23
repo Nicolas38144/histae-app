@@ -37,6 +37,7 @@ flutter run
 | [Roadmap](roadmap.md) | Remaining device, provider and release validation |
 | [Localization](lib/core/l10n/README.md) | ARB content, generation and interface language |
 | [API languages](docs/api-languages.md) | Request language, account preferences and legal documents |
+| [Licensing](docs/licensing.md) | Audit-only source access, dependency licenses and review limits |
 
 The Rust API [HTTP contract](../histae-api-rust/docs/http-contract.md) defines routes, DTOs and
 authorization. Its [billing guide](../histae-api-rust/docs/store-billing.md) covers store products
@@ -62,7 +63,13 @@ Run existing tests relevant to a change; see [Development](docs/development.md#c
 Documentation-only edits do not require Flutter tests. Simulated tests and local builds do not
 verify real SMS, push delivery, advertising, purchases or native platform behavior.
 
-## License
+## Source access and licensing
 
-Copyright © 2026 Nicolas GERMANI. Proprietary software, all rights reserved:
-see [LICENSE.md](LICENSE.md). Bundled fonts retain their own licenses, linked in the design system.
+Copyright © 2026 Nicolas GERMANI. Original Histae code is proprietary and publicly available only
+for inspection and security audits. Reuse, modification outside an audit, redistribution and use
+in another project or service are prohibited for commercial and non-commercial purposes without
+prior written permission. See [LICENSE.md](LICENSE.md) for the limited audit permission and
+applicable exceptions. External contributions are not accepted.
+
+Third-party dependencies, SDKs and fonts retain their own licenses; these restrictions do not
+override their rights or notices. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
