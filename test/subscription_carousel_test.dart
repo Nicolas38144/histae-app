@@ -82,7 +82,7 @@ void main() {
   }
 
   testWidgets(
-    'swipes and selectors compare offers without a reread or purchase',
+    'starts monthly and compares offers without a reread or purchase',
     (tester) async {
       var reads = 0;
       final choices = <BillingPeriod?>[];
@@ -94,14 +94,30 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.text('Offre 1 sur 3'), findsOneWidget);
+      expect(find.text('Offre 2 sur 3'), findsOneWidget);
+      expect(
+        tester
+            .widget<ChoiceChip>(
+              find.byKey(const Key('plan-selector-premium_monthly')),
+            )
+            .selected,
+        isTrue,
+      );
+      expect(find.text('7,50 EUR par mois'), findsOneWidget);
       await tester.drag(
         find.byKey(const Key('subscription-plan-pages')),
-        const Offset(-650, 0),
+        const Offset(650, 0),
       );
       await tester.pumpAndSettle();
-      expect(find.text('Offre 2 sur 3'), findsOneWidget);
-      expect(find.text('7,50 EUR par mois'), findsOneWidget);
+      expect(find.text('Offre 1 sur 3'), findsOneWidget);
+      await tester.pumpWidget(
+        subject(
+          catalog,
+          choose: (offer) async => choices.add(offer.billingPeriod),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Offre 1 sur 3'), findsOneWidget);
       await tester.tap(find.byKey(const Key('plan-selector-premium_annual')));
       await tester.pumpAndSettle();
       expect(find.text('Offre 3 sur 3'), findsOneWidget);

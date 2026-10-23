@@ -75,6 +75,10 @@ class SubscriptionPlans extends StatelessWidget {
     }
     final copy = AppStrings.of(context).messages;
     return SubscriptionPlanCarousel(
+      initialSlideId: catalog.offers
+          .where((offer) => offer.billingPeriod == BillingPeriod.monthly)
+          .firstOrNull
+          ?.code,
       slides: [
         for (final offer in catalog.offers)
           (

@@ -87,6 +87,9 @@ details and confirmations remain scrollable. Never globally shrink the person's 
 Use [visual previews](docs/development.md#visual-previews) for relevant states and translations.
 Native icon masks, fonts and cold starts still need Android/iOS device review.
 
-Subscription offers use a horizontal carousel with named selectors, previous/next buttons and
-a localized position label. Its height follows the selected card, including large text; offers
-appear before subscription maintenance actions. Feed remains the initial tab at the center.
+Subscription offers open on Monthly when available. The horizontal carousel spaces cards apart
+and reveals the neighboring cards; the shared coral-to-lavender action gradient identifies
+the selected offer, with dark text for contrast.
+Previous/next buttons and a localized position label also support navigation. Its height follows
+the selected card, including large text; offers appear before subscription maintenance actions.
+Feed remains the initial tab at the center.
