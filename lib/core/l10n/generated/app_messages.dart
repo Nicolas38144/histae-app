@@ -831,62 +831,8 @@ abstract class AppMessages {
   /// Interface: lib/features/billing/presentation/billing_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Paiement ouvert dans votre navigateur. À votre retour, vérifiez votre abonnement. La confirmation peut prendre quelques instants.'**
-  String get billingStringsPaymentOpenedInYourBrowserCheck;
-
-  /// Interface: lib/features/billing/presentation/billing_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Gestion ouverte dans votre navigateur. Vérifiez votre abonnement à votre retour.'**
-  String get billingStringsSubscriptionManagementOpenedInYourBrowser;
-
-  /// Interface: lib/features/billing/presentation/billing_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'La tentative précédente est terminée ou expirée. Votre formule a été vérifiée. Vous pouvez choisir une nouvelle souscription.'**
-  String get billingStringsThePreviousAttemptHasEndedOr;
-
-  /// Interface: lib/features/billing/presentation/billing_strings.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Un abonnement existe déjà. Actualisez votre situation avant de poursuivre.'**
   String get billingStringsASubscriptionAlreadyExistsRefreshYour;
-
-  /// Interface: lib/features/billing/presentation/billing_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Une souscription est déjà ouverte. Reprenez la tentative ou attendez son expiration.'**
-  String get billingStringsASubscriptionAttemptIsAlreadyOpen;
-
-  /// Interface: lib/features/billing/presentation/billing_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Votre souscription est en cours de vérification. Réessayez plus tard avec la même tentative.'**
-  String get billingStringsYourSubscriptionIsBeingCheckedTry;
-
-  /// Interface: lib/features/billing/presentation/billing_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Cette tentative doit être vérifiée avant de poursuivre. Contactez l’assistance si le problème persiste.'**
-  String get billingStringsThisAttemptMustBeCheckedBefore;
-
-  /// Interface: lib/features/billing/presentation/billing_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Cette tentative est terminée ou expirée. Vérifiez votre abonnement.'**
-  String get billingStringsThisAttemptHasEndedOrExpired;
-
-  /// Interface: lib/features/billing/presentation/billing_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'La gestion de cet abonnement n’est pas encore disponible.'**
-  String get billingStringsManagementOfThisSubscriptionIsNot;
-
-  /// Interface: lib/features/billing/presentation/billing_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Impossible d’ouvrir le navigateur. Votre tentative reste disponible pour réessayer.'**
-  String get billingStringsUnableToOpenTheBrowserYour;
 
   /// Interface: lib/features/billing/presentation/billing_strings.dart
   ///
@@ -933,18 +879,6 @@ abstract class AppMessages {
   /// Interface: lib/features/billing/presentation/subscription_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'{arg0}\n\nAbonnement à renouvellement automatique. Abonnement sans période d’essai. Le montant et la date du paiement seront confirmés avant validation dans le navigateur. Vous pourrez gérer la résiliation depuis votre abonnement. Les photos restent soumises à votre accord mutuel.'**
-  String subscriptionPageAutoRenewingSubscriptionWithNoTrial(Object arg0);
-
-  /// Interface: lib/features/billing/presentation/subscription_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Continuer dans le navigateur'**
-  String get subscriptionPageContinueInBrowser;
-
-  /// Interface: lib/features/billing/presentation/subscription_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'À VOTRE RYTHME'**
   String get subscriptionPageAtYourOwnPace;
 
@@ -983,24 +917,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Vérifier mon abonnement'**
   String get subscriptionPageCheckMySubscription;
-
-  /// Interface: lib/features/billing/presentation/subscription_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Ouverture du navigateur'**
-  String get subscriptionPageOpeningBrowser;
-
-  /// Interface: lib/features/billing/presentation/subscription_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Une tentative {arg0} est en attente de vérification. Reprenez-la pour éviter une seconde souscription.'**
-  String subscriptionPageAAttemptIsAwaitingVerificationResume(Object arg0);
-
-  /// Interface: lib/features/billing/presentation/subscription_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Reprendre cette tentative'**
-  String get subscriptionPageResumeThisAttempt;
 
   /// Interface: lib/features/billing/presentation/subscription_page.dart
   ///
@@ -1379,12 +1295,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Les vidéos ne sont pas encore configurées pour cet appareil.'**
   String get rewardedVideoGatewayVideosAreNotYetConfiguredFor;
-
-  /// Interface: lib/features/continuation/presentation/continuation_balance_card.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Pour continuer'**
-  String get continuationBalanceCardToContinue;
 
   /// Action visible ouvrant le détail des crédits depuis la carte dans Matchs.
   ///
@@ -4929,18 +4839,6 @@ abstract class AppMessages {
   /// **'Messagerie'**
   String get appStringsMessaging;
 
-  /// Interface: lib/features/billing/presentation/subscription_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'mensuelle'**
-  String get subscriptionPageMonthly;
-
-  /// Interface: lib/features/billing/presentation/subscription_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'annuelle'**
-  String get subscriptionPageAnnual;
-
   /// Interface: lib/features/consents/presentation/consent_strings.dart
   ///
   /// In fr, this message translates to:
@@ -5204,12 +5102,6 @@ abstract class AppMessages {
   /// **'La langue choisie s’applique à l’interface, aux catalogues et aux notifications de cet appareil. Un choix connecté met aussi à jour la préférence du compte. Les messages, bios et réponses des personnes conservent leur langue d’origine.'**
   String get languageDescription;
 
-  /// Localized interface copy
-  ///
-  /// In fr, this message translates to:
-  /// **' · Lu'**
-  String get messageRead;
-
   /// iOS permission copy; regenerate native resources with tool/generate_native_localizations.dart
   ///
   /// In fr, this message translates to:
@@ -5252,12 +5144,6 @@ abstract class AppMessages {
   /// **'Restaurer mes achats'**
   String get billingRestorePurchases;
 
-  /// No description provided for @billingCopyAccountId.
-  ///
-  /// In fr, this message translates to:
-  /// **'Copier mon identifiant de compte'**
-  String get billingCopyAccountId;
-
   /// No description provided for @billingStorePriceUnavailable.
   ///
   /// In fr, this message translates to:
@@ -5287,24 +5173,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Vérification de l’achat…'**
   String get billingStoreVerifying;
-
-  /// No description provided for @billingStoreApple.
-  ///
-  /// In fr, this message translates to:
-  /// **'App Store'**
-  String get billingStoreApple;
-
-  /// No description provided for @billingStoreGoogle.
-  ///
-  /// In fr, this message translates to:
-  /// **'Google Play'**
-  String get billingStoreGoogle;
-
-  /// No description provided for @billingStoreWeb.
-  ///
-  /// In fr, this message translates to:
-  /// **'Site Histae'**
-  String get billingStoreWeb;
 
   /// No description provided for @billingStoreGrace.
   ///

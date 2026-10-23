@@ -180,7 +180,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                           .subscriptionPageYourSessionMustBeVerifiedTo,
                     )
                   else ...[
-                    if (c.loading || !c.restored && c.failure == null)
+                    if (c.loading)
                       LinearProgressIndicator(
                         semanticsLabel: AppStrings.of(context)
                             .messages

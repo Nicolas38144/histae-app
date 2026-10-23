@@ -441,44 +441,8 @@ class AppMessagesFr extends AppMessages {
       'Vos droits ont été confirmés par Histae.';
 
   @override
-  String get billingStringsPaymentOpenedInYourBrowserCheck =>
-      'Paiement ouvert dans votre navigateur. À votre retour, vérifiez votre abonnement. La confirmation peut prendre quelques instants.';
-
-  @override
-  String get billingStringsSubscriptionManagementOpenedInYourBrowser =>
-      'Gestion ouverte dans votre navigateur. Vérifiez votre abonnement à votre retour.';
-
-  @override
-  String get billingStringsThePreviousAttemptHasEndedOr =>
-      'La tentative précédente est terminée ou expirée. Votre formule a été vérifiée. Vous pouvez choisir une nouvelle souscription.';
-
-  @override
   String get billingStringsASubscriptionAlreadyExistsRefreshYour =>
       'Un abonnement existe déjà. Actualisez votre situation avant de poursuivre.';
-
-  @override
-  String get billingStringsASubscriptionAttemptIsAlreadyOpen =>
-      'Une souscription est déjà ouverte. Reprenez la tentative ou attendez son expiration.';
-
-  @override
-  String get billingStringsYourSubscriptionIsBeingCheckedTry =>
-      'Votre souscription est en cours de vérification. Réessayez plus tard avec la même tentative.';
-
-  @override
-  String get billingStringsThisAttemptMustBeCheckedBefore =>
-      'Cette tentative doit être vérifiée avant de poursuivre. Contactez l’assistance si le problème persiste.';
-
-  @override
-  String get billingStringsThisAttemptHasEndedOrExpired =>
-      'Cette tentative est terminée ou expirée. Vérifiez votre abonnement.';
-
-  @override
-  String get billingStringsManagementOfThisSubscriptionIsNot =>
-      'La gestion de cet abonnement n’est pas encore disponible.';
-
-  @override
-  String get billingStringsUnableToOpenTheBrowserYour =>
-      'Impossible d’ouvrir le navigateur. Votre tentative reste disponible pour réessayer.';
 
   @override
   String get billingStringsPaymentIsTemporarilyUnavailableYourAttempt =>
@@ -510,15 +474,6 @@ class AppMessagesFr extends AppMessages {
   }
 
   @override
-  String subscriptionPageAutoRenewingSubscriptionWithNoTrial(Object arg0) {
-    return '$arg0\n\nAbonnement à renouvellement automatique. Abonnement sans période d’essai. Le montant et la date du paiement seront confirmés avant validation dans le navigateur. Vous pourrez gérer la résiliation depuis votre abonnement. Les photos restent soumises à votre accord mutuel.';
-  }
-
-  @override
-  String get subscriptionPageContinueInBrowser =>
-      'Continuer dans le navigateur';
-
-  @override
   String get subscriptionPageAtYourOwnPace => 'À VOTRE RYTHME';
 
   @override
@@ -543,17 +498,6 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get subscriptionPageCheckMySubscription => 'Vérifier mon abonnement';
-
-  @override
-  String get subscriptionPageOpeningBrowser => 'Ouverture du navigateur';
-
-  @override
-  String subscriptionPageAAttemptIsAwaitingVerificationResume(Object arg0) {
-    return 'Une tentative $arg0 est en attente de vérification. Reprenez-la pour éviter une seconde souscription.';
-  }
-
-  @override
-  String get subscriptionPageResumeThisAttempt => 'Reprendre cette tentative';
 
   @override
   String get subscriptionPageSignUpAndPaymentManagementAre =>
@@ -789,9 +733,6 @@ class AppMessagesFr extends AppMessages {
   @override
   String get rewardedVideoGatewayVideosAreNotYetConfiguredFor =>
       'Les vidéos ne sont pas encore configurées pour cet appareil.';
-
-  @override
-  String get continuationBalanceCardToContinue => 'Pour continuer';
 
   @override
   String get continuationBalanceCardViewCredits => 'Voir mes crédits';
@@ -2997,12 +2938,6 @@ class AppMessagesFr extends AppMessages {
   String get appStringsMessaging => 'Messagerie';
 
   @override
-  String get subscriptionPageMonthly => 'mensuelle';
-
-  @override
-  String get subscriptionPageAnnual => 'annuelle';
-
-  @override
   String get consentStringsLocation => 'Localisation';
 
   @override
@@ -3186,9 +3121,6 @@ class AppMessagesFr extends AppMessages {
       'La langue choisie s’applique à l’interface, aux catalogues et aux notifications de cet appareil. Un choix connecté met aussi à jour la préférence du compte. Les messages, bios et réponses des personnes conservent leur langue d’origine.';
 
   @override
-  String get messageRead => ' · Lu';
-
-  @override
   String get iosLocationPermission =>
       'Histae utilise une position ponctuelle pour proposer des rencontres à proximité. Votre position exacte reste privée, sans suivi en arrière-plan.';
 
@@ -3213,9 +3145,6 @@ class AppMessagesFr extends AppMessages {
   String get billingRestorePurchases => 'Restaurer mes achats';
 
   @override
-  String get billingCopyAccountId => 'Copier mon identifiant de compte';
-
-  @override
   String get billingStorePriceUnavailable => 'Prix du store indisponible';
 
   @override
@@ -3232,15 +3161,6 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get billingStoreVerifying => 'Vérification de l’achat…';
-
-  @override
-  String get billingStoreApple => 'App Store';
-
-  @override
-  String get billingStoreGoogle => 'Google Play';
-
-  @override
-  String get billingStoreWeb => 'Site Histae';
 
   @override
   String get billingStoreGrace => 'Délai de grâce de paiement';

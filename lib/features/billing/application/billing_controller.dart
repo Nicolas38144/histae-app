@@ -61,7 +61,7 @@ class BillingController extends ChangeNotifier {
       _processing = false,
       _invalidated = false;
   bool loading = false, busy = false, fresh = false, purchasePending = false;
-  bool restored = true, storeAvailable = false;
+  bool storeAvailable = false;
   SubscriptionState? subscription;
   List<StoreOffer> offers = [];
   ApiFailure? failure;

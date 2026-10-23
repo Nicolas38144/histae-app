@@ -509,44 +509,8 @@
   "@billingStringsYourEntitlementsHaveBeenConfirmedBy": {
     "description": "Interface: lib/features/billing/presentation/billing_strings.dart"
   },
-  "billingStringsPaymentOpenedInYourBrowserCheck": "Paiement ouvert dans votre navigateur. À votre retour, vérifiez votre abonnement. La confirmation peut prendre quelques instants.",
-  "@billingStringsPaymentOpenedInYourBrowserCheck": {
-    "description": "Interface: lib/features/billing/presentation/billing_strings.dart"
-  },
-  "billingStringsSubscriptionManagementOpenedInYourBrowser": "Gestion ouverte dans votre navigateur. Vérifiez votre abonnement à votre retour.",
-  "@billingStringsSubscriptionManagementOpenedInYourBrowser": {
-    "description": "Interface: lib/features/billing/presentation/billing_strings.dart"
-  },
-  "billingStringsThePreviousAttemptHasEndedOr": "La tentative précédente est terminée ou expirée. Votre formule a été vérifiée. Vous pouvez choisir une nouvelle souscription.",
-  "@billingStringsThePreviousAttemptHasEndedOr": {
-    "description": "Interface: lib/features/billing/presentation/billing_strings.dart"
-  },
   "billingStringsASubscriptionAlreadyExistsRefreshYour": "Un abonnement existe déjà. Actualisez votre situation avant de poursuivre.",
   "@billingStringsASubscriptionAlreadyExistsRefreshYour": {
-    "description": "Interface: lib/features/billing/presentation/billing_strings.dart"
-  },
-  "billingStringsASubscriptionAttemptIsAlreadyOpen": "Une souscription est déjà ouverte. Reprenez la tentative ou attendez son expiration.",
-  "@billingStringsASubscriptionAttemptIsAlreadyOpen": {
-    "description": "Interface: lib/features/billing/presentation/billing_strings.dart"
-  },
-  "billingStringsYourSubscriptionIsBeingCheckedTry": "Votre souscription est en cours de vérification. Réessayez plus tard avec la même tentative.",
-  "@billingStringsYourSubscriptionIsBeingCheckedTry": {
-    "description": "Interface: lib/features/billing/presentation/billing_strings.dart"
-  },
-  "billingStringsThisAttemptMustBeCheckedBefore": "Cette tentative doit être vérifiée avant de poursuivre. Contactez l’assistance si le problème persiste.",
-  "@billingStringsThisAttemptMustBeCheckedBefore": {
-    "description": "Interface: lib/features/billing/presentation/billing_strings.dart"
-  },
-  "billingStringsThisAttemptHasEndedOrExpired": "Cette tentative est terminée ou expirée. Vérifiez votre abonnement.",
-  "@billingStringsThisAttemptHasEndedOrExpired": {
-    "description": "Interface: lib/features/billing/presentation/billing_strings.dart"
-  },
-  "billingStringsManagementOfThisSubscriptionIsNot": "La gestion de cet abonnement n’est pas encore disponible.",
-  "@billingStringsManagementOfThisSubscriptionIsNot": {
-    "description": "Interface: lib/features/billing/presentation/billing_strings.dart"
-  },
-  "billingStringsUnableToOpenTheBrowserYour": "Impossible d’ouvrir le navigateur. Votre tentative reste disponible pour réessayer.",
-  "@billingStringsUnableToOpenTheBrowserYour": {
     "description": "Interface: lib/features/billing/presentation/billing_strings.dart"
   },
   "billingStringsPaymentIsTemporarilyUnavailableYourAttempt": "Le paiement est temporairement indisponible. Votre tentative est conservée.",
@@ -582,19 +546,6 @@
       }
     }
   },
-  "subscriptionPageAutoRenewingSubscriptionWithNoTrial": "{arg0}\n\nAbonnement à renouvellement automatique. Abonnement sans période d’essai. Le montant et la date du paiement seront confirmés avant validation dans le navigateur. Vous pourrez gérer la résiliation depuis votre abonnement. Les photos restent soumises à votre accord mutuel.",
-  "@subscriptionPageAutoRenewingSubscriptionWithNoTrial": {
-    "description": "Interface: lib/features/billing/presentation/subscription_page.dart",
-    "placeholders": {
-      "arg0": {
-        "type": "Object"
-      }
-    }
-  },
-  "subscriptionPageContinueInBrowser": "Continuer dans le navigateur",
-  "@subscriptionPageContinueInBrowser": {
-    "description": "Interface: lib/features/billing/presentation/subscription_page.dart"
-  },
   "subscriptionPageAtYourOwnPace": "À VOTRE RYTHME",
   "@subscriptionPageAtYourOwnPace": {
     "description": "Interface: lib/features/billing/presentation/subscription_page.dart"
@@ -621,23 +572,6 @@
   },
   "subscriptionPageCheckMySubscription": "Vérifier mon abonnement",
   "@subscriptionPageCheckMySubscription": {
-    "description": "Interface: lib/features/billing/presentation/subscription_page.dart"
-  },
-  "subscriptionPageOpeningBrowser": "Ouverture du navigateur",
-  "@subscriptionPageOpeningBrowser": {
-    "description": "Interface: lib/features/billing/presentation/subscription_page.dart"
-  },
-  "subscriptionPageAAttemptIsAwaitingVerificationResume": "Une tentative {arg0} est en attente de vérification. Reprenez-la pour éviter une seconde souscription.",
-  "@subscriptionPageAAttemptIsAwaitingVerificationResume": {
-    "description": "Interface: lib/features/billing/presentation/subscription_page.dart",
-    "placeholders": {
-      "arg0": {
-        "type": "Object"
-      }
-    }
-  },
-  "subscriptionPageResumeThisAttempt": "Reprendre cette tentative",
-  "@subscriptionPageResumeThisAttempt": {
     "description": "Interface: lib/features/billing/presentation/subscription_page.dart"
   },
   "subscriptionPageSignUpAndPaymentManagementAre": "La souscription et la gestion des paiements ne sont pas encore disponibles dans cette version. Votre formule et vos droits existants restent consultables.",
@@ -917,13 +851,9 @@
   "@rewardedVideoGatewayVideosAreNotYetConfiguredFor": {
     "description": "Interface: lib/features/continuation/data/rewarded_video_gateway.dart"
   },
-  "continuationBalanceCardToContinue": "Pour continuer",
   "continuationBalanceCardViewCredits": "Voir mes crédits",
   "@continuationBalanceCardViewCredits": {
     "description": "Action visible ouvrant le détail des crédits depuis la carte dans Matchs."
-  },
-  "@continuationBalanceCardToContinue": {
-    "description": "Interface: lib/features/continuation/presentation/continuation_balance_card.dart"
   },
   "continuationBalanceCardRefreshingYourCredits": "Actualisation de vos crédits…",
   "@continuationBalanceCardRefreshingYourCredits": {
@@ -3476,14 +3406,6 @@
   "@appStringsMessaging": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "subscriptionPageMonthly": "mensuelle",
-  "@subscriptionPageMonthly": {
-    "description": "Interface: lib/features/billing/presentation/subscription_page.dart"
-  },
-  "subscriptionPageAnnual": "annuelle",
-  "@subscriptionPageAnnual": {
-    "description": "Interface: lib/features/billing/presentation/subscription_page.dart"
-  },
   "consentStringsLocation": "Localisation",
   "@consentStringsLocation": {
     "description": "Interface: lib/features/consents/presentation/consent_strings.dart"
@@ -3748,10 +3670,6 @@
   "@languageDescription": {
     "description": "Localized interface copy"
   },
-  "messageRead": " · Lu",
-  "@messageRead": {
-    "description": "Localized interface copy"
-  },
   "iosLocationPermission": "Histae utilise une position ponctuelle pour proposer des rencontres à proximité. Votre position exacte reste privée, sans suivi en arrière-plan.",
   "@iosLocationPermission": {
     "description": "iOS permission copy; regenerate native resources with tool/generate_native_localizations.dart"
@@ -3777,15 +3695,11 @@
     "description": "Friendly interface copy for the profile or matches screen."
   },
   "billingRestorePurchases": "Restaurer mes achats",
-  "billingCopyAccountId": "Copier mon identifiant de compte",
   "billingStorePriceUnavailable": "Prix du store indisponible",
   "billingStoreManagedWeb": "Cet abonnement a été souscrit sur le site. Sa gestion s’effectue sur le site Histae.",
   "billingStorePending": "Achat en attente de confirmation par le store.",
   "billingStorePurchaseFailed": "L’achat ne peut pas être confirmé pour ce compte.",
   "billingStoreVerifying": "Vérification de l’achat…",
-  "billingStoreApple": "App Store",
-  "billingStoreGoogle": "Google Play",
-  "billingStoreWeb": "Site Histae",
   "billingStoreGrace": "Délai de grâce de paiement",
   "billingStoreRevoked": "Abonnement révoqué",
   "billingStoreOnHold": "Abonnement suspendu pour incident de paiement",

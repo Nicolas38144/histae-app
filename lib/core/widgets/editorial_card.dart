@@ -13,7 +13,6 @@ class EditorialDivider extends StatelessWidget {
 }
 
 /// Shared section heading, with the same hierarchy as the website's intros.
-/// The legacy name remains available to existing feature pages.
 class EditorialCard extends StatelessWidget {
   const EditorialCard({
     super.key,
