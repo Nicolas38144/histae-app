@@ -1,59 +1,71 @@
-# Langues des appels API
+# API request languages
 
-Les codes échangés sont `fr`, `en`, `es` et `it`. Les clients HTTP utilisent la langue résolue par `LocaleController` ; JSON, multipart, export et ouverture SSE portent `Accept-Language`. Les corps métier conservent leur contrat.
+[Documentation](../README.md#documentation) · [Interface localization](../lib/core/l10n/README.md)
 
-## Préférence du compte et de l’appareil
+Supported wire codes are `fr`, `en`, `es` and `it`. JSON, multipart, export and SSE requests use
+the language resolved by `LocaleController` in `Accept-Language`. Business payload contracts remain
+unchanged.
 
-Le français est la langue initiale. Une préférence d’appareil enregistrée, y compris le mode système, prime. Sans choix local, `AccountLanguageBinding` lit `GET /api/users/me/language` pour adopter la préférence du compte vérifié ; cette lecture n’écrit aucune préférence.
+## Account and device preference
 
-Un choix explicite connecté s’applique à l’interface et appelle `PATCH /api/users/me/language` avec, par exemple, `{ "language": "it" }`. Un échec distant laisse l’interface utilisable, affiche l’échec et respecte `Retry-After` avant une nouvelle tentative volontaire. Restaurer l’app ou changer la langue du système ne réécrit pas silencieusement la préférence du compte.
+French is the initial fallback. A saved device preference, including system mode, takes precedence.
+Without a local choice, `AccountLanguageBinding` reads `GET /api/users/me/language` to adopt the
+verified account's language. This read does not write a preference.
 
-La déconnexion retire le repli du compte, tout en conservant un choix explicite d’appareil. Une langue non prise en charge revient au français.
+An explicit signed-in choice updates the interface and calls `PATCH /api/users/me/language`, for
+example with `{ "language": "it" }`. A failed account update leaves the interface usable, reports
+the failure and respects `Retry-After` before another deliberate attempt. App restoration and
+system-language changes do not silently overwrite the account preference.
 
-## Adaptation des parcours
+Logout removes the account fallback but preserves an explicit device choice. Unsupported languages
+fall back to French.
 
-| Parcours | Règle |
+## Flow-specific rules
+
+| Flow | Rule |
 | --- | --- |
-| Catalogue, profil, traits, questions, feed et matchs | Lectures localisées ; réponses d’une ancienne révision ignorées et pagination reprise au début si nécessaire. |
-| Consentements | Vérifier version, URL et `document_language` du document présenté avant écriture. Conserver `accepted_document_language` comme preuve historique. |
-| OTP | La langue est figée avec le téléphone et la clé d’idempotence ; un renvoi volontaire crée une nouvelle intention. |
-| Achats natifs | Les intentions et vérifications utilisent l’en-tête courant ; le SDK du store fournit ses prix localisés. |
-| Gestion de l’abonnement | Ouverture du store d’origine ; un abonnement Stripe existant se gère sur le site Histae. |
-| Appareil push | L’exception de langue suit l’enregistrement ; `null` permet de suivre le compte. Un appareil déjà activé peut être réenregistré après un changement explicite. |
-| Export et SSE | Langue transmise à l’ouverture ; clés d’export, protocole d’événements et contenus personnels conservés. |
+| Catalogue, profile, traits, questions, feed and matches | Localized reads; ignore old revisions and restart pagination when needed |
+| Consent | Check the shown version, URL and `document_language`; retain `accepted_document_language` as historical evidence |
+| OTP | Freeze language with the phone/idempotency key; a deliberate resend starts a new intention |
+| Native purchases | API intentions/verification use request language; store SDKs provide localized prices |
+| Subscription management | Open the original store; existing Stripe subscriptions are website-managed |
+| Push devices | Device language override follows registration; `null` follows the account |
+| Export and SSE | Send language at opening; preserve protocol keys and personal content |
 
-Les bios, réponses et messages des personnes ne sont jamais traduits par le client. Les photos signées utilisent un transport distinct, sans Bearer. Les dialogues natifs gardent leurs propres réglages.
+Personal biographies, answers and messages are never translated by the client. Signed photos use
+a separate transport without Bearer credentials. Native dialogs follow their own platform settings.
 
-## Cohérence des requêtes
+## Request consistency
 
-La révision de localisation est distincte de `resourceKey`. Changer de langue renouvelle les lectures concernées sans supprimer navigation, brouillons, crédits ou intentions d’écriture. Les données mises en cache dans une autre langue ne sont pas réutilisées.
+Localization revision is separate from `resourceKey`. A language change renews affected reads
+without clearing navigation, drafts or immutable write intentions. Cached data from another
+language is not reused.
 
-Une reprise après un `401` d’expiration confirmé garde la langue de la requête d’origine. Un timeout ne déclenche pas de nouvelle mutation automatique. Une intention push déjà engagée conserve ses paramètres jusqu’à sa résolution. Un changement de langue ne réinitialise pas un achat natif en cours ni sa vérification.
+A permitted retry after confirmed token expiry retains the original request language. A timeout
+does not automatically repeat a mutation. In-flight push registration keeps its parameters until
+resolved, and language changes do not reset a native purchase or its verification.
 
-Les choix de consentement non confirmés sont invalidés si le document présenté change, même à version juridique identique. Un changement de langue ne vaut pas consentement. Une lecture documentaire indisponible ne simule pas une déconnexion ; un rejet d’authentification conserve les protections de session habituelles.
+Unconfirmed consent choices are invalidated when the shown document changes, even at the same legal
+version. Changing language is not consent. An unavailable document read does not simulate logout;
+authentication rejection still follows the normal session protections.
 
-## Achats natifs et site
+## Native billing and the website
 
-Les appels suivants utilisent le transport API commun et son en-tête `Accept-Language` :
+The shared language-aware transport covers store product discovery, purchase intentions,
+Apple/Google verification and subscription reads. Store account settings determine displayed prices
+independently of API language. Restoration verifies with the server and cannot reassign ownership.
 
-- `GET /api/billing/store-products?provider=app_store|google_play` ;
-- `POST /api/users/me/subscription/purchase-intents` ;
-- `POST /api/users/me/subscription/apple/verify` ;
-- `POST /api/users/me/subscription/google-play/verify` ;
-- `GET /api/users/me/subscription` pour relire les droits effectifs.
+Old mobile Stripe Checkout/portal routes return `410 billing_web_only`. Website UUID/phone/OTP
+authentication uses its own cookie and does not reuse mobile credentials. Its localization and
+retry rules belong to the [server billing guide](../../histae-api-rust/docs/store-billing.md).
 
-Le catalogue technique fournit les identifiants des produits ; le SDK du store fournit les prix selon le compte du store, indépendamment de la langue de l’API. Les dialogues et pages natifs suivent leurs propres réglages. Une restauration repasse par la vérification serveur et ne réattribue pas l’achat à un autre compte.
-
-Les anciennes routes mobiles Stripe Checkout/portail répondent `410 billing_web_only`. Le site possède son propre parcours UUID + téléphone + OTP et un cookie de paiement ; il n’utilise pas la session mobile. Les variantes linguistiques du paiement et leurs reprises sont décrites dans le [guide serveur](../../histae-api-rust/docs/store-billing.md).
-
-## Vérification
-
-Après modification des ARB, suivre le [guide de traduction](../lib/core/l10n/README.md). Adapter les contrôles au parcours modifié ; pour le transport et la préférence de langue :
+## Verification
 
 ```bash
 flutter test test/api_language_test.dart test/localization_test.dart
 ```
 
-Ajouter les tests existants OTP, session, facturation ou notifications uniquement si ces parcours sont concernés. Les simulations ne nécessitent ni SMS, ni paiement, ni push réels.
-
-Sur appareil, vérifier le choix avant connexion, le mode système, les documents juridiques, la restauration d’un achat natif et la langue d’un appareil push déjà activé. Les contrôles communs sont dans le [README](../README.md) et les validations de livraison dans la [roadmap](../roadmap.md).
+Add existing OTP, session, billing or notification suites only when affected. Simulations require
+no real SMS, payment or push. On devices, verify pre-login selection, system mode, legal documents,
+purchase restoration and an already-enabled push device's language. Common commands and release
+criteria are in [Development](development.md) and the [roadmap](../roadmap.md).

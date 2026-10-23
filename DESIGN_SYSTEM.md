@@ -1,70 +1,88 @@
-# Système visuel Histae
+# Histae design system
 
-L’app reprend l’identité du [site Histae](https://www.histae.com/fr/) : livre ouvert, bleu nuit, lavande, touches abricot et titres à empattements. Le mode nuit est appliqué par défaut.
+[Documentation](README.md#documentation)
 
-## Ton et contenu
+The mobile app shares the website's open-book identity, night-blue palette, lavender and apricot
+accents, and serif headings. Dark mode is the default.
 
-Écrire simplement, avec chaleur et des actions concrètes. Garder le vouvoiement en français. Les messages courants parlent des personnes et de leurs possibilités, sans exposer les mécanismes réseau. Un résultat incertain reste présenté comme incertain : aucun enregistrement, paiement ou crédit ne doit être annoncé sans confirmation.
+## Voice and content
 
-Laisser de la place aux bios longues et aux réponses. Les contenus des personnes ne sont ni réécrits ni traduits automatiquement. Les exemples et captures de démonstration utilisent des profils fictifs identifiés comme tels. Les états vides proposent une action utile sans simuler d’activité.
+Use simple, welcoming copy and concrete actions. French uses the formal form of address.
+Ordinary messages should describe what a person can do, without exposing transport internals.
+An uncertain save, purchase or reward stays uncertain until confirmed.
 
-## Couleurs et typographie
+Give long biographies and answers room to breathe. Do not rewrite or automatically translate
+personal content. Previews use clearly identified fictional profiles and conversations.
+Empty states provide a useful action without fabricating activity.
 
-Les valeurs de référence sont dans [HistaeTokens](lib/core/theme/histae_tokens.dart), appliquées par le [thème Flutter](lib/app/theme.dart).
+## Colors and typography
 
-| Usage | Valeur |
+[HistaeTokens](lib/core/theme/histae_tokens.dart) and the [Flutter theme](lib/app/theme.dart)
+are the implementation references.
+
+| Role | Value |
 | --- | --- |
-| Fond principal | `#0D1421` |
-| Fond secondaire | `#141D2D` |
-| Panneau | `#1A2231` |
-| Texte principal | `#F9F7F2` |
-| Texte secondaire | `#C6C1D3` |
-| Accent lavande | `#B69CFF` |
-| Accent abricot | `#F09A82` |
-| Action principale | Dégradé `#F2A48C` → `#D8B3F7`, texte bleu nuit. |
+| Main background | `#0D1421` |
+| Secondary background | `#141D2D` |
+| Panel | `#1A2231` |
+| Main text | `#F9F7F2` |
+| Secondary text | `#C6C1D3` |
+| Lavender | `#B69CFF` |
+| Apricot | `#F09A82` |
+| Primary action | `#F2A48C` → `#D8B3F7` gradient with dark text |
 
-**Inter** porte les textes, boutons et formulaires ; **Source Serif 4** porte les titres. Les tailles s’adaptent à la largeur et à la préférence de texte du système. Les cartes utilisent des bordures fines et un rayon courant de 20 px ; les actions principales sont arrondies en pilule.
+Inter is used for body text, forms and buttons; Source Serif 4 for headings. Respect screen width
+and system text size. Panels generally use thin borders and a 20 px radius; primary actions use
+a pill shape. Secondary buttons use a subtle lavender surface, light outline and 16 px corners.
+Space stacked actions so their hierarchy stays clear.
 
-Les polices sont embarquées avec leurs licences : [Inter](assets/fonts/inter/OFL.txt), [Source Serif 4](assets/fonts/source_serif_4/OFL.txt) et la famille historique [DM Serif Display](assets/fonts/dm_serif_display/OFL.txt).
+Bundled font licenses: [Inter](assets/fonts/inter/OFL.txt),
+[Source Serif 4](assets/fonts/source_serif_4/OFL.txt) and the retained
+[DM Serif Display](assets/fonts/dm_serif_display/OFL.txt) family.
 
-## Logo et ouverture
+## Logo and launch
 
-Le logo est le **livre ouvert**, seul ou accompagné du nom Histae. La source produit est [histae-logo.svg](assets/branding/histae-logo.svg). Les signatures sombre et claire, leurs PNG et l’icône native sont dans [assets/branding](assets/branding/).
+The logo is the open book, with the Histae name as an optional signature. The product source is
+[histae-logo.svg](assets/branding/histae-logo.svg); variants and PNGs live in
+[assets/branding](assets/branding/). Native launcher icons show the book with platform-appropriate
+padding. Android also has adaptive and monochrome layers.
 
-Les icônes Android/iOS montrent uniquement le livre, avec une marge adaptée aux masques natifs. Android dispose aussi de calques adaptatifs et monochromes. Les proportions de l’icône sont distinctes de celles des en-têtes. Le [guide de lancement iOS](ios/Runner/Assets.xcassets/LaunchImage.imageset/README.md) précise les ressources de l’écran natif.
+`AppOpening` separates **H.** to reveal **istae**, then shows the book. The 1,480 ms animation runs
+on mount, skips reduced-motion mode and finishes on suspension without resetting application state.
+The [iOS launch guide](ios/Runner/Assets.xcassets/LaunchImage.imageset/README.md) covers native images.
 
-À l’ouverture, **H.** se sépare pour dévoiler **istae**, puis le livre apparaît. Cette animation de 1 480 ms ne joue qu’au montage ; elle est ignorée si les animations sont désactivées et se termine lors d’une suspension. Le contenu, la session et la navigation conservent leur état.
+`tool/generate_brand_assets.cjs` uses Node.js, Sharp and local SVG sources under
+`pictures/logos/nouvelle-da/02-les-pages/`. It regenerates product/native sizes; `--site` also exports
+website assets. Review generated assets before using them in a release.
 
-Le [générateur d’assets](tool/generate_brand_assets.cjs) nécessite Node.js, Sharp et les sources SVG locales de `pictures/logos/nouvelle-da/02-les-pages/`. Il régénère les fichiers produit et les tailles natives ; son option `--site` exporte aussi les assets du site.
+## Main screens
 
-## Composition des écrans
+Feed gives priority to profiles, without commercial buttons. Reading to the end of a long profile
+must not accidentally pass it. Expired presence goes directly to the location step while readiness
+refreshes; the person still chooses when to request GPS.
 
-Le **Feed** réserve l’espace aux profils, sans bouton commercial. Les bios et réponses restent entièrement lisibles ; faire défiler un texte long ne doit pas déclencher un passage accidentel au profil suivant.
+Matches shows a compact, scrollable credit card with an explicit view-credits action and arrow.
+Free users see available included/ad credits and Videos; Premium users get an appropriate message
+without a video button. A failed or unknown quota read must not appear as a zero balance.
 
-Dans **Matchs**, l’introduction précède une réserve de crédits compacte et défilante. Free voit les crédits gratuits et publicitaires disponibles ainsi que l’action Vidéos. Premium dispose d’un message adapté, sans bouton vidéo. Une lecture inconnue ou échouée ne produit pas un faux solde nul.
+Profile groups the introduction, answers, feed preview, account details, pause mode and settings.
+Its subscription entry shows Premium for Free or the subscription-management label for Premium,
+with neutral loading state. The copyable account UUID appears only in the private profile.
 
-La réserve est une carte cliquable avec l’action explicite **Voir mes crédits** et une flèche. L’identifiant de compte reste exclusivement dans **Mon profil**, sans répétition dans l’abonnement.
+Answer editing separates the question, text, order and remove/move actions. Replacing the full answer
+list is explicit. Sensitive-data and location choices use switches, separate from required terms
+acceptance and privacy-notice acknowledgement.
 
-Le **Profil** commence par la présentation, les réponses et l’aperçu public, puis regroupe les détails, le mode pause et les réglages du compte. Un seul accès affiche Premium pour Free ou Mon abonnement pour Premium ; l’état de chargement reste neutre.
+## Navigation and accessibility
 
-L’éditeur de réponses distingue la question, le texte, son ordre et les actions de retrait/déplacement. La sélection recherche dans les questions disponibles ; l’enregistrement du remplacement complet est explicite. Les consentements sensibles et de localisation utilisent des interrupteurs, séparés des documents CGU et notice.
+The Feed / Matches / Profile bar is transparent, with no panel, shadow or separator. Icons are
+24 px; the selected icon has a 44 px lavender circle, a label below and a full-tab touch target.
+Reduced motion removes the circle transition. System bars remain transparent with appropriate
+bottom spacing for scrollable content.
 
-## Composants et accessibilité
+Shared widgets retain disabled states, focus, semantics and keyboard behavior. Keep scrolling and
+whole words on small screens, with a keyboard or at 200% text. Chat headers become compact while
+details and confirmations remain scrollable. Never globally shrink the person's chosen text scale.
 
-`HistaeScaffold`, `HistaeButton`, les cartes et les séparateurs composent des widgets Flutter standards. La décoration conserve les états désactivés, le focus, la sémantique et le comportement du clavier. Les valeurs et droits affichés restent fournis par les contrôleurs.
-
-Les boutons principaux conservent le dégradé abricot-lavande. Les boutons secondaires utilisent une surface lavande discrète, un contour léger et des angles de 16 px ; les actions textuelles sont plus légères. Séparer les actions empilées pour conserver leur lisibilité.
-
-La barre Feed / Matchs / Profil est transparente, sans panneau, ombre, socle coloré ni ligne de séparation. Les icônes mesurent 24 px ; l’onglet actif utilise un cercle lavande de 44 px autour de l’icône, avec le libellé en dessous et une cible tactile conservée sur tout l’onglet. La réduction des animations supprime la transition du cercle. Les barres système sont transparentes et le contenu défilant garde son espace inférieur. Avec un petit écran, le clavier ou du texte à 200 %, garder le défilement et les mots entiers. L’en-tête du chat devient compact ; les détails et confirmations restent défilables. Ne pas réduire globalement l’échelle de texte choisie par la personne.
-
-## Vérification visuelle
-
-Les scénarios `tool/preview_*_test.dart` produisent des aperçus des vrais widgets avec données simulées sous `build/previews/`. Pour l’ouverture, par exemple :
-
-```bash
-flutter test tool/preview_brand_test.dart --update-goldens
-```
-
-Selon l’outil, définir `FLUTTER_ROOT` vers le SDK local. Examiner les états utiles, les longues traductions, le texte à 200 %, le clavier et les zones système. Ajouter un test seulement si le comportement modifié le justifie. Les masques d’icône, polices et démarrages natifs restent à contrôler sur Android et iOS.
-
-Voir le [README](README.md) pour les commandes communes et la [roadmap](roadmap.md) pour les validations restantes.
+Use [visual previews](docs/development.md#visual-previews) for relevant states and translations.
+Native icon masks, fonts and cold starts still need Android/iOS device review.

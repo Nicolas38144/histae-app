@@ -1,80 +1,112 @@
-# Architecture Flutter
+# Flutter architecture
 
-L’app est organisée par fonctionnalité, avec des contrôleurs `ChangeNotifier`, des dépendances injectées par constructeur et la navigation Flutter (`Navigator` / `MaterialPageRoute`).
+[Documentation](README.md#documentation)
 
-## Répartition des responsabilités
+The app is organized by feature, with `ChangeNotifier` controllers, constructor injection and
+Flutter navigation (`Navigator` and `MaterialPageRoute`). The usual flow is
+**view → controller → repository → HTTP client**.
 
-| Couche | Responsabilité |
+## Responsibilities and ownership
+
+| Layer | Responsibility |
 | --- | --- |
-| `lib/app/` | Démarrage, composition des dépendances, session, navigation et cycle de vie global. |
-| `lib/core/` | Configuration, réseau, primitives asynchrones, localisation et composants communs. |
-| `features/*/presentation/` | Affichage, interactions, navigation et confirmations. |
-| `features/*/application/` | État observable, commandes, validation des actions et annulation. |
-| `features/*/data/` | Repositories, transport, décodage, cache et services natifs. |
-| `features/*/domain/` | Contrats et modèles partagés qui doivent rester indépendants de leur implémentation. |
+| `lib/app/` | Bootstrap, dependency composition, session scope, navigation and global lifecycle |
+| `lib/core/` | Configuration, transport, async primitives, localization and shared UI |
+| `features/*/presentation/` | Rendering, interactions, navigation and confirmations |
+| `features/*/application/` | Observable state, commands, action validation and cancellation |
+| `features/*/data/` | Repositories, DTO decoding, cache and native integrations |
+| `features/*/domain/` | Shared contracts independent of their concrete implementation |
 
-Le chemin habituel est **vue → contrôleur → repository → client HTTP**. `core` n’importe aucune fonctionnalité. Les repositories privés dépendent de `AuthenticatedSession`, sans importer `SessionController`. Les modèles simples restent dans `data` ; les collections exposées sont protégées contre les modifications externes.
+Core does not import features. Private repositories depend on `AuthenticatedSession`, not
+`SessionController`. Exposed collections are protected from external mutation.
 
-## Démarrage et propriété des ressources
+`bootstrap` reads the public environment, registers font licenses and attempts to clean interrupted
+private exports. `AppDependencies` composes services; `HistaeApp` disposes the dependencies it owns.
+`SessionGate` selects the public, onboarding or private flow from confirmed session state.
 
-`bootstrap` charge strictement le `.env` public, enregistre les licences et nettoie les exports interrompus. `AppDependencies` construit les clients et services. `HistaeApp` possède les dépendances reçues et les libère à sa destruction.
+`MainShell` owns Feed, Matches and Profile controllers. Its `IndexedStack` retains the three views
+and scroll state; its session resource key rebuilds the private scope when access changes.
+A page disposes a controller it creates. A received controller remains owned by its parent.
+Suspending activity and disposing resources are distinct operations.
 
-`SessionGate` choisit l’accueil, l’onboarding ou l’espace privé selon l’état confirmé de la session. `MainShell` possède les contrôleurs Feed, Matchs et Profil ; son `IndexedStack` conserve les trois vues et leur défilement. Sa clé suit `session.resourceKey`, afin de reconstruire l’espace privé après un changement de périmètre.
+## Cache and reads
 
-Un contrôleur créé par une page est libéré par cette page. Un contrôleur reçu d’un parent reste la propriété du parent. La suspension d’un parcours et la destruction de ses ressources sont des opérations distinctes.
+`SessionController` owns authentication and request authorization. Domain snapshots belong to the
+repositories composed by `SessionRepositories`; the public catalogue has a separate language-aware cache.
+`ReadSnapshots` holds at most 128 validated entries per instance in memory and retains their original
+read timestamp. `ReadPolicy.cached` reuses a snapshot; `ReadPolicy.refresh` requests a new one.
 
-## Cache et lectures
-
-`SessionController` assure l’authentification et l’autorisation des requêtes. Le cache métier appartient aux repositories, composés par `SessionRepositories`. Le catalogue public possède son propre cache, séparé par langue.
-
-`ReadSnapshots` conserve au maximum 128 entrées par instance, uniquement en mémoire. Les valeurs sont des modèles validés ; leur date de lecture initiale est conservée. `ReadPolicy.cached` réutilise une lecture disponible, tandis que `ReadPolicy.refresh` contacte le serveur.
-
-| Déclencheur | Comportement |
+| Trigger | Behavior |
 | --- | --- |
-| Démarrage des onglets ou première ouverture d’un détail | Initialiser les données manquantes via les commandes du contrôleur. |
-| Changement d’onglet ou retour au premier plan | Conserver les données et réactiver les actions sans relecture systématique. |
-| Actualisation manuelle ou pagination demandée | Effectuer une lecture explicite. |
-| Écriture, événement serveur ou vérification d’un coût | Relire les ressources nécessaires selon le parcours. |
-| Échéance locale | Invalider l’affichage ou l’action sans lancer de requête automatique. |
+| Main-flow startup or first detail opening | Initialize missing controller data |
+| Tab change or foreground return | Reuse loaded data without a systematic reread |
+| Manual refresh or requested pagination | Perform an explicit read |
+| Mutation, relevant server event or cost confirmation | Refresh the affected resources |
+| Feed presence expiry | Hide stale candidates, show the location step and refresh readiness once |
+| Other resource deadlines | Disable or evict expired state; refresh only as defined by that flow |
 
-Une écriture invalide les ressources concernées avant et après l’appel, même si sa réponse est perdue. Les invalidations ciblées rejettent les remplissages tardifs concernés sans vider les lectures indépendantes. Un échec d’actualisation ne restaure pas un ancien succès.
+Writes invalidate affected resources before and after the call, including lost responses.
+Targeted invalidation rejects late fills without clearing unrelated snapshots. A failed refresh
+must not resurrect an old success. Account, consent, language and access changes purge the relevant
+caches. Canceled responses, errors, exports and SSE streams are not reusable snapshots.
 
-Les changements de compte, consentements, langue ou accès privé purgent les caches concernés. Le changement de langue utilise une révision distincte : les lectures sont renouvelées sans effacer navigation, brouillons et intentions d’écriture. Les erreurs, réponses annulées, exports et flux SSE ne sont pas des instantanés réutilisables.
+Feed expiry retains the last server diagnostic for a coherent location prompt. It never requests
+GPS automatically. The already-checked deadline prevents repeated reads when the server returns
+the same expired timestamp. An expired readiness response cannot load a stale candidate batch.
 
-## Session, concurrence et persistance
+## Sessions, concurrency and persistence
 
-La rotation du refresh token est sérialisée. Le stockage sécurisé est écrit puis relu avant de publier une nouvelle session ; une rotation incertaine ferme l’accès plutôt que réutiliser un ancien refresh. La fermeture de session et la suppression du compte disposent également d’une barrière durable.
+Refresh-token rotation is serialized. Secure storage is written and reread before a new session
+is published. An uncertain rotation closes access rather than reusing an old refresh token.
+Logout and account deletion also use durable barriers.
 
-Une requête peut être rejouée une fois après un `401` confirmant l’expiration de l’access token, si le parcours l’autorise. Aucun retry réseau universel ne s’applique aux mutations. Une reprise conserve la clé d’idempotence, le contenu et la langue de son intention.
+A permitted request may retry once after a `401` confirming access-token expiry. There is no universal
+network retry for mutations. Retried intentions retain their idempotency key, content and language.
+`RequestCancellation`, revisions and generations prevent late responses from restoring private data.
+`SerialExecutor` orders local operations; `RetryTicker` updates countdowns while respecting `Retry-After`.
 
-| Données | Conservation |
+| Data | Storage |
 | --- | --- |
-| Access token, profils, messages, coordonnées, brouillons et URL signées | Mémoire du parcours ou de la session. |
-| Refresh token et état de rotation/fermeture | Stockage sécurisé lié à l’origine API. |
-| Tentative Checkout et préférence push | Métadonnées minimales dans des entrées sécurisées liées au propriétaire. |
-| Langue explicitement choisie | Préférence d’appareil indépendante du compte. |
-| Export privé | Fichier temporaire dédié, nettoyé après usage. |
+| Access token, profiles, messages, coordinates, drafts and signed URLs | Flow/session memory |
+| Refresh token and rotation/logout state | Secure storage bound to the API origin |
+| Push preference and registration metadata | Minimal owner-bound secure entries |
+| Explicit interface language | Device preference independent of the account |
+| Private export | Dedicated temporary file, cleaned after use |
 
-`RequestCancellation`, les révisions et les générations empêchent une réponse tardive de restaurer des données périmées. `SerialExecutor` ordonne les opérations locales sans retry. `RetryTicker` actualise seulement un compteur visuel et respecte `Retry-After`.
+Native store SDKs own their purchase lifecycle. The app does not persist a browser Checkout attempt.
 
-## Messages et notifications
+## Real time, messages and private photos
 
-`RealtimeHub` fournit un transport SSE partagé aux rencontres, notifications et abonnements. Le parcours principal cesse de traiter les événements lorsqu’un parcours de notification le couvre ; le transport reste commun. Le flux est arrêté à la perte d’accès privé ou à la destruction de son propriétaire.
+`RealtimeHub` shares SSE transport among matches, notifications and subscriptions. Covered routes
+suspend the relevant main-flow event handling without creating another transport. Private access
+loss or owner disposal stops the stream.
 
-Les événements provoquent les lectures autorisées nécessaires. Une notification ne contient aucune preuve d’accès : son ouverture vérifie la session puis la collection mobile et l’historique. `MessageOutbox` conserve les brouillons et les intentions d’envoi immuables. Un accusé de lecture exige un message reçu visible dans une conversation au premier plan.
+Events trigger the authorized reads required by each flow. Notifications are not authorization
+proof: opening one verifies the session, collection and history. `MessageOutbox` retains drafts
+and immutable send intentions. Read receipts require a received message visible in the foreground.
 
-## Photos, crédits et fournisseurs
+`SignedPhotoLoader` downloads to memory without Bearer credentials or redirects, with a 5,000,000-byte
+limit and a fifteen-second timeout. Access is checked before display. Closing, losing access or
+reaching the display deadline evicts the image. Reopening does not extend the four-minute deadline
+measured from the resource read.
 
-`SignedPhotoLoader` télécharge en mémoire, sans Bearer ni redirection, avec une limite de 5 000 000 octets et un délai de quinze secondes. Le parcours vérifie les droits avant l’affichage et évince l’image à la fermeture, à la perte d’accès ou à son échéance. Réouvrir une photo ne prolonge pas les quatre minutes calculées depuis la lecture de sa ressource.
+## Credits and provider adapters
 
-Profil et Matchs utilisent le même `ContinuationController`. L’activation initialise le quota une fois ; les actualisations et vérifications après dépense, récompense ou changement de formule confirmé le relisent. Le coût d’une continuation est revérifié avant son acceptation.
+Profile and Matches share `ContinuationController`. It initializes quota once and refreshes after
+explicit requests, spending, rewards or confirmed subscription changes. The continuation cost is
+rechecked before acceptance; the client never invents a credit debit or grant.
 
-`RewardedVideoGateway` isole UMP et AdMob ; `RewardTracker` suit l’intention côté API. Le rappel du SDK ne crédite jamais le compte : seule la validation serveur le permet. `BillingController` conserve une tentative Checkout durable et vérifie les droits après le retour effectif du navigateur ou un événement pertinent. Les passerelles natives restent injectables pour les tests.
+`RewardedVideoGateway` isolates UMP/AdMob; `RewardTracker` follows the server intent. Only server
+validation grants a reward. `BillingController` operates on immutable values and `BillingGateway`;
+`NativeBillingGateway` alone handles Apple/Google SDK objects. Purchase verification precedes
+completion, and unverified purchases remain available for a safe retry or restoration.
 
-## Présentation et langues
+## Presentation and language
 
-Le thème et les composants partagés portent la [direction artistique](DESIGN_SYSTEM.md). `AppOpening` anime l’ouverture sans posséder la session ni le navigateur ; les services continuent à démarrer. Les animations désactivées ou une suspension terminent cette présentation.
+The [design system](DESIGN_SYSTEM.md) defines the shared visual behavior. `AppOpening` owns only the
+opening presentation; session initialization and navigation continue independently.
+`LocaleController` owns device language and `AccountLanguageBinding` connects it to the verified
+account. A separate localization revision refreshes reads without discarding drafts or mutations.
 
-Les textes d’interface viennent des ARB. `LocaleController` possède la préférence d’appareil ; `AccountLanguageBinding` la relie au compte vérifié. Les erreurs métier restent des codes traduits au rendu. Voir les [conventions de traduction](lib/core/l10n/README.md) et le [contrat de langue réseau](docs/api-languages.md).
-
-Les contrôles et commandes de développement sont dans le [README](README.md). Les validations fournisseur et appareil restantes sont suivies dans la [roadmap](roadmap.md).
+See [Localization](lib/core/l10n/README.md), [API languages](docs/api-languages.md) and
+[Development](docs/development.md) for the corresponding contracts and checks.

@@ -1,37 +1,52 @@
-# Traductions de l’interface
+# Interface localization
 
-Les sources sont les quatre catalogues [ARB](arb/) : français, anglais, espagnol et italien. Les textes d’interface, validations, confirmations et libellés d’accessibilité doivent y être déclarés.
+[Documentation](../../../README.md#documentation) · [API languages](../../../docs/api-languages.md)
 
-## Ajouter ou modifier un texte
+The four [ARB catalogues](arb/) contain French, English, Spanish and Italian interface text,
+validation, confirmations and accessibility labels. Developer documentation is written in English;
+this does not change the app's supported languages or French fallback.
 
-1. Ajouter une clé descriptive dans les quatre catalogues, avec les paramètres et métadonnées nécessaires dans le français.
-2. Utiliser un message ICU pour les pluriels ; éviter les phrases et suffixes assemblés dans le code.
-3. Régénérer les classes Flutter :
+## Add or update a message
+
+1. Add a descriptive key to all four catalogues, with placeholder metadata in the French template.
+2. Use ICU plurals rather than concatenating sentence fragments or suffixes.
+3. Run generation from the app root:
 
 ```bash
 flutter gen-l10n
 ```
 
-Utiliser `AppStrings.of(context).messages` pour les textes et `AppStrings` pour les formats de dates, nombres, prix et erreurs. Les couches de données et d’état renvoient des codes ou `ClientMessage`, traduits par la présentation. Ne pas éditer les fichiers de [generated](generated/) à la main.
+Use `AppStrings.of(context).messages` for copy and `AppStrings` for date, number, price and error
+formatting. Data/application layers return codes or `ClientMessage`; presentation translates them.
+Do not edit [generated Dart files](generated/) by hand. Remove genuinely unused keys from every
+locale and regenerate rather than keeping obsolete copy indefinitely.
 
-## Préférence et contenus
+## Language preference and content
 
-`LocaleController` possède la préférence d’appareil, restaurée avant le premier rendu. Sans choix explicite, le compte vérifié peut fournir sa langue via `AccountLanguageBinding`. Le français est le repli ; le mode appareil résout la langue principale du système. Changer de langue conserve la navigation et les brouillons.
+`LocaleController` restores the device preference before the first render. Without an explicit
+local choice, `AccountLanguageBinding` can adopt the verified account's language. System mode
+resolves the device's primary language; unsupported languages use French.
 
-L’API localise ses catalogues et documents selon `Accept-Language`. Les textes personnels ne sont pas traduits automatiquement. La langue d’un document effectivement présenté et celle de son acceptation restent distinctes de la préférence d’interface. Voir le [guide des langues API](../../../docs/api-languages.md).
+Changing language retains navigation and drafts. The API localizes catalogues and documents using
+`Accept-Language`, but personal text is not translated. Document presentation/acceptance language
+is separate from interface preference. Native and provider dialogs use their own settings.
 
-Les dialogues du système et des fournisseurs suivent leurs réglages natifs. Si les textes de permission iOS des ARB changent, régénérer également leurs ressources :
+## Native permission resources
+
+After changing the relevant iOS permission messages, also regenerate native localizations:
 
 ```bash
 dart run tool/generate_native_localizations.dart
 ```
 
-## Vérification ciblée
+Review the generated native resources; Dart localization alone does not update every system dialog.
 
-Depuis la racine de l’app :
+## Focused verification
 
 ```bash
 flutter test test/localization_test.dart
 ```
 
-Ce contrôle vérifie notamment la complétude des catalogues, les paramètres, les pluriels et l’absence de libellés en dur. Pour une revue visuelle des quatre langues, utiliser `tool/preview_localizations_test.dart` et examiner les longues traductions, le texte agrandi et le clavier. Les commandes communes sont dans le [README principal](../../../README.md).
+The suite checks catalogue completeness, placeholders, plurals and hardcoded-label conventions.
+For visual review, use `tool/preview_localizations_test.dart`, including long translations, 200% text
+and keyboard layouts. See [Development](../../../docs/development.md) for shared checks and previews.

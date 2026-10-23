@@ -1,75 +1,110 @@
-# Résumé fonctionnel et règles d’intégration
+# Product flows and integration rules
 
-Ce document décrit les parcours mobiles et leurs contraintes. Le [README](README.md) couvre le lancement, l’[architecture](ARCHITECTURE.md) les responsabilités du code, et la [roadmap](roadmap.md) l’avancement.
+[Documentation](README.md#documentation) · [Architecture](ARCHITECTURE.md) · [Roadmap](roadmap.md)
 
-Le backend de référence est [histae-api-rust](../histae-api-rust/docs/README.md). Les DTO, erreurs, limites et autorisations détaillées viennent de son [contrat HTTP](../histae-api-rust/docs/http-contract.md). Le mobile ne contient ni administration ni appels à `/api/admin/*`.
+The Rust API [HTTP contract](../histae-api-rust/docs/http-contract.md) owns DTOs, errors, limits and
+authorization. The mobile app contains neither administration UI nor `/api/admin/*` calls.
 
-## Accès au compte et consentements
+## Account access and consent
 
-Créer un compte et se reconnecter utilisent le même parcours OTP : téléphone français normalisé en `+33`, code SMS, puis lecture de l’identité et des consentements. Aucun mot de passe ou endpoint d’inscription distinct n’est ajouté. Une demande de SMS acceptée ne prouve pas sa livraison ; une vérification dont le résultat est perdu exige un nouveau code.
+Registration and returning sign-in share the French phone/SMS OTP flow. There is no separate
+password-based registration endpoint. An accepted SMS request does not prove delivery; a lost
+verification result requires a new code.
 
-L’accès privé dépend des documents courants exigés par l’API. Les CGU sont acceptées et la notice de confidentialité est reconnue comme consultée. Les nouveaux choix ne sont pas présélectionnés. Les accords sensibles et de localisation sont distincts et modifiables ; leur retrait est confirmé en expliquant ses effets. La permission native de localisation ne remplace pas cet accord.
+Private access depends on the API's current required documents. Terms are accepted and the privacy
+notice is acknowledged. New choices are not preselected. Sensitive-data and location agreements
+are separate and withdrawable, with their consequences explained. Native GPS permission does not
+replace the Histae agreement.
 
-Le retrait sensible efface les données concernées, dont sexe et préférences ; le retrait de localisation efface la présence. Ces retraits peuvent rendre le feed indisponible sans fermer tous les réglages du compte. Déconnexion, droits, export et suppression restent accessibles quand l’API les autorise avant la fin de l’onboarding.
+Sensitive-data withdrawal removes the affected fields, including sex/preferences; location
+withdrawal removes presence. Discovery may become unavailable while other account settings remain
+accessible. Logout, privacy requests, export and deletion remain available where the API permits.
 
-Avant un enregistrement, l’app compare version, URL et langue du document à ceux réellement présentés. Le PUT actuel n’envoie pas de version attendue : le précontrôle mobile ne garantit donc pas l’atomicité si le document change entre lecture et écriture. Cette limite doit être traitée côté API pour une garantie complète.
+Before saving, the client compares the document version, URL and language against what was shown.
+The current PUT does not send an expected version: this precheck cannot guarantee atomicity if a
+document changes during the write. A complete guarantee requires an API change.
 
-## Profil, réponses et photo
+## Profile and private photo
 
-Le profil est réservé aux majeurs. Les modifications envoient explicitement l’état voulu de la bio et du sexe ; les préférences sont enregistrées ensemble. Traits et questions viennent des catalogues de l’API.
+Profiles are adult-only. Identity/bio updates send the intended field state; preferences are saved
+together. Traits and questions come from API catalogues. The owner manages up to three ordered
+answers; saving confirms replacement of the entire list, including clearing it. Public projections
+show approved text, while the owner sees moderation state.
 
-Le propriétaire peut gérer zéro à trois réponses ordonnées. L’enregistrement remplace la liste complète et demande confirmation, y compris pour un effacement. Chaque réponse respecte les limites du modèle et du contrat. Le propriétaire voit les états de modération ; les projections publiques ne montrent que les textes approuvés.
+One private photo can be selected, replaced or removed. Preparation produces an oriented JPEG
+without EXIF, limited to 500,000 upload bytes. An uncertain retry keeps its exact bytes and key.
+Signed photos are temporary, without disk caching or speculative partner downloads.
 
-Une seule photo privée peut être choisie, remplacée ou retirée. L’app prépare un JPEG sans EXIF, corrige son orientation et limite l’envoi à 500 000 octets. Une reprise conserve les mêmes octets et la même clé d’idempotence. Les URL signées restent temporaires, sans cache disque ni téléchargement partenaire anticipé.
+The owner's feed preview reuses public components and approved content, without inventing a
+distance/photo or allowing a swipe on the owner.
 
-L’aperçu de son profil réutilise les composants du feed avec les textes publics approuvés. Il n’invente ni distance ni photo et ne permet pas de swiper son propre profil.
+## Feed, location and pause
 
-## Feed, localisation et pause
+The server readiness diagnostic identifies missing steps. GPS is requested on demand after the
+Histae agreement and native permission; there is no background location tracking or reuse of an
+old native reading.
 
-Le diagnostic serveur guide les étapes nécessaires à la découverte. La position est demandée ponctuellement, après accord métier et permission système ; l’app ne suit pas les déplacements en arrière-plan et ne réutilise pas une ancienne mesure native. Une présence expirée masque le lot localement jusqu’à l’actualisation ou une action appropriée.
+When presence expires, stale candidates disappear and the recent-location step appears immediately.
+The app refreshes readiness automatically once, without triggering GPS. Repeated expired server
+timestamps do not start a request loop.
 
-Le feed présente prénom, âge, distance reçue, bio, traits et réponses sans photo. Un double appui permet d’aimer ; le geste de passage commence en fin de lecture pour préserver les profils longs. Des boutons offrent les mêmes actions. Une intention incertaine ne peut être reprise qu’avec la même cible et la même décision.
+Feed shows first name, age, server distance, biography, traits and answers without a photo.
+A double tap likes; a separate upward gesture at the end passes. Buttons offer the same actions.
+An uncertain choice can only resume with the same target and decision. A match requires a
+confirmed reciprocal result from the server.
 
-Deux likes réciproques peuvent créer un match, confirmé par la réponse serveur. Le mode pause est un réglage du compte partagé entre appareils : il masque les nouvelles découvertes et suspend les nouveaux likes/matchs, tout en conservant les conversations existantes. Son déploiement serveur est nécessaire à son fonctionnement.
+Pause mode is an account setting shared across devices. It hides new discovery and suspends new
+likes/matches while preserving existing conversations. Its API deployment is required.
 
-## Matchs et messages
+## Matches, messages and reveal
 
-Les états `active` et `confirmed` permettent l’envoi selon les droits reçus ; `awaiting_continuation` conserve l’historique et suspend la composition. Les échéances locales désactivent les actions sans fabriquer un nouvel état serveur.
+Server-authorized `active` and `confirmed` matches permit sending. `awaiting_continuation` keeps
+history readable and disables composition. Local deadlines disable actions without inventing a
+new server state. Message ordering and cursors follow the API.
 
-Les messages et curseurs suivent l’ordre du serveur. Un envoi conserve texte et UUID après réponse perdue ; sa reprise reste explicite. Les accusés de lecture concernent uniquement les messages reçus visibles au premier plan. Le temps réel est partagé entre parcours ; une notification vérifie les autorisations avant d’ouvrir une conversation.
+A lost send response retains text and UUID for an explicit retry. Read receipts apply only to
+received messages visible in the foreground. Shared real time refreshes affected resources;
+notification navigation verifies access before opening the conversation.
 
-Terminer un match et bloquer une personne sont des actions distinctes, confirmées. Débloquer ne restaure pas automatiquement une rencontre. Les données devenues inaccessibles sont purgées et les réponses tardives ignorées.
+Mutual photo reveal must be confirmed by the API. Losing access, closing the viewer or reaching its
+display deadline evicts the signed link and bytes. Reopening does not extend the deadline.
+Ending a match and blocking a person are distinct confirmed actions; unblocking does not recreate
+a match. Inaccessible data is purged and late responses are ignored.
 
-## Révélation, continuations et crédits
+## Continuations, credits and rewards
 
-La photo du partenaire ne devient affichable qu’après révélation mutuelle confirmée par l’API. Les liens et octets sont évincés à la perte d’accès, à la fermeture ou à leur échéance d’affichage ; réouvrir la vue ne renouvelle pas cette échéance.
+Before a continuation, the app rereads the match and quota, presents the person's cost and sends
+the accepted `credit_cost`. It never calculates a successful debit locally. A changed plan or stale
+offer requires renewed confirmation; an uncertain retry retains the accepted cost.
 
-Avant une continuation, l’app relit la rencontre et le quota puis présente le coût personnel à accepter. Elle envoie `credit_cost` sans calculer le débit localement. Un changement de formule ou une offre devenue trop ancienne exige une nouvelle présentation ; une reprise incertaine garde le coût accepté.
+Matches distinguishes available included credits, ad credits and the weekly cap. Reservations are
+not shown as available. Premium continuations use no credits; read failures are not zero balances.
 
-Matchs distingue les crédits gratuits disponibles, les crédits publicitaires disponibles et le plafond hebdomadaire. Les réservations ne sont pas affichées comme disponibles. Premium dispose de continuations sans crédit ; une erreur de lecture ne produit pas un faux zéro.
+Videos are optional for eligible Free users. The API intent supplies ad-unit/custom data; UMP
+handles ad preferences separately from Histae consent. SDK completion starts tracking, while only
+server validation grants the credit.
 
-## Vidéos, notifications et abonnement
+## Push and billing
 
-Les vidéos récompensées sont volontaires et réservées aux comptes Free éligibles. L’intention API fournit l’unité et `custom_data` ; UMP gère les préférences publicitaires indépendamment des consentements Histae. Le rappel du SDK déclenche le suivi, jamais un crédit local. Seule la validation serveur autorise la mise à jour du quota.
+Push requires public Firebase options, user enablement, native permission and API registration.
+In-app banners remain generic and openings are deduplicated. Removing a push device does not revoke
+its login session.
 
-Les push nécessitent configuration Firebase, activation volontaire, permission native et enregistrement auprès de l’API. Le bandeau de l’app reste générique et les ouvertures sont dédupliquées. Retirer un appareil push ne révoque pas sa session de connexion.
+Google Play and StoreKit provide native purchase UI and localized prices. The API supplies store
+product identifiers and verifies receipts before purchase completion. Restoration preserves the
+purchase's Histae owner. Effective Free/Premium rights come from the API, never a success URL or
+SDK status alone. Stripe subscriptions are managed on the website; the app offers no Stripe checkout.
 
-Les offres et leurs prix proviennent de `plans` et `offers`. Les niveaux de droits restent Free/Premium, avec périodicité mensuelle ou annuelle pour Checkout. L’intégration de paiement actuelle vise Android hors Play Store ; les versions stores nécessitent une intégration adaptée. Une URL de succès ou l’ouverture du navigateur ne prouve jamais un accès Premium : seule la projection de l’API le confirme.
+## Privacy and deletion
 
-## Vie privée et suppression
+Privacy groups documents, editable choices, sessions, devices, blocks, rights requests, export and
+deletion. Submitting a rights request does not immediately execute it. Private JSON exports are
+downloaded temporarily and shared explicitly; cleanup is restricted to app-owned files and cannot
+remove copies saved elsewhere.
 
-L’espace Vie privée regroupe documents, accords modifiables, sessions, appareils, blocages, demandes de droits, export et suppression. Une demande de droits déposée n’est pas une exécution immédiate.
+Deletion requires confirmation and a dedicated token. A `202` closes access and reports cleanup
+in progress. A lost response closes local access with an uncertain remote result, without claiming
+erasure is finished.
 
-L’export est téléchargé dans un fichier privé temporaire puis partagé sur action explicite. Son nettoyage reste limité aux fichiers appartenant à l’app ; les copies enregistrées ailleurs échappent à ce nettoyage.
-
-La suppression nécessite une confirmation et un jeton dédié. Un `202` ferme l’accès au compte et annonce un nettoyage en cours. Une réponse perdue entraîne une fermeture locale avec un résultat distant incertain, sans affirmer que l’effacement est terminé.
-
-## Règles communes
-
-Les onglets et lectures déjà obtenues restent en mémoire pendant la session. Actualisation manuelle, action métier, changement de langue et événement pertinent peuvent imposer de nouvelles lectures. Les règles du cache et de sa purge sont détaillées dans l’[architecture](ARCHITECTURE.md).
-
-Les curseurs sont opaques, les dates métier sont traitées avec leur fuseau et les erreurs par code. Respecter `Retry-After` ; ne pas ajouter de retry universel sur les mutations. Les secrets restent côté serveur et les données privées hors des logs.
-
-L’interface est disponible en quatre langues. Les bios, réponses et messages des personnes ne sont jamais traduits automatiquement ; la langue des catalogues et documents dépend du contrat décrit dans le [guide API](docs/api-languages.md).
-
-Les tests et aperçus utilisent des données simulées. La livraison du code, la disponibilité de l’API et la validation sur appareils/fournisseurs sont suivies séparément dans la [roadmap](roadmap.md).
+For shared caching and retry rules, use [Architecture](ARCHITECTURE.md). Interface and request
+language rules are in [Localization](lib/core/l10n/README.md) and [API languages](docs/api-languages.md).
