@@ -9,7 +9,11 @@ import 'package:histae_app/features/discovery/application/discovery_controller.d
 import 'package:histae_app/features/discovery/data/device_location.dart';
 import 'package:histae_app/features/discovery/data/discovery_models.dart';
 import 'package:histae_app/features/discovery/data/discovery_repository.dart';
+import 'package:histae_app/features/discovery/presentation/discovery_page.dart';
+import 'package:histae_app/features/discovery/presentation/discovery_status_sections.dart';
 import 'package:histae_app/features/discovery/presentation/feed_profile_card.dart';
+import 'package:histae_app/features/profile/application/profile_controller.dart';
+import 'package:histae_app/features/profile/data/profile_repository.dart';
 import 'package:http/http.dart' as http;
 
 import 'support/auth_fixture.dart';
@@ -190,7 +194,7 @@ void main() {
     expect(c.encounter, isNull);
   });
   testWidgets(
-    'presence expiry hides stale feed locally until manual refresh without requesting native location',
+    'presence expiry shows the location step and refreshes readiness once without automatic GPS',
     (tester) async {
       var now = DateTime.utc(2026, 10, 16, 12);
       final expires = now.add(const Duration(seconds: 2));
@@ -214,19 +218,81 @@ void main() {
       );
       addTearDown(c.dispose);
       await c.activate();
+      final profile = ProfileController(ProfileRepository(session));
+      addTearDown(profile.dispose);
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: histaeTheme(Brightness.dark),
+          home: DiscoveryPage(controller: c, profile: profile),
+        ),
+      );
+      expect(find.byType(FeedProfileCard), findsOneWidget);
       now = expires;
       await tester.pump(const Duration(seconds: 2));
       await tester.pump();
-      expect(reads, 1);
-      expect(c.ready, isFalse);
-      expect(c.current, isNull);
-      expect(source.calls, 0);
-      await c.refresh();
       expect(reads, 2);
       expect(c.ready, isFalse);
+      expect(c.status, isNotNull);
+      expect(c.requiredActions, [DiscoveryAction.freshPresence]);
+      expect(c.current, isNull);
       expect(source.calls, 0);
+      expect(find.byType(FeedProfileCard), findsNothing);
+      expect(find.byType(DiscoveryReadinessCard), findsOneWidget);
+      expect(find.text('Une position récente'), findsOneWidget);
+      expect(
+        find.text('Cette page a expiré. Actualisez les profils.'),
+        findsNothing,
+      );
+      await tester.pump(const Duration(minutes: 5));
+      expect(
+        reads,
+        2,
+        reason: 'the expired deadline must not start a read loop',
+      );
+      await c.refresh();
+      await tester.pump();
+      expect(reads, 3);
+      expect(c.ready, isFalse);
+      expect(source.calls, 0);
+      expect(find.byType(DiscoveryReadinessCard), findsOneWidget);
+      await tester.pumpWidget(const SizedBox());
     },
   );
+  testWidgets('an expired server deadline is refreshed once without a loop', (
+    tester,
+  ) async {
+    final now = DateTime.utc(2026, 10, 16, 12);
+    var feedReads = 0, statusReads = 0;
+    final session = testSession((r) async {
+      if (r.url.path.endsWith('discovery-status')) {
+        statusReads++;
+        return jsonResponse(
+          discoveryStatusJson(
+            expiresAt: now.subtract(const Duration(seconds: 1)),
+          ),
+        );
+      }
+      if (r.url.path == '/api/feed') feedReads++;
+      return defaultDiscoveryResponse(r);
+    });
+    addTearDown(session.dispose);
+    await session.establish(testTokens);
+    final source = TestLocationSource();
+    final c = DiscoveryController(
+      DiscoveryRepository(session),
+      source,
+      now: () => now,
+    );
+    addTearDown(c.dispose);
+    await c.activate();
+    await tester.pump();
+    await tester.pump(const Duration(minutes: 5));
+    expect(statusReads, 2);
+    expect(c.ready, isFalse);
+    expect(c.requiredActions, [DiscoveryAction.freshPresence]);
+    expect(feedReads, 0);
+    expect(source.calls, 0);
+  });
   test('Retry-After prevents resending and explicit block supersedes an uncertain like safely', () async {
     var fail = true;
     final requests = <http.Request>[];

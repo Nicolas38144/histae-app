@@ -216,7 +216,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
         return const HistaeScaffold(body: SizedBox.shrink());
       }
       final profile = c.current;
-      final required = c.status?.requiredActions ?? const <DiscoveryAction>[];
+      final required = c.requiredActions;
       final showFeed =
           c.ready &&
           !c.locating &&

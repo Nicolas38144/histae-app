@@ -72,6 +72,8 @@ Après connexion par code SMS et validation des documents nécessaires à l’ac
 
 Les trois onglets chargent leurs données au démarrage et conservent leur état pendant la session. Changer d’onglet ou revenir dans l’app réutilise les données ; les gestes et boutons d’actualisation lancent une nouvelle lecture. Les écrans secondaires chargent leurs données à la première ouverture. Les messages restent reçus en direct, et les actions ou événements serveur peuvent déclencher les vérifications nécessaires.
 
+Quand la position du feed expire, l’application affiche directement l’étape de localisation et relit automatiquement l’état de découverte une fois. Elle ne demande pas de nouvelle position GPS sans action de l’utilisateur et ne relance pas une boucle de lecture si l’API renvoie la même échéance expirée.
+
 L’API reste l’autorité pour les consentements, matchs, quotas, récompenses et abonnements. Le mode pause est un réglage serveur : sa disponibilité dépend du déploiement de `GET/PATCH /api/users/me/discovery-settings`.
 
 ## Identifiant du compte

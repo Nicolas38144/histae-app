@@ -71,7 +71,15 @@ class DiscoveryController extends ChangeNotifier {
 
   bool get active => _active && accessible;
 
-  bool get ready => status?.ready == true;
+  bool get _presenceExpired =>
+      status?.ready == true &&
+      status?.presenceExpiresAt?.isAfter(_now().toUtc()) == false;
+
+  bool get ready => status?.ready == true && !_presenceExpired;
+
+  List<DiscoveryAction> get requiredActions => _presenceExpired
+      ? const [DiscoveryAction.freshPresence]
+      : status?.requiredActions ?? const [];
 
   bool get busy => loading || locating || sending;
 
@@ -187,13 +195,12 @@ class DiscoveryController extends ChangeNotifier {
     _expiryTimer = Timer(wait.isNegative ? Duration.zero : wait, () {
       if (!active) return;
       _checkedExpiry = expires;
-      // The local deadline invalidates the displayed batch without a read;
-      // it never manufactures a server readiness result or publishes GPS.
+      // Show the location step immediately, then refresh server readiness once.
+      // Keep the checked deadline to avoid a loop if the server returns it again.
       _epoch++;
       _scope.cancel();
       _scope = RequestCancellation();
       if (sending && pending != null) uncertain = true;
-      status = null;
       _queue.clear();
       _seen.clear();
       _cursor = null;
@@ -201,6 +208,7 @@ class DiscoveryController extends ChangeNotifier {
       locating = false;
       sending = false;
       _notify();
+      unawaited(refresh());
     });
   }
 
@@ -226,7 +234,7 @@ class DiscoveryController extends ChangeNotifier {
       }
       status = next;
       _armExpiry();
-      if (!next.ready) {
+      if (!ready) {
         _queue.clear();
         _seen.clear();
         _cursor = null;
