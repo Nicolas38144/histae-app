@@ -129,8 +129,6 @@
   "billingStringsTheResponseDoesNotConfirmYour": "The response does not confirm your status. Refresh before continuing.",
   "billingStringsYourSubscriptionCannotBeCheckedRight": "Your subscription cannot be checked right now. Try again later.",
   "subscriptionPageContinueWith": "Continue with {arg0}",
-  "subscriptionPageAtYourOwnPace": "AT YOUR OWN PACE",
-  "subscriptionPageMoreRoomForAStory": "More room\nfor a story.",
   "subscriptionPageFindYourPlanAndWhatIt": "Find your plan and what it offers. Revealing photos always requires mutual consent.",
   "subscriptionPageYourSessionMustBeVerifiedTo": "Your session must be verified to view your subscription.",
   "subscriptionPageCheckingYourSubscription": "Checking your subscription",
@@ -862,5 +860,11 @@
   "accountIdentifierTitle": "My account ID",
   "accountIdentifierCopy": "Copy my account ID",
   "accountIdentifierCopied": "Account ID copied",
-  "accountIdentifierCopyFailed": "Unable to copy the account ID"
+  "accountIdentifierCopyFailed": "Unable to copy the account ID",
+  "subscriptionPreviousOffer": "Previous plan",
+  "subscriptionNextOffer": "Next plan",
+  "subscriptionOfferPosition": "Plan {current} of {total}",
+  "subscriptionFreeOffer": "Free",
+  "subscriptionMonthlyOffer": "Monthly",
+  "subscriptionAnnualOffer": "Annual"
 }

@@ -7,6 +7,7 @@ import '../../catalog/data/plan_catalog.dart';
 import '../../catalog/presentation/plan_card.dart';
 import '../data/billing_gateway.dart';
 import '../data/billing_models.dart';
+import 'subscription_plan_carousel.dart';
 
 class SubscriptionPlans extends StatelessWidget {
   const SubscriptionPlans({
@@ -72,37 +73,47 @@ class SubscriptionPlans extends StatelessWidget {
         ],
       );
     }
-    return Column(
-      children: [
+    final copy = AppStrings.of(context).messages;
+    return SubscriptionPlanCarousel(
+      slides: [
         for (final offer in catalog.offers)
-          PlanCard(
-            plan: catalog.plans.firstWhere(
-              (plan) => plan.code == offer.planCode,
+          (
+            id: offer.code,
+            label: switch (offer.billingPeriod) {
+              null => copy.subscriptionFreeOffer,
+              BillingPeriod.monthly => copy.subscriptionMonthlyOffer,
+              BillingPeriod.annual => copy.subscriptionAnnualOffer,
+            },
+            child: PlanCard(
+              key: ValueKey('plan-offer-${offer.code}'),
+              plan: catalog.plans.firstWhere(
+                (plan) => plan.code == offer.planCode,
+              ),
+              offer: offer,
+              priceLabel: _price(context, offer),
+              action:
+                  offer.billingPeriod != null &&
+                      paymentsAvailable &&
+                      canSubscribe &&
+                      hasPending == false
+                  ? HistaeButton(
+                      onPressed: canAct ? () => onChoose(offer) : null,
+                      child: Text(
+                        AppStrings.of(context).messages
+                            .chooseOffer(offer.displayName),
+                      ),
+                    )
+                  : offer.billingPeriod != null && !paymentsAvailable
+                  ? OutlinedButton(
+                      onPressed: null,
+                      child: Text(
+                        AppStrings.of(context)
+                            .messages
+                            .subscriptionPlansPaymentUnavailable,
+                      ),
+                    )
+                  : null,
             ),
-            offer: offer,
-            priceLabel: _price(context, offer),
-            action:
-                offer.billingPeriod != null &&
-                    paymentsAvailable &&
-                    canSubscribe &&
-                    hasPending == false
-                ? HistaeButton(
-                    onPressed: canAct ? () => onChoose(offer) : null,
-                    child: Text(
-                      AppStrings.of(context).messages
-                          .chooseOffer(offer.displayName),
-                    ),
-                  )
-                : offer.billingPeriod != null && !paymentsAvailable
-                ? OutlinedButton(
-                    onPressed: null,
-                    child: Text(
-                      AppStrings.of(context)
-                          .messages
-                          .subscriptionPlansPaymentUnavailable,
-                    ),
-                  )
-                : null,
           ),
       ],
     );

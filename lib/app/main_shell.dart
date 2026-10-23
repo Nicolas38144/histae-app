@@ -49,7 +49,7 @@ class _MainShellState extends State<MainShell> {
   final _pageStorage = PageStorageBucket();
   PushController? _push;
   bool _covered = false;
-  int _selected = 0;
+  MainTab _selected = MainTab.discovery;
   String? _initialMatchId;
   bool? _lastPaused;
 
@@ -91,9 +91,10 @@ class _MainShellState extends State<MainShell> {
   }
 
   void _select(int index) {
-    if (_selected == index) return;
+    final tab = MainTab.values[index];
+    if (_selected == tab) return;
     setState(() {
-      _selected = index;
+      _selected = tab;
       _initialMatchId = null;
     });
   }
@@ -101,12 +102,12 @@ class _MainShellState extends State<MainShell> {
   Future<void> _openMatches([String? id]) async {
     if (!mounted || widget.session.phase != SessionPhase.ready) return;
     if (id == null) {
-      _select(1);
+      _select(MainTab.matches.index);
       return;
     }
     Navigator.of(context).popUntil((route) => route.isFirst);
     setState(() {
-      _selected = 1;
+      _selected = MainTab.matches;
       _initialMatchId = id;
     });
   }
@@ -130,36 +131,39 @@ class _MainShellState extends State<MainShell> {
       child: Offstage(
         offstage: _covered,
         child: IndexedStack(
-          index: _selected,
+          index: _selected.index,
           children: [
-            DiscoveryPage(
-              key: const PageStorageKey('main-discovery'),
-              controller: _discovery,
-              profile: _profile,
-              visibility: _visibility,
-              openMatches: _openMatches,
-            ),
-            MatchesPage(
-              key: const PageStorageKey('main-matches'),
-              controller: _matches,
-              initialMatchId: _initialMatchId,
-              onInitialMatchHandled: () => _initialMatchId = null,
-            ),
-            ProfilePage(
-              key: const PageStorageKey('main-profile'),
-              controller: _profile,
-              privacyRepository: _repositories.privacy,
-              deviceRepository: _repositories.devices,
-              continuation: _matches.continuation,
-              catalog: widget.catalog,
-              visibility: _visibility,
-            ),
+            for (final tab in MainTab.values)
+              switch (tab) {
+                MainTab.discovery => DiscoveryPage(
+                  key: const PageStorageKey('main-discovery'),
+                  controller: _discovery,
+                  profile: _profile,
+                  visibility: _visibility,
+                  openMatches: _openMatches,
+                ),
+                MainTab.matches => MatchesPage(
+                  key: const PageStorageKey('main-matches'),
+                  controller: _matches,
+                  initialMatchId: _initialMatchId,
+                  onInitialMatchHandled: () => _initialMatchId = null,
+                ),
+                MainTab.profile => ProfilePage(
+                  key: const PageStorageKey('main-profile'),
+                  controller: _profile,
+                  privacyRepository: _repositories.privacy,
+                  deviceRepository: _repositories.devices,
+                  continuation: _matches.continuation,
+                  catalog: widget.catalog,
+                  visibility: _visibility,
+                ),
+              },
           ],
         ),
       ),
     ),
     bottomNavigationBar: MainNavigationBar(
-      selectedIndex: _selected,
+      selectedIndex: _selected.index,
       onSelected: _select,
     ),
   );

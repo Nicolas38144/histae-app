@@ -546,14 +546,6 @@
       }
     }
   },
-  "subscriptionPageAtYourOwnPace": "À VOTRE RYTHME",
-  "@subscriptionPageAtYourOwnPace": {
-    "description": "Interface: lib/features/billing/presentation/subscription_page.dart"
-  },
-  "subscriptionPageMoreRoomForAStory": "Plus de place\npour une histoire.",
-  "@subscriptionPageMoreRoomForAStory": {
-    "description": "Interface: lib/features/billing/presentation/subscription_page.dart"
-  },
   "subscriptionPageFindYourPlanAndWhatIt": "Retrouvez votre formule et ce qu’elle vous permet de vivre. La révélation des photos demande toujours votre accord mutuel.",
   "@subscriptionPageFindYourPlanAndWhatIt": {
     "description": "Interface: lib/features/billing/presentation/subscription_page.dart"
@@ -3733,5 +3725,22 @@
   "accountIdentifierTitle": "Identifiant de mon compte",
   "accountIdentifierCopy": "Copier mon identifiant",
   "accountIdentifierCopied": "Identifiant copié",
-  "accountIdentifierCopyFailed": "Impossible de copier l’identifiant"
+  "accountIdentifierCopyFailed": "Impossible de copier l’identifiant",
+  "subscriptionPreviousOffer": "Offre précédente",
+  "subscriptionNextOffer": "Offre suivante",
+  "subscriptionOfferPosition": "Offre {current} sur {total}",
+  "@subscriptionOfferPosition": {
+    "description": "Position of the selected subscription offer in the carousel.",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "subscriptionFreeOffer": "Gratuit",
+  "subscriptionMonthlyOffer": "Mensuel",
+  "subscriptionAnnualOffer": "Annuel"
 }

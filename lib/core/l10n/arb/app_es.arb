@@ -129,8 +129,6 @@
   "billingStringsTheResponseDoesNotConfirmYour": "La respuesta no permite confirmar tu situación. Actualiza antes de continuar.",
   "billingStringsYourSubscriptionCannotBeCheckedRight": "No se puede verificar tu suscripción por ahora. Reinténtalo más tarde.",
   "subscriptionPageContinueWith": "Continuar con {arg0}",
-  "subscriptionPageAtYourOwnPace": "A TU RITMO",
-  "subscriptionPageMoreRoomForAStory": "Más espacio\npara una historia.",
   "subscriptionPageFindYourPlanAndWhatIt": "Consulta tu plan y lo que te ofrece. Revelar las fotos siempre requiere un acuerdo mutuo.",
   "subscriptionPageYourSessionMustBeVerifiedTo": "Es necesario verificar tu sesión para consultar la suscripción.",
   "subscriptionPageCheckingYourSubscription": "Verificando tu suscripción",
@@ -862,5 +860,11 @@
   "accountIdentifierTitle": "Identificador de mi cuenta",
   "accountIdentifierCopy": "Copiar mi identificador",
   "accountIdentifierCopied": "Identificador copiado",
-  "accountIdentifierCopyFailed": "No se ha podido copiar el identificador"
+  "accountIdentifierCopyFailed": "No se ha podido copiar el identificador",
+  "subscriptionPreviousOffer": "Oferta anterior",
+  "subscriptionNextOffer": "Siguiente oferta",
+  "subscriptionOfferPosition": "Oferta {current} de {total}",
+  "subscriptionFreeOffer": "Gratis",
+  "subscriptionMonthlyOffer": "Mensual",
+  "subscriptionAnnualOffer": "Anual"
 }

@@ -473,13 +473,6 @@ class AppMessagesEs extends AppMessages {
   }
 
   @override
-  String get subscriptionPageAtYourOwnPace => 'A TU RITMO';
-
-  @override
-  String get subscriptionPageMoreRoomForAStory =>
-      'Más espacio\npara una historia.';
-
-  @override
   String get subscriptionPageFindYourPlanAndWhatIt =>
       'Consulta tu plan y lo que te ofrece. Revelar las fotos siempre requiere un acuerdo mutuo.';
 
@@ -3203,4 +3196,24 @@ class AppMessagesEs extends AppMessages {
   @override
   String get accountIdentifierCopyFailed =>
       'No se ha podido copiar el identificador';
+
+  @override
+  String get subscriptionPreviousOffer => 'Oferta anterior';
+
+  @override
+  String get subscriptionNextOffer => 'Siguiente oferta';
+
+  @override
+  String subscriptionOfferPosition(int current, int total) {
+    return 'Oferta $current de $total';
+  }
+
+  @override
+  String get subscriptionFreeOffer => 'Gratis';
+
+  @override
+  String get subscriptionMonthlyOffer => 'Mensual';
+
+  @override
+  String get subscriptionAnnualOffer => 'Anual';
 }

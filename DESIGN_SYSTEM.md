@@ -75,7 +75,7 @@ acceptance and privacy-notice acknowledgement.
 
 ## Navigation and accessibility
 
-The Feed / Matches / Profile bar is transparent, with no panel, shadow or separator. Icons are
+The Profile / Feed / Matches bar is transparent, with no panel, shadow or separator. Icons are
 24 px; the selected icon has a 44 px lavender circle, a label below and a full-tab touch target.
 Reduced motion removes the circle transition. System bars remain transparent with appropriate
 bottom spacing for scrollable content.
@@ -86,3 +86,7 @@ details and confirmations remain scrollable. Never globally shrink the person's 
 
 Use [visual previews](docs/development.md#visual-previews) for relevant states and translations.
 Native icon masks, fonts and cold starts still need Android/iOS device review.
+
+Subscription offers use a horizontal carousel with named selectors, previous/next buttons and
+a localized position label. Its height follows the selected card, including large text; offers
+appear before subscription maintenance actions. Feed remains the initial tab at the center.

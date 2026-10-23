@@ -161,25 +161,23 @@ class _SubscriptionPageState extends State<SubscriptionPage>
               child: ListView(
                 padding: const EdgeInsets.all(24),
                 children: [
-                  EditorialCard(
-                    eyebrow: AppStrings.of(context)
-                        .messages
-                        .subscriptionPageAtYourOwnPace,
-                    title: AppStrings.of(context)
-                        .messages
-                        .subscriptionPageMoreRoomForAStory,
-                    body: AppStrings.of(context)
+                  Text(
+                    AppStrings.of(context)
                         .messages
                         .subscriptionPageFindYourPlanAndWhatIt,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                   const SizedBox(height: 20),
-                  if (!c.accessible)
+                  if (!c.accessible) ...[
                     Text(
                       AppStrings.of(context)
                           .messages
                           .subscriptionPageYourSessionMustBeVerifiedTo,
-                    )
-                  else ...[
+                    ),
+                    _plans(context),
+                  ] else ...[
                     if (c.loading)
                       LinearProgressIndicator(
                         semanticsLabel: AppStrings.of(context)
@@ -220,6 +218,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                         ),
                       ),
                     ],
+                    _plans(context),
                     const SizedBox(height: 20),
                     OutlinedButton.icon(
                       onPressed: c.loading || c.busy || c.retrySeconds > 0
@@ -282,25 +281,6 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                         ),
                       ),
                   ],
-                  const EditorialDivider(),
-                  Text(
-                    AppStrings.of(context).messages.subscriptionPagePlans,
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                  const SizedBox(height: 16),
-                  if (_catalog case final catalog?)
-                    ListenableBuilder(
-                      listenable: catalog,
-                      builder: (context, _) => SubscriptionPlans(
-                        catalog: catalog,
-                        paymentsAvailable: c.paymentsAvailable,
-                        canSubscribe: c.subscription?.accessGranted == false,
-                        hasPending: c.purchasePending,
-                        storeOffers: c.offers,
-                        canAct: _canAct,
-                        onChoose: _choose,
-                      ),
-                    ),
                 ],
               ),
             ),
@@ -308,6 +288,31 @@ class _SubscriptionPageState extends State<SubscriptionPage>
         ),
       ),
     ),
+  );
+
+  Widget _plans(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      const EditorialDivider(),
+      Text(
+        AppStrings.of(context).messages.subscriptionPagePlans,
+        style: Theme.of(context).textTheme.headlineMedium,
+      ),
+      const SizedBox(height: 16),
+      if (_catalog case final catalog?)
+        ListenableBuilder(
+          listenable: catalog,
+          builder: (context, _) => SubscriptionPlans(
+            catalog: catalog,
+            paymentsAvailable: c.paymentsAvailable,
+            canSubscribe: c.subscription?.accessGranted == false,
+            hasPending: c.purchasePending,
+            storeOffers: c.offers,
+            canAct: _canAct,
+            onChoose: _choose,
+          ),
+        ),
+    ],
   );
 
   bool get _canAct =>

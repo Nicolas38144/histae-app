@@ -469,12 +469,6 @@ class AppMessagesEn extends AppMessages {
   }
 
   @override
-  String get subscriptionPageAtYourOwnPace => 'AT YOUR OWN PACE';
-
-  @override
-  String get subscriptionPageMoreRoomForAStory => 'More room\nfor a story.';
-
-  @override
   String get subscriptionPageFindYourPlanAndWhatIt =>
       'Find your plan and what it offers. Revealing photos always requires mutual consent.';
 
@@ -3170,4 +3164,24 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get accountIdentifierCopyFailed => 'Unable to copy the account ID';
+
+  @override
+  String get subscriptionPreviousOffer => 'Previous plan';
+
+  @override
+  String get subscriptionNextOffer => 'Next plan';
+
+  @override
+  String subscriptionOfferPosition(int current, int total) {
+    return 'Plan $current of $total';
+  }
+
+  @override
+  String get subscriptionFreeOffer => 'Free';
+
+  @override
+  String get subscriptionMonthlyOffer => 'Monthly';
+
+  @override
+  String get subscriptionAnnualOffer => 'Annual';
 }

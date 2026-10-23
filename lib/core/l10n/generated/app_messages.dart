@@ -879,18 +879,6 @@ abstract class AppMessages {
   /// Interface: lib/features/billing/presentation/subscription_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'À VOTRE RYTHME'**
-  String get subscriptionPageAtYourOwnPace;
-
-  /// Interface: lib/features/billing/presentation/subscription_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Plus de place\npour une histoire.'**
-  String get subscriptionPageMoreRoomForAStory;
-
-  /// Interface: lib/features/billing/presentation/subscription_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Retrouvez votre formule et ce qu’elle vous permet de vivre. La révélation des photos demande toujours votre accord mutuel.'**
   String get subscriptionPageFindYourPlanAndWhatIt;
 
@@ -5251,6 +5239,42 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Impossible de copier l’identifiant'**
   String get accountIdentifierCopyFailed;
+
+  /// No description provided for @subscriptionPreviousOffer.
+  ///
+  /// In fr, this message translates to:
+  /// **'Offre précédente'**
+  String get subscriptionPreviousOffer;
+
+  /// No description provided for @subscriptionNextOffer.
+  ///
+  /// In fr, this message translates to:
+  /// **'Offre suivante'**
+  String get subscriptionNextOffer;
+
+  /// Position of the selected subscription offer in the carousel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Offre {current} sur {total}'**
+  String subscriptionOfferPosition(int current, int total);
+
+  /// No description provided for @subscriptionFreeOffer.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gratuit'**
+  String get subscriptionFreeOffer;
+
+  /// No description provided for @subscriptionMonthlyOffer.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mensuel'**
+  String get subscriptionMonthlyOffer;
+
+  /// No description provided for @subscriptionAnnualOffer.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuel'**
+  String get subscriptionAnnualOffer;
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

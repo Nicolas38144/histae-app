@@ -40,8 +40,19 @@ void main() {
         tester
             .widget<MainNavigationBar>(find.byType(MainNavigationBar))
             .selectedIndex,
-        0,
+        MainTab.discovery.index,
       );
+      final profilePosition = tester.getCenter(
+        find.byKey(const Key('main-tab-profile')),
+      );
+      final feedPosition = tester.getCenter(
+        find.byKey(const Key('main-tab-discovery')),
+      );
+      final matchesPosition = tester.getCenter(
+        find.byKey(const Key('main-tab-matches')),
+      );
+      expect(profilePosition.dx, lessThan(feedPosition.dx));
+      expect(feedPosition.dx, lessThan(matchesPosition.dx));
       expect(find.byType(BackButton), findsNothing);
 
       await tester.tap(find.byKey(const Key('main-tab-matches')));
@@ -162,7 +173,7 @@ void main() {
       tester
           .widget<MainNavigationBar>(find.byType(MainNavigationBar))
           .selectedIndex,
-      1,
+      MainTab.matches.index,
     );
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox.shrink());

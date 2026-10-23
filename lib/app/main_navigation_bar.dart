@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../core/l10n/app_strings.dart';
 
+enum MainTab { profile, discovery, matches }
+
 class MainNavigationBar extends StatelessWidget {
   const MainNavigationBar({
     super.key,
@@ -17,24 +19,27 @@ class MainNavigationBar extends StatelessWidget {
     final largeText = MediaQuery.textScalerOf(context).scale(12) > 18;
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
     final destinations = [
-      (
-        key: 'discovery',
-        label: AppStrings.of(context).messages.mainNavigationBarFeed,
-        icon: Icons.home_outlined,
-        selected: Icons.home_rounded,
-      ),
-      (
-        key: 'matches',
-        label: AppStrings.of(context).messages.mainNavigationBarMatches,
-        icon: Icons.forum_outlined,
-        selected: Icons.forum_rounded,
-      ),
-      (
-        key: 'profile',
-        label: AppStrings.of(context).messages.mainNavigationBarProfile,
-        icon: Icons.person_outline_rounded,
-        selected: Icons.person_rounded,
-      ),
+      for (final tab in MainTab.values)
+        switch (tab) {
+          MainTab.discovery => (
+            key: 'discovery',
+            label: AppStrings.of(context).messages.mainNavigationBarFeed,
+            icon: Icons.home_outlined,
+            selected: Icons.home_rounded,
+          ),
+          MainTab.matches => (
+            key: 'matches',
+            label: AppStrings.of(context).messages.mainNavigationBarMatches,
+            icon: Icons.forum_outlined,
+            selected: Icons.forum_rounded,
+          ),
+          MainTab.profile => (
+            key: 'profile',
+            label: AppStrings.of(context).messages.mainNavigationBarProfile,
+            icon: Icons.person_outline_rounded,
+            selected: Icons.person_rounded,
+          ),
+        },
     ];
     int labelWidth(String label) {
       final painter = TextPainter(
