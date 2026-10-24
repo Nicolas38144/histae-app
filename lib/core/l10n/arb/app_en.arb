@@ -866,5 +866,21 @@
   "subscriptionOfferPosition": "Plan {current} of {total}",
   "subscriptionFreeOffer": "Free",
   "subscriptionMonthlyOffer": "Monthly",
-  "subscriptionAnnualOffer": "Annual"
+  "subscriptionAnnualOffer": "Annual",
+  "registrationProfileStep": "Your profile",
+  "registrationPreferencesStep": "Your preferences",
+  "registrationConsentsStep": "Your consent choices",
+  "registrationPhoneStep": "Your number",
+  "registrationStep": "Step {step} of 4 · {title}",
+  "registrationContinue": "Continue",
+  "registrationLocalDraft": "Take your time introducing yourself. Your information stays on this device during sign-up and will only be sent after your number is verified.",
+  "registrationSensitiveDraft": "Your sex and preferences will only be sent with your agreement at the next step, after your number is verified.",
+  "registrationConsentIntro": "Your choices will be saved after your number is verified. You can decline sensitive data processing and location; discovery will then remain unavailable.",
+  "registrationPhoneTitle": "One last step, and you’re here.",
+  "registrationPhoneIntro": "Verify your number by SMS to create your account and save your introduction. Your number will not appear on your profile.",
+  "registrationLeaveTitle": "Leave sign-up?",
+  "registrationLeaveBody": "Any information from this sign-up that has not been saved will be lost.",
+  "registrationExistingAccount": "This number is already linked to a Histae account. Continue to your space: your existing profile will be kept.",
+  "registrationSaving": "Finish signing up",
+  "registrationRetrySave": "Your number is verified. Your information is kept during sign-up: you can resume saving without requesting another code."
 }

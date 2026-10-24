@@ -10,9 +10,10 @@ import '../data/auth_repository.dart';
 import 'session_controller.dart';
 
 class OtpController extends ChangeNotifier {
-  OtpController(this.session, {DateTime Function()? now})
+  OtpController(this.session, {DateTime Function()? now, this.onAuthenticated})
     : _now = now ?? DateTime.now;
   final SessionController session;
+  final Future<void> Function(TokenPair tokens)? onAuthenticated;
   final DateTime Function() _now;
   String? _phone;
   String? _key;
@@ -94,7 +95,12 @@ class OtpController extends ChangeNotifier {
           _request!,
         );
         if (!_disposed) {
-          await session.establish(pair);
+          final complete = onAuthenticated;
+          if (complete == null) {
+            await session.establish(pair);
+          } else {
+            await complete(pair);
+          }
         } else {
           // A known late login response can still be revoked. Never establish
           // a session after its login screen was abandoned.

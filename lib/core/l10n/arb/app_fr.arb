@@ -3742,5 +3742,77 @@
   },
   "subscriptionFreeOffer": "Gratuit",
   "subscriptionMonthlyOffer": "Mensuel",
-  "subscriptionAnnualOffer": "Annuel"
+  "subscriptionAnnualOffer": "Annuel",
+  "registrationProfileStep": "Votre profil",
+  "registrationPreferencesStep": "Vos préférences",
+  "registrationConsentsStep": "Vos consentements",
+  "registrationPhoneStep": "Votre numéro",
+  "registrationStep": "Étape {step} sur 4 · {title}",
+  "registrationContinue": "Continuer",
+  "registrationLocalDraft": "Prenez le temps de vous présenter. Vos informations restent sur cet appareil pendant ce parcours et ne seront envoyées qu’après la vérification de votre numéro.",
+  "registrationSensitiveDraft": "Votre sexe et vos préférences ne seront transmis qu’avec votre accord à l’étape suivante, après la vérification de votre numéro.",
+  "registrationConsentIntro": "Vos choix seront enregistrés après la vérification de votre numéro. Vous pouvez refuser les données sensibles et la localisation ; la découverte restera alors indisponible.",
+  "registrationPhoneTitle": "Un dernier pas, et vous y êtes.",
+  "registrationPhoneIntro": "Vérifiez votre numéro par SMS pour créer votre compte et enregistrer votre présentation. Votre numéro n’apparaîtra pas sur votre profil.",
+  "registrationLeaveTitle": "Quitter cette inscription ?",
+  "registrationLeaveBody": "Les informations de ce parcours qui n’ont pas été enregistrées seront perdues.",
+  "registrationExistingAccount": "Ce numéro est déjà lié à un compte Histae. Retrouvez votre espace : votre profil existant sera conservé.",
+  "registrationSaving": "Finaliser votre inscription",
+  "registrationRetrySave": "Votre numéro est vérifié. Vos informations sont conservées pendant ce parcours : vous pouvez reprendre l’enregistrement sans demander un nouveau code.",
+  "@registrationProfileStep": {
+    "description": "Registration flow before phone verification"
+  },
+  "@registrationPreferencesStep": {
+    "description": "Registration flow before phone verification"
+  },
+  "@registrationConsentsStep": {
+    "description": "Registration flow before phone verification"
+  },
+  "@registrationPhoneStep": {
+    "description": "Registration flow before phone verification"
+  },
+  "@registrationStep": {
+    "description": "Registration flow before phone verification",
+    "placeholders": {
+      "step": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "@registrationContinue": {
+    "description": "Registration flow before phone verification"
+  },
+  "@registrationLocalDraft": {
+    "description": "Registration flow before phone verification"
+  },
+  "@registrationSensitiveDraft": {
+    "description": "Registration flow before phone verification"
+  },
+  "@registrationConsentIntro": {
+    "description": "Registration flow before phone verification"
+  },
+  "@registrationPhoneTitle": {
+    "description": "Registration flow before phone verification"
+  },
+  "@registrationPhoneIntro": {
+    "description": "Registration flow before phone verification"
+  },
+  "@registrationLeaveTitle": {
+    "description": "Registration flow before phone verification"
+  },
+  "@registrationLeaveBody": {
+    "description": "Registration flow before phone verification"
+  },
+  "@registrationExistingAccount": {
+    "description": "Registration flow before phone verification"
+  },
+  "@registrationSaving": {
+    "description": "Registration flow before phone verification"
+  },
+  "@registrationRetrySave": {
+    "description": "Registration flow before phone verification"
+  }
 }

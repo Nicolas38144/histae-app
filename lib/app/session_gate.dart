@@ -7,11 +7,13 @@ import '../features/auth/application/session_controller.dart';
 import '../features/catalog/data/catalog_repository.dart';
 import '../features/consents/presentation/consents_page.dart';
 import '../features/privacy/presentation/privacy_strings.dart';
+import '../features/registration/application/registration_controller.dart';
+import '../features/registration/presentation/registration_page.dart';
 import 'main_shell.dart';
 import 'session_repositories.dart';
 import 'welcome_page.dart';
 
-class SessionGate extends StatelessWidget {
+class SessionGate extends StatefulWidget {
   const SessionGate({
     super.key,
     required this.session,
@@ -23,11 +25,50 @@ class SessionGate extends StatelessWidget {
   final SessionRepositories? repositories;
 
   @override
+  State<SessionGate> createState() => _SessionGateState();
+}
+
+class _SessionGateState extends State<SessionGate> {
+  RegistrationController? _registration;
+  SessionController get session => widget.session;
+  CatalogRepository? get catalog => widget.catalog;
+  SessionRepositories? get repositories => widget.repositories;
+
+  void _register() => setState(() {
+    _registration = RegistrationController(session);
+  });
+
+  void _endRegistration() {
+    final previous = _registration;
+    setState(() {
+      _registration = null;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => previous?.dispose());
+  }
+
+  @override
+  void dispose() {
+    _registration?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
+    if (_registration case final registration?) {
+      return RegistrationPage(
+        controller: registration,
+        onComplete: _endRegistration,
+        onCancel: _endRegistration,
+      );
+    }
     switch (session.phase) {
       case SessionPhase.signedOut:
-        return WelcomePage(repository: catalog, session: session);
+        return WelcomePage(
+          repository: catalog,
+          session: session,
+          onRegister: _register,
+        );
       case SessionPhase.needsConsents:
         return ConsentsPage(session: session, onboarding: true);
       case SessionPhase.ready:

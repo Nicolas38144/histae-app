@@ -3223,4 +3223,61 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get subscriptionAnnualOffer => 'Annuel';
+
+  @override
+  String get registrationProfileStep => 'Votre profil';
+
+  @override
+  String get registrationPreferencesStep => 'Vos préférences';
+
+  @override
+  String get registrationConsentsStep => 'Vos consentements';
+
+  @override
+  String get registrationPhoneStep => 'Votre numéro';
+
+  @override
+  String registrationStep(int step, String title) {
+    return 'Étape $step sur 4 · $title';
+  }
+
+  @override
+  String get registrationContinue => 'Continuer';
+
+  @override
+  String get registrationLocalDraft =>
+      'Prenez le temps de vous présenter. Vos informations restent sur cet appareil pendant ce parcours et ne seront envoyées qu’après la vérification de votre numéro.';
+
+  @override
+  String get registrationSensitiveDraft =>
+      'Votre sexe et vos préférences ne seront transmis qu’avec votre accord à l’étape suivante, après la vérification de votre numéro.';
+
+  @override
+  String get registrationConsentIntro =>
+      'Vos choix seront enregistrés après la vérification de votre numéro. Vous pouvez refuser les données sensibles et la localisation ; la découverte restera alors indisponible.';
+
+  @override
+  String get registrationPhoneTitle => 'Un dernier pas, et vous y êtes.';
+
+  @override
+  String get registrationPhoneIntro =>
+      'Vérifiez votre numéro par SMS pour créer votre compte et enregistrer votre présentation. Votre numéro n’apparaîtra pas sur votre profil.';
+
+  @override
+  String get registrationLeaveTitle => 'Quitter cette inscription ?';
+
+  @override
+  String get registrationLeaveBody =>
+      'Les informations de ce parcours qui n’ont pas été enregistrées seront perdues.';
+
+  @override
+  String get registrationExistingAccount =>
+      'Ce numéro est déjà lié à un compte Histae. Retrouvez votre espace : votre profil existant sera conservé.';
+
+  @override
+  String get registrationSaving => 'Finaliser votre inscription';
+
+  @override
+  String get registrationRetrySave =>
+      'Votre numéro est vérifié. Vos informations sont conservées pendant ce parcours : vous pouvez reprendre l’enregistrement sans demander un nouveau code.';
 }

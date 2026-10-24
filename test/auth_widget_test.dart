@@ -94,7 +94,7 @@ void main() {
   }
 
   testWidgets(
-    'registration is explicit and private space requires OTP then server consent completion',
+    'returning sign-in requires OTP then current server consent completion',
     (tester) async {
       tester.view.physicalSize = const Size(800, 1800);
       tester.view.devicePixelRatio = 1;
@@ -113,7 +113,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Mon profil'), findsNothing);
       expect(find.text('J’ai déjà un compte'), findsOneWidget);
-      await revealAndTap(tester, find.text('Créer mon compte'));
+      await revealAndTap(tester, find.text('J’ai déjà un compte'));
       await tester.enterText(
         find.byKey(const Key('phone')),
         '+33 6 12 34 56 78',

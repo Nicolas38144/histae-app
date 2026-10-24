@@ -13,9 +13,15 @@ import '../features/catalog/presentation/catalog_page.dart';
 import '../features/privacy/presentation/privacy_strings.dart';
 
 class WelcomePage extends StatelessWidget {
-  const WelcomePage({super.key, required this.repository, this.session});
+  const WelcomePage({
+    super.key,
+    required this.repository,
+    this.session,
+    this.onRegister,
+  });
   final CatalogRepository? repository;
   final SessionController? session;
+  final VoidCallback? onRegister;
 
   @override
   Widget build(BuildContext context) {
@@ -65,12 +71,7 @@ class WelcomePage extends StatelessWidget {
                   if (auth.failure case final failure?)
                     Text(strings.authFailure(failure)),
                   HistaeButton(
-                    onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) =>
-                            OtpPage(session: auth, registration: true),
-                      ),
-                    ),
+                    onPressed: onRegister,
                     child: Text(strings.createAccount),
                   ),
                   const SizedBox(height: 12),

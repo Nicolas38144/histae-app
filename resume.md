@@ -7,9 +7,21 @@ authorization. The mobile app contains neither administration UI nor `/api/admin
 
 ## Account access and consent
 
-Registration and returning sign-in share the French phone/SMS OTP flow. There is no separate
-password-based registration endpoint. An accepted SMS request does not prove delivery; a lost
-verification result requires a new code.
+Registration proceeds through profile (first name, birthdate, sex and biography), preferences,
+consent choices, then French phone/SMS OTP verification. The draft stays in flow memory between
+steps; no private field or consent is sent before verification. Closing the flow or process discards
+unsaved values. Returning sign-in opens phone verification directly. Both flows share the same OTP
+implementation; there is no separate password-based registration endpoint. An accepted SMS request
+does not prove delivery; a lost verification result requires a new code.
+
+`GET /api/legal/documents` supplies the current public document metadata, using the same versions,
+URLs and language fallbacks as the authenticated consent endpoint. Deploy this API route before the
+new registration flow. After verification, the app compares the documents again, saves the explicit
+consent choices, then the profile and permitted preferences. Sex and preferences are omitted without
+sensitive-data consent. An existing account is preserved rather than overwritten by a sign-up draft.
+An interrupted save can be resumed manually without another SMS; uncertain writes are checked by
+reading the current server state first. Photos, traits and question answers remain editable from
+the profile once the account is created.
 
 Private access depends on the API's current required documents. Terms are accepted and the privacy
 notice is acknowledged. New choices are not preselected. Sensitive-data and location agreements

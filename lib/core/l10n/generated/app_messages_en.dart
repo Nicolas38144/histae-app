@@ -3184,4 +3184,61 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get subscriptionAnnualOffer => 'Annual';
+
+  @override
+  String get registrationProfileStep => 'Your profile';
+
+  @override
+  String get registrationPreferencesStep => 'Your preferences';
+
+  @override
+  String get registrationConsentsStep => 'Your consent choices';
+
+  @override
+  String get registrationPhoneStep => 'Your number';
+
+  @override
+  String registrationStep(int step, String title) {
+    return 'Step $step of 4 · $title';
+  }
+
+  @override
+  String get registrationContinue => 'Continue';
+
+  @override
+  String get registrationLocalDraft =>
+      'Take your time introducing yourself. Your information stays on this device during sign-up and will only be sent after your number is verified.';
+
+  @override
+  String get registrationSensitiveDraft =>
+      'Your sex and preferences will only be sent with your agreement at the next step, after your number is verified.';
+
+  @override
+  String get registrationConsentIntro =>
+      'Your choices will be saved after your number is verified. You can decline sensitive data processing and location; discovery will then remain unavailable.';
+
+  @override
+  String get registrationPhoneTitle => 'One last step, and you’re here.';
+
+  @override
+  String get registrationPhoneIntro =>
+      'Verify your number by SMS to create your account and save your introduction. Your number will not appear on your profile.';
+
+  @override
+  String get registrationLeaveTitle => 'Leave sign-up?';
+
+  @override
+  String get registrationLeaveBody =>
+      'Any information from this sign-up that has not been saved will be lost.';
+
+  @override
+  String get registrationExistingAccount =>
+      'This number is already linked to a Histae account. Continue to your space: your existing profile will be kept.';
+
+  @override
+  String get registrationSaving => 'Finish signing up';
+
+  @override
+  String get registrationRetrySave =>
+      'Your number is verified. Your information is kept during sign-up: you can resume saving without requesting another code.';
 }

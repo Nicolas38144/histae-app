@@ -5275,6 +5275,102 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Annuel'**
   String get subscriptionAnnualOffer;
+
+  /// Registration flow before phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre profil'**
+  String get registrationProfileStep;
+
+  /// Registration flow before phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos préférences'**
+  String get registrationPreferencesStep;
+
+  /// Registration flow before phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos consentements'**
+  String get registrationConsentsStep;
+
+  /// Registration flow before phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre numéro'**
+  String get registrationPhoneStep;
+
+  /// Registration flow before phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'Étape {step} sur 4 · {title}'**
+  String registrationStep(int step, String title);
+
+  /// Registration flow before phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'Continuer'**
+  String get registrationContinue;
+
+  /// Registration flow before phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'Prenez le temps de vous présenter. Vos informations restent sur cet appareil pendant ce parcours et ne seront envoyées qu’après la vérification de votre numéro.'**
+  String get registrationLocalDraft;
+
+  /// Registration flow before phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre sexe et vos préférences ne seront transmis qu’avec votre accord à l’étape suivante, après la vérification de votre numéro.'**
+  String get registrationSensitiveDraft;
+
+  /// Registration flow before phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos choix seront enregistrés après la vérification de votre numéro. Vous pouvez refuser les données sensibles et la localisation ; la découverte restera alors indisponible.'**
+  String get registrationConsentIntro;
+
+  /// Registration flow before phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'Un dernier pas, et vous y êtes.'**
+  String get registrationPhoneTitle;
+
+  /// Registration flow before phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifiez votre numéro par SMS pour créer votre compte et enregistrer votre présentation. Votre numéro n’apparaîtra pas sur votre profil.'**
+  String get registrationPhoneIntro;
+
+  /// Registration flow before phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'Quitter cette inscription ?'**
+  String get registrationLeaveTitle;
+
+  /// Registration flow before phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'Les informations de ce parcours qui n’ont pas été enregistrées seront perdues.'**
+  String get registrationLeaveBody;
+
+  /// Registration flow before phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce numéro est déjà lié à un compte Histae. Retrouvez votre espace : votre profil existant sera conservé.'**
+  String get registrationExistingAccount;
+
+  /// Registration flow before phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'Finaliser votre inscription'**
+  String get registrationSaving;
+
+  /// Registration flow before phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre numéro est vérifié. Vos informations sont conservées pendant ce parcours : vous pouvez reprendre l’enregistrement sans demander un nouveau code.'**
+  String get registrationRetrySave;
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

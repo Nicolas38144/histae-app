@@ -24,6 +24,13 @@ Core does not import features. Private repositories depend on `AuthenticatedSess
 private exports. `AppDependencies` composes services; `HistaeApp` disposes the dependencies it owns.
 `SessionGate` selects the public, onboarding or private flow from confirmed session state.
 
+During sign-up, `SessionGate` owns `RegistrationController` and keeps its flow visible while OTP
+establishes the session. `RegistrationDraft` holds only form values in memory; the profile and
+preferences widgets own their text controllers. `RegistrationLegalRepository` loads public document
+metadata, while the registration controller coordinates authenticated consent/profile writes and
+explicit recovery. `OtpForm` is shared with returning sign-in through an authentication callback.
+The normal private scope opens only after sign-up finishes or the user explicitly leaves it.
+
 `MainShell` owns Feed, Matches and Profile controllers. Its `IndexedStack` retains the three views
 and scroll state; its session resource key rebuilds the private scope when access changes.
 A page disposes a controller it creates. A received controller remains owned by its parent.

@@ -3216,4 +3216,61 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get subscriptionAnnualOffer => 'Anual';
+
+  @override
+  String get registrationProfileStep => 'Tu perfil';
+
+  @override
+  String get registrationPreferencesStep => 'Tus preferencias';
+
+  @override
+  String get registrationConsentsStep => 'Tus consentimientos';
+
+  @override
+  String get registrationPhoneStep => 'Tu número';
+
+  @override
+  String registrationStep(int step, String title) {
+    return 'Paso $step de 4 · $title';
+  }
+
+  @override
+  String get registrationContinue => 'Continuar';
+
+  @override
+  String get registrationLocalDraft =>
+      'Tómate tu tiempo para presentarte. Tus datos permanecen en este dispositivo durante el registro y solo se enviarán después de verificar tu número.';
+
+  @override
+  String get registrationSensitiveDraft =>
+      'Tu sexo y tus preferencias solo se enviarán con tu consentimiento en el siguiente paso, después de verificar tu número.';
+
+  @override
+  String get registrationConsentIntro =>
+      'Tus elecciones se guardarán después de verificar tu número. Puedes rechazar el tratamiento de datos sensibles y la ubicación; en ese caso, el descubrimiento seguirá sin estar disponible.';
+
+  @override
+  String get registrationPhoneTitle => 'Un último paso y ya estás aquí.';
+
+  @override
+  String get registrationPhoneIntro =>
+      'Verifica tu número por SMS para crear tu cuenta y guardar tu presentación. Tu número no aparecerá en tu perfil.';
+
+  @override
+  String get registrationLeaveTitle => '¿Salir del registro?';
+
+  @override
+  String get registrationLeaveBody =>
+      'Se perderá la información de este registro que no se haya guardado.';
+
+  @override
+  String get registrationExistingAccount =>
+      'Este número ya está vinculado a una cuenta de Histae. Accede a tu espacio: se conservará tu perfil actual.';
+
+  @override
+  String get registrationSaving => 'Finalizar tu registro';
+
+  @override
+  String get registrationRetrySave =>
+      'Tu número está verificado. Tus datos se conservan durante el registro: puedes volver a guardarlos sin pedir otro código.';
 }

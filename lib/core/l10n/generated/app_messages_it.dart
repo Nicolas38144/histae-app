@@ -3227,4 +3227,61 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get subscriptionAnnualOffer => 'Annuale';
+
+  @override
+  String get registrationProfileStep => 'Il tuo profilo';
+
+  @override
+  String get registrationPreferencesStep => 'Le tue preferenze';
+
+  @override
+  String get registrationConsentsStep => 'I tuoi consensi';
+
+  @override
+  String get registrationPhoneStep => 'Il tuo numero';
+
+  @override
+  String registrationStep(int step, String title) {
+    return 'Passaggio $step di 4 · $title';
+  }
+
+  @override
+  String get registrationContinue => 'Continua';
+
+  @override
+  String get registrationLocalDraft =>
+      'Prenditi il tempo per presentarti. I tuoi dati restano su questo dispositivo durante la registrazione e saranno inviati solo dopo la verifica del numero.';
+
+  @override
+  String get registrationSensitiveDraft =>
+      'Il tuo sesso e le tue preferenze saranno inviati solo con il tuo consenso nel passaggio successivo, dopo la verifica del numero.';
+
+  @override
+  String get registrationConsentIntro =>
+      'Le tue scelte saranno salvate dopo la verifica del numero. Puoi rifiutare il trattamento dei dati sensibili e la localizzazione; in tal caso, la scoperta resterà non disponibile.';
+
+  @override
+  String get registrationPhoneTitle => 'Un ultimo passo e ci sei.';
+
+  @override
+  String get registrationPhoneIntro =>
+      'Verifica il numero tramite SMS per creare il tuo account e salvare la tua presentazione. Il numero non apparirà sul tuo profilo.';
+
+  @override
+  String get registrationLeaveTitle => 'Uscire dalla registrazione?';
+
+  @override
+  String get registrationLeaveBody =>
+      'Le informazioni di questa registrazione che non sono state salvate andranno perse.';
+
+  @override
+  String get registrationExistingAccount =>
+      'Questo numero è già collegato a un account Histae. Accedi al tuo spazio: il tuo profilo attuale sarà conservato.';
+
+  @override
+  String get registrationSaving => 'Completa la registrazione';
+
+  @override
+  String get registrationRetrySave =>
+      'Il tuo numero è verificato. I dati restano disponibili durante la registrazione: puoi riprendere il salvataggio senza richiedere un altro codice.';
 }

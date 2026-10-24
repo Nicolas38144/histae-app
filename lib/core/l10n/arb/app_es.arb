@@ -866,5 +866,21 @@
   "subscriptionOfferPosition": "Oferta {current} de {total}",
   "subscriptionFreeOffer": "Gratis",
   "subscriptionMonthlyOffer": "Mensual",
-  "subscriptionAnnualOffer": "Anual"
+  "subscriptionAnnualOffer": "Anual",
+  "registrationProfileStep": "Tu perfil",
+  "registrationPreferencesStep": "Tus preferencias",
+  "registrationConsentsStep": "Tus consentimientos",
+  "registrationPhoneStep": "Tu número",
+  "registrationStep": "Paso {step} de 4 · {title}",
+  "registrationContinue": "Continuar",
+  "registrationLocalDraft": "Tómate tu tiempo para presentarte. Tus datos permanecen en este dispositivo durante el registro y solo se enviarán después de verificar tu número.",
+  "registrationSensitiveDraft": "Tu sexo y tus preferencias solo se enviarán con tu consentimiento en el siguiente paso, después de verificar tu número.",
+  "registrationConsentIntro": "Tus elecciones se guardarán después de verificar tu número. Puedes rechazar el tratamiento de datos sensibles y la ubicación; en ese caso, el descubrimiento seguirá sin estar disponible.",
+  "registrationPhoneTitle": "Un último paso y ya estás aquí.",
+  "registrationPhoneIntro": "Verifica tu número por SMS para crear tu cuenta y guardar tu presentación. Tu número no aparecerá en tu perfil.",
+  "registrationLeaveTitle": "¿Salir del registro?",
+  "registrationLeaveBody": "Se perderá la información de este registro que no se haya guardado.",
+  "registrationExistingAccount": "Este número ya está vinculado a una cuenta de Histae. Accede a tu espacio: se conservará tu perfil actual.",
+  "registrationSaving": "Finalizar tu registro",
+  "registrationRetrySave": "Tu número está verificado. Tus datos se conservan durante el registro: puedes volver a guardarlos sin pedir otro código."
 }
