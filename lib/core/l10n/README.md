@@ -31,9 +31,9 @@ Changing language retains navigation and drafts. The API localizes catalogues an
 `Accept-Language`, but personal text is not translated. Document presentation/acceptance language
 is separate from interface preference. Native and provider dialogs use their own settings.
 
-## Native permission resources
+## Native iOS resources
 
-After changing the relevant iOS permission messages, also regenerate native localizations:
+After changing iOS permission or privacy-shield messages, also regenerate native localizations:
 
 ```bash
 dart run tool/generate_native_localizations.dart

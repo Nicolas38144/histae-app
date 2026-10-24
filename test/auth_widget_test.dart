@@ -7,6 +7,7 @@ import 'package:histae_app/core/widgets/histae_button.dart';
 import 'package:histae_app/features/auth/application/session_controller.dart';
 import 'package:histae_app/features/consents/data/consent_state.dart';
 import 'package:histae_app/features/consents/presentation/consents_page.dart';
+import 'package:http/http.dart' as http;
 
 import 'support/auth_fixture.dart';
 
@@ -121,6 +122,9 @@ void main() {
       await revealAndTap(tester, find.text('Demander un code'));
       expect(find.byKey(const Key('phone')), findsNothing);
       expect(find.byKey(const Key('otp')), findsOneWidget);
+      expect(find.text('Numéro utilisé : +33 • •• •• •• 78'), findsOneWidget);
+      expect(find.textContaining('0612345678'), findsNothing);
+      expect(find.textContaining('+33612345678'), findsNothing);
       expect(find.textContaining('Nouveau code dans'), findsOneWidget);
       final resend = find.ancestor(
         of: find.text('Demander un nouveau code'),
@@ -138,10 +142,60 @@ void main() {
       await revealAndTap(tester, find.text('Vérifier le code'));
       expect(verifies, 1);
       expect(sends, 1);
+      expect(find.text('Réessayer la demande'), findsNothing);
       expect(
         tester.widget<TextField>(find.byKey(const Key('otp'))).controller!.text,
         isEmpty,
       );
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
+
+  testWidgets(
+    'retry only resolves an uncertain send; uncertain verification requires a new code',
+    (tester) async {
+      tester.view.physicalSize = const Size(800, 1800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final keys = <String?>[];
+      var verifies = 0;
+      final session = testSession((request) async {
+        if (request.url.path.endsWith('/send')) {
+          keys.add(request.headers['Idempotency-Key']);
+          if (keys.length == 1) {
+            throw http.ClientException('Synthetic lost send response');
+          }
+        }
+        if (request.url.path.endsWith('/verify')) {
+          verifies++;
+          throw http.ClientException('Synthetic lost verification response');
+        }
+        return defaultAuthResponse(request);
+      });
+      await tester.pumpWidget(HistaeApp(sessionController: session));
+      await tester.pumpAndSettle();
+      await revealAndTap(tester, find.text('J’ai déjà un compte'));
+      await tester.enterText(find.byKey(const Key('phone')), '0612345678');
+      await revealAndTap(tester, find.text('Demander un code'));
+      expect(find.text('Réessayer la demande'), findsOneWidget);
+      expect(
+        find.textContaining('Nous n’avons pas pu confirmer la demande.'),
+        findsOneWidget,
+      );
+      await revealAndTap(tester, find.text('Réessayer la demande'));
+      expect(keys, hasLength(2));
+      expect(keys.first, isNotNull);
+      expect(keys.last, keys.first);
+      expect(find.text('Réessayer la demande'), findsNothing);
+      await tester.enterText(find.byKey(const Key('otp')), '123456');
+      await revealAndTap(tester, find.text('Vérifier le code'));
+      expect(verifies, 1);
+      expect(find.byKey(const Key('otp')), findsNothing);
+      expect(find.text('Réessayer la demande'), findsNothing);
+      expect(find.text('Demander un nouveau code'), findsOneWidget);
+      expect(find.text('Numéro utilisé : +33 • •• •• •• 78'), findsOneWidget);
+      expect(keys, hasLength(2));
       await tester.pumpWidget(const SizedBox.shrink());
     },
   );

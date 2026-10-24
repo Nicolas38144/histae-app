@@ -23,7 +23,7 @@
   "appStringsEnter33FollowedBy9Digits": "Enter +33 followed by 9 digits, without the initial zero.",
   "appStringsRequestACode": "Request a code",
   "appStringsRequestANewCode": "Request a new code",
-  "appStringsResumeThePreviousRequest": "Resume sending the code",
+  "appStringsResumeThePreviousRequest": "Retry request",
   "appStrings6DigitVerificationCode": "6-digit verification code",
   "appStringsVerifyCode": "Verify code",
   "appStringsChangeNumber": "Change number",
@@ -894,5 +894,9 @@
   "phoneNationalLabel": "Phone number",
   "phoneNationalHint": "06 12 34 56 78",
   "phoneNationalHelp": "The +33 country code is added automatically. You can include the leading 0.",
-  "otpResendIn": "Request another code in {seconds} s"
+  "otpResendIn": "Request another code in {seconds} s",
+  "otpPhoneInUse": "Number used: {phone}",
+  "otpSendUnconfirmed": "We could not confirm the request. If you received a code, enter it. Otherwise, retry the request.",
+  "screenPrivacyLabel": "Content protected",
+  "screenCaptureHelp": "Stop screen recording or sharing to return to Histae."
 }

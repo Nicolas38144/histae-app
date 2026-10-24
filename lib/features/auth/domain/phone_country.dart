@@ -17,3 +17,9 @@ String? normalizeFrenchPhone(String input) {
   final phone = input.trim().replaceAll(RegExp(r'[ .()\-]'), '');
   return RegExp(r'^\+33[1-9][0-9]{8}$').hasMatch(phone) ? phone : null;
 }
+
+/// The OTP summary reveals only the country and the final two national digits.
+String? maskFrenchPhone(String input) {
+  final phone = normalizeFrenchPhone(input);
+  return phone == null ? null : '+33 • •• •• •• ${phone.substring(10)}';
+}

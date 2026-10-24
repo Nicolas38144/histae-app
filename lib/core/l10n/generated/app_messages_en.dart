@@ -85,7 +85,7 @@ class AppMessagesEn extends AppMessages {
   String get appStringsRequestANewCode => 'Request a new code';
 
   @override
-  String get appStringsResumeThePreviousRequest => 'Resume sending the code';
+  String get appStringsResumeThePreviousRequest => 'Retry request';
 
   @override
   String get appStrings6DigitVerificationCode => '6-digit verification code';
@@ -3288,4 +3288,20 @@ class AppMessagesEn extends AppMessages {
   String otpResendIn(int seconds) {
     return 'Request another code in $seconds s';
   }
+
+  @override
+  String otpPhoneInUse(String phone) {
+    return 'Number used: $phone';
+  }
+
+  @override
+  String get otpSendUnconfirmed =>
+      'We could not confirm the request. If you received a code, enter it. Otherwise, retry the request.';
+
+  @override
+  String get screenPrivacyLabel => 'Content protected';
+
+  @override
+  String get screenCaptureHelp =>
+      'Stop screen recording or sharing to return to Histae.';
 }

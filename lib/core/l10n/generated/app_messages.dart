@@ -243,7 +243,7 @@ abstract class AppMessages {
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Reprendre l’envoi du code'**
+  /// **'Réessayer la demande'**
   String get appStringsResumeThePreviousRequest;
 
   /// Interface: lib/core/l10n/app_strings.dart
@@ -5443,6 +5443,30 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Nouveau code dans {seconds} s'**
   String otpResendIn(int seconds);
+
+  /// Privacy shield and phone verification interface.
+  ///
+  /// In fr, this message translates to:
+  /// **'Numéro utilisé : {phone}'**
+  String otpPhoneInUse(String phone);
+
+  /// Privacy shield and phone verification interface.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous n’avons pas pu confirmer la demande. Si vous avez reçu un code, saisissez-le. Sinon, réessayez la demande.'**
+  String get otpSendUnconfirmed;
+
+  /// Privacy shield and phone verification interface.
+  ///
+  /// In fr, this message translates to:
+  /// **'Contenu protégé'**
+  String get screenPrivacyLabel;
+
+  /// Privacy shield and phone verification interface.
+  ///
+  /// In fr, this message translates to:
+  /// **'Arrêtez l’enregistrement ou le partage d’écran pour retrouver Histae.'**
+  String get screenCaptureHelp;
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

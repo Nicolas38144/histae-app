@@ -2,3 +2,5 @@
 "NSLocationWhenInUseUsageDescription" = "Histae utilise une position ponctuelle pour proposer des rencontres à proximité. Votre position exacte reste privée, sans suivi en arrière-plan.";
 "NSPhotoLibraryUsageDescription" = "Choisissez votre unique photo de profil Histae. Elle sera révélée uniquement après un accord mutuel.";
 "NSLocalNetworkUsageDescription" = "En développement, Histae se connecte au serveur de test sur votre réseau local.";
+"HistaePrivacyShieldTitle" = "Contenu protégé";
+"HistaePrivacyShieldCaptureHelp" = "Arrêtez l’enregistrement ou le partage d’écran pour retrouver Histae.";

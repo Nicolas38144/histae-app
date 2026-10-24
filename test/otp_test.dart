@@ -11,6 +11,22 @@ import 'package:http/http.dart' as http;
 import 'support/auth_fixture.dart';
 
 void main() {
+  test('OTP summaries expose only the country and last two digits and clear with the intention', () async {
+    expect(maskFrenchPhone('+33 (6) 12.34-56 78'), '+33 • •• •• •• 78');
+    expect(maskFrenchPhone('+336123456'), isNull);
+    expect(maskFrenchPhone('+32612345678'), isNull);
+    final session = testSession(
+      (request) async => defaultAuthResponse(request),
+    );
+    addTearDown(session.dispose);
+    final controller = OtpController(session);
+    addTearDown(controller.dispose);
+    expect(controller.maskedPhone, isNull);
+    await controller.send('+33612345678');
+    expect(controller.maskedPhone, '+33 • •• •• •• 78');
+    controller.changePhone();
+    expect(controller.maskedPhone, isNull);
+  });
   test('French country selection normalizes national input and international autofill', () {
     for (final input in [
       '06 12 34 56 78',
@@ -48,8 +64,9 @@ void main() {
       'registration': true,
     });
     expect(controller.requested, isTrue);
-    expect(controller.canResume, isTrue);
+    expect(controller.hasIntention, isTrue);
     expect(controller.failure, isNull);
+    expect(controller.canRetrySend, isFalse);
     expect(controller.resendSeconds, greaterThanOrEqualTo(59));
     expect(session.hasSession, isFalse);
   });
@@ -87,7 +104,9 @@ void main() {
     await controller.send('+33 6 12 34 56 78');
     expect(controller.requested, isTrue);
     expect(controller.failure!.code, 'otp_delivery_unknown');
+    expect(controller.canRetrySend, isTrue);
     await controller.send('+33612345678', newIntention: false);
+    expect(controller.canRetrySend, isFalse);
     expect(keys[1], keys[0]);
     expect(bodies[1], bodies[0]);
     await controller.send('+33612345678');
@@ -126,9 +145,11 @@ void main() {
 
   test('verification errors leave OTP outside session refresh logic', () async {
     var verifies = 0;
+    var sends = 0;
     var refreshes = 0;
     final session = testSession((request) async {
       if (request.url.path == '/api/auth/refresh') refreshes++;
+      if (request.url.path == '/api/auth/otp/send') sends++;
       if (request.url.path == '/api/auth/otp/verify') {
         verifies++;
         expect(jsonDecode(request.body), {
@@ -150,6 +171,9 @@ void main() {
     expect(verifies, 2);
     expect(refreshes, 0);
     expect(controller.failure!.code, 'invalid_or_expired_otp');
+    expect(controller.canRetrySend, isFalse);
+    await controller.retrySend();
+    expect(sends, 1);
     expect(session.phase, SessionPhase.signedOut);
   });
 
@@ -171,6 +195,8 @@ void main() {
       await controller.send('+33612345678');
       await controller.verify('123456');
       expect(controller.verificationUncertain, isTrue);
+      expect(controller.canRetrySend, isFalse);
+      await controller.retrySend();
       await controller.verify('123456');
       expect(verifies, 1);
       now = now.add(const Duration(seconds: 61));

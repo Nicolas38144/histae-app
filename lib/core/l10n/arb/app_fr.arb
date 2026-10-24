@@ -92,7 +92,7 @@
   "@appStringsRequestANewCode": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsResumeThePreviousRequest": "Reprendre l’envoi du code",
+  "appStringsResumeThePreviousRequest": "Réessayer la demande",
   "@appStringsResumeThePreviousRequest": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
@@ -3887,5 +3887,26 @@
         "type": "int"
       }
     }
+  },
+  "otpPhoneInUse": "Numéro utilisé : {phone}",
+  "otpSendUnconfirmed": "Nous n’avons pas pu confirmer la demande. Si vous avez reçu un code, saisissez-le. Sinon, réessayez la demande.",
+  "screenPrivacyLabel": "Contenu protégé",
+  "screenCaptureHelp": "Arrêtez l’enregistrement ou le partage d’écran pour retrouver Histae.",
+  "@otpPhoneInUse": {
+    "description": "Privacy shield and phone verification interface.",
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "@otpSendUnconfirmed": {
+    "description": "Privacy shield and phone verification interface."
+  },
+  "@screenPrivacyLabel": {
+    "description": "Privacy shield and phone verification interface."
+  },
+  "@screenCaptureHelp": {
+    "description": "Privacy shield and phone verification interface."
   }
 }

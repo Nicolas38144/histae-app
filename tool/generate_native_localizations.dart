@@ -1,4 +1,4 @@
-// Run from the project root after editing the iOS permission copy in the ARBs.
+// Run from the project root after editing native iOS copy in the ARBs.
 import 'dart:convert';
 import 'dart:io';
 
@@ -7,6 +7,8 @@ void main() {
     'NSLocationWhenInUseUsageDescription': 'iosLocationPermission',
     'NSPhotoLibraryUsageDescription': 'iosPhotoPermission',
     'NSLocalNetworkUsageDescription': 'iosLocalNetworkPermission',
+    'HistaePrivacyShieldTitle': 'screenPrivacyLabel',
+    'HistaePrivacyShieldCaptureHelp': 'screenCaptureHelp',
   };
   for (final locale in ['fr', 'en', 'es', 'it']) {
     final copy = jsonDecode(

@@ -31,6 +31,7 @@ payments. Run the relevant existing suite rather than testing every visual or do
 | Feed expiry, location or pause | `flutter test test/discovery_test.dart test/discovery_pause_test.dart` |
 | Native billing | `flutter test test/billing_test.dart` |
 | Interface/request language | `flutter test test/localization_test.dart test/api_language_test.dart` |
+| Screen privacy and OTP recovery | `flutter test test/app_privacy_shield_test.dart test/otp_test.dart test/auth_widget_test.dart` |
 
 Tests use simulated providers. State exactly which checks ran and distinguish them from actual
 device/provider validation. The current release backlog is in the [roadmap](../roadmap.md).
@@ -75,6 +76,15 @@ Keep signing credentials outside the public environment asset.
 iOS builds require macOS, Xcode and the intended signing/provisioning setup. Validate native
 permissions, Keychain, sharing, APNs, launch assets and store purchases on representative devices.
 Do not infer iOS success from Android or widget tests.
+
+For screen privacy, test Recents/app-switcher previews from a conversation, photo and OTP form,
+including rotation, interruptions and returning from a system dialog. Drafts must remain intact.
+On Android, system screenshots should be rejected or blank and recordings must not show app
+content. Test at least API 24 and API 33+ after a full native rebuild. On iOS, verify app-switcher
+masking and active recording/mirroring on iOS 15–17 and iOS 18+. A still screenshot while the app
+is active remains possible on iOS; there is no supported global screenshot-blocking API. Avoid
+secure-text-field view-hierarchy workarounds. Native shields do not protect other applications,
+an external camera or a compromised OS.
 
 Before beta, record the app/API versions, environment, tested flows and outstanding issues.
 Provider enablement and local compilation are separate from approval and availability in the stores.

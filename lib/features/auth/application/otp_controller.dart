@@ -23,6 +23,7 @@ class OtpController extends ChangeNotifier {
   String? _phone;
   String? _key;
   ApiLanguage? _language;
+  bool _sendRetryPending = false;
   bool busy = false;
   bool requested = false;
   bool verificationUncertain = false;
@@ -45,13 +46,16 @@ class OtpController extends ChangeNotifier {
     return remaining > retrySeconds ? remaining : retrySeconds;
   }
 
-  bool get canResume => _key != null;
+  bool get hasIntention => _key != null;
+  bool get canRetrySend => hasIntention && _sendRetryPending;
+  String? get maskedPhone => _phone == null ? null : maskFrenchPhone(_phone!);
   // New send/resend explicitly creates an intention. Technical resume keeps
   // BOTH its phone and UUID, which are held in memory only.
 
   Future<void> send(String input, {bool newIntention = true}) async {
     if (busy || _disposed || retrySeconds > 0) return;
     if (newIntention && resendSeconds > 0) return;
+    if (!newIntention && !canRetrySend) return;
     final phone = normalizeFrenchPhone(input);
     if (phone == null) {
       failure = const ApiFailure(
@@ -65,6 +69,7 @@ class OtpController extends ChangeNotifier {
       _phone = phone;
       _key = newUuidV4();
       _language = session.language;
+      _sendRetryPending = false;
       verificationUncertain = false;
       // A lost response may still have queued the request. Technical replay
       // keeps its UUID; requesting another SMS must wait.
@@ -84,9 +89,17 @@ class OtpController extends ChangeNotifier {
       _resendAt = _now().add(receipt.resendAfter);
       _timer.restart();
       requested = true;
+      _sendRetryPending = false;
       verificationUncertain = false;
       notice = 'otp_accepted';
-    });
+    }, sending: true);
+  }
+
+  /// Resolve only an uncertain send, keeping its phone, language and UUID.
+  Future<void> retrySend() async {
+    if (_phone case final phone?) {
+      await send(phone, newIntention: false);
+    }
   }
 
   Future<void> verify(String otp) async {
@@ -97,6 +110,7 @@ class OtpController extends ChangeNotifier {
         retrySeconds > 0) {
       return;
     }
+    _sendRetryPending = false;
     if (!RegExp(r'^[0-9]{6}$').hasMatch(otp)) {
       failure = const ApiFailure(
         ApiFailureKind.validation,
@@ -137,10 +151,13 @@ class OtpController extends ChangeNotifier {
         }
         rethrow;
       }
-    });
+    }, sending: false);
   }
 
-  Future<void> _run(Future<void> Function() action) async {
+  Future<void> _run(
+    Future<void> Function() action, {
+    required bool sending,
+  }) async {
     busy = true;
     failure = null;
     notice = null;
@@ -151,11 +168,13 @@ class OtpController extends ChangeNotifier {
     } on ApiFailure catch (error) {
       if (!_disposed) {
         failure = error;
-        if (error.code == 'otp_delivery_unknown' ||
-            error.statusCode == null ||
-            error.kind == ApiFailureKind.invalidResponse ||
-            error.kind == ApiFailureKind.server) {
-          requested = true; // The original code may still arrive.
+        if (sending) {
+          _sendRetryPending =
+              error.code == 'otp_delivery_unknown' ||
+              error.statusCode == null ||
+              error.kind == ApiFailureKind.invalidResponse ||
+              error.kind == ApiFailureKind.server;
+          if (_sendRetryPending) requested = true; // A code may still arrive.
         }
         if (error.code == 'otp_resend_too_soon') {
           // Another device or app instance may already have requested a code.
@@ -184,6 +203,7 @@ class OtpController extends ChangeNotifier {
     _phone = null;
     _key = null;
     _language = null;
+    _sendRetryPending = false;
     requested = false;
     verificationUncertain = false;
     failure = null;
@@ -200,6 +220,7 @@ class OtpController extends ChangeNotifier {
     _phone = null;
     _key = null;
     _language = null;
+    _sendRetryPending = false;
     super.dispose();
   }
 }

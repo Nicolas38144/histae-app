@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../core/l10n/app_strings.dart';
 import '../core/l10n/generated/app_messages.dart';
 import '../core/l10n/locale_controller.dart';
+import '../core/widgets/app_privacy_shield.dart';
 import '../features/auth/application/session_controller.dart';
 import '../features/billing/application/billing_controller.dart';
 import '../features/billing/presentation/billing_scope.dart';
@@ -159,16 +160,18 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
         localizationsDelegates: AppMessages.localizationsDelegates,
         builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
           value: Theme.of(context).appBarTheme.systemOverlayStyle!,
-          child: AppOpening(
-            child: RewardedVideoScope(
-              gateway: widget.rewardedVideoGateway,
-              child: BillingScope(
-                controller: widget.billingController,
-                child: PushScope(
-                  controller: widget.pushController,
-                  child: NotificationOverlay(
+          child: AppPrivacyShield(
+            child: AppOpening(
+              child: RewardedVideoScope(
+                gateway: widget.rewardedVideoGateway,
+                child: BillingScope(
+                  controller: widget.billingController,
+                  child: PushScope(
                     controller: widget.pushController,
-                    child: child!,
+                    child: NotificationOverlay(
+                      controller: widget.pushController,
+                      child: child!,
+                    ),
                   ),
                 ),
               ),

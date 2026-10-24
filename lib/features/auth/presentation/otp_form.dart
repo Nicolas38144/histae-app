@@ -85,7 +85,7 @@ class _OtpFormState extends State<OtpForm> {
                       child: Text(strings.messages.phoneCountryFrance),
                     ),
                   ],
-                  onChanged: controller.busy || controller.canResume
+                  onChanged: controller.busy || controller.hasIntention
                       ? null
                       : (value) => setState(() {
                           _country = value ?? PhoneCountry.france;
@@ -95,7 +95,7 @@ class _OtpFormState extends State<OtpForm> {
                 TextField(
                   controller: _phone,
                   key: const Key('phone'),
-                  enabled: !controller.busy && !controller.canResume,
+                  enabled: !controller.busy && !controller.hasIntention,
                   decoration: InputDecoration(
                     labelText: strings.messages.phoneNationalLabel,
                     hintText: strings.messages.phoneNationalHint,
@@ -110,17 +110,28 @@ class _OtpFormState extends State<OtpForm> {
                 ),
                 const SizedBox(height: 20),
               ],
+              if (controller.requested && controller.maskedPhone != null) ...[
+                Text(
+                  strings.messages.otpPhoneInUse(controller.maskedPhone!),
+                  key: const Key('otp-phone-summary'),
+                ),
+                const SizedBox(height: 16),
+              ],
               if (controller.notice == 'otp_accepted')
                 Semantics(liveRegion: true, child: Text(strings.otpAccepted)),
-              if (controller.failure case final failure?) ...[
+              if (controller.failure != null &&
+                  !controller.verificationUncertain &&
+                  !controller.canRetrySend) ...[
                 Semantics(
                   liveRegion: true,
-                  child: Text(strings.authFailure(failure)),
+                  child: Text(strings.authFailure(controller.failure!)),
                 ),
                 const SizedBox(height: 16),
               ],
               if (controller.verificationUncertain)
                 Text(strings.verificationUncertain),
+              if (controller.canRetrySend)
+                Text(strings.messages.otpSendUnconfirmed),
               if (controller.requested &&
                   !controller.verificationUncertain) ...[
                 const SizedBox(height: 20),
@@ -153,7 +164,7 @@ class _OtpFormState extends State<OtpForm> {
                 Text(strings.retryIn(controller.retrySeconds)),
               if (controller.resendSeconds > 0)
                 Text(strings.messages.otpResendIn(controller.resendSeconds)),
-              if (!controller.canResume)
+              if (!controller.hasIntention)
                 HistaeButton(
                   onPressed: canSend
                       ? () {
@@ -173,17 +184,12 @@ class _OtpFormState extends State<OtpForm> {
                       : null,
                   child: Text(strings.resendOtp),
                 ),
-              if (controller.canResume && controller.failure != null)
+              if (controller.canRetrySend)
                 OutlinedButton(
-                  onPressed: enabled
-                      ? () => controller.send(
-                          _normalizedPhone,
-                          newIntention: false,
-                        )
-                      : null,
+                  onPressed: enabled ? controller.retrySend : null,
                   child: Text(strings.resumeOtp),
                 ),
-              if (controller.canResume)
+              if (controller.hasIntention)
                 TextButton(
                   onPressed: controller.busy
                       ? null

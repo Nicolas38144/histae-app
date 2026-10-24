@@ -85,8 +85,7 @@ class AppMessagesIt extends AppMessages {
   String get appStringsRequestANewCode => 'Richiedi un nuovo codice';
 
   @override
-  String get appStringsResumeThePreviousRequest =>
-      'Riprendere l’invio del codice';
+  String get appStringsResumeThePreviousRequest => 'Riprova la richiesta';
 
   @override
   String get appStrings6DigitVerificationCode => 'Codice di verifica a 6 cifre';
@@ -3331,4 +3330,20 @@ class AppMessagesIt extends AppMessages {
   String otpResendIn(int seconds) {
     return 'Richiedi un altro codice tra $seconds s';
   }
+
+  @override
+  String otpPhoneInUse(String phone) {
+    return 'Numero utilizzato: $phone';
+  }
+
+  @override
+  String get otpSendUnconfirmed =>
+      'Non è stato possibile confermare la richiesta. Se hai ricevuto un codice, inseriscilo. Altrimenti riprova la richiesta.';
+
+  @override
+  String get screenPrivacyLabel => 'Contenuto protetto';
+
+  @override
+  String get screenCaptureHelp =>
+      'Interrompi la registrazione o la condivisione dello schermo per tornare a Histae.';
 }

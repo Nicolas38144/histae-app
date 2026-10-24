@@ -2,3 +2,5 @@
 "NSLocationWhenInUseUsageDescription" = "Histae usa una rilevazione singola per proporre incontri nelle vicinanze. La posizione esatta resta privata, senza tracciamento in background.";
 "NSPhotoLibraryUsageDescription" = "Scegli la tua unica foto profilo Histae. Verrà svelata solo dopo il consenso reciproco.";
 "NSLocalNetworkUsageDescription" = "Durante lo sviluppo, Histae si connette al server di test sulla rete locale.";
+"HistaePrivacyShieldTitle" = "Contenuto protetto";
+"HistaePrivacyShieldCaptureHelp" = "Interrompi la registrazione o la condivisione dello schermo per tornare a Histae.";

@@ -33,6 +33,16 @@ The normal private scope opens only after sign-up finishes or the user explicitl
 `OtpController` separates resend deadlines from verification rate limits; `OtpForm` only renders
 those states. `AuthRepository` decodes the server's resend receipt. Neither UI nor controller
 infers account membership from accepted requests.
+The OTP summary exposes only the country prefix and final two digits. An uncertain send may be
+retried with its original intention; an incorrect code never offers a send replay, and an uncertain
+verification requires a deliberate new code.
+
+`AppPrivacyShield` hides the entire navigator, overlays and opening animation while the app is
+inactive, without disposing drafts or controllers. Focus, touch and accessibility are excluded.
+Android sets `FLAG_SECURE` before the first Flutter frame and disables Recents snapshots on API 33+.
+iOS `SceneDelegate` owns a native `ScreenPrivacyShield` window for synchronous background masking
+and screen-capture detection (scene traits on iOS 18+, legacy screen notifications on iOS 15–17).
+It never becomes key. Still screenshots cannot be blocked through supported iOS APIs.
 
 The catalogue owns `SubscriptionPlanCarousel`, reused by its public read-only page and billing's
 subscription plans. It owns selection and measured card heights only; catalogue loading and
