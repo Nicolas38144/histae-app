@@ -1125,13 +1125,13 @@ abstract class AppMessages {
   /// Interface: lib/features/consents/presentation/consent_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'J’accepte le traitement de mes données sensibles'**
+  /// **'J’accepte explicitement que Histae traite mon sexe déclaré et mes préférences sur les personnes recherchées pour me proposer des rencontres compatibles, selon ce document. Je sais que je peux retirer cet accord à tout moment et que la découverte ne sera alors plus disponible.'**
   String get consentStringsIConsentToTheProcessingOf;
 
   /// Interface: lib/features/consents/presentation/consent_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'J’accepte le traitement de ma localisation'**
+  /// **'J’accepte que Histae utilise la position que je transmets pour calculer des distances et me proposer des profils compatibles. Je sais que je peux retirer cet accord à tout moment et que la découverte nécessitera alors un nouvel accord et une nouvelle position.'**
   String get consentStringsIConsentToTheProcessingOf198;
 
   /// Interface: lib/features/consents/presentation/consent_strings.dart

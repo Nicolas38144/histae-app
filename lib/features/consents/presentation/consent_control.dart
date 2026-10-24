@@ -93,6 +93,10 @@ class ConsentControl extends StatelessWidget {
           Semantics(header: true, child: title),
           if (renewal)
             Text(AppStrings.of(context).messages.consentControlRenewalNeeded),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Text(strings.consentLabel(consent.type)),
+          ),
           Row(
             children: [
               Expanded(child: document),
@@ -111,16 +115,17 @@ class ConsentControl extends StatelessWidget {
         SwitchListTile(
           key: key,
           contentPadding: EdgeInsets.zero,
-          title: Semantics(
-            label: strings.consentLabel(consent.type),
-            excludeSemantics: true,
-            child: title,
-          ),
-          subtitle: renewal
-              ? Text(
+          title: title,
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(strings.consentLabel(consent.type)),
+              if (renewal)
+                Text(
                   AppStrings.of(context).messages.consentControlRenewalNeeded,
-                )
-              : null,
+                ),
+            ],
+          ),
           value: value,
           onChanged: onChanged,
         ),

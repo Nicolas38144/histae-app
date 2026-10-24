@@ -294,7 +294,12 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(home: ConsentsPage(session: session)),
       );
-      expect(find.byType(SwitchListTile), findsNWidgets(2));
+      for (final type in [ConsentType.sensitive, ConsentType.location]) {
+        final control = find.byKey(Key(type.wireName));
+        await tester.scrollUntilVisible(control, 200);
+        await tester.pumpAndSettle();
+        expect(tester.widget<SwitchListTile>(control).value, isTrue);
+      }
       expect(find.byType(CheckboxListTile), findsNothing);
       for (final type in [ConsentType.terms, ConsentType.privacy]) {
         final status = find.text(

@@ -617,11 +617,11 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get consentStringsIConsentToTheProcessingOf =>
-      'I consent to the processing of my sensitive data';
+      'I explicitly agree that Histae may process my declared sex and my preferences regarding the people I am looking for to suggest compatible encounters, as described in this document. I understand that I can withdraw this agreement at any time and that discovery will then no longer be available.';
 
   @override
   String get consentStringsIConsentToTheProcessingOf198 =>
-      'I consent to the processing of my location';
+      'I agree that Histae may use the location I transmit to calculate distances and suggest compatible profiles. I understand that I can withdraw this agreement at any time and that discovery will then require renewed agreement and a new location.';
 
   @override
   String get consentStringsTermsOfUse => 'Terms of use';
