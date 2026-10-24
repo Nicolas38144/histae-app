@@ -5,9 +5,9 @@ import '../../../core/widgets/histae_button.dart';
 import '../../catalog/application/catalog_controller.dart';
 import '../../catalog/data/plan_catalog.dart';
 import '../../catalog/presentation/plan_card.dart';
+import '../../catalog/presentation/subscription_plan_carousel.dart';
 import '../data/billing_gateway.dart';
 import '../data/billing_models.dart';
-import 'subscription_plan_carousel.dart';
 
 class SubscriptionPlans extends StatelessWidget {
   const SubscriptionPlans({

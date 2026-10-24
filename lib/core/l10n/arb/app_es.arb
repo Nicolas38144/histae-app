@@ -49,7 +49,7 @@
   "appStringsYourHistaeSpace": "Mi perfil",
   "appStringsYourAccountIsCreatedAndYour": "Tu cuenta está creada y tus consentimientos obligatorios están al día. Podrás completar tu perfil en la próxima actualización.",
   "appStringsYouCanViewYourDocumentsManage": "Aquí puedes consultar tus documentos, gestionar tus consentimientos o cerrar sesión, aunque no hayas terminado el registro.",
-  "appStringsEnterAValidFrenchPhoneNumber": "Introduce un número francés válido con prefijo +33.",
+  "appStringsEnterAValidFrenchPhoneNumber": "Introduce un número francés válido.",
   "appStringsEnterTheSixDigitsOfThe": "Introduce los seis dígitos del código recibido.",
   "appStringsTheCodeIsInvalidOrHas": "El código no es válido o ha caducado.",
   "appStringsTheSmsCouldNotBeSent": "No se ha podido enviar el SMS. Puede retomar el envío.",
@@ -882,5 +882,17 @@
   "registrationLeaveBody": "Se perderá la información de este registro que no se haya guardado.",
   "registrationExistingAccount": "Este número ya está vinculado a una cuenta de Histae. Accede a tu espacio: se conservará tu perfil actual.",
   "registrationSaving": "Finalizar tu registro",
-  "registrationRetrySave": "Tu número está verificado. Tus datos se conservan durante el registro: puedes volver a guardarlos sin pedir otro código."
+  "registrationRetrySave": "Tu número está verificado. Tus datos se conservan durante el registro: puedes volver a guardarlos sin pedir otro código.",
+  "registrationChooseDate": "Elegir una fecha",
+  "registrationAdultOnly": "Debes tener al menos 18 años.",
+  "registrationAgeValue": "{value} años",
+  "registrationDistanceValue": "{value} km",
+  "registrationDecrease": "Disminuir: {label}",
+  "registrationIncrease": "Aumentar: {label}",
+  "phoneCountry": "País",
+  "phoneCountryFrance": "Francia (+33)",
+  "phoneNationalLabel": "Número de teléfono",
+  "phoneNationalHint": "06 12 34 56 78",
+  "phoneNationalHelp": "El prefijo +33 se añade automáticamente. Puedes incluir el 0 inicial.",
+  "otpResendIn": "Pide otro código en {seconds} s"
 }

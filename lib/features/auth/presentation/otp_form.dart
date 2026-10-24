@@ -7,6 +7,7 @@ import '../../../core/widgets/histae_button.dart';
 import '../application/otp_controller.dart';
 import '../application/session_controller.dart';
 import '../domain/auth_models.dart';
+import '../domain/phone_country.dart';
 
 /// Shared phone verification form. Its caller owns what happens after login.
 class OtpForm extends StatefulWidget {
@@ -15,10 +16,12 @@ class OtpForm extends StatefulWidget {
     required this.session,
     this.registration = false,
     this.onAuthenticated,
+    this.onSignIn,
   });
   final SessionController session;
   final bool registration;
   final Future<void> Function(TokenPair tokens)? onAuthenticated;
+  final VoidCallback? onSignIn;
 
   @override
   State<OtpForm> createState() => _OtpFormState();
@@ -28,9 +31,13 @@ class _OtpFormState extends State<OtpForm> {
   late final _controller = OtpController(
     widget.session,
     onAuthenticated: widget.onAuthenticated,
+    registration: widget.registration,
   );
   final _phone = TextEditingController();
   final _otp = TextEditingController();
+  PhoneCountry _country = PhoneCountry.france;
+
+  String get _normalizedPhone => _country.normalize(_phone.text) ?? _phone.text;
 
   @override
   void dispose() {
@@ -50,6 +57,7 @@ class _OtpFormState extends State<OtpForm> {
       builder: (context, _) {
         final controller = _controller;
         final enabled = !controller.busy && controller.retrySeconds == 0;
+        final canSend = enabled && controller.resendSeconds == 0;
         return AutofillGroup(
           child: ListView(
             padding: const EdgeInsets.all(24),
@@ -63,23 +71,45 @@ class _OtpFormState extends State<OtpForm> {
                     : strings.otpIntroduction,
               ),
               const SizedBox(height: 24),
-              TextField(
-                controller: _phone,
-                key: const Key('phone'),
-                enabled: !controller.busy && !controller.canResume,
-                decoration: InputDecoration(
-                  labelText: strings.phoneLabel,
-                  hintText: strings.phoneHint,
-                  helperText: strings.phoneHelp,
-                  helperMaxLines: 3,
+              if (!controller.requested) ...[
+                DropdownButtonFormField<PhoneCountry>(
+                  key: const Key('phone-country'),
+                  initialValue: _country,
+                  isExpanded: true,
+                  decoration: InputDecoration(
+                    labelText: strings.messages.phoneCountry,
+                  ),
+                  items: [
+                    DropdownMenuItem(
+                      value: PhoneCountry.france,
+                      child: Text(strings.messages.phoneCountryFrance),
+                    ),
+                  ],
+                  onChanged: controller.busy || controller.canResume
+                      ? null
+                      : (value) => setState(() {
+                          _country = value ?? PhoneCountry.france;
+                        }),
                 ),
-                keyboardType: TextInputType.phone,
-                autofillHints: const [AutofillHints.telephoneNumber],
-                autocorrect: false,
-                enableSuggestions: false,
-                textInputAction: TextInputAction.done,
-              ),
-              const SizedBox(height: 20),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: _phone,
+                  key: const Key('phone'),
+                  enabled: !controller.busy && !controller.canResume,
+                  decoration: InputDecoration(
+                    labelText: strings.messages.phoneNationalLabel,
+                    hintText: strings.messages.phoneNationalHint,
+                    helperText: strings.messages.phoneNationalHelp,
+                    helperMaxLines: 3,
+                  ),
+                  keyboardType: TextInputType.phone,
+                  autofillHints: const [AutofillHints.telephoneNumber],
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  textInputAction: TextInputAction.done,
+                ),
+                const SizedBox(height: 20),
+              ],
               if (controller.notice == 'otp_accepted')
                 Semantics(liveRegion: true, child: Text(strings.otpAccepted)),
               if (controller.failure case final failure?) ...[
@@ -121,22 +151,24 @@ class _OtpFormState extends State<OtpForm> {
               ],
               if (controller.retrySeconds > 0)
                 Text(strings.retryIn(controller.retrySeconds)),
+              if (controller.resendSeconds > 0)
+                Text(strings.messages.otpResendIn(controller.resendSeconds)),
               if (!controller.canResume)
                 HistaeButton(
-                  onPressed: enabled
+                  onPressed: canSend
                       ? () {
                           _otp.clear();
-                          controller.send(_phone.text);
+                          controller.send(_normalizedPhone);
                         }
                       : null,
                   child: Text(strings.sendOtp),
                 )
               else
                 OutlinedButton(
-                  onPressed: enabled
+                  onPressed: canSend
                       ? () {
                           _otp.clear();
-                          controller.send(_phone.text);
+                          controller.send(_normalizedPhone);
                         }
                       : null,
                   child: Text(strings.resendOtp),
@@ -144,7 +176,10 @@ class _OtpFormState extends State<OtpForm> {
               if (controller.canResume && controller.failure != null)
                 OutlinedButton(
                   onPressed: enabled
-                      ? () => controller.send(_phone.text, newIntention: false)
+                      ? () => controller.send(
+                          _normalizedPhone,
+                          newIntention: false,
+                        )
                       : null,
                   child: Text(strings.resumeOtp),
                 ),
@@ -157,6 +192,11 @@ class _OtpFormState extends State<OtpForm> {
                           controller.changePhone();
                         },
                   child: Text(strings.changePhone),
+                ),
+              if (widget.registration && widget.onSignIn != null)
+                TextButton(
+                  onPressed: controller.busy ? null : widget.onSignIn,
+                  child: Text(strings.existingAccount),
                 ),
               if (controller.busy) ...[
                 const SizedBox(height: 20),

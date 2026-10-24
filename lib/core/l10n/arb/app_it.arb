@@ -49,7 +49,7 @@
   "appStringsYourHistaeSpace": "Il mio profilo",
   "appStringsYourAccountIsCreatedAndYour": "Il tuo account è stato creato e i consensi obbligatori sono aggiornati. Potrai completare il profilo con il prossimo aggiornamento.",
   "appStringsYouCanViewYourDocumentsManage": "Qui puoi consultare i documenti, gestire i consensi o uscire, anche prima di completare la registrazione.",
-  "appStringsEnterAValidFrenchPhoneNumber": "Inserisci un numero francese valido con prefisso +33.",
+  "appStringsEnterAValidFrenchPhoneNumber": "Inserisci un numero francese valido.",
   "appStringsEnterTheSixDigitsOfThe": "Inserisci le sei cifre del codice ricevuto.",
   "appStringsTheCodeIsInvalidOrHas": "Il codice non è valido o è scaduto.",
   "appStringsTheSmsCouldNotBeSent": "Non è stato possibile inviare l’SMS. Potete riprendere l’invio.",
@@ -882,5 +882,17 @@
   "registrationLeaveBody": "Le informazioni di questa registrazione che non sono state salvate andranno perse.",
   "registrationExistingAccount": "Questo numero è già collegato a un account Histae. Accedi al tuo spazio: il tuo profilo attuale sarà conservato.",
   "registrationSaving": "Completa la registrazione",
-  "registrationRetrySave": "Il tuo numero è verificato. I dati restano disponibili durante la registrazione: puoi riprendere il salvataggio senza richiedere un altro codice."
+  "registrationRetrySave": "Il tuo numero è verificato. I dati restano disponibili durante la registrazione: puoi riprendere il salvataggio senza richiedere un altro codice.",
+  "registrationChooseDate": "Scegli una data",
+  "registrationAdultOnly": "Devi avere almeno 18 anni.",
+  "registrationAgeValue": "{value} anni",
+  "registrationDistanceValue": "{value} km",
+  "registrationDecrease": "Diminuisci: {label}",
+  "registrationIncrease": "Aumenta: {label}",
+  "phoneCountry": "Paese",
+  "phoneCountryFrance": "Francia (+33)",
+  "phoneNationalLabel": "Numero di telefono",
+  "phoneNationalHint": "06 12 34 56 78",
+  "phoneNationalHelp": "Il prefisso +33 viene aggiunto automaticamente. Puoi includere lo 0 iniziale.",
+  "otpResendIn": "Richiedi un altro codice tra {seconds} s"
 }

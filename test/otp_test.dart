@@ -11,6 +11,48 @@ import 'package:http/http.dart' as http;
 import 'support/auth_fixture.dart';
 
 void main() {
+  test('French country selection normalizes national input and international autofill', () {
+    for (final input in [
+      '06 12 34 56 78',
+      '6 12 34 56 78',
+      '+33 (6) 12.34-56 78',
+    ]) {
+      expect(PhoneCountry.france.normalize(input), '+33612345678');
+    }
+    for (final input in [
+      '+32612345678',
+      '0012345678',
+      '061234567',
+      '06123456789',
+      'abc',
+    ]) {
+      expect(PhoneCountry.france.normalize(input), isNull);
+    }
+  });
+
+  test('sign-up opens generic OTP entry without claiming delivery or authentication', () async {
+    final bodies = <Object?>[];
+    final session = testSession((request) async {
+      bodies.add(jsonDecode(request.body));
+      return jsonResponse({
+        'message': 'accepted',
+        'resend_after_seconds': 60,
+      }, 202);
+    });
+    addTearDown(session.dispose);
+    final controller = OtpController(session, registration: true);
+    addTearDown(controller.dispose);
+    await controller.send('+33612345678');
+    expect(bodies.single, {
+      'phone_number': '+33612345678',
+      'registration': true,
+    });
+    expect(controller.requested, isTrue);
+    expect(controller.canResume, isTrue);
+    expect(controller.failure, isNull);
+    expect(controller.resendSeconds, greaterThanOrEqualTo(59));
+    expect(session.hasSession, isFalse);
+  });
   test(
     'French numbers follow Rust normalization and exclude invalid inputs',
     () {
@@ -28,6 +70,7 @@ void main() {
   );
 
   test('uncertain delivery resumes the same UUID and parameters; explicit resend changes UUID', () async {
+    var now = DateTime.now();
     final keys = <String>[];
     final bodies = <Object?>[];
     final session = testSession((request) async {
@@ -39,7 +82,7 @@ void main() {
           : defaultAuthResponse(request);
     });
     addTearDown(session.dispose);
-    final controller = OtpController(session);
+    final controller = OtpController(session, now: () => now);
     addTearDown(controller.dispose);
     await controller.send('+33 6 12 34 56 78');
     expect(controller.requested, isTrue);
@@ -47,6 +90,9 @@ void main() {
     await controller.send('+33612345678', newIntention: false);
     expect(keys[1], keys[0]);
     expect(bodies[1], bodies[0]);
+    await controller.send('+33612345678');
+    expect(keys, hasLength(2));
+    now = now.add(const Duration(seconds: 61));
     await controller.send('+33612345678');
     expect(keys[2], isNot(keys[0]));
     expect(
@@ -111,6 +157,7 @@ void main() {
     'lost verification response requires a new code, never an automatic replay',
     () async {
       var verifies = 0;
+      var now = DateTime.now();
       final session = testSession((request) async {
         if (request.url.path == '/api/auth/otp/verify') {
           verifies++;
@@ -119,13 +166,14 @@ void main() {
         return defaultAuthResponse(request);
       });
       addTearDown(session.dispose);
-      final controller = OtpController(session);
+      final controller = OtpController(session, now: () => now);
       addTearDown(controller.dispose);
       await controller.send('+33612345678');
       await controller.verify('123456');
       expect(controller.verificationUncertain, isTrue);
       await controller.verify('123456');
       expect(verifies, 1);
+      now = now.add(const Duration(seconds: 61));
       await controller.send('+33612345678');
       expect(controller.verificationUncertain, isFalse);
     },
@@ -148,11 +196,66 @@ void main() {
     controller.changePhone();
     await controller.send('+33712345678');
     expect(calls, 1);
-    now = now.add(const Duration(seconds: 31));
+    now = now.add(const Duration(seconds: 61));
     expect(calls, 1);
     await controller.send('+33712345678');
     expect(calls, 2);
   });
+
+  test(
+    'resend cooldown preserves verification and survives editing the phone',
+    () async {
+      var now = DateTime.now();
+      var sends = 0;
+      var verifies = 0;
+      final session = testSession((request) async {
+        if (request.url.path.endsWith('/send')) {
+          sends++;
+          return jsonResponse({'resend_after_seconds': 90}, 202);
+        }
+        verifies++;
+        return apiError(401, 'invalid_or_expired_otp');
+      });
+      addTearDown(session.dispose);
+      final controller = OtpController(session, now: () => now);
+      addTearDown(controller.dispose);
+      await controller.send('+33612345678');
+      expect(controller.resendSeconds, 90);
+      await controller.verify('123456');
+      expect(verifies, 1);
+      expect(controller.retrySeconds, 0);
+      expect(controller.resendSeconds, 90);
+      controller.changePhone();
+      await controller.send('+33712345678');
+      expect(sends, 1);
+      now = now.add(const Duration(seconds: 91));
+      await controller.send('+33712345678');
+      expect(sends, 2);
+    },
+  );
+
+  test(
+    'server resend cooldown still permits entering an existing code',
+    () async {
+      var verifies = 0;
+      final session = testSession((request) async {
+        if (request.url.path.endsWith('/send')) {
+          return apiError(429, 'otp_resend_too_soon', retryAfter: '30');
+        }
+        verifies++;
+        return apiError(401, 'invalid_or_expired_otp');
+      });
+      addTearDown(session.dispose);
+      final controller = OtpController(session);
+      addTearDown(controller.dispose);
+      await controller.send('+33612345678');
+      expect(controller.requested, isTrue);
+      expect(controller.retrySeconds, 0);
+      expect(controller.resendSeconds, greaterThan(0));
+      await controller.verify('123456');
+      expect(verifies, 1);
+    },
+  );
 
   test('accepted means HTTP 202, not SMS receipt or a session', () async {
     final session = testSession(

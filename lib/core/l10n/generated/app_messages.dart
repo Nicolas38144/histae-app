@@ -399,7 +399,7 @@ abstract class AppMessages {
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Saisissez un numéro français valide au format +33.'**
+  /// **'Saisissez un numéro français valide.'**
   String get appStringsEnterAValidFrenchPhoneNumber;
 
   /// Interface: lib/core/l10n/app_strings.dart
@@ -5371,6 +5371,78 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Votre numéro est vérifié. Vos informations sont conservées pendant ce parcours : vous pouvez reprendre l’enregistrement sans demander un nouveau code.'**
   String get registrationRetrySave;
+
+  /// Registration controls and phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir une date'**
+  String get registrationChooseDate;
+
+  /// Registration controls and phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous devez avoir au moins 18 ans.'**
+  String get registrationAdultOnly;
+
+  /// Registration controls and phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'{value} ans'**
+  String registrationAgeValue(int value);
+
+  /// Registration controls and phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'{value} km'**
+  String registrationDistanceValue(int value);
+
+  /// Registration controls and phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'Diminuer : {label}'**
+  String registrationDecrease(String label);
+
+  /// Registration controls and phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'Augmenter : {label}'**
+  String registrationIncrease(String label);
+
+  /// Registration controls and phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'Pays'**
+  String get phoneCountry;
+
+  /// Registration controls and phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'France (+33)'**
+  String get phoneCountryFrance;
+
+  /// Registration controls and phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'Numéro de téléphone'**
+  String get phoneNationalLabel;
+
+  /// Registration controls and phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'06 12 34 56 78'**
+  String get phoneNationalHint;
+
+  /// Registration controls and phone verification
+  ///
+  /// In fr, this message translates to:
+  /// **'L’indicatif +33 est ajouté automatiquement. Vous pouvez saisir le 0 initial.'**
+  String get phoneNationalHelp;
+
+  /// Countdown before a new OTP request; verification remains available.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouveau code dans {seconds} s'**
+  String otpResendIn(int seconds);
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

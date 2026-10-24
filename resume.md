@@ -14,6 +14,21 @@ unsaved values. Returning sign-in opens phone verification directly. Both flows 
 implementation; there is no separate password-based registration endpoint. An accepted SMS request
 does not prove delivery; a lost verification result requires a new code.
 
+Sign-up uses a calendar-only adult birthdate picker and defaults sex to male. Preference sliders
+start at ages 18–50 and 50 km, with one-unit minus/plus buttons disabled at the API bounds or the
+opposite age limit. Phone entry uses the France (+33) selector and normalizes national typing or
+international autofill to E.164. Registration OTP requests include `registration: true`. Every accepted request opens the same
+code-entry screen: an already registered number at sign-up, or an unknown number at sign-in,
+receives no SMS. HTTP does not query account membership or wait for Sweego: the API atomically
+queues an encrypted request for its outbox worker. The generic acknowledgement proves neither
+delivery nor authentication. An explicit sign-in action remains available during registration.
+
+The server enforces a shared resend cooldown (60 seconds by default); the mobile displays its
+remaining time without disabling code verification. Editing the phone cannot bypass it. A lost
+send response is resumed with the same UUID and parameters, never a new background SMS. Global
+provider attempt limits default to 100/hour and 500/day in addition to per-phone limits. Deploy
+the matching API, schema and outbox worker before relying on these protections.
+
 `GET /api/legal/documents` supplies the current public document metadata, using the same versions,
 URLs and language fallbacks as the authenticated consent endpoint. Deploy this API route before the
 new registration flow. After verification, the app compares the documents again, saves the explicit
@@ -120,3 +135,6 @@ erasure is finished.
 
 For shared caching and retry rules, use [Architecture](ARCHITECTURE.md). Interface and request
 language rules are in [Localization](lib/core/l10n/README.md) and [API languages](docs/api-languages.md).
+
+The public plan catalogue and subscription management share the same adaptive offer carousel,
+with Monthly selected initially, visible neighbouring cards and localized offer selectors.

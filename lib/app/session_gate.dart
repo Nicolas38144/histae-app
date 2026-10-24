@@ -4,6 +4,7 @@ import '../core/l10n/app_strings.dart';
 import '../core/widgets/histae_scaffold.dart';
 import '../core/widgets/status_view.dart';
 import '../features/auth/application/session_controller.dart';
+import '../features/auth/presentation/otp_page.dart';
 import '../features/catalog/data/catalog_repository.dart';
 import '../features/consents/presentation/consents_page.dart';
 import '../features/privacy/presentation/privacy_strings.dart';
@@ -60,6 +61,12 @@ class _SessionGateState extends State<SessionGate> {
         controller: registration,
         onComplete: _endRegistration,
         onCancel: _endRegistration,
+        onSignIn: () {
+          _endRegistration();
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(builder: (_) => OtpPage(session: session)),
+          );
+        },
       );
     }
     switch (session.phase) {

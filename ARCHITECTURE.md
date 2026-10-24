@@ -30,6 +30,13 @@ preferences widgets own their text controllers. `RegistrationLegalRepository` lo
 metadata, while the registration controller coordinates authenticated consent/profile writes and
 explicit recovery. `OtpForm` is shared with returning sign-in through an authentication callback.
 The normal private scope opens only after sign-up finishes or the user explicitly leaves it.
+`OtpController` separates resend deadlines from verification rate limits; `OtpForm` only renders
+those states. `AuthRepository` decodes the server's resend receipt. Neither UI nor controller
+infers account membership from accepted requests.
+
+The catalogue owns `SubscriptionPlanCarousel`, reused by its public read-only page and billing's
+subscription plans. It owns selection and measured card heights only; catalogue loading and
+purchase actions remain in their respective controllers.
 
 `MainShell` owns Feed, Matches and Profile controllers. Its `IndexedStack` retains the three views
 and scroll state; its session resource key rebuilds the private scope when access changes.

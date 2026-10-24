@@ -8,7 +8,11 @@ import 'package:histae_app/core/l10n/generated/app_messages.dart';
 import 'package:histae_app/features/consents/domain/consent_state.dart';
 import 'package:histae_app/features/profile/data/profile_models.dart';
 import 'package:histae_app/features/registration/application/registration_controller.dart';
+import 'package:histae_app/features/registration/application/registration_dates.dart';
+import 'package:histae_app/features/registration/application/registration_draft.dart';
+import 'package:histae_app/features/registration/presentation/preference_slider.dart';
 import 'package:histae_app/features/registration/presentation/registration_page.dart';
+import 'package:histae_app/features/registration/presentation/registration_preferences_step.dart';
 
 import 'support/auth_fixture.dart';
 import 'support/profile_fixture.dart';
@@ -42,6 +46,20 @@ Future<RegistrationController> prepared(
 }
 
 void main() {
+  test('sign-up defaults and latest adult birthdate remain valid at leap-day boundaries', () {
+    final draft = RegistrationDraft();
+    expect(draft.profile.sex, 'male');
+    expect(draft.preferences.minAge, 18);
+    expect(draft.preferences.maxAge, 50);
+    expect(
+      latestAdultBirthdate(DateTime.utc(2024, 2, 29)),
+      DateTime(2006, 2, 28),
+    );
+    expect(
+      latestAdultBirthdate(DateTime.utc(2026, 2, 28)),
+      DateTime(2008, 2, 28),
+    );
+  });
   test('drafts stay local, then consents precede profile and preferences after verification', () async {
     final fixture = RegistrationFixture();
     final controller = await prepared(fixture);
@@ -183,7 +201,19 @@ void main() {
     final scrollable = find.byType(Scrollable).first;
     tester.state<ScrollableState>(scrollable).position.jumpTo(0);
     await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(target, 180, scrollable: scrollable);
+    for (
+      var attempt = 0;
+      target.evaluate().isEmpty && attempt < 40;
+      attempt++
+    ) {
+      // Scroll from the list padding rather than the biography's inner editor.
+      final bounds = tester.getRect(scrollable);
+      await tester.dragFrom(
+        Offset(bounds.left + 8, bounds.center.dy),
+        const Offset(0, -180),
+      );
+      await tester.pumpAndSettle();
+    }
     await tester.ensureVisible(target);
     await tester.pumpAndSettle();
   }
@@ -200,6 +230,25 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  Future<void> chooseDate(WidgetTester tester) async {
+    await tapVisible(tester, find.byKey(const Key('registration-birthdate')));
+    expect(
+      tester
+          .widget<DatePickerDialog>(find.byType(DatePickerDialog))
+          .initialEntryMode,
+      DatePickerEntryMode.calendarOnly,
+    );
+    expect(
+      find.descendant(
+        of: find.byType(DatePickerDialog),
+        matching: find.byType(EditableText),
+      ),
+      findsNothing,
+    );
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+  }
+
   testWidgets(
     'sign-up opens the profile first and retains drafts when going back before the phone step',
     (tester) async {
@@ -211,7 +260,7 @@ void main() {
       expect(find.byKey(const Key('phone')), findsNothing);
       expect(fixture.requests, isEmpty);
       await enter(tester, 'registration-firstname', 'Camille');
-      await enter(tester, 'registration-birthdate', '1995-06-12');
+      await chooseDate(tester);
       await enter(
         tester,
         'registration-bio',
@@ -219,7 +268,13 @@ void main() {
       );
       await tapVisible(tester, find.byKey(const Key('registration-next')));
       expect(find.byKey(const Key('phone')), findsNothing);
-      await enter(tester, 'registration-distance', '75');
+      await tapVisible(
+        tester,
+        find.descendant(
+          of: find.byKey(const Key('registration-distance')),
+          matching: find.byKey(const Key('increase')),
+        ),
+      );
       await tester.tap(find.byTooltip('Retour'));
       await tester.pumpAndSettle();
       await reveal(tester, find.byKey(const Key('registration-firstname')));
@@ -234,10 +289,11 @@ void main() {
       await reveal(tester, find.byKey(const Key('registration-distance')));
       expect(
         tester
-            .widget<TextField>(find.byKey(const Key('registration-distance')))
-            .controller!
-            .text,
-        '75',
+            .widget<PreferenceSlider>(
+              find.byKey(const Key('registration-distance')),
+            )
+            .value,
+        51,
       );
       await tapVisible(
         tester,
@@ -256,7 +312,8 @@ void main() {
         await tapVisible(tester, find.byKey(Key(type.wireName)));
       }
       await tapVisible(tester, find.byKey(const Key('registration-next')));
-      await enter(tester, 'phone', '+33 6 12 34 56 78');
+      expect(find.text('France (+33)'), findsOneWidget);
+      await enter(tester, 'phone', '06 12 34 56 78');
       await tapVisible(tester, find.text('Demander un code'));
       await enter(tester, 'otp', '123456');
       await tapVisible(tester, find.text('Vérifier le code'));
@@ -287,7 +344,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await enter(tester, 'phone', '+33 6 12 34 56 78');
+      await enter(tester, 'phone', '06 12 34 56 78');
       await tapVisible(tester, find.text('Demander un code'));
       await enter(tester, 'otp', '123456');
       await tapVisible(tester, find.text('Vérifier le code'));
@@ -300,6 +357,13 @@ void main() {
         hasLength(1),
       );
       final writes = fixture.writes.toList();
+      final send = fixture.requests.singleWhere(
+        (request) => request.url.path == '/api/auth/otp/send',
+      );
+      expect(jsonDecode(send.body), {
+        'phone_number': '+33612345678',
+        'registration': true,
+      });
       expect((jsonDecode(writes[1].body) as Map)['firstname'], 'Camille');
       expect(tester.takeException(), isNull);
     },
@@ -335,11 +399,90 @@ void main() {
       );
       await tester.pumpAndSettle();
       await enter(tester, 'registration-firstname', 'Camille');
-      await enter(tester, 'registration-birthdate', '1995-06-12');
+      await chooseDate(tester);
       await tapVisible(tester, find.byKey(const Key('registration-next')));
       expect(controller.step, RegistrationStep.preferences);
       expect(tester.takeException(), isNull);
       expect(fixture.requests, isEmpty);
+    },
+  );
+
+  testWidgets(
+    'preference sliders disable both buttons at their bounds and keep ages ordered',
+    (tester) async {
+      final draft = RegistrationDraft()
+        ..preferences = const Preferences(18, 50, 50, 'both');
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppMessages.localizationsDelegates,
+          supportedLocales: AppMessages.supportedLocales,
+          locale: const Locale('fr'),
+          home: Scaffold(
+            body: RegistrationPreferencesStep(draft: draft, onContinue: () {}),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      Finder part(String key, String button) => find.descendant(
+        of: find.byKey(Key(key)),
+        matching: find.byKey(Key(button)),
+      );
+      Finder slider(String key) => find.descendant(
+        of: find.byKey(Key(key)),
+        matching: find.byType(Slider),
+      );
+      Future<void> drag(String key, double amount) async {
+        await reveal(tester, slider(key));
+        await tester.drag(slider(key), Offset(amount, 0));
+        await tester.pumpAndSettle();
+      }
+
+      expect(
+        tester
+            .widget<IconButton>(part('registration-min-age', 'decrease'))
+            .onPressed,
+        isNull,
+      );
+      await drag('registration-min-age', 800);
+      expect(draft.preferences.minAge, 50);
+      expect(
+        tester
+            .widget<IconButton>(part('registration-min-age', 'increase'))
+            .onPressed,
+        isNull,
+      );
+      await reveal(tester, part('registration-max-age', 'decrease'));
+      expect(
+        tester
+            .widget<IconButton>(part('registration-max-age', 'decrease'))
+            .onPressed,
+        isNull,
+      );
+      await drag('registration-max-age', 800);
+      expect(draft.preferences.maxAge, 99);
+      expect(
+        tester
+            .widget<IconButton>(part('registration-max-age', 'increase'))
+            .onPressed,
+        isNull,
+      );
+      await drag('registration-distance', -800);
+      expect(draft.preferences.distance, 1);
+      expect(
+        tester
+            .widget<IconButton>(part('registration-distance', 'decrease'))
+            .onPressed,
+        isNull,
+      );
+      await drag('registration-distance', 800);
+      expect(draft.preferences.distance, 500);
+      expect(
+        tester
+            .widget<IconButton>(part('registration-distance', 'increase'))
+            .onPressed,
+        isNull,
+      );
+      expect(draft.preferences.validate(), isNull);
     },
   );
 }

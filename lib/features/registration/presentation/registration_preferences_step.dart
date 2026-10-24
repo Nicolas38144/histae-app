@@ -5,6 +5,7 @@ import '../../../core/widgets/histae_button.dart';
 import '../../profile/data/profile_models.dart';
 import '../../profile/presentation/profile_strings.dart';
 import '../application/registration_draft.dart';
+import 'preference_slider.dart';
 
 class RegistrationPreferencesStep extends StatefulWidget {
   const RegistrationPreferencesStep({
@@ -22,15 +23,9 @@ class RegistrationPreferencesStep extends StatefulWidget {
 
 class _RegistrationPreferencesStepState
     extends State<RegistrationPreferencesStep> {
-  late final _min = TextEditingController(
-    text: widget.draft.preferences.minAge.toString(),
-  );
-  late final _max = TextEditingController(
-    text: widget.draft.preferences.maxAge.toString(),
-  );
-  late final _distance = TextEditingController(
-    text: widget.draft.preferences.distance.toString(),
-  );
+  late int _min = widget.draft.preferences.minAge;
+  late int _max = widget.draft.preferences.maxAge;
+  late int _distance = widget.draft.preferences.distance;
   late String? _looking = widget.draft.preferences.lookingFor.isEmpty
       ? null
       : widget.draft.preferences.lookingFor;
@@ -38,33 +33,13 @@ class _RegistrationPreferencesStepState
 
   void _changed() {
     widget.draft.preferences = Preferences(
-      int.tryParse(_min.text) ?? -1,
-      int.tryParse(_max.text) ?? -1,
-      int.tryParse(_distance.text) ?? -1,
+      _min,
+      _max,
+      _distance,
       _looking ?? '',
     );
     if (_error != null) setState(() => _error = null);
   }
-
-  @override
-  void dispose() {
-    _min.dispose();
-    _max.dispose();
-    _distance.dispose();
-    super.dispose();
-  }
-
-  Widget _number(TextEditingController controller, String label, String key) =>
-      Padding(
-        padding: const EdgeInsets.only(top: 20),
-        child: TextField(
-          key: Key(key),
-          controller: controller,
-          keyboardType: TextInputType.number,
-          decoration: InputDecoration(labelText: label),
-          onChanged: (_) => _changed(),
-        ),
-      );
 
   @override
   Widget build(BuildContext context) {
@@ -96,12 +71,41 @@ class _RegistrationPreferencesStepState
             _changed();
           },
         ),
-        _number(_min, copy.preferencesEditorMinimumAge, 'registration-min-age'),
-        _number(_max, copy.preferencesEditorMaximumAge, 'registration-max-age'),
-        _number(
-          _distance,
-          copy.preferencesEditorMaximumDistanceKm,
-          'registration-distance',
+        PreferenceSlider(
+          key: const Key('registration-min-age'),
+          label: copy.preferencesEditorMinimumAge,
+          valueLabel: copy.registrationAgeValue(_min),
+          value: _min,
+          minimum: 18,
+          maximum: _max,
+          onChanged: (value) => setState(() {
+            _min = value;
+            _changed();
+          }),
+        ),
+        PreferenceSlider(
+          key: const Key('registration-max-age'),
+          label: copy.preferencesEditorMaximumAge,
+          valueLabel: copy.registrationAgeValue(_max),
+          value: _max,
+          minimum: _min,
+          maximum: 99,
+          onChanged: (value) => setState(() {
+            _max = value;
+            _changed();
+          }),
+        ),
+        PreferenceSlider(
+          key: const Key('registration-distance'),
+          label: copy.preferencesEditorMaximumDistanceKm,
+          valueLabel: copy.registrationDistanceValue(_distance),
+          value: _distance,
+          minimum: 1,
+          maximum: 500,
+          onChanged: (value) => setState(() {
+            _distance = value;
+            _changed();
+          }),
         ),
         const SizedBox(height: 20),
         Text(copy.registrationSensitiveDraft),

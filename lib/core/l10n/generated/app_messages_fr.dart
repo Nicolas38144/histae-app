@@ -175,7 +175,7 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get appStringsEnterAValidFrenchPhoneNumber =>
-      'Saisissez un numéro français valide au format +33.';
+      'Saisissez un numéro français valide.';
 
   @override
   String get appStringsEnterTheSixDigitsOfThe =>
@@ -3280,4 +3280,51 @@ class AppMessagesFr extends AppMessages {
   @override
   String get registrationRetrySave =>
       'Votre numéro est vérifié. Vos informations sont conservées pendant ce parcours : vous pouvez reprendre l’enregistrement sans demander un nouveau code.';
+
+  @override
+  String get registrationChooseDate => 'Choisir une date';
+
+  @override
+  String get registrationAdultOnly => 'Vous devez avoir au moins 18 ans.';
+
+  @override
+  String registrationAgeValue(int value) {
+    return '$value ans';
+  }
+
+  @override
+  String registrationDistanceValue(int value) {
+    return '$value km';
+  }
+
+  @override
+  String registrationDecrease(String label) {
+    return 'Diminuer : $label';
+  }
+
+  @override
+  String registrationIncrease(String label) {
+    return 'Augmenter : $label';
+  }
+
+  @override
+  String get phoneCountry => 'Pays';
+
+  @override
+  String get phoneCountryFrance => 'France (+33)';
+
+  @override
+  String get phoneNationalLabel => 'Numéro de téléphone';
+
+  @override
+  String get phoneNationalHint => '06 12 34 56 78';
+
+  @override
+  String get phoneNationalHelp =>
+      'L’indicatif +33 est ajouté automatiquement. Vous pouvez saisir le 0 initial.';
+
+  @override
+  String otpResendIn(int seconds) {
+    return 'Nouveau code dans $seconds s';
+  }
 }

@@ -6,6 +6,7 @@ import '../../../core/theme/histae_tokens.dart';
 
 typedef SubscriptionPlanSlide = ({String id, String label, Widget child});
 
+/// Shared by the public catalogue and subscription management.
 /// One offer at a time, without imposing a height that could truncate its text.
 class SubscriptionPlanCarousel extends StatefulWidget {
   const SubscriptionPlanCarousel({

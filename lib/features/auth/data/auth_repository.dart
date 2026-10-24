@@ -3,17 +3,19 @@ import '../../../core/network/api_client.dart';
 import '../domain/auth_models.dart';
 
 export '../domain/auth_models.dart';
+export '../domain/phone_country.dart';
 
 abstract interface class AuthRepository {
   factory AuthRepository(ApiClient api) = ApiAuthRepository;
 
   ApiClient get api;
 
-  Future<void> sendOtp(
+  Future<OtpSendReceipt> sendOtp(
     String phone,
     String key,
     RequestCancellation cancellation, {
     ApiLanguage? language,
+    bool registration = false,
   });
 
   Future<TokenPair> verifyOtp(
@@ -33,21 +35,23 @@ final class ApiAuthRepository implements AuthRepository {
   final ApiClient api;
 
   @override
-  Future<void> sendOtp(
+  Future<OtpSendReceipt> sendOtp(
     String phone,
     String key,
     RequestCancellation cancellation, {
     ApiLanguage? language,
+    bool registration = false,
   }) async {
-    await api.requestJson(
+    final response = await api.requestJson(
       'POST',
       '/api/auth/otp/send',
       language: language,
-      body: {'phone_number': phone},
+      body: {'phone_number': phone, if (registration) 'registration': true},
       idempotencyKey: key,
       expectedStatus: 202,
       cancellation: cancellation,
     );
+    return OtpSendReceipt.fromJson(response);
   }
 
   @override
@@ -85,9 +89,4 @@ final class ApiAuthRepository implements AuthRepository {
       expectedStatus: 204,
     );
   }
-}
-
-String? normalizeFrenchPhone(String input) {
-  final phone = input.trim().replaceAll(RegExp(r'[ .()\-]'), '');
-  return RegExp(r'^\+33[1-9][0-9]{8}$').hasMatch(phone) ? phone : null;
 }

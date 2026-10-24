@@ -10,9 +10,14 @@ import '../data/auth_repository.dart';
 import 'session_controller.dart';
 
 class OtpController extends ChangeNotifier {
-  OtpController(this.session, {DateTime Function()? now, this.onAuthenticated})
-    : _now = now ?? DateTime.now;
+  OtpController(
+    this.session, {
+    DateTime Function()? now,
+    this.onAuthenticated,
+    this.registration = false,
+  }) : _now = now ?? DateTime.now;
   final SessionController session;
+  final bool registration;
   final Future<void> Function(TokenPair tokens)? onAuthenticated;
   final DateTime Function() _now;
   String? _phone;
@@ -24,8 +29,9 @@ class OtpController extends ChangeNotifier {
   String? notice;
   ApiFailure? failure;
   DateTime? _retryAt;
+  DateTime? _resendAt;
   late final RetryTicker _timer = RetryTicker(
-    remaining: () => retrySeconds,
+    remaining: () => resendSeconds,
     onTick: () {
       if (!_disposed) notifyListeners();
     },
@@ -34,6 +40,10 @@ class OtpController extends ChangeNotifier {
   bool _disposed = false;
 
   int get retrySeconds => retrySecondsUntil(_retryAt, now: _now());
+  int get resendSeconds {
+    final remaining = retrySecondsUntil(_resendAt, now: _now());
+    return remaining > retrySeconds ? remaining : retrySeconds;
+  }
 
   bool get canResume => _key != null;
   // New send/resend explicitly creates an intention. Technical resume keeps
@@ -41,6 +51,7 @@ class OtpController extends ChangeNotifier {
 
   Future<void> send(String input, {bool newIntention = true}) async {
     if (busy || _disposed || retrySeconds > 0) return;
+    if (newIntention && resendSeconds > 0) return;
     final phone = normalizeFrenchPhone(input);
     if (phone == null) {
       failure = const ApiFailure(
@@ -54,17 +65,24 @@ class OtpController extends ChangeNotifier {
       _phone = phone;
       _key = newUuidV4();
       _language = session.language;
-      requested = false;
       verificationUncertain = false;
+      // A lost response may still have queued the request. Technical replay
+      // keeps its UUID; requesting another SMS must wait.
+      _resendAt = _now().add(const Duration(seconds: 60));
+      _timer.restart();
     }
     if (_phone != phone || _key == null) return;
     await _run(() async {
-      await session.repository.sendOtp(
+      final receipt = await session.repository.sendOtp(
         _phone!,
         _key!,
         _request!,
         language: _language,
+        registration: registration,
       );
+      if (_disposed) return;
+      _resendAt = _now().add(receipt.resendAfter);
+      _timer.restart();
       requested = true;
       verificationUncertain = false;
       notice = 'otp_accepted';
@@ -139,9 +157,17 @@ class OtpController extends ChangeNotifier {
             error.kind == ApiFailureKind.server) {
           requested = true; // The original code may still arrive.
         }
-        _retryAt = error.retryAt;
+        if (error.code == 'otp_resend_too_soon') {
+          // Another device or app instance may already have requested a code.
+          // This deadline limits sending, never verification of that code.
+          requested = true;
+          _resendAt = error.retryAt ?? _now().add(const Duration(seconds: 60));
+          _retryAt = null;
+        } else {
+          _retryAt = error.retryAt;
+        }
         _timer.cancel();
-        if (retrySeconds > 0) {
+        if (resendSeconds > 0) {
           _timer.restart();
         }
       }
@@ -162,7 +188,7 @@ class OtpController extends ChangeNotifier {
     verificationUncertain = false;
     failure = null;
     notice = null;
-    // Keep any server Retry-After when the phone is edited.
+    // Editing the phone does not bypass either resend or server limits.
     notifyListeners();
   }
 

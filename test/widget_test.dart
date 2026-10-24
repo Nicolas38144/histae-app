@@ -56,15 +56,26 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
       response.complete(http.Response(catalogFixture(), 200));
       await tester.pumpAndSettle();
-      expect(find.text('Free'), findsOneWidget);
       expect(find.text('Premium Mensuel'), findsOneWidget);
-      expect(find.text('Premium Annuel'), findsOneWidget);
+      expect(find.text('Offre 2 sur 3'), findsOneWidget);
+      expect(
+        tester
+            .widget<ChoiceChip>(
+              find.byKey(const Key('plan-selector-premium_monthly')),
+            )
+            .selected,
+        isTrue,
+      );
       expect(
         find.text('Le prix de cette offre est affiché dans Mon abonnement.'),
-        findsNWidgets(2),
+        findsAtLeastNWidgets(1),
       );
       expect(find.text('12,34 EUR / mois'), findsNothing);
       expect(find.text('98,76 EUR / an'), findsNothing);
+      await tester.ensureVisible(find.byKey(const Key('plan-selector-free')));
+      await tester.tap(find.byKey(const Key('plan-selector-free')));
+      await tester.pumpAndSettle();
+      expect(find.text('Offre 1 sur 3'), findsOneWidget);
       expect(find.text('Crédits inclus par semaine : 3'), findsOneWidget);
       expect(find.text('Messagerie'), findsOneWidget);
       expect(find.text('Messaging'), findsNothing);
@@ -164,7 +175,11 @@ void main() {
       await tester.scrollUntilVisible(find.text('Découvrir les formules'), 200);
       await openCatalog(tester);
       await tester.pumpAndSettle();
-      await tester.scrollUntilVisible(find.text('Actualiser'), 200);
+      await tester.scrollUntilVisible(
+        find.text('Actualiser'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(tester.takeException(), isNull);
     },
   );

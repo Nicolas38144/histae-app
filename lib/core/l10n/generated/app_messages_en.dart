@@ -174,7 +174,7 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get appStringsEnterAValidFrenchPhoneNumber =>
-      'Enter a valid French phone number starting with +33.';
+      'Enter a valid French phone number.';
 
   @override
   String get appStringsEnterTheSixDigitsOfThe =>
@@ -3241,4 +3241,51 @@ class AppMessagesEn extends AppMessages {
   @override
   String get registrationRetrySave =>
       'Your number is verified. Your information is kept during sign-up: you can resume saving without requesting another code.';
+
+  @override
+  String get registrationChooseDate => 'Choose a date';
+
+  @override
+  String get registrationAdultOnly => 'You must be at least 18 years old.';
+
+  @override
+  String registrationAgeValue(int value) {
+    return '$value years';
+  }
+
+  @override
+  String registrationDistanceValue(int value) {
+    return '$value km';
+  }
+
+  @override
+  String registrationDecrease(String label) {
+    return 'Decrease: $label';
+  }
+
+  @override
+  String registrationIncrease(String label) {
+    return 'Increase: $label';
+  }
+
+  @override
+  String get phoneCountry => 'Country';
+
+  @override
+  String get phoneCountryFrance => 'France (+33)';
+
+  @override
+  String get phoneNationalLabel => 'Phone number';
+
+  @override
+  String get phoneNationalHint => '06 12 34 56 78';
+
+  @override
+  String get phoneNationalHelp =>
+      'The +33 country code is added automatically. You can include the leading 0.';
+
+  @override
+  String otpResendIn(int seconds) {
+    return 'Request another code in $seconds s';
+  }
 }

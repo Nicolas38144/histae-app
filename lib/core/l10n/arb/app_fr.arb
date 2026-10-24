@@ -196,7 +196,7 @@
   "@appStringsYouCanViewYourDocumentsManage": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsEnterAValidFrenchPhoneNumber": "Saisissez un numéro français valide au format +33.",
+  "appStringsEnterAValidFrenchPhoneNumber": "Saisissez un numéro français valide.",
   "@appStringsEnterAValidFrenchPhoneNumber": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
@@ -3814,5 +3814,78 @@
   },
   "@registrationRetrySave": {
     "description": "Registration flow before phone verification"
+  },
+  "registrationChooseDate": "Choisir une date",
+  "registrationAdultOnly": "Vous devez avoir au moins 18 ans.",
+  "registrationAgeValue": "{value} ans",
+  "registrationDistanceValue": "{value} km",
+  "registrationDecrease": "Diminuer : {label}",
+  "registrationIncrease": "Augmenter : {label}",
+  "phoneCountry": "Pays",
+  "phoneCountryFrance": "France (+33)",
+  "phoneNationalLabel": "Numéro de téléphone",
+  "phoneNationalHint": "06 12 34 56 78",
+  "phoneNationalHelp": "L’indicatif +33 est ajouté automatiquement. Vous pouvez saisir le 0 initial.",
+  "@registrationChooseDate": {
+    "description": "Registration controls and phone verification"
+  },
+  "@registrationAdultOnly": {
+    "description": "Registration controls and phone verification"
+  },
+  "@registrationAgeValue": {
+    "description": "Registration controls and phone verification",
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "@registrationDistanceValue": {
+    "description": "Registration controls and phone verification",
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "@registrationDecrease": {
+    "description": "Registration controls and phone verification",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "@registrationIncrease": {
+    "description": "Registration controls and phone verification",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "@phoneCountry": {
+    "description": "Registration controls and phone verification"
+  },
+  "@phoneCountryFrance": {
+    "description": "Registration controls and phone verification"
+  },
+  "@phoneNationalLabel": {
+    "description": "Registration controls and phone verification"
+  },
+  "@phoneNationalHint": {
+    "description": "Registration controls and phone verification"
+  },
+  "@phoneNationalHelp": {
+    "description": "Registration controls and phone verification"
+  },
+  "otpResendIn": "Nouveau code dans {seconds} s",
+  "@otpResendIn": {
+    "description": "Countdown before a new OTP request; verification remains available.",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
   }
 }

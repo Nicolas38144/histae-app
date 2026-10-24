@@ -18,10 +18,12 @@ class RegistrationPage extends StatefulWidget {
     required this.controller,
     required this.onComplete,
     required this.onCancel,
+    this.onSignIn,
   });
   final RegistrationController controller;
   final VoidCallback onComplete;
   final VoidCallback onCancel;
+  final VoidCallback? onSignIn;
 
   @override
   State<RegistrationPage> createState() => _RegistrationPageState();
@@ -87,6 +89,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
               session: controller.session,
               registration: true,
               onAuthenticated: _authenticate,
+              onSignIn: widget.onSignIn,
             ),
           ),
         ],

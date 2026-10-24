@@ -7,9 +7,11 @@ import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../../core/widgets/status_view.dart';
+import '../../billing/data/billing_models.dart' show BillingPeriod;
 import '../application/catalog_controller.dart';
 import '../data/catalog_repository.dart';
 import 'plan_card.dart';
+import 'subscription_plan_carousel.dart';
 
 export 'plan_card.dart' show PlanCard;
 
@@ -110,18 +112,37 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
             body: strings.catalogIntro,
           ),
           const SizedBox(height: 16),
-          for (final offer in controller.offers)
-            PlanCard(
-              priceLabel: offer.billingPeriod == null
-                  ? null
-                  : AppStrings.of(context)
-                        .messages
-                        .billingStorePriceInSubscription,
-              plan: controller.plans.firstWhere(
-                (plan) => plan.code == offer.planCode,
-              ),
-              offer: offer,
-            ),
+          SubscriptionPlanCarousel(
+            initialSlideId: controller.offers
+                .where((offer) => offer.billingPeriod == BillingPeriod.monthly)
+                .firstOrNull
+                ?.code,
+            slides: [
+              for (final offer in controller.offers)
+                (
+                  id: offer.code,
+                  label: switch (offer.billingPeriod) {
+                    null => strings.messages.subscriptionFreeOffer,
+                    BillingPeriod.monthly =>
+                      strings.messages.subscriptionMonthlyOffer,
+                    BillingPeriod.annual =>
+                      strings.messages.subscriptionAnnualOffer,
+                  },
+                  child: PlanCard(
+                    key: ValueKey('plan-offer-${offer.code}'),
+                    priceLabel: offer.billingPeriod == null
+                        ? null
+                        : AppStrings.of(context)
+                              .messages
+                              .billingStorePriceInSubscription,
+                    plan: controller.plans.firstWhere(
+                      (plan) => plan.code == offer.planCode,
+                    ),
+                    offer: offer,
+                  ),
+                ),
+            ],
+          ),
           const SizedBox(height: 16),
           Text(strings.catalogReadOnly),
           const SizedBox(height: 16),

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
+import 'package:histae_app/core/widgets/histae_button.dart';
 import 'package:histae_app/features/auth/application/session_controller.dart';
 import 'package:histae_app/features/consents/data/consent_state.dart';
 import 'package:histae_app/features/consents/presentation/consents_page.dart';
@@ -92,6 +93,58 @@ void main() {
     await tester.tap(finder);
     await tester.pumpAndSettle();
   }
+
+  testWidgets(
+    'generic OTP entry disables resend but allows verifying immediately',
+    (tester) async {
+      tester.view.physicalSize = const Size(800, 1800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      var sends = 0;
+      var verifies = 0;
+      final session = testSession((request) async {
+        if (request.url.path.endsWith('/send')) {
+          sends++;
+          return jsonResponse({'resend_after_seconds': 60}, 202);
+        }
+        if (request.url.path.endsWith('/verify')) {
+          verifies++;
+          return apiError(401, 'invalid_or_expired_otp');
+        }
+        return defaultAuthResponse(request);
+      });
+      await tester.pumpWidget(HistaeApp(sessionController: session));
+      await tester.pumpAndSettle();
+      await revealAndTap(tester, find.text('J’ai déjà un compte'));
+      await tester.enterText(find.byKey(const Key('phone')), '0612345678');
+      await revealAndTap(tester, find.text('Demander un code'));
+      expect(find.byKey(const Key('phone')), findsNothing);
+      expect(find.byKey(const Key('otp')), findsOneWidget);
+      expect(find.textContaining('Nouveau code dans'), findsOneWidget);
+      final resend = find.ancestor(
+        of: find.text('Demander un nouveau code'),
+        matching: find.byType(OutlinedButton),
+      );
+      // The public copy never claims that a number exists or that an SMS arrived.
+      expect(find.textContaining('déjà associé'), findsNothing);
+      expect(tester.widget<OutlinedButton>(resend).onPressed, isNull);
+      final verify = find.ancestor(
+        of: find.text('Vérifier le code'),
+        matching: find.byType(HistaeButton),
+      );
+      expect(tester.widget<HistaeButton>(verify).onPressed, isNotNull);
+      await tester.enterText(find.byKey(const Key('otp')), '123456');
+      await revealAndTap(tester, find.text('Vérifier le code'));
+      expect(verifies, 1);
+      expect(sends, 1);
+      expect(
+        tester.widget<TextField>(find.byKey(const Key('otp'))).controller!.text,
+        isEmpty,
+      );
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
 
   testWidgets(
     'returning sign-in requires OTP then current server consent completion',

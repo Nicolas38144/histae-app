@@ -176,7 +176,7 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get appStringsEnterAValidFrenchPhoneNumber =>
-      'Introduce un número francés válido con prefijo +33.';
+      'Introduce un número francés válido.';
 
   @override
   String get appStringsEnterTheSixDigitsOfThe =>
@@ -3273,4 +3273,51 @@ class AppMessagesEs extends AppMessages {
   @override
   String get registrationRetrySave =>
       'Tu número está verificado. Tus datos se conservan durante el registro: puedes volver a guardarlos sin pedir otro código.';
+
+  @override
+  String get registrationChooseDate => 'Elegir una fecha';
+
+  @override
+  String get registrationAdultOnly => 'Debes tener al menos 18 años.';
+
+  @override
+  String registrationAgeValue(int value) {
+    return '$value años';
+  }
+
+  @override
+  String registrationDistanceValue(int value) {
+    return '$value km';
+  }
+
+  @override
+  String registrationDecrease(String label) {
+    return 'Disminuir: $label';
+  }
+
+  @override
+  String registrationIncrease(String label) {
+    return 'Aumentar: $label';
+  }
+
+  @override
+  String get phoneCountry => 'País';
+
+  @override
+  String get phoneCountryFrance => 'Francia (+33)';
+
+  @override
+  String get phoneNationalLabel => 'Número de teléfono';
+
+  @override
+  String get phoneNationalHint => '06 12 34 56 78';
+
+  @override
+  String get phoneNationalHelp =>
+      'El prefijo +33 se añade automáticamente. Puedes incluir el 0 inicial.';
+
+  @override
+  String otpResendIn(int seconds) {
+    return 'Pide otro código en $seconds s';
+  }
 }
