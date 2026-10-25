@@ -128,10 +128,6 @@
   "@appStringsSignOut": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsYouAreSignedOut": "Vous êtes déconnecté.",
-  "@appStringsYouAreSignedOut": {
-    "description": "Interface: lib/core/l10n/app_strings.dart"
-  },
   "appStringsYouAreSignedOutOnThis": "Vous êtes déconnecté sur cet appareil. La révocation de la session sur le serveur n’a pas pu être confirmée.",
   "@appStringsYouAreSignedOutOnThis": {
     "description": "Interface: lib/core/l10n/app_strings.dart"

@@ -116,9 +116,6 @@ class AppMessagesFr extends AppMessages {
   String get appStringsSignOut => 'Se déconnecter';
 
   @override
-  String get appStringsYouAreSignedOut => 'Vous êtes déconnecté.';
-
-  @override
   String get appStringsYouAreSignedOutOnThis =>
       'Vous êtes déconnecté sur cet appareil. La révocation de la session sur le serveur n’a pas pu être confirmée.';
 

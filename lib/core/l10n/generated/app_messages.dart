@@ -297,12 +297,6 @@ abstract class AppMessages {
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Vous êtes déconnecté.'**
-  String get appStringsYouAreSignedOut;
-
-  /// Interface: lib/core/l10n/app_strings.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Vous êtes déconnecté sur cet appareil. La révocation de la session sur le serveur n’a pas pu être confirmée.'**
   String get appStringsYouAreSignedOutOnThis;
 

@@ -152,8 +152,6 @@ class AppStrings {
 
   String get logout => messages.appStringsSignOut;
 
-  String get logoutConfirmed => messages.appStringsYouAreSignedOut;
-
   String get logoutUnconfirmed => messages.appStringsYouAreSignedOutOnThis;
 
   String get privacyTitle => messages.appStringsYourChoicesAndPrivacy;

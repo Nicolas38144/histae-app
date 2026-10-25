@@ -115,9 +115,6 @@ class AppMessagesEn extends AppMessages {
   String get appStringsSignOut => 'Sign out';
 
   @override
-  String get appStringsYouAreSignedOut => 'You are signed out.';
-
-  @override
   String get appStringsYouAreSignedOutOnThis =>
       'You are signed out on this device. Session revocation on the server could not be confirmed.';
 

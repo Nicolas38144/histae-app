@@ -462,7 +462,7 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
     phase = SessionPhase.synchronizing;
     resourceRevision++;
     _notify();
-    var resultNotice = action == 'erasure'
+    String? resultNotice = action == 'erasure'
         ? 'erasure_unconfirmed'
         : 'logout_unconfirmed';
     try {
@@ -498,9 +498,7 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
             jsonField<int>(jsonObject(result), 'revoked_sessions') < 0) {
           throw const ApiFailure(ApiFailureKind.invalidResponse);
         }
-        resultNotice = action == 'all'
-            ? 'logout_all_confirmed'
-            : 'logout_confirmed';
+        resultNotice = action == 'all' ? 'logout_all_confirmed' : null;
       }
     } on ApiFailure catch (e) {
       if (action == 'erasure' &&
@@ -736,7 +734,7 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
     await _invalidate(const ApiFailure(ApiFailureKind.unauthenticated));
     if (phase == SessionPhase.signedOut) {
       failure = null;
-      notice = confirmed ? 'logout_confirmed' : 'logout_unconfirmed';
+      notice = confirmed ? null : 'logout_unconfirmed';
     }
     _loggingOut = false;
     _notify();

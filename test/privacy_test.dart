@@ -173,7 +173,7 @@ void main() {
       } else {
         await session.revokeCurrentSession(privacyId);
         expect(calls.single.url.path, '/api/auth/sessions/$privacyId');
-        expect(session.notice, 'logout_confirmed');
+        expect(session.notice, isNull);
       }
       expect(session.hasSession, isFalse);
       session.dispose();

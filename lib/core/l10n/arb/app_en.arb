@@ -32,7 +32,6 @@
   "appStringsCheckingYourSession": "Getting you back in…",
   "appStringsYourSessionIsUnavailable": "Your session is unavailable",
   "appStringsSignOut": "Sign out",
-  "appStringsYouAreSignedOut": "You are signed out.",
   "appStringsYouAreSignedOutOnThis": "You are signed out on this device. Session revocation on the server could not be confirmed.",
   "appStringsYourChoicesAndPrivacy": "Your choices and privacy",
   "appStringsYourConsents": "Your consents",

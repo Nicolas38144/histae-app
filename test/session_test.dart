@@ -272,7 +272,7 @@ void main() {
         {'refresh_token': 'test-refresh-new'},
       ]);
       expect(session.phase, SessionPhase.signedOut);
-      expect(session.notice, 'logout_confirmed');
+      expect(session.notice, isNull);
       expect(SessionRecord.decode(vault.value)!.phase, 'signed_out');
     },
   );

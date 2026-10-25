@@ -116,9 +116,6 @@ class AppMessagesIt extends AppMessages {
   String get appStringsSignOut => 'Esci';
 
   @override
-  String get appStringsYouAreSignedOut => 'Hai effettuato la disconnessione.';
-
-  @override
   String get appStringsYouAreSignedOutOnThis =>
       'Hai effettuato la disconnessione su questo dispositivo. Non è stato possibile confermare la revoca sul server.';
 

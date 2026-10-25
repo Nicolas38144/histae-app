@@ -32,7 +32,6 @@
   "appStringsCheckingYourSession": "Estamos recuperando su sesión…",
   "appStringsYourSessionIsUnavailable": "Tu sesión no está disponible",
   "appStringsSignOut": "Cerrar sesión",
-  "appStringsYouAreSignedOut": "Has cerrado sesión.",
   "appStringsYouAreSignedOutOnThis": "Has cerrado sesión en este dispositivo. No se ha podido confirmar la revocación en el servidor.",
   "appStringsYourChoicesAndPrivacy": "Tus opciones y tu privacidad",
   "appStringsYourConsents": "Tus consentimientos",

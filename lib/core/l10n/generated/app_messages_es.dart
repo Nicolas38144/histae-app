@@ -116,9 +116,6 @@ class AppMessagesEs extends AppMessages {
   String get appStringsSignOut => 'Cerrar sesión';
 
   @override
-  String get appStringsYouAreSignedOut => 'Has cerrado sesión.';
-
-  @override
   String get appStringsYouAreSignedOutOnThis =>
       'Has cerrado sesión en este dispositivo. No se ha podido confirmar la revocación en el servidor.';
 

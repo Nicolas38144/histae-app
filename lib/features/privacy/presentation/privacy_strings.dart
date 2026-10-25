@@ -78,6 +78,5 @@ String sessionNotice(AppStrings strings, String? notice) => switch (notice) {
     strings.messages.privacyStringsSessionOrAccountClosureWasInterrupted,
   'logout_all_confirmed' =>
     strings.messages.privacyStringsAllYourSessionsWereRevoked,
-  'logout_confirmed' => strings.messages.appStringsYouAreSignedOut,
   _ => strings.messages.privacyStringsYouAreSignedOutOnThis,
 };

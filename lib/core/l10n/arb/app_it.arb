@@ -32,7 +32,6 @@
   "appStringsCheckingYourSession": "Stiamo recuperando la vostra sessione…",
   "appStringsYourSessionIsUnavailable": "La sessione non è accessibile",
   "appStringsSignOut": "Esci",
-  "appStringsYouAreSignedOut": "Hai effettuato la disconnessione.",
   "appStringsYouAreSignedOutOnThis": "Hai effettuato la disconnessione su questo dispositivo. Non è stato possibile confermare la revoca sul server.",
   "appStringsYourChoicesAndPrivacy": "Le tue scelte e la tua privacy",
   "appStringsYourConsents": "I tuoi consensi",
