@@ -78,6 +78,18 @@ This checks an Android development artifact, not store readiness. The checked-in
 build currently uses debug signing; configure production signing before distributing a release.
 Keep signing credentials outside the public environment asset.
 
+Also verify the optimized Android build after changes to native dependencies or build settings:
+
+```bash
+flutter build apk --release
+```
+
+Install it over the existing app without clearing data, launch it from a stopped process, and
+check that it stays open and resumes correctly. A successful build or debug launch does not
+verify release startup. Flutter loads `android/app/proguard-rules.pro` automatically; its targeted
+Room constructor rule prevents WorkManager initialization from failing before Flutter starts
+when R8 removes the reflectively created database constructor.
+
 iOS builds require macOS, Xcode and the intended signing/provisioning setup. Validate native
 permissions, Keychain, sharing, APNs, launch assets and store purchases on representative devices.
 Do not infer iOS success from Android or widget tests.
