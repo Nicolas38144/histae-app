@@ -43,6 +43,7 @@ class DiscoveryStrings {
   };
 
   String actionTitle(DiscoveryAction action) => switch (action) {
+    DiscoveryAction.photo => strings.messages.discoveryPhotoTitle,
     DiscoveryAction.profile =>
       strings.messages.discoveryStringsYourIntroduction,
     DiscoveryAction.resumeDiscovery =>
@@ -59,6 +60,7 @@ class DiscoveryStrings {
   };
 
   String actionBody(DiscoveryAction action) => switch (action) {
+    DiscoveryAction.photo => strings.messages.discoveryPhotoBody,
     DiscoveryAction.profile =>
       strings.messages.discoveryStringsAddYourFirstNameDateOf,
     DiscoveryAction.resumeDiscovery =>

@@ -52,7 +52,7 @@ class PartnerPage extends StatelessWidget {
                           .partnerPageDiscoverThisPersonThroughYourConversations,
                 ),
                 const SizedBox(height: 24),
-                if (match.photosRevealed && match.partner.photo != null)
+                if (match.photosRevealed && !controller.photosBlocked(id) && match.partner.photo != null)
                   OutlinedButton.icon(
                     onPressed: !controller.verified
                         ? null

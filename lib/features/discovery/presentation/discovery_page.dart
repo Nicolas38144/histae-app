@@ -12,6 +12,7 @@ import '../../../core/widgets/histae_wordmark.dart';
 import '../../consents/presentation/consents_page.dart';
 import '../../privacy/presentation/report_page.dart';
 import '../../profile/application/profile_controller.dart';
+import '../../profile/presentation/photo_page.dart';
 import '../../profile/presentation/profile_editors.dart';
 import '../application/discovery_controller.dart';
 import '../application/discovery_visibility_controller.dart';
@@ -127,7 +128,9 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
         return;
       }
       await _open(
-        action == DiscoveryAction.preferences
+        action == DiscoveryAction.photo
+            ? PhotoPage(controller: profile)
+            : action == DiscoveryAction.preferences
             ? PreferencesEditor(controller: profile)
             : IdentityEditor(controller: profile),
       );

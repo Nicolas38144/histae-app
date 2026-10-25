@@ -39,7 +39,11 @@ class ConversationHeader extends StatelessWidget {
   String _action(BuildContext context) =>
       match.status == MatchStatus.awaitingContinuation
       ? AppStrings.of(context).messages.conversationHeaderChooseWhatComesNext
-      : AppStrings.of(context).messages.chatPagePhotosAndContinuation;
+      : match.photosRevealed
+      ? AppStrings.of(context).messages.photoRevealManage
+      : match.myRevealed
+      ? AppStrings.of(context).messages.photoRevealWaitingAction
+      : AppStrings.of(context).messages.photoRevealShare;
 
   @override
   Widget build(BuildContext context) {
@@ -72,9 +76,7 @@ class ConversationHeader extends StatelessWidget {
                           ? AppStrings.of(context)
                                 .messages
                                 .conversationHeaderPaused
-                          : AppStrings.of(context)
-                                .messages
-                                .conversationHeaderYourChoices,
+                          : _action(context),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -105,7 +107,12 @@ class ConversationHeader extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: TextButton.icon(
                 onPressed: onDecisions,
-                icon: const Icon(Icons.hub_outlined, size: 18),
+                icon: Icon(
+                  match.photosRevealed
+                      ? Icons.photo_outlined
+                      : Icons.visibility_outlined,
+                  size: 18,
+                ),
                 label: Text(_action(context)),
               ),
             ),

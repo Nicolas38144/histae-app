@@ -17,6 +17,8 @@ abstract interface class ContinuationRepository {
 
   Future<bool> reveal(String id, RequestCancellation scope);
 
+  Future<bool> withdrawReveal(String id, RequestCancellation scope);
+
   Future<bool> continueMatch(String id, int cost, RequestCancellation scope);
 
   Future<RewardIntent> createReward(String platform, RequestCancellation scope);
@@ -77,6 +79,16 @@ final class ApiContinuationRepository implements ContinuationRepository {
         jsonObject(await _request('PATCH', '${_path(id)}/reveal', scope)),
         'photos_revealed',
       );
+
+  @override
+  Future<bool> withdrawReveal(String id, RequestCancellation scope) async {
+    final result = jsonField<bool>(
+      jsonObject(await _request('DELETE', '${_path(id)}/reveal', scope)),
+      'photos_revealed',
+    );
+    if (result) invalidResponse();
+    return result;
+  }
 
   @override
   Future<bool> continueMatch(

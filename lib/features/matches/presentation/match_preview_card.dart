@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/theme/histae_tokens.dart';
 import '../data/match_models.dart';
+import 'match_photo_avatar.dart';
 import 'matches_strings.dart';
 
 class MatchPreviewCard extends StatelessWidget {
@@ -11,10 +12,14 @@ class MatchPreviewCard extends StatelessWidget {
     required this.match,
     required this.ownerId,
     required this.onTap,
+    this.photoReadAt,
+    this.photosAllowed = false,
   });
   final UserMatch match;
   final String ownerId;
   final VoidCallback? onTap;
+  final DateTime? photoReadAt;
+  final bool photosAllowed;
 
   @override
   Widget build(BuildContext context) {
@@ -31,24 +36,14 @@ class MatchPreviewCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  ExcludeSemantics(
-                    child: Container(
-                      width: 44,
-                      height: 44,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: colors.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: colors.primary.withValues(alpha: 0.2),
-                        ),
-                      ),
-                      child: Icon(
-                        Icons.forum_outlined,
-                        color: colors.primary,
-                        size: 21,
-                      ),
-                    ),
+                  MatchPhotoAvatar(
+                    key: ValueKey('$ownerId:${match.id}'),
+                    url: match.partner.photo,
+                    readAt: photoReadAt,
+                    allowed:
+                        photosAllowed &&
+                        match.historyAllowed &&
+                        match.photosRevealed,
                   ),
                   const SizedBox(width: 14),
                   Expanded(

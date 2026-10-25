@@ -52,11 +52,21 @@ class _MainShellState extends State<MainShell> {
   MainTab _selected = MainTab.discovery;
   String? _initialMatchId;
   bool? _lastPaused;
+  int _lastPhotoRevision = 0;
 
   @override
   void initState() {
     super.initState();
     _visibility.addListener(_visibilityChanged);
+    _profile.addListener(_profilePhotoChanged);
+  }
+
+  void _profilePhotoChanged() {
+    if (_profile.photoRevision == _lastPhotoRevision) return;
+    _lastPhotoRevision = _profile.photoRevision;
+    _matches.profilePhotoChanged();
+    _discovery.deactivate();
+    if (!_covered) Future.microtask(_discovery.activate);
   }
 
   void _visibilityChanged() {
@@ -118,6 +128,7 @@ class _MainShellState extends State<MainShell> {
     _matches.dispose();
     _discovery.dispose();
     _visibility.dispose();
+    _profile.removeListener(_profilePhotoChanged);
     _profile.dispose();
     if (widget.repositories == null) _repositories.dispose();
     super.dispose();
@@ -143,11 +154,14 @@ class _MainShellState extends State<MainShell> {
                   visible: _selected == MainTab.discovery && !_covered,
                   openMatches: _openMatches,
                 ),
-                MainTab.matches => MatchesPage(
-                  key: const PageStorageKey('main-matches'),
-                  controller: _matches,
-                  initialMatchId: _initialMatchId,
-                  onInitialMatchHandled: () => _initialMatchId = null,
+                MainTab.matches => TickerMode(
+                  enabled: _selected == MainTab.matches && !_covered,
+                  child: MatchesPage(
+                    key: const PageStorageKey('main-matches'),
+                    controller: _matches,
+                    initialMatchId: _initialMatchId,
+                    onInitialMatchHandled: () => _initialMatchId = null,
+                  ),
                 ),
                 MainTab.profile => ProfilePage(
                   key: const PageStorageKey('main-profile'),

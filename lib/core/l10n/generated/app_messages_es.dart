@@ -760,7 +760,7 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get continuationPageYourPhotoMayBecomeVisibleIn =>
-      'Tu foto podrá verse en este match tras un acuerdo mutuo. Esta decisión es independiente de continuar y no muestra tu foto en el feed.';
+      'Tu foto actual será visible para este match cuando ambos aceptéis. Si la cambias, la nueva foto también se compartirá aquí tras su aprobación. Puedes retirar tu consentimiento en cualquier momento.';
 
   @override
   String get continuationPageGiveMyConsent => 'Dar mi consentimiento';
@@ -2514,7 +2514,7 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get photoPageOnePersonalPhotoItDoesNot =>
-      'Una sola foto personal. No aparece en el feed y revelarla requiere un acuerdo mutuo.';
+      'Se necesita una foto aprobada para acceder al feed. Sigue siendo privada hasta que ambos aceptéis en cada match. Si la cambias, la nueva foto será visible en los matches ya autorizados tras su aprobación.';
 
   @override
   String get photoPageYourCurrentPhoto => 'Tu foto actual';
@@ -3314,4 +3314,62 @@ class AppMessagesEs extends AppMessages {
   @override
   String get screenCaptureHelp =>
       'Detén la grabación o el uso compartido de pantalla para volver a Histae.';
+
+  @override
+  String get discoveryPhotoTitle => 'Un rostro, para más adelante';
+
+  @override
+  String get discoveryPhotoBody =>
+      'Añade una foto y espera su aprobación para acceder al feed. Seguirá siendo privada: solo tus matches podrán verla cuando ambos lo aceptéis.';
+
+  @override
+  String get photoRevealTitle => 'Un rostro detrás de las palabras.';
+
+  @override
+  String get photoRevealBody =>
+      'Cuando ambos queráis, descubrid vuestras fotos. Esta decisión solo se aplica a este match y puedes retirarla en cualquier momento.';
+
+  @override
+  String get photoRevealShare => 'Revelar nuestras fotos';
+
+  @override
+  String get photoRevealManage => 'Nuestras fotos';
+
+  @override
+  String get photoRevealWaitingAction => 'Foto: ya has aceptado';
+
+  @override
+  String get photoRevealWaiting =>
+      'Ya has aceptado. Vuestras fotos seguirán siendo privadas hasta que la otra persona haga lo mismo.';
+
+  @override
+  String get photoRevealShared => 'Los dos habéis elegido veros.';
+
+  @override
+  String get photoRevealWithdraw => 'Retirar mi consentimiento';
+
+  @override
+  String get photoRevealWithdrawTitle => '¿Ocultar vuestras fotos?';
+
+  @override
+  String get photoRevealWithdrawBody =>
+      'Tu foto se ocultará a esta persona y dejarás de ver la suya, también en la conversación y la lista de matches. Los mensajes se conservarán.';
+
+  @override
+  String get photoRevealWithdrawalPending =>
+      'La retirada aún no está confirmada. Las fotos están ocultas en este dispositivo; inténtalo de nuevo para confirmarla con el servidor.';
+
+  @override
+  String get photoRevealRetryWithdrawal => 'Confirmar la retirada';
+
+  @override
+  String get photoRevealWithdrawn =>
+      'Has retirado tu consentimiento. Ambas fotos están ocultas.';
+
+  @override
+  String get photoRevealMissing =>
+      'Cada uno necesita una foto aprobada antes de revelar vuestras fotos. Revisa tu foto en tu perfil.';
+
+  @override
+  String get chatPageRead => ' · Leído';
 }

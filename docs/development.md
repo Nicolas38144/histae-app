@@ -29,6 +29,7 @@ payments. Run the relevant existing suite rather than testing every visual or do
 | --- | --- |
 | Session/cache behavior | `flutter test test/read_snapshots_test.dart test/cache_lifecycle_regressions_test.dart` |
 | Feed expiry, location or pause | `flutter test test/discovery_test.dart test/discovery_pause_test.dart` |
+| Photo readiness, withdrawal and private thumbnails | `flutter test test/photo_sharing_test.dart test/continuation_test.dart` |
 | Feed reading delay and transitions | `flutter test test/feed_reading_delay_test.dart` |
 | Native billing | `flutter test test/billing_test.dart` |
 | Interface/request language | `flutter test test/localization_test.dart test/api_language_test.dart` |
@@ -64,6 +65,18 @@ Review the [design system](../DESIGN_SYSTEM.md) before changing shared component
 `flutter test tool/preview_feed_test.dart` exports a populated feed and 30 fps PNG sequences for
 like/pass demonstrations under `build/previews/feed/`. Touch markers belong to the recording only.
 Use `--dart-define=FEED_PREVIEW_ACTION=like` or `pass` to render one sequence.
+
+`flutter test tool/preview_photo_reveal_test.dart` renders the real match, conversation, consent,
+photo and withdrawal screens and a 15 fps frame sequence in `build/previews/photo-reveal/`.
+Supply a fictional portrait with `--dart-define=PHOTO_PREVIEW_PORTRAIT=<local PNG path>` (the
+default points to the delivered preview under `pictures/previews/photo-reveal-2026-10-25/`).
+The other participant's agreement is simulated; no provider or production API is contacted.
+Native screen protections stay enabled. The preview label and touch markers belong only to the
+recording. Encode frames with FFmpeg, padding odd dimensions for H.264:
+
+```bash
+ffmpeg -framerate 15 -i build/previews/photo-reveal/frames/%04d.png -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2,fps=30" -c:v libx264 -crf 20 -pix_fmt yuv420p -movflags +faststart build/previews/photo-reveal/demo.mp4
+```
 
 For website screenshots, run `flutter test tool/preview_website_test.dart`, then the site's
 `scripts/export-app-screenshots.mjs` converter. Keep profiles and conversations fictional and labelled.

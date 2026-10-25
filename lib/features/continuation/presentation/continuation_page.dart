@@ -13,6 +13,7 @@ import '../application/continuation_controller.dart';
 import 'continuation_strings.dart';
 import 'credits_page.dart';
 import 'partner_photo_page.dart';
+import 'photo_reveal_panel.dart';
 
 class ContinuationPage extends StatefulWidget {
   const ContinuationPage({
@@ -97,6 +98,19 @@ class _ContinuationPageState extends State<ContinuationPage>
     }
   }
 
+  Future<void> _withdrawReveal() async {
+    final text = AppStrings.of(context).messages;
+    if (await confirmAction(
+          context,
+          text.photoRevealWithdrawTitle,
+          text.photoRevealWithdrawBody,
+          action: text.photoRevealWithdraw,
+        ) &&
+        mounted) {
+      await c.withdrawReveal();
+    }
+  }
+
   @override
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: Listenable.merge([c, c.access]),
@@ -153,83 +167,18 @@ class _ContinuationPageState extends State<ContinuationPage>
                         .messages
                         .continuationPageTheCostMustBeCheckedAnd,
                   ),
-                const EditorialDivider(),
-                Text(
-                  AppStrings.of(context)
-                      .messages
-                      .continuationPageSeeEachOtherTogether,
-                  style: Theme.of(context).textTheme.headlineSmall,
+                const SizedBox(height: 20),
+                PhotoRevealPanel(
+                  controller: c,
+                  onReveal: _reveal,
+                  onWithdraw: _withdrawReveal,
+                  onOpen: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) =>
+                          PartnerPhotoPage(access: c.access, matchId: m.id),
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  AppStrings.of(context)
-                      .messages
-                      .continuationPageRevealingPhotosRequiresSeparateConsentFrom,
-                ),
-                if (c.myRevealed)
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    child: Text(
-                      AppStrings.of(context)
-                          .messages
-                          .continuationPageYourPhotoRevealConsentHasBeen,
-                    ),
-                  ),
-                if (m.photosRevealed) ...[
-                  Text(
-                    AppStrings.of(context)
-                        .messages
-                        .continuationPageMutualPhotoRevealIsConfirmed,
-                  ),
-                  if (m.partner.photo == null)
-                    Text(
-                      AppStrings.of(context)
-                          .messages
-                          .continuationPageThePhotoIsCurrentlyUnavailable,
-                    )
-                  else
-                    HistaeButton.icon(
-                      onPressed: !c.access.verified
-                          ? null
-                          : () => Navigator.of(context).push(
-                              MaterialPageRoute<void>(
-                                builder: (_) => PartnerPhotoPage(
-                                  access: c.access,
-                                  matchId: m.id,
-                                ),
-                              ),
-                            ),
-                      icon: const Icon(Icons.photo_outlined),
-                      label: Text(
-                        AppStrings.of(context)
-                            .messages
-                            .continuationPageViewTheirPhoto,
-                      ),
-                    ),
-                ] else if (c.pendingReveal) ...[
-                  Text(
-                    AppStrings.of(context)
-                        .messages
-                        .continuationPageYourPhotoRevealRequestStillNeeds,
-                  ),
-                  OutlinedButton(
-                    onPressed: c.canReveal ? c.reveal : null,
-                    child: Text(
-                      AppStrings.of(context)
-                          .messages
-                          .continuationPageResumeTheSamePhotoRevealConsent,
-                    ),
-                  ),
-                ] else if (!c.myRevealed)
-                  OutlinedButton.icon(
-                    onPressed: c.canReveal ? _reveal : null,
-                    icon: const Icon(Icons.visibility_outlined),
-                    label: Text(
-                      AppStrings.of(context)
-                          .messages
-                          .continuationPageChooseToRevealPhotos,
-                    ),
-                  ),
                 const EditorialDivider(),
                 Text(
                   AppStrings.of(context)

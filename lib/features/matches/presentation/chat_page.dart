@@ -11,6 +11,7 @@ import '../../continuation/presentation/continuation_page.dart';
 import '../../privacy/presentation/report_page.dart';
 import '../application/matches_controller.dart';
 import 'conversation_header.dart';
+import 'match_photo_avatar.dart';
 import 'matches_strings.dart';
 import 'partner_page.dart';
 
@@ -189,9 +190,32 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
     final unavailable = match == null || !match.historyAllowed;
     return HistaeScaffold(
       appBar: AppBar(
-        title: Text(
-          match?.partner.firstname ??
-              AppStrings.of(context).messages.continuationPageYourMatch,
+        title: Row(
+          children: [
+            if (match != null) ...[
+              MatchPhotoAvatar(
+                key: ValueKey('${c.ownerId}:${match.id}'),
+                url: match.partner.photo,
+                readAt: c.readAt,
+                allowed:
+                    c.active &&
+                    c.verified &&
+                    match.historyAllowed &&
+                    match.photosRevealed &&
+                    !c.photosBlocked(match.id),
+                size: 36,
+              ),
+              const SizedBox(width: 10),
+            ],
+            Expanded(
+              child: Text(
+                match?.partner.firstname ??
+                    AppStrings.of(context).messages.continuationPageYourMatch,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
         ),
         actions: [
           IconButton(
@@ -413,7 +437,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                                             ),
                                             const SizedBox(height: 8),
                                             Text(
-                                              '${MatchesStrings(AppStrings.of(context)).date(m.createdAt)}${own ? (m.readAt == null ? AppStrings.of(context).messages.chatPageSent : ' · Lu') : ''}',
+                                              '${MatchesStrings(AppStrings.of(context)).date(m.createdAt)}${own ? (m.readAt == null ? AppStrings.of(context).messages.chatPageSent : AppStrings.of(context).messages.chatPageRead) : ''}',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .bodySmall

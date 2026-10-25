@@ -244,6 +244,11 @@ class _MatchesPageState extends State<MatchesPage> {
                         MatchPreviewCard(
                           match: match,
                           ownerId: c.ownerId,
+                          photoReadAt: c.readAt,
+                          photosAllowed:
+                              c.active &&
+                              c.verified &&
+                              !c.photosBlocked(match.id),
                           onTap: _opening ? null : () => _open(match.id),
                         ),
                       if (c.retrySeconds > 0)

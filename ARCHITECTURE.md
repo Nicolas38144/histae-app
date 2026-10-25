@@ -114,6 +114,13 @@ limit and a fifteen-second timeout. Access is checked before display. Closing, l
 reaching the display deadline evicts the image. Reopening does not extend the four-minute deadline
 measured from the resource read.
 
+`MatchPhotoAvatar` applies the same four-minute resource deadline to authorized thumbnails. It
+downloads through `SignedPhotoLoader`, never through a persistent network-image cache, and purges
+on hidden routes/tabs, backgrounding, withdrawal or replacement. `ContinuationController` keeps
+grant and withdrawal retry intentions distinct. `MatchAccess` owns an immediate local photo
+barrier until a fresh server snapshot confirms withdrawal, so a lost response cannot restore an
+old image. Consent and continuation remain independent operations.
+
 ## Credits and provider adapters
 
 Profile and Matches share `ContinuationController`. It initializes quota once and refreshes after

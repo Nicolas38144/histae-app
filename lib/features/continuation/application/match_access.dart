@@ -28,6 +28,10 @@ abstract interface class MatchAccess implements Listenable {
 
   bool isRemoved(String id);
 
+  bool photosBlocked(String id);
+
+  void blockPhotos(String id);
+
   Future<void> refresh();
 
   void removeUnavailable(String id);

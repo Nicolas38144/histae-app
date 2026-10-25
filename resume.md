@@ -58,6 +58,9 @@ together. Traits and questions come from API catalogues. The owner manages up to
 answers; saving confirms replacement of the entire list, including clearing it. Public projections
 show approved text, while the owner sees moderation state.
 
+An approved private photo is required to access discovery and to appear as a candidate. The feed
+shows a repair step linking to photo management while a photo is missing or awaiting approval.
+Photo writes invalidate feed readiness without introducing navigation-based API reloads.
 One private photo can be selected, replaced or removed. Preparation produces an oriented JPEG
 without EXIF, limited to 500,000 upload bytes. An uncertain retry keeps its exact bytes and key.
 Signed photos are temporary, without disk caching or speculative partner downloads.
@@ -101,6 +104,13 @@ notification navigation verifies access before opening the conversation.
 
 Mutual photo reveal must be confirmed by the API. Losing access, closing the viewer or reaching its
 display deadline evicts the signed link and bytes. Reopening does not extend the deadline.
+The conversation header offers an explicit photo-sharing action. Each participant can withdraw
+their agreement for that match: both photos and thumbnails are hidden, while messages and the
+other participant's agreement are retained. A later agreement can restore mutual sharing.
+Unconfirmed withdrawal stays hidden locally and can only retry withdrawal, never an old grant.
+Replacements use the latest approved profile photo in all mutually authorized matches, with that
+behavior explained before agreement. Authorized thumbnails appear beside the name in the match
+list and conversation header; they use bounded memory downloads and are purged when hidden.
 Ending a match and blocking a person are distinct confirmed actions; unblocking does not recreate
 a match. Inaccessible data is purged and late responses are ignored.
 

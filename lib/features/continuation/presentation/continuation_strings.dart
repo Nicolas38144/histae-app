@@ -7,6 +7,7 @@ class ContinuationStrings {
   final AppStrings strings;
 
   String failure(ApiFailure e) => switch (e.code) {
+    'photo_required' => strings.messages.photoRevealMissing,
     'continuation_plan_changed' =>
       strings.messages.continuationStringsYourPlanHasChangedCheckYour,
     'continuation_quota_reached' =>

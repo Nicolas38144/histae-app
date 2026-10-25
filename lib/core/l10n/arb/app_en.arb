@@ -206,7 +206,7 @@
   "continuationPageContinueWithoutCredits": "Continue without credits",
   "continuationPageAcceptUpTo1Credit": "Accept up to 1 credit",
   "continuationPageRevealYourPhotos": "Reveal your photos?",
-  "continuationPageYourPhotoMayBecomeVisibleIn": "Your photo may become visible in this match after mutual consent. This is independent of continuation and does not show your photo in the feed.",
+  "continuationPageYourPhotoMayBecomeVisibleIn": "Your current photo will be visible to this match once you both agree. If you replace it, your new photo will also be shared here after approval. You can withdraw your consent at any time.",
   "continuationPageGiveMyConsent": "Give my consent",
   "continuationPageYourMatch": "Your match",
   "continuationPageThisMatchIsNoLongerAvailable": "This match\nis no longer available.",
@@ -670,7 +670,7 @@
   "photoPagePhotoReceivedItsReviewStatusIs": "Photo received. Its review status is shown below.",
   "photoPageYourPhoto": "Your photo",
   "photoPageAFaceAtTheRightTime": "A face,\nat the right time.",
-  "photoPageOnePersonalPhotoItDoesNot": "One personal photo. It does not appear in the feed and revealing it requires mutual consent.",
+  "photoPageOnePersonalPhotoItDoesNot": "An approved photo is required to access the feed. It stays private until you both agree in each match. If you replace it, your new photo will be visible in matches you have already authorized after approval.",
   "photoPageYourCurrentPhoto": "Your current photo",
   "photoPageYourSelectionNotYetConfirmedBy": "Your selection, not yet saved",
   "photoPagePreviewUnavailable": "Preview unavailable",
@@ -890,5 +890,79 @@
   "feedReadingProgress": "Profile reading time",
   "feedReadingReady": "You can now like this profile or move to the next one.",
   "screenPrivacyLabel": "Content protected",
-  "screenCaptureHelp": "Stop screen recording or sharing to return to Histae."
+  "screenCaptureHelp": "Stop screen recording or sharing to return to Histae.",
+  "discoveryPhotoTitle": "A face, for later",
+  "@discoveryPhotoTitle": {
+    "description": "Private photo readiness and mutual sharing controls."
+  },
+  "discoveryPhotoBody": "Add a photo and wait for its approval to access the feed. It stays private: only your matches can discover it after you both agree.",
+  "@discoveryPhotoBody": {
+    "description": "Private photo readiness and mutual sharing controls."
+  },
+  "photoRevealTitle": "A face behind the words.",
+  "@photoRevealTitle": {
+    "description": "Private photo readiness and mutual sharing controls."
+  },
+  "photoRevealBody": "When you both feel ready, discover your photos. This choice applies only to this match and you can withdraw it at any time.",
+  "@photoRevealBody": {
+    "description": "Private photo readiness and mutual sharing controls."
+  },
+  "photoRevealShare": "Reveal our photos",
+  "@photoRevealShare": {
+    "description": "Private photo readiness and mutual sharing controls."
+  },
+  "photoRevealManage": "Our photos",
+  "@photoRevealManage": {
+    "description": "Private photo readiness and mutual sharing controls."
+  },
+  "photoRevealWaitingAction": "Photo: you have agreed",
+  "@photoRevealWaitingAction": {
+    "description": "Private photo readiness and mutual sharing controls."
+  },
+  "photoRevealWaiting": "You have agreed. Your photos stay private until the other person makes the same choice.",
+  "@photoRevealWaiting": {
+    "description": "Private photo readiness and mutual sharing controls."
+  },
+  "photoRevealShared": "You have both chosen to see each other.",
+  "@photoRevealShared": {
+    "description": "Private photo readiness and mutual sharing controls."
+  },
+  "photoRevealWithdraw": "Withdraw my consent",
+  "@photoRevealWithdraw": {
+    "description": "Private photo readiness and mutual sharing controls."
+  },
+  "photoRevealWithdrawTitle": "Hide your photos?",
+  "@photoRevealWithdrawTitle": {
+    "description": "Private photo readiness and mutual sharing controls."
+  },
+  "photoRevealWithdrawBody": "Your photo will be hidden from this person and you will no longer see theirs, including in the conversation and match list. Your messages will remain.",
+  "@photoRevealWithdrawBody": {
+    "description": "Private photo readiness and mutual sharing controls."
+  },
+  "photoRevealWithdrawalPending": "Withdrawal is not yet confirmed. Photos are hidden on this device; try again to confirm withdrawal with the server.",
+  "@photoRevealWithdrawalPending": {
+    "description": "Private photo readiness and mutual sharing controls."
+  },
+  "photoRevealRetryWithdrawal": "Confirm withdrawal",
+  "@photoRevealRetryWithdrawal": {
+    "description": "Private photo readiness and mutual sharing controls."
+  },
+  "photoRevealWithdrawn": "Your consent has been withdrawn. Both photos are hidden.",
+  "@photoRevealWithdrawn": {
+    "description": "Private photo readiness and mutual sharing controls."
+  },
+  "photoRevealMissing": "You each need an approved photo before revealing your photos. Check your photo in your profile.",
+  "@photoRevealMissing": {
+    "description": "Private photo readiness and mutual sharing controls."
+  },
+  "@continuationPageYourPhotoMayBecomeVisibleIn": {
+    "description": "Private photo readiness and mutual sharing controls."
+  },
+  "@photoPageOnePersonalPhotoItDoesNot": {
+    "description": "Private photo readiness and mutual sharing controls."
+  },
+  "chatPageRead": " · Read",
+  "@chatPageRead": {
+    "description": "Read receipt suffix for an outgoing message."
+  }
 }

@@ -50,6 +50,26 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       _removed.contains(id) ||
       _items.any((m) => m.id == id && !m.historyAllowed);
 
+  final _photoBarriers = <String>{};
+
+  @override
+  bool photosBlocked(String id) => _photoBarriers.contains(id);
+
+  @override
+  void blockPhotos(String id) {
+    _photoBarriers.add(id);
+    repository.invalidate(matchId: id);
+    _notify();
+  }
+
+  void profilePhotoChanged() {
+    if (!accessible) return;
+    repository.invalidate();
+    _verified = false;
+    _notify();
+    if (active) unawaited(refresh());
+  }
+
   @override
   void removeUnavailable(String id) {
     _purge(id, remove: true);
@@ -199,6 +219,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     privacyEpoch++;
     suspend();
     _items.clear();
+    _photoBarriers.clear();
     _messages.clear();
     _outbox.clear();
     _removed.clear();
@@ -450,6 +471,9 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
         ..addAll(items);
       listCursor = cursor;
       readRevision++;
+      for (final item in items) {
+        if (!item.myRevealed) _photoBarriers.remove(item.id);
+      }
       readAt = repository.matchesReadAt;
       if (cursor == null) {
         for (final id in {..._outbox.matchIds, ..._closures.keys}) {

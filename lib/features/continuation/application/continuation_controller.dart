@@ -53,7 +53,8 @@ class ContinuationController extends ChangeNotifier {
   ApiFailure? failure, catalogFailure;
   String? notice;
   ContinuationOffer? _offer;
-  final _pendingContinue = <String, int>{}, _pendingReveal = <String>{};
+  final _pendingContinue = <String, int>{};
+  final _pendingReveal = <String, bool>{};
   final _continued = <String>{}, _revealed = <String>{};
 
   bool get accessible =>
@@ -67,13 +68,16 @@ class ContinuationController extends ChangeNotifier {
 
   int? get pendingCost => _pendingContinue[access.selectedId];
 
-  bool get pendingReveal => _pendingReveal.contains(access.selectedId);
+  bool get pendingReveal => _pendingReveal[access.selectedId] == true;
+
+  bool get pendingWithdrawal => _pendingReveal[access.selectedId] == false;
 
   bool get myContinued =>
       match?.myContinued == true || _continued.contains(access.selectedId);
 
   bool get myRevealed =>
-      match?.myRevealed == true || _revealed.contains(access.selectedId);
+      !pendingWithdrawal &&
+      (match?.myRevealed == true || _revealed.contains(access.selectedId));
 
   bool get canDecide =>
       active &&
@@ -92,7 +96,10 @@ class ContinuationController extends ChangeNotifier {
       match?.status == MatchStatus.awaitingContinuation &&
       !myContinued;
 
-  bool get canReveal => canDecide && !myRevealed;
+  bool get canReveal => canDecide && !myRevealed && !pendingWithdrawal;
+
+  bool get canWithdrawReveal =>
+      canDecide && (myRevealed || pendingReveal || pendingWithdrawal);
 
   bool get advertisingEnabled {
     final current = quota;
@@ -133,7 +140,7 @@ class ContinuationController extends ChangeNotifier {
     }
     for (final id in {
       ..._pendingContinue.keys,
-      ..._pendingReveal,
+      ..._pendingReveal.keys,
       ..._continued,
       ..._revealed,
     }) {
@@ -154,7 +161,7 @@ class ContinuationController extends ChangeNotifier {
         if (m.myContinued || m.status == MatchStatus.confirmed) {
           _pendingContinue.remove(m.id);
         }
-        if (m.myRevealed) _pendingReveal.remove(m.id);
+        if (_pendingReveal[m.id] == m.myRevealed) _pendingReveal.remove(m.id);
       }
     }
     if (!access.active && busy) {
@@ -178,6 +185,7 @@ class ContinuationController extends ChangeNotifier {
     if (!_active) {
       _active = true;
       _scope = RequestCancellation();
+      _notify();
     }
     final epoch = _epoch;
     await _load;
@@ -340,7 +348,7 @@ class ContinuationController extends ChangeNotifier {
   Future<void> reveal() async {
     final m = match;
     if (!canReveal || m == null) return;
-    _pendingReveal.add(m.id);
+    _pendingReveal[m.id] = true;
     await _decision(
       m.id,
       () => repository.reveal(m.id, _scope),
@@ -348,10 +356,25 @@ class ContinuationController extends ChangeNotifier {
     );
   }
 
+  Future<void> withdrawReveal() async {
+    final m = match;
+    if (!canWithdrawReveal || m == null) return;
+    _pendingReveal[m.id] = false;
+    _revealed.remove(m.id);
+    access.blockPhotos(m.id);
+    await _decision(
+      m.id,
+      () => repository.withdrawReveal(m.id, _scope),
+      continuation: false,
+      photoConsent: false,
+    );
+  }
+
   Future<void> _decision(
     String id,
     Future<bool> Function() send, {
     required bool continuation,
+    bool photoConsent = true,
   }) async {
     final epoch = _epoch;
     ApiFailure? outcome;
@@ -368,8 +391,8 @@ class ContinuationController extends ChangeNotifier {
         notice = 'continued';
       } else {
         _pendingReveal.remove(id);
-        _revealed.add(id);
-        notice = 'revealed';
+        if (photoConsent) _revealed.add(id);
+        notice = photoConsent ? 'revealed' : 'reveal_withdrawn';
       }
     } on ApiFailure catch (e) {
       if (!_alive(epoch)) return;
@@ -398,7 +421,7 @@ class ContinuationController extends ChangeNotifier {
         busy = false;
         _notify();
         await access.refresh();
-        if (_alive(epoch)) await loadQuota();
+        if (continuation && _alive(epoch)) await loadQuota();
         if (_alive(epoch) && outcome != null) {
           failure = outcome;
           _notify();

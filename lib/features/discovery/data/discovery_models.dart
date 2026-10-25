@@ -7,6 +7,7 @@ export '../../../core/network/json_fields.dart' show wireTime;
 enum DiscoveryAction {
   profile('profile'),
   sex('sex'),
+  photo('photo'),
   preferences('preferences'),
   sensitiveConsent('sensitive_data_consent'),
   locationConsent('location_consent'),

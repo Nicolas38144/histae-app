@@ -41,6 +41,7 @@ class ProfileController extends ChangeNotifier {
       if (!_disposed) notifyListeners();
     },
   );
+  int photoRevision = 0;
   PhotoIntent? photoIntent;
   DateTime? photoReadAt;
 
@@ -276,6 +277,7 @@ class ProfileController extends ChangeNotifier {
     } finally {
       if (!_disposed && generation == _generation) {
         saving = false;
+        if (photo) photoRevision++;
         _notify();
         if (_languageDirty) {
           _localeRevision = session.localizationRevision;

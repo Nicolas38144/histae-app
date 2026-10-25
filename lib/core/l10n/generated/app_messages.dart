@@ -1341,7 +1341,7 @@ abstract class AppMessages {
   /// Interface: lib/features/continuation/presentation/continuation_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Votre photo pourra être visible dans cette rencontre après un accord mutuel. Ce choix est indépendant de la continuation et ne rend pas votre photo visible dans le feed.'**
+  /// **'Votre photo actuelle sera visible pour cette rencontre lorsque vous aurez tous les deux accepté. Si vous la remplacez, la nouvelle photo sera également partagée ici après validation. Vous pourrez retirer votre accord à tout moment.'**
   String get continuationPageYourPhotoMayBecomeVisibleIn;
 
   /// Interface: lib/features/continuation/presentation/continuation_page.dart
@@ -4128,7 +4128,7 @@ abstract class AppMessages {
   /// Interface: lib/features/profile/presentation/photo_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Une seule photo personnelle. Elle n’apparaît pas dans le feed et sa révélation demandera votre accord mutuel.'**
+  /// **'Une photo approuvée est nécessaire pour accéder au feed. Elle reste privée jusqu’à votre accord mutuel dans chaque rencontre. Si vous la remplacez, la nouvelle photo sera visible dans vos rencontres déjà autorisées après validation.'**
   String get photoPageOnePersonalPhotoItDoesNot;
 
   /// Interface: lib/features/profile/presentation/photo_page.dart
@@ -5419,6 +5419,108 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Arrêtez l’enregistrement ou le partage d’écran pour retrouver Histae.'**
   String get screenCaptureHelp;
+
+  /// Private photo readiness and mutual sharing controls.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un visage, pour plus tard'**
+  String get discoveryPhotoTitle;
+
+  /// Private photo readiness and mutual sharing controls.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajoutez une photo et attendez sa validation pour accéder au feed. Elle restera privée : seuls vos matchs pourront la découvrir après votre accord mutuel.'**
+  String get discoveryPhotoBody;
+
+  /// Private photo readiness and mutual sharing controls.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un visage derrière les mots.'**
+  String get photoRevealTitle;
+
+  /// Private photo readiness and mutual sharing controls.
+  ///
+  /// In fr, this message translates to:
+  /// **'Si vous en avez envie tous les deux, découvrez vos photos. Ce choix concerne uniquement cette rencontre et vous pouvez le retirer à tout moment.'**
+  String get photoRevealBody;
+
+  /// Private photo readiness and mutual sharing controls.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dévoiler nos photos'**
+  String get photoRevealShare;
+
+  /// Private photo readiness and mutual sharing controls.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nos photos'**
+  String get photoRevealManage;
+
+  /// Private photo readiness and mutual sharing controls.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo : votre accord est donné'**
+  String get photoRevealWaitingAction;
+
+  /// Private photo readiness and mutual sharing controls.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre accord est donné. Vos photos resteront privées tant que l’autre personne n’aura pas fait le même choix.'**
+  String get photoRevealWaiting;
+
+  /// Private photo readiness and mutual sharing controls.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous avez choisi de vous découvrir tous les deux.'**
+  String get photoRevealShared;
+
+  /// Private photo readiness and mutual sharing controls.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer mon accord'**
+  String get photoRevealWithdraw;
+
+  /// Private photo readiness and mutual sharing controls.
+  ///
+  /// In fr, this message translates to:
+  /// **'Masquer vos photos ?'**
+  String get photoRevealWithdrawTitle;
+
+  /// Private photo readiness and mutual sharing controls.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre photo sera masquée pour cette personne et vous ne verrez plus la sienne, y compris dans la conversation et la liste des matchs. Vos messages seront conservés.'**
+  String get photoRevealWithdrawBody;
+
+  /// Private photo readiness and mutual sharing controls.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le retrait reste à confirmer. Les photos sont masquées sur cet appareil ; réessayez pour confirmer le retrait auprès du serveur.'**
+  String get photoRevealWithdrawalPending;
+
+  /// Private photo readiness and mutual sharing controls.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmer le retrait'**
+  String get photoRevealRetryWithdrawal;
+
+  /// Private photo readiness and mutual sharing controls.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre accord est retiré. Vos deux photos sont masquées.'**
+  String get photoRevealWithdrawn;
+
+  /// Private photo readiness and mutual sharing controls.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chacun doit avoir une photo approuvée avant de pouvoir dévoiler vos photos. Vérifiez votre photo depuis votre profil.'**
+  String get photoRevealMissing;
+
+  /// Read receipt suffix for an outgoing message.
+  ///
+  /// In fr, this message translates to:
+  /// **' · Lu'**
+  String get chatPageRead;
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

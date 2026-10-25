@@ -43,6 +43,7 @@ class _PartnerPhotoPageState extends State<PartnerPhotoPage>
       c.selected?.id == widget.matchId &&
       c.selected!.historyAllowed &&
       c.selected!.photosRevealed &&
+      !c.photosBlocked(widget.matchId) &&
       c.readAt != null &&
       DateTime.now().toUtc().difference(c.readAt!) < const Duration(minutes: 4);
 
@@ -176,7 +177,7 @@ class _PartnerPhotoPageState extends State<PartnerPhotoPage>
               ClipRRect(
                 borderRadius: BorderRadius.circular(28),
                 child: AspectRatio(
-                  aspectRatio: 1,
+                  aspectRatio: 4 / 5,
                   child: Image(
                     image: _image!,
                     fit: BoxFit.contain,
