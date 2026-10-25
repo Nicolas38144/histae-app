@@ -153,18 +153,6 @@ abstract class AppMessages {
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'LES MOTS D’ABORD'**
-  String get appStringsWordsFirst;
-
-  /// Interface: lib/core/l10n/app_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Faisons connaissance.'**
-  String get appStringsLetSGetToKnowYou;
-
-  /// Interface: lib/core/l10n/app_strings.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Heureux de vous retrouver.'**
   String get appStringsGoodToSeeYouAgain;
 
@@ -195,12 +183,6 @@ abstract class AppMessages {
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Mon espace'**
-  String get appStringsMySpace;
-
-  /// Interface: lib/core/l10n/app_strings.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Votre numéro reste privé. Un code reçu par SMS vous permettra de créer votre compte ou de vous reconnecter.'**
   String get appStringsVerifyYourNumberWithACode;
 
@@ -215,18 +197,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Un instant…'**
   String get appStringsWorking;
-
-  /// Interface: lib/core/l10n/app_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Numéro français au format +33'**
-  String get appStringsFrenchPhoneNumberStartingWith33;
-
-  /// Interface: lib/core/l10n/app_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Saisissez +33 suivi des 9 chiffres, sans le zéro initial.'**
-  String get appStringsEnter33FollowedBy9Digits;
 
   /// Interface: lib/core/l10n/app_strings.dart
   ///
@@ -293,12 +263,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Se déconnecter'**
   String get appStringsSignOut;
-
-  /// Interface: lib/core/l10n/app_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Vous êtes déconnecté sur cet appareil. La révocation de la session sur le serveur n’a pas pu être confirmée.'**
-  String get appStringsYouAreSignedOutOnThis;
 
   /// Interface: lib/core/l10n/app_strings.dart
   ///
@@ -377,12 +341,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Mon profil'**
   String get appStringsYourHistaeSpace;
-
-  /// Interface: lib/core/l10n/app_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Votre compte est créé et vos consentements obligatoires sont à jour. Vous pourrez compléter votre profil lors de la prochaine mise à jour.'**
-  String get appStringsYourAccountIsCreatedAndYour;
 
   /// Interface: lib/core/l10n/app_strings.dart
   ///
@@ -4790,12 +4748,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Aucun trait n’est proposé pour le moment.'**
   String get traitsEditorNoTraitsAreCurrentlyAvailable;
-
-  /// Interface: lib/core/l10n/app_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'+33 6 12 34 56 78'**
-  String get appStrings33612345678;
 
   /// Interface: lib/core/l10n/app_strings.dart
   ///

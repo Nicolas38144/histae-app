@@ -113,12 +113,11 @@ class ContinuationOffer {
   const ContinuationOffer(
     this.matchId,
     this.cost,
-    this.plan,
     this.readRevision,
     this.createdAt,
     this.resourceKey,
   );
-  final String matchId, plan, resourceKey;
+  final String matchId, resourceKey;
   final int cost, readRevision;
   final DateTime createdAt;
 }

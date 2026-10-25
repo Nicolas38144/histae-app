@@ -1,5 +1,5 @@
 import 'package:histae_app/core/network/api_client.dart';
-import 'package:histae_app/features/consents/data/consent_state.dart';
+import 'package:histae_app/features/consents/domain/consent_state.dart';
 import 'package:histae_app/features/discovery/data/device_location.dart';
 import 'package:http/http.dart' as http;
 

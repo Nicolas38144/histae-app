@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
 import 'package:histae_app/app/theme.dart';
-import 'package:histae_app/features/consents/data/consent_state.dart';
+import 'package:histae_app/features/consents/domain/consent_state.dart';
 import 'package:histae_app/features/profile/application/profile_controller.dart';
 import 'package:histae_app/features/profile/data/photo_preparer.dart';
 import 'package:histae_app/features/profile/data/profile_repository.dart';

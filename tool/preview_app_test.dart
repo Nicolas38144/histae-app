@@ -26,13 +26,6 @@ import '../test/support/profile_fixture.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(() async {
-    final serif = FontLoader('DMSerifDisplay')
-      ..addFont(
-        rootBundle.load(
-          'assets/fonts/dm_serif_display/DMSerifDisplay-Regular.ttf',
-        ),
-      );
-    await serif.load();
     for (final font in [
       ('Inter', 'inter/Inter-Variable.ttf'),
       ('SourceSerif4', 'source_serif_4/SourceSerif4-Variable.ttf'),

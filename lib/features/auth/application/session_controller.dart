@@ -106,7 +106,6 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
   bool _establishing = false;
   bool _saving = false;
 
-  bool get isSaving => _saving;
   bool _synchronizing = false;
   int _localizedReads = 0;
 

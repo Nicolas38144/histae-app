@@ -186,6 +186,3 @@ class SwipeResult {
   final SwipeDecision decision;
   final ReceivedMatch? match;
 }
-// Compatibility with the original public feed model name.
-
-typedef FeedAnswer = PublicProfileAnswer;

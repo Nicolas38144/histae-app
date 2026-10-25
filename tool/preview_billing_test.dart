@@ -20,12 +20,6 @@ import '../test/support/matches_fixture.dart';
 
 void main() {
   setUpAll(() async {
-    await (FontLoader('DMSerifDisplay')..addFont(
-          rootBundle.load(
-            'assets/fonts/dm_serif_display/DMSerifDisplay-Regular.ttf',
-          ),
-        ))
-        .load();
     for (final font in [
       ('Inter', 'inter/Inter-Variable.ttf'),
       ('SourceSerif4', 'source_serif_4/SourceSerif4-Variable.ttf'),

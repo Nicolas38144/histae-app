@@ -36,9 +36,8 @@ and system text size. Panels generally use thin borders and a 20 px radius; prim
 a pill shape. Secondary buttons use a subtle lavender surface, light outline and 16 px corners.
 Space stacked actions so their hierarchy stays clear.
 
-Bundled font licenses: [Inter](assets/fonts/inter/OFL.txt),
-[Source Serif 4](assets/fonts/source_serif_4/OFL.txt) and the retained
-[DM Serif Display](assets/fonts/dm_serif_display/OFL.txt) family.
+Bundled font licenses: [Inter](assets/fonts/inter/OFL.txt) and
+[Source Serif 4](assets/fonts/source_serif_4/OFL.txt).
 
 ## Logo and launch
 

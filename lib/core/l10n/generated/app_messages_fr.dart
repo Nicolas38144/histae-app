@@ -36,12 +36,6 @@ class AppMessagesFr extends AppMessages {
       'À votre rythme. Et toujours à deux.';
 
   @override
-  String get appStringsWordsFirst => 'LES MOTS D’ABORD';
-
-  @override
-  String get appStringsLetSGetToKnowYou => 'Faisons connaissance.';
-
-  @override
   String get appStringsGoodToSeeYouAgain => 'Heureux de vous retrouver.';
 
   @override
@@ -57,9 +51,6 @@ class AppMessagesFr extends AppMessages {
   String get appStringsIAlreadyHaveAnAccount => 'J’ai déjà un compte';
 
   @override
-  String get appStringsMySpace => 'Mon espace';
-
-  @override
   String get appStringsVerifyYourNumberWithACode =>
       'Votre numéro reste privé. Un code reçu par SMS vous permettra de créer votre compte ou de vous reconnecter.';
 
@@ -69,14 +60,6 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get appStringsWorking => 'Un instant…';
-
-  @override
-  String get appStringsFrenchPhoneNumberStartingWith33 =>
-      'Numéro français au format +33';
-
-  @override
-  String get appStringsEnter33FollowedBy9Digits =>
-      'Saisissez +33 suivi des 9 chiffres, sans le zéro initial.';
 
   @override
   String get appStringsRequestACode => 'Demander un code';
@@ -114,10 +97,6 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get appStringsSignOut => 'Se déconnecter';
-
-  @override
-  String get appStringsYouAreSignedOutOnThis =>
-      'Vous êtes déconnecté sur cet appareil. La révocation de la session sur le serveur n’a pas pu être confirmée.';
 
   @override
   String get appStringsYourChoicesAndPrivacy => 'Vos choix et votre vie privée';
@@ -161,10 +140,6 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get appStringsYourHistaeSpace => 'Mon profil';
-
-  @override
-  String get appStringsYourAccountIsCreatedAndYour =>
-      'Votre compte est créé et vos consentements obligatoires sont à jour. Vous pourrez compléter votre profil lors de la prochaine mise à jour.';
 
   @override
   String get appStringsYouCanViewYourDocumentsManage =>
@@ -2909,9 +2884,6 @@ class AppMessagesFr extends AppMessages {
   @override
   String get traitsEditorNoTraitsAreCurrentlyAvailable =>
       'Aucun trait n’est proposé pour le moment.';
-
-  @override
-  String get appStrings33612345678 => '+33 6 12 34 56 78';
 
   @override
   String get appStringsRefresh => 'Actualiser';

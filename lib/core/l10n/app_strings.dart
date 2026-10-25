@@ -100,10 +100,6 @@ class AppStrings {
 
   String get appName => messages.appOpeningHistae;
 
-  String get wordsFirst => messages.appStringsWordsFirst;
-
-  String get registrationHeading => messages.appStringsLetSGetToKnowYou;
-
   String get loginHeading => messages.appStringsGoodToSeeYouAgain;
 
   String get trustHeading => messages.appStringsWithConfidence;
@@ -114,20 +110,12 @@ class AppStrings {
 
   String get existingAccount => messages.appStringsIAlreadyHaveAnAccount;
 
-  String get myAccount => messages.appStringsMySpace;
-
   String get otpIntroduction => messages.appStringsVerifyYourNumberWithACode;
 
   String get onboardingRequired =>
       messages.appStringsCompleteTheRequiredChoicesIndicatedBy;
 
   String get actionInProgress => messages.appStringsWorking;
-
-  String get phoneLabel => messages.appStringsFrenchPhoneNumberStartingWith33;
-
-  String get phoneHint => messages.appStrings33612345678;
-
-  String get phoneHelp => messages.appStringsEnter33FollowedBy9Digits;
 
   String get sendOtp => messages.appStringsRequestACode;
 
@@ -151,8 +139,6 @@ class AppStrings {
   String get sessionUnavailable => messages.appStringsYourSessionIsUnavailable;
 
   String get logout => messages.appStringsSignOut;
-
-  String get logoutUnconfirmed => messages.appStringsYouAreSignedOutOnThis;
 
   String get privacyTitle => messages.appStringsYourChoicesAndPrivacy;
 
@@ -181,8 +167,6 @@ class AppStrings {
   String get choicesSaved => messages.appStringsYourChoicesHaveBeenSaved;
 
   String get accountTitle => messages.appStringsYourHistaeSpace;
-
-  String get accountReady => messages.appStringsYourAccountIsCreatedAndYour;
 
   String get privacyScope => messages.appStringsYouCanViewYourDocumentsManage;
 

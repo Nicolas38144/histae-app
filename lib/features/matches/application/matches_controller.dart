@@ -27,10 +27,9 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     _localeRevision = session.localizationRevision;
     session.addListener(_sessionChanged);
     this.realtime.onSignal = _signal;
-    this.realtime.onState = (connected, error) {
+    this.realtime.onState = (connected, _) {
       if (!active || !_realtimeEnabled) return;
       realtimeConnected = connected;
-      realtimeFailure = error;
       _notify();
     };
   }
@@ -123,7 +122,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   @override
   bool ending = false;
   bool realtimeConnected = false;
-  ApiFailure? failure, chatFailure, readFailure, realtimeFailure;
+  ApiFailure? failure, chatFailure, readFailure;
   String? notice;
   ClientMessage? validation;
   DateTime? _retryAt;
@@ -214,7 +213,6 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     failure = null;
     chatFailure = null;
     readFailure = null;
-    realtimeFailure = null;
     notice = null;
     privateRevision++;
     _retryAt = null;

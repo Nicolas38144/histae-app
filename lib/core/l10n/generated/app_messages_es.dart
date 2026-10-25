@@ -36,12 +36,6 @@ class AppMessagesEs extends AppMessages {
       'A su ritmo. Siempre entre dos.';
 
   @override
-  String get appStringsWordsFirst => 'LAS PALABRAS PRIMERO';
-
-  @override
-  String get appStringsLetSGetToKnowYou => 'Vamos a conocernos.';
-
-  @override
   String get appStringsGoodToSeeYouAgain => 'Nos alegra verte de nuevo.';
 
   @override
@@ -57,9 +51,6 @@ class AppMessagesEs extends AppMessages {
   String get appStringsIAlreadyHaveAnAccount => 'Ya tengo una cuenta';
 
   @override
-  String get appStringsMySpace => 'Mi espacio';
-
-  @override
   String get appStringsVerifyYourNumberWithACode =>
       'Su número permanece privado. Un código por SMS le permitirá crear su cuenta o volver a entrar.';
 
@@ -69,14 +60,6 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get appStringsWorking => 'Un momento…';
-
-  @override
-  String get appStringsFrenchPhoneNumberStartingWith33 =>
-      'Número francés con prefijo +33';
-
-  @override
-  String get appStringsEnter33FollowedBy9Digits =>
-      'Introduce +33 seguido de 9 dígitos, sin el cero inicial.';
 
   @override
   String get appStringsRequestACode => 'Solicitar un código';
@@ -114,10 +97,6 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get appStringsSignOut => 'Cerrar sesión';
-
-  @override
-  String get appStringsYouAreSignedOutOnThis =>
-      'Has cerrado sesión en este dispositivo. No se ha podido confirmar la revocación en el servidor.';
 
   @override
   String get appStringsYourChoicesAndPrivacy => 'Tus opciones y tu privacidad';
@@ -161,10 +140,6 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get appStringsYourHistaeSpace => 'Mi perfil';
-
-  @override
-  String get appStringsYourAccountIsCreatedAndYour =>
-      'Tu cuenta está creada y tus consentimientos obligatorios están al día. Podrás completar tu perfil en la próxima actualización.';
 
   @override
   String get appStringsYouCanViewYourDocumentsManage =>
@@ -2902,9 +2877,6 @@ class AppMessagesEs extends AppMessages {
   @override
   String get traitsEditorNoTraitsAreCurrentlyAvailable =>
       'No hay rasgos disponibles por ahora.';
-
-  @override
-  String get appStrings33612345678 => '+33 6 12 34 56 78';
 
   @override
   String get appStringsRefresh => 'Actualizar';

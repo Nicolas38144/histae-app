@@ -292,7 +292,6 @@ class ContinuationController extends ChangeNotifier {
     return _offer = ContinuationOffer(
       id!,
       quota!.creditCost,
-      quota!.plan,
       access.readRevision,
       _now().toUtc(),
       _key,

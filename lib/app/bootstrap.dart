@@ -13,11 +13,6 @@ Future<AppDependencies> bootstrap({LocaleController? locale}) async {
     // The privacy hub exposes cleanup failure and permits a later retry.
   }
   LicenseRegistry.addLicense(() async* {
-    yield LicenseEntryWithLineBreaks([
-      'DM Serif Display',
-    ], await rootBundle.loadString('assets/fonts/dm_serif_display/OFL.txt'));
-  });
-  LicenseRegistry.addLicense(() async* {
     for (final font in [
       ('Inter', 'assets/fonts/inter/OFL.txt'),
       ('Source Serif 4', 'assets/fonts/source_serif_4/OFL.txt'),

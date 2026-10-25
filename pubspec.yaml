@@ -25,7 +25,6 @@ dependencies:
   path_provider: ^2.1.6
   geolocator: ^14.1.1
 
-  cupertino_icons: ^2.0.0
   google_mobile_ads: ^9.1.0
   share_plus: ^13.3.1
   firebase_core: ^5.0.0
@@ -45,14 +44,11 @@ flutter:
   uses-material-design: true
   assets:
     - .env
-    - assets/branding/
-    - assets/fonts/dm_serif_display/OFL.txt
+    - assets/branding/histae-signature-dark.png
+    - assets/branding/histae-signature-light.png
     - assets/fonts/inter/OFL.txt
     - assets/fonts/source_serif_4/OFL.txt
   fonts:
-    - family: DMSerifDisplay
-      fonts:
-        - asset: assets/fonts/dm_serif_display/DMSerifDisplay-Regular.ttf
     - family: Inter
       fonts:
         - asset: assets/fonts/inter/Inter-Variable.ttf

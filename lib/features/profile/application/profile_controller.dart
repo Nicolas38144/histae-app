@@ -310,11 +310,6 @@ class ProfileController extends ChangeNotifier {
     photoIntent = null;
   }
 
-  void clearPhotoPreview() {
-    photoReadAt = null;
-    _notify();
-  }
-
   @override
   void dispose() {
     _disposed = true;

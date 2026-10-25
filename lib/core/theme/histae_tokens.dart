@@ -7,7 +7,6 @@ abstract final class HistaeTokens {
   static const panel = Color(0xff1a2231);
   static const ink = Color(0xfff9f7f2);
   static const muted = Color(0xffc6c1d3);
-  static const faint = Color(0xff9c96ad);
   static const lavender = Color(0xffb69cff);
   static const coral = Color(0xfff09a82);
   static const plum = Color(0xff392243);

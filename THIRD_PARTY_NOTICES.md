@@ -8,12 +8,15 @@ retain their own licenses and rights, including reuse rights those licenses gran
 
 ## Fonts and SDKs
 
-The bundled DM Serif Display, Inter and Source Serif 4 fonts retain SIL Open Font License
+The bundled Inter and Source Serif 4 fonts retain SIL Open Font License
 1.1. Their original texts are preserved at:
 
-- [DM Serif Display](assets/fonts/dm_serif_display/OFL.txt)
 - [Inter](assets/fonts/inter/OFL.txt)
 - [Source Serif 4](assets/fonts/source_serif_4/OFL.txt)
+
+DM Serif Display is no longer bundled. Its [original license](assets/fonts/dm_serif_display/OFL.txt)
+is retained as a historical notice. The dated package inventory below also retains Cupertino Icons,
+which was subsequently removed from the app's dependencies.
 
 Flutter and its SDK packages retain the Flutter BSD license. Flutter's generated license
 data and the existing font-license registration must be kept in release builds.

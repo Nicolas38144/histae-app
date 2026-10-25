@@ -26,7 +26,7 @@ class RewardTracker extends ChangeNotifier {
   String? _platform;
   RewardIntent? intent;
   ApiFailure? failure;
-  bool busy = false, completedVideo = false, cancelled = false;
+  bool busy = false, completedVideo = false;
   DateTime? retryAt;
 
   bool get accessible =>
@@ -56,7 +56,6 @@ class RewardTracker extends ChangeNotifier {
     failure = null;
     retryAt = null;
     completedVideo = false;
-    cancelled = false;
     _notify();
   }
 
@@ -93,7 +92,6 @@ class RewardTracker extends ChangeNotifier {
     _platform = platform;
     _poll?.cancel();
     _pollCount = 0;
-    cancelled = false;
     completedVideo = false;
     final epoch = _epoch;
     busy = true;
@@ -190,7 +188,6 @@ class RewardTracker extends ChangeNotifier {
     try {
       await repository.cancelReward(id, _scope);
       if (!_alive(epoch) || intent?.id != id) return;
-      cancelled = true;
       intent = null;
       _platform = null;
       completedVideo = false;

@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/core/network/api_client.dart';
 import 'package:histae_app/core/network/api_failure.dart';
-import 'package:histae_app/features/consents/data/consent_state.dart';
+import 'package:histae_app/features/consents/domain/consent_state.dart';
 import 'package:histae_app/features/profile/application/profile_controller.dart';
 import 'package:histae_app/features/profile/data/profile_models.dart';
 import 'package:histae_app/features/profile/data/profile_repository.dart';

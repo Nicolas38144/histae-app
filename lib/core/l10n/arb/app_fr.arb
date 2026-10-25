@@ -32,14 +32,6 @@
   "@welcomePageTimeReciprocityConsent": {
     "description": "Interface: lib/app/welcome_page.dart"
   },
-  "appStringsWordsFirst": "LES MOTS D’ABORD",
-  "@appStringsWordsFirst": {
-    "description": "Interface: lib/core/l10n/app_strings.dart"
-  },
-  "appStringsLetSGetToKnowYou": "Faisons connaissance.",
-  "@appStringsLetSGetToKnowYou": {
-    "description": "Interface: lib/core/l10n/app_strings.dart"
-  },
   "appStringsGoodToSeeYouAgain": "Heureux de vous retrouver.",
   "@appStringsGoodToSeeYouAgain": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
@@ -60,10 +52,6 @@
   "@appStringsIAlreadyHaveAnAccount": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsMySpace": "Mon espace",
-  "@appStringsMySpace": {
-    "description": "Interface: lib/core/l10n/app_strings.dart"
-  },
   "appStringsVerifyYourNumberWithACode": "Votre numéro reste privé. Un code reçu par SMS vous permettra de créer votre compte ou de vous reconnecter.",
   "@appStringsVerifyYourNumberWithACode": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
@@ -74,14 +62,6 @@
   },
   "appStringsWorking": "Un instant…",
   "@appStringsWorking": {
-    "description": "Interface: lib/core/l10n/app_strings.dart"
-  },
-  "appStringsFrenchPhoneNumberStartingWith33": "Numéro français au format +33",
-  "@appStringsFrenchPhoneNumberStartingWith33": {
-    "description": "Interface: lib/core/l10n/app_strings.dart"
-  },
-  "appStringsEnter33FollowedBy9Digits": "Saisissez +33 suivi des 9 chiffres, sans le zéro initial.",
-  "@appStringsEnter33FollowedBy9Digits": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
   "appStringsRequestACode": "Demander un code",
@@ -126,10 +106,6 @@
   },
   "appStringsSignOut": "Se déconnecter",
   "@appStringsSignOut": {
-    "description": "Interface: lib/core/l10n/app_strings.dart"
-  },
-  "appStringsYouAreSignedOutOnThis": "Vous êtes déconnecté sur cet appareil. La révocation de la session sur le serveur n’a pas pu être confirmée.",
-  "@appStringsYouAreSignedOutOnThis": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
   "appStringsYourChoicesAndPrivacy": "Vos choix et votre vie privée",
@@ -182,10 +158,6 @@
   },
   "appStringsYourHistaeSpace": "Mon profil",
   "@appStringsYourHistaeSpace": {
-    "description": "Interface: lib/core/l10n/app_strings.dart"
-  },
-  "appStringsYourAccountIsCreatedAndYour": "Votre compte est créé et vos consentements obligatoires sont à jour. Vous pourrez compléter votre profil lors de la prochaine mise à jour.",
-  "@appStringsYourAccountIsCreatedAndYour": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
   "appStringsYouCanViewYourDocumentsManage": "Vous pouvez consulter vos documents, gérer vos consentements ou vous déconnecter ici, même si votre parcours n’est pas terminé.",
@@ -3373,10 +3345,6 @@
   "traitsEditorNoTraitsAreCurrentlyAvailable": "Aucun trait n’est proposé pour le moment.",
   "@traitsEditorNoTraitsAreCurrentlyAvailable": {
     "description": "Interface: lib/features/profile/presentation/traits_editor.dart"
-  },
-  "appStrings33612345678": "+33 6 12 34 56 78",
-  "@appStrings33612345678": {
-    "description": "Interface: lib/core/l10n/app_strings.dart"
   },
   "appStringsRefresh": "Actualiser",
   "@appStringsRefresh": {
