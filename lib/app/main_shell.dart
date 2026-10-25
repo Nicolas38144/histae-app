@@ -140,6 +140,7 @@ class _MainShellState extends State<MainShell> {
                   controller: _discovery,
                   profile: _profile,
                   visibility: _visibility,
+                  visible: _selected == MainTab.discovery && !_covered,
                   openMatches: _openMatches,
                 ),
                 MainTab.matches => MatchesPage(

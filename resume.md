@@ -77,6 +77,12 @@ timestamps do not start a request loop.
 
 Feed shows first name, age, server distance, biography, traits and answers without a photo.
 A double tap likes; a separate upward gesture at the end passes. Buttons offer the same actions.
+Each profile requires three seconds of visible reading before either action becomes available.
+A thin gradient bar fills at the top of the profile and pauses while the feed is hidden or the app
+is inactive. Confirmed choices show a brief heart or upward-arrow animation, slide the current
+profile upward and bring in the next from below. Reduced motion uses a static feedback symbol
+and disables the sliding transition.
+Reporting and blocking remain immediately available.
 An uncertain choice can only resume with the same target and decision. A match requires a
 confirmed reciprocal result from the server.
 

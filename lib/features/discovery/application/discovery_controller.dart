@@ -17,6 +17,12 @@ class EncounterReceipt {
   final FeedProfile profile;
 }
 
+/// A new instance is published only after a choice is acknowledged by the API.
+class DiscoveryChoiceFeedback {
+  DiscoveryChoiceFeedback(this.decision);
+  final SwipeDecision decision;
+}
+
 class DiscoveryController extends ChangeNotifier {
   DiscoveryController(
     this.repository,
@@ -50,6 +56,7 @@ class DiscoveryController extends ChangeNotifier {
   bool exhausted = false;
   PendingChoice? pending;
   EncounterReceipt? encounter;
+  DiscoveryChoiceFeedback? choiceFeedback;
 
   void forgetEncounter(String matchId) {
     if (encounter?.match.id != matchId) return;
@@ -155,6 +162,7 @@ class DiscoveryController extends ChangeNotifier {
   }
 
   void deactivate({bool notify = true}) {
+    choiceFeedback = null;
     _active = false;
     _epoch++;
     _scope.cancel();
@@ -404,6 +412,7 @@ class DiscoveryController extends ChangeNotifier {
     final epoch = _epoch;
     sending = true;
     notice = null;
+    choiceFeedback = null;
     failure = null;
     _notify();
     EncounterReceipt? received;
@@ -426,7 +435,11 @@ class DiscoveryController extends ChangeNotifier {
         if (encounter?.profile.id == intent.profile.id) encounter = null;
         notice = 'blocked';
       } else {
-        notice = intent.action == PendingAction.like ? 'liked' : 'passed';
+        choiceFeedback = DiscoveryChoiceFeedback(
+          intent.action == PendingAction.like
+              ? SwipeDecision.like
+              : SwipeDecision.pass,
+        );
         if (received != null) encounter = received;
       }
     } on ApiFailure catch (e) {
@@ -490,6 +503,7 @@ class DiscoveryController extends ChangeNotifier {
     pending = null;
     encounter = null;
     status = null;
+    choiceFeedback = null;
     super.dispose();
   }
 }

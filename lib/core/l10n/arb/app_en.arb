@@ -383,8 +383,6 @@
   "discoveryStringsApproximateLocationUsedDistancesMayBe": "Approximate location used. Distances may be less accurate.",
   "discoveryStringsYourLocationHasBeenUpdated": "Your location has been updated.",
   "discoveryStringsLocationSubmissionIsUncertainItsStatus": "Location submission is uncertain. Its status is being checked with Histae; it will not be resent automatically.",
-  "discoveryStringsYourInterestHasBeenRecorded": "Your like has been sent.",
-  "discoveryStringsYouPassedOnThisProfile": "You passed on this profile.",
   "discoveryStringsThisProfileIsBlockedYouCan": "This profile is blocked. You can no longer discover or chat with each other.",
   "discoveryStringsThisProfileWasRemovedFromDiscovery": "This profile was removed from discovery. No other choice was sent.",
   "discoveryStringsResumeTheSameLike": "Resume the same like",
@@ -896,6 +894,9 @@
   "otpResendIn": "Request another code in {seconds} s",
   "otpPhoneInUse": "Number used: {phone}",
   "otpSendUnconfirmed": "We could not confirm the request. If you received a code, enter it. Otherwise, retry the request.",
+  "feedReadingCountdown": "{seconds, plural, one{1 more second to get to know this profile} other{{seconds} more seconds to get to know this profile}}",
+  "feedReadingProgress": "Profile reading time",
+  "feedReadingReady": "You can now like this profile or move to the next one.",
   "screenPrivacyLabel": "Content protected",
   "screenCaptureHelp": "Stop screen recording or sharing to return to Histae."
 }

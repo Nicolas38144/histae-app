@@ -75,7 +75,10 @@ class _AppOpeningState extends State<AppOpening>
         excluding: !_finished,
         child: ExcludeSemantics(
           excluding: !_finished,
-          child: IgnorePointer(ignoring: !_finished, child: widget.child),
+          child: IgnorePointer(
+            ignoring: !_finished,
+            child: TickerMode(enabled: _finished, child: widget.child),
+          ),
         ),
       ),
       if (!_finished)

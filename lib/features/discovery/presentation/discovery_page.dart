@@ -20,7 +20,9 @@ import '../data/discovery_models.dart';
 import 'discovery_status_sections.dart';
 import 'discovery_strings.dart';
 import 'encounter_page.dart';
+import 'feed_choice_feedback.dart';
 import 'feed_profile_card.dart';
+import 'feed_profile_transition.dart';
 
 class DiscoveryPage extends StatefulWidget {
   const DiscoveryPage({
@@ -29,11 +31,13 @@ class DiscoveryPage extends StatefulWidget {
     required this.profile,
     this.openMatches,
     this.visibility,
+    this.visible = true,
   });
   final DiscoveryController controller;
   final ProfileController profile;
   final Future<void> Function([String? id])? openMatches;
   final DiscoveryVisibilityController? visibility;
+  final bool visible;
 
   @override
   State<DiscoveryPage> createState() => _DiscoveryPageState();
@@ -222,7 +226,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
           !c.locating &&
           c.locationIssue == null &&
           profile != null &&
-          c.pending == null &&
+          (c.pending == null || (c.sending && !c.uncertain)) &&
           c.failure == null;
       final enabled = !c.busy && c.retrySeconds == 0;
       final statusBody = <Widget>[
@@ -451,63 +455,70 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
           ],
         ),
         body: SafeArea(
-          child: showFeed
-              ? Column(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                        child: FeedProfileCard(
-                          key: ValueKey(profile.id),
-                          profile: profile,
-                          enabled:
-                              c.canChoose &&
-                              widget.visibility?.saving != true &&
-                              widget.visibility?.uncertain != true,
-                          onLike: () => _choose(SwipeDecision.like),
-                          onPass: () => _choose(SwipeDecision.pass),
-                        ),
-                      ),
-                    ),
-                    if (c.notice != null)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 4,
-                        ),
-                        child: Semantics(
-                          liveRegion: true,
-                          child: Text(
-                            DiscoveryStrings(AppStrings.of(context))
-                                .notice(c.notice),
-                            style: Theme.of(context).textTheme.bodySmall,
+          child: FeedChoiceFeedback(
+            feedback: c.choiceFeedback,
+            active: widget.visible,
+            child: showFeed
+                ? Column(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                          child: FeedProfileTransition(
+                            child: FeedProfileCard(
+                              key: ValueKey(profile.id),
+                              profile: profile,
+                              active: widget.visible,
+                              enabled:
+                                  c.canChoose &&
+                                  widget.visibility?.saving != true &&
+                                  widget.visibility?.uncertain != true,
+                              onLike: () => _choose(SwipeDecision.like),
+                              onPass: () => _choose(SwipeDecision.pass),
+                            ),
                           ),
                         ),
                       ),
-                    if (_message != null)
-                      Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Semantics(
-                          liveRegion: true,
-                          child: Text(_message!),
+                      if (c.notice != null)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 4,
+                          ),
+                          child: Semantics(
+                            liveRegion: true,
+                            child: Text(
+                              DiscoveryStrings(AppStrings.of(context))
+                                  .notice(c.notice),
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ),
                         ),
-                      ),
-                    if (c.encounter case final encounter?)
-                      TextButton(
-                        onPressed: () => _showEncounter(encounter),
-                        child: Text(
-                          AppStrings.of(context).messages
-                              .discoveryPageYourMatchWith(
-                                encounter.profile.firstname,
-                              ),
+                      if (_message != null)
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Semantics(
+                            liveRegion: true,
+                            child: Text(_message!),
+                          ),
                         ),
-                      ),
-                  ],
-                )
-              : ListView(
-                  padding: const EdgeInsets.all(24),
-                  children: statusBody,
-                ),
+                      if (c.encounter case final encounter?)
+                        TextButton(
+                          onPressed: () => _showEncounter(encounter),
+                          child: Text(
+                            AppStrings.of(context).messages
+                                .discoveryPageYourMatchWith(
+                                  encounter.profile.firstname,
+                                ),
+                          ),
+                        ),
+                    ],
+                  )
+                : ListView(
+                    padding: const EdgeInsets.all(24),
+                    children: statusBody,
+                  ),
+          ),
         ),
       );
     },

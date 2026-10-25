@@ -50,6 +50,8 @@ void main() {
     addTearDown(c.dispose);
     await c.activate();
     await c.decide(SwipeDecision.pass);
+    expect(c.choiceFeedback?.decision, SwipeDecision.pass);
+    expect(c.notice, isNull);
     await Future<void>.delayed(Duration.zero);
     expect(cursors, [null, opaque, null]);
     expect(c.current?.id, candidateTwo);
@@ -82,6 +84,7 @@ void main() {
     await c.activate();
     expect(await c.decide(SwipeDecision.like), isNull);
     expect(c.uncertain, isTrue);
+    expect(c.choiceFeedback, isNull);
     expect(c.canChoose, isFalse);
     await c.decide(SwipeDecision.pass);
     expect(writes.length, 1);
@@ -90,6 +93,8 @@ void main() {
     expect(c.pending?.action, PendingAction.like);
     fail = false;
     final receipt = await c.resumeChoice();
+    expect(c.choiceFeedback?.decision, SwipeDecision.like);
+    expect(c.notice, isNull);
     expect(writes, [
       {'target_user_id': candidateOne, 'decision': 'like'},
       {'target_user_id': candidateOne, 'decision': 'like'},
@@ -385,6 +390,8 @@ void main() {
           ),
         ),
       );
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 3));
       await tester.tap(find.text('Léa, 27'));
       await tester.pump(const Duration(milliseconds: 80));
       await tester.tap(find.text('Léa, 27'));
@@ -418,6 +425,8 @@ void main() {
           ),
         ),
       );
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 3));
       await tester.drag(
         find.byKey(const Key('feed-profile-scroll')),
         const Offset(0, -10000),

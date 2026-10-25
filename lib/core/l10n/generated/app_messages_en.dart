@@ -1477,14 +1477,6 @@ class AppMessagesEn extends AppMessages {
       'Location submission is uncertain. Its status is being checked with Histae; it will not be resent automatically.';
 
   @override
-  String get discoveryStringsYourInterestHasBeenRecorded =>
-      'Your like has been sent.';
-
-  @override
-  String get discoveryStringsYouPassedOnThisProfile =>
-      'You passed on this profile.';
-
-  @override
   String get discoveryStringsThisProfileIsBlockedYouCan =>
       'This profile is blocked. You can no longer discover or chat with each other.';
 
@@ -3294,6 +3286,24 @@ class AppMessagesEn extends AppMessages {
   @override
   String get otpSendUnconfirmed =>
       'We could not confirm the request. If you received a code, enter it. Otherwise, retry the request.';
+
+  @override
+  String feedReadingCountdown(int seconds) {
+    String _temp0 = intl.Intl.pluralLogic(
+      seconds,
+      locale: localeName,
+      other: '$seconds more seconds to get to know this profile',
+      one: '1 more second to get to know this profile',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get feedReadingProgress => 'Profile reading time';
+
+  @override
+  String get feedReadingReady =>
+      'You can now like this profile or move to the next one.';
 
   @override
   String get screenPrivacyLabel => 'Content protected';

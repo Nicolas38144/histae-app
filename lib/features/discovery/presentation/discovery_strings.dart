@@ -82,8 +82,6 @@ class DiscoveryStrings {
       strings.messages.discoveryStringsYourLocationHasBeenUpdated,
     'presence_uncertain' =>
       strings.messages.discoveryStringsLocationSubmissionIsUncertainItsStatus,
-    'liked' => strings.messages.discoveryStringsYourInterestHasBeenRecorded,
-    'passed' => strings.messages.discoveryStringsYouPassedOnThisProfile,
     'blocked' => strings.messages.discoveryStringsThisProfileIsBlockedYouCan,
     'candidate_unavailable' =>
       strings.messages.discoveryStringsThisProfileWasRemovedFromDiscovery,

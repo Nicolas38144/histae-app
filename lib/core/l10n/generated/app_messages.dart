@@ -2406,18 +2406,6 @@ abstract class AppMessages {
   /// Interface: lib/features/discovery/presentation/discovery_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Votre « J’aime » a bien été transmis.'**
-  String get discoveryStringsYourInterestHasBeenRecorded;
-
-  /// Interface: lib/features/discovery/presentation/discovery_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Vous avez passé ce profil.'**
-  String get discoveryStringsYouPassedOnThisProfile;
-
-  /// Interface: lib/features/discovery/presentation/discovery_strings.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Ce profil est bloqué. Vous ne pourrez plus vous rencontrer ni échanger.'**
   String get discoveryStringsThisProfileIsBlockedYouCan;
 
@@ -5449,6 +5437,24 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Nous n’avons pas pu confirmer la demande. Si vous avez reçu un code, saisissez-le. Sinon, réessayez la demande.'**
   String get otpSendUnconfirmed;
+
+  /// Time left before liking or passing a profile; only counts while the feed is visible.
+  ///
+  /// In fr, this message translates to:
+  /// **'{seconds, plural, one{Encore 1 seconde pour découvrir ce profil} other{Encore {seconds} secondes pour découvrir ce profil}}'**
+  String feedReadingCountdown(int seconds);
+
+  /// Accessibility label for the thin three-second reading progress bar.
+  ///
+  /// In fr, this message translates to:
+  /// **'Temps de découverte du profil'**
+  String get feedReadingProgress;
+
+  /// Accessibility value when the profile reading progress bar is full.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous pouvez aimer ce profil ou passer au suivant.'**
+  String get feedReadingReady;
 
   /// Privacy shield and phone verification interface.
   ///

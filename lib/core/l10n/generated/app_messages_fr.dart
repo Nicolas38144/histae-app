@@ -1489,14 +1489,6 @@ class AppMessagesFr extends AppMessages {
       'L’envoi de la position reste incertain. Son état est relu auprès de Histae ; aucun renvoi automatique.';
 
   @override
-  String get discoveryStringsYourInterestHasBeenRecorded =>
-      'Votre « J’aime » a bien été transmis.';
-
-  @override
-  String get discoveryStringsYouPassedOnThisProfile =>
-      'Vous avez passé ce profil.';
-
-  @override
   String get discoveryStringsThisProfileIsBlockedYouCan =>
       'Ce profil est bloqué. Vous ne pourrez plus vous rencontrer ni échanger.';
 
@@ -3333,6 +3325,24 @@ class AppMessagesFr extends AppMessages {
   @override
   String get otpSendUnconfirmed =>
       'Nous n’avons pas pu confirmer la demande. Si vous avez reçu un code, saisissez-le. Sinon, réessayez la demande.';
+
+  @override
+  String feedReadingCountdown(int seconds) {
+    String _temp0 = intl.Intl.pluralLogic(
+      seconds,
+      locale: localeName,
+      other: 'Encore $seconds secondes pour découvrir ce profil',
+      one: 'Encore 1 seconde pour découvrir ce profil',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get feedReadingProgress => 'Temps de découverte du profil';
+
+  @override
+  String get feedReadingReady =>
+      'Vous pouvez aimer ce profil ou passer au suivant.';
 
   @override
   String get screenPrivacyLabel => 'Contenu protégé';

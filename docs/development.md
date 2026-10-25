@@ -29,6 +29,7 @@ payments. Run the relevant existing suite rather than testing every visual or do
 | --- | --- |
 | Session/cache behavior | `flutter test test/read_snapshots_test.dart test/cache_lifecycle_regressions_test.dart` |
 | Feed expiry, location or pause | `flutter test test/discovery_test.dart test/discovery_pause_test.dart` |
+| Feed reading delay and transitions | `flutter test test/feed_reading_delay_test.dart` |
 | Native billing | `flutter test test/billing_test.dart` |
 | Interface/request language | `flutter test test/localization_test.dart test/api_language_test.dart` |
 | Screen privacy and OTP recovery | `flutter test test/app_privacy_shield_test.dart test/otp_test.dart test/auth_widget_test.dart` |
@@ -60,6 +61,10 @@ Some tools require `FLUTTER_ROOT` to point to the SDK to load platform fonts. In
 images, long biographies and translations, 200% text, keyboard layouts and system insets.
 Review the [design system](../DESIGN_SYSTEM.md) before changing shared components or brand assets.
 
+`flutter test tool/preview_feed_test.dart` exports a populated feed and 30 fps PNG sequences for
+like/pass demonstrations under `build/previews/feed/`. Touch markers belong to the recording only.
+Use `--dart-define=FEED_PREVIEW_ACTION=like` or `pass` to render one sequence.
+
 For website screenshots, run `flutter test tool/preview_website_test.dart`, then the site's
 `scripts/export-app-screenshots.mjs` converter. Keep profiles and conversations fictional and labelled.
 
@@ -76,6 +81,12 @@ Keep signing credentials outside the public environment asset.
 iOS builds require macOS, Xcode and the intended signing/provisioning setup. Validate native
 permissions, Keychain, sharing, APNs, launch assets and store purchases on representative devices.
 Do not infer iOS success from Android or widget tests.
+
+The phone interface is locked to portrait-up at Flutter startup and in the Android manifest and
+both iOS property lists. Rebuild and restart after changing native settings, then rotate the device
+on the feed and a form: the interface and drafts must stay in place. iPad full-screen mode is
+required for its orientation restriction. Android 16+ may override orientation locks on displays
+at least 600 dp wide; see [Flutter's platform limits](https://api.flutter.dev/flutter/services/SystemChrome/setPreferredOrientations.html).
 
 For screen privacy, test Recents/app-switcher previews from a conversation, photo and OTP form,
 including rotation, interruptions and returning from a system dialog. Drafts must remain intact.

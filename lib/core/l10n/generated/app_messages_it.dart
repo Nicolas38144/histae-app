@@ -1492,14 +1492,6 @@ class AppMessagesIt extends AppMessages {
       'L’invio della posizione è incerto. Lo stato viene verificato con Histae; nessun reinvio automatico.';
 
   @override
-  String get discoveryStringsYourInterestHasBeenRecorded =>
-      'Il vostro «Mi piace» è stato inviato.';
-
-  @override
-  String get discoveryStringsYouPassedOnThisProfile =>
-      'Hai saltato questo profilo.';
-
-  @override
   String get discoveryStringsThisProfileIsBlockedYouCan =>
       'Questo profilo è bloccato. Non potrete più scoprirvi né conversare.';
 
@@ -3336,6 +3328,24 @@ class AppMessagesIt extends AppMessages {
   @override
   String get otpSendUnconfirmed =>
       'Non è stato possibile confermare la richiesta. Se hai ricevuto un codice, inseriscilo. Altrimenti riprova la richiesta.';
+
+  @override
+  String feedReadingCountdown(int seconds) {
+    String _temp0 = intl.Intl.pluralLogic(
+      seconds,
+      locale: localeName,
+      other: 'Ancora $seconds secondi per conoscere questo profilo',
+      one: 'Ancora 1 secondo per conoscere questo profilo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get feedReadingProgress => 'Tempo per conoscere il profilo';
+
+  @override
+  String get feedReadingReady =>
+      'Ora puoi mettere Mi piace a questo profilo o passare al successivo.';
 
   @override
   String get screenPrivacyLabel => 'Contenuto protetto';

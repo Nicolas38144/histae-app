@@ -1488,14 +1488,6 @@ class AppMessagesEs extends AppMessages {
       'El envío de la ubicación es incierto. Se consulta su estado con Histae; no se reenviará automáticamente.';
 
   @override
-  String get discoveryStringsYourInterestHasBeenRecorded =>
-      'Su «Me gusta» se ha enviado.';
-
-  @override
-  String get discoveryStringsYouPassedOnThisProfile =>
-      'Has pasado este perfil.';
-
-  @override
   String get discoveryStringsThisProfileIsBlockedYouCan =>
       'Este perfil está bloqueado. Ya no podréis descubriros ni conversar.';
 
@@ -3325,6 +3317,24 @@ class AppMessagesEs extends AppMessages {
   @override
   String get otpSendUnconfirmed =>
       'No hemos podido confirmar la solicitud. Si has recibido un código, introdúcelo. Si no, vuelve a intentar la solicitud.';
+
+  @override
+  String feedReadingCountdown(int seconds) {
+    String _temp0 = intl.Intl.pluralLogic(
+      seconds,
+      locale: localeName,
+      other: '$seconds segundos más para conocer este perfil',
+      one: '1 segundo más para conocer este perfil',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get feedReadingProgress => 'Tiempo para conocer el perfil';
+
+  @override
+  String get feedReadingReady =>
+      'Ya puedes indicar que te gusta este perfil o pasar al siguiente.';
 
   @override
   String get screenPrivacyLabel => 'Contenido protegido';

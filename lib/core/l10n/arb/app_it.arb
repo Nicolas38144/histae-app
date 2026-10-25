@@ -383,8 +383,6 @@
   "discoveryStringsApproximateLocationUsedDistancesMayBe": "Posizione approssimativa utilizzata. Le distanze potrebbero essere meno precise.",
   "discoveryStringsYourLocationHasBeenUpdated": "La posizione è stata aggiornata.",
   "discoveryStringsLocationSubmissionIsUncertainItsStatus": "L’invio della posizione è incerto. Lo stato viene verificato con Histae; nessun reinvio automatico.",
-  "discoveryStringsYourInterestHasBeenRecorded": "Il vostro «Mi piace» è stato inviato.",
-  "discoveryStringsYouPassedOnThisProfile": "Hai saltato questo profilo.",
   "discoveryStringsThisProfileIsBlockedYouCan": "Questo profilo è bloccato. Non potrete più scoprirvi né conversare.",
   "discoveryStringsThisProfileWasRemovedFromDiscovery": "Questo profilo è stato rimosso dalla scoperta. Nessun’altra scelta è stata inviata.",
   "discoveryStringsResumeTheSameLike": "Riprendi lo stesso Mi piace",
@@ -896,6 +894,9 @@
   "otpResendIn": "Richiedi un altro codice tra {seconds} s",
   "otpPhoneInUse": "Numero utilizzato: {phone}",
   "otpSendUnconfirmed": "Non è stato possibile confermare la richiesta. Se hai ricevuto un codice, inseriscilo. Altrimenti riprova la richiesta.",
+  "feedReadingCountdown": "{seconds, plural, one{Ancora 1 secondo per conoscere questo profilo} other{Ancora {seconds} secondi per conoscere questo profilo}}",
+  "feedReadingProgress": "Tempo per conoscere il profilo",
+  "feedReadingReady": "Ora puoi mettere Mi piace a questo profilo o passare al successivo.",
   "screenPrivacyLabel": "Contenuto protetto",
   "screenCaptureHelp": "Interrompi la registrazione o la condivisione dello schermo per tornare a Histae."
 }

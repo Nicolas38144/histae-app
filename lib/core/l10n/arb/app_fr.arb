@@ -1682,14 +1682,6 @@
   "@discoveryStringsLocationSubmissionIsUncertainItsStatus": {
     "description": "Interface: lib/features/discovery/presentation/discovery_strings.dart"
   },
-  "discoveryStringsYourInterestHasBeenRecorded": "Votre « J’aime » a bien été transmis.",
-  "@discoveryStringsYourInterestHasBeenRecorded": {
-    "description": "Interface: lib/features/discovery/presentation/discovery_strings.dart"
-  },
-  "discoveryStringsYouPassedOnThisProfile": "Vous avez passé ce profil.",
-  "@discoveryStringsYouPassedOnThisProfile": {
-    "description": "Interface: lib/features/discovery/presentation/discovery_strings.dart"
-  },
   "discoveryStringsThisProfileIsBlockedYouCan": "Ce profil est bloqué. Vous ne pourrez plus vous rencontrer ni échanger.",
   "@discoveryStringsThisProfileIsBlockedYouCan": {
     "description": "Interface: lib/features/discovery/presentation/discovery_strings.dart"
@@ -3886,6 +3878,21 @@
   },
   "otpPhoneInUse": "Numéro utilisé : {phone}",
   "otpSendUnconfirmed": "Nous n’avons pas pu confirmer la demande. Si vous avez reçu un code, saisissez-le. Sinon, réessayez la demande.",
+  "feedReadingCountdown": "{seconds, plural, one{Encore 1 seconde pour découvrir ce profil} other{Encore {seconds} secondes pour découvrir ce profil}}",
+  "feedReadingProgress": "Temps de découverte du profil",
+  "@feedReadingProgress": {
+    "description": "Accessibility label for the thin three-second reading progress bar."
+  },
+  "feedReadingReady": "Vous pouvez aimer ce profil ou passer au suivant.",
+  "@feedReadingReady": {
+    "description": "Accessibility value when the profile reading progress bar is full."
+  },
+  "@feedReadingCountdown": {
+    "description": "Time left before liking or passing a profile; only counts while the feed is visible.",
+    "placeholders": {
+      "seconds": { "type": "int" }
+    }
+  },
   "screenPrivacyLabel": "Contenu protégé",
   "screenCaptureHelp": "Arrêtez l’enregistrement ou le partage d’écran pour retrouver Histae.",
   "@otpPhoneInUse": {
