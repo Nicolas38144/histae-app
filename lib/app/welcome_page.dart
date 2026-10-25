@@ -61,7 +61,7 @@ class WelcomePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 28),
                 if (session case final auth?) ...[
-                  if (auth.notice != null)
+                  if (auth.notice != null && auth.notice != 'logout_confirmed')
                     Semantics(
                       liveRegion: true,
                       child: Text(
