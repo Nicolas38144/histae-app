@@ -64,7 +64,11 @@ class DeviceLocation implements LocationSource {
     StreamSubscription<Position>? subscription;
     try {
       _check(cancellation);
-      if (!await Geolocator.isLocationServiceEnabled()) {
+      final android =
+          !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+      // Android's fused provider resolves disabled services through its native
+      // activation dialog when the stream starts. An early rejection bypasses it.
+      if (!android && !await Geolocator.isLocationServiceEnabled()) {
         throw const LocationFailure(LocationIssue.disabled);
       }
       _check(cancellation);
@@ -83,8 +87,13 @@ class DeviceLocation implements LocationSource {
       }
       final accuracy = await Geolocator.getLocationAccuracy();
       _check(cancellation);
-      final LocationSettings settings =
-          defaultTargetPlatform == TargetPlatform.iOS
+      final LocationSettings settings = android
+          ? AndroidSettings(
+              accuracy: LocationAccuracy.high,
+              maxUpdateAge: Duration.zero,
+              timeLimit: const Duration(seconds: 25),
+            )
+          : defaultTargetPlatform == TargetPlatform.iOS
           ? AppleSettings(
               accuracy: LocationAccuracy.high,
               allowBackgroundLocationUpdates: false,

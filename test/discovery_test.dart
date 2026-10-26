@@ -149,6 +149,59 @@ void main() {
     expect(writes.single.keys.toSet(), {'latitude', 'longitude'});
     expect(source.scope?.isCancelled, isFalse);
   });
+  testWidgets(
+    'disabled location feedback stays with its action and opens service settings',
+    (tester) async {
+      var writes = 0;
+      final source = _SettingsLocationSource()
+        ..handler = () async =>
+            throw const LocationFailure(LocationIssue.disabled);
+      final session = testSession((r) async {
+        if (r.url.path.endsWith('discovery-status')) {
+          return jsonResponse(discoveryStatusJson(ready: false));
+        }
+        if (r.url.path.endsWith('/presence')) writes++;
+        return defaultDiscoveryResponse(r);
+      });
+      addTearDown(session.dispose);
+      await session.establish(testTokens);
+      final c = DiscoveryController(DiscoveryRepository(session), source);
+      final profile = ProfileController(ProfileRepository(session));
+      addTearDown(c.dispose);
+      addTearDown(profile.dispose);
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: histaeTheme(Brightness.dark),
+          home: DiscoveryPage(controller: c, profile: profile),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final locate = find.text('Actualiser ma position');
+      await tester.ensureVisible(locate);
+      await tester.tap(locate);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Localiser cet appareil'));
+      await tester.pumpAndSettle();
+      expect(c.locationIssue, LocationIssue.disabled);
+      expect(writes, 0);
+      expect(
+        find.descendant(
+          of: find.byType(DiscoveryReadinessCard),
+          matching: find.byType(DiscoveryLocationFeedback),
+        ),
+        findsOneWidget,
+      );
+      final settings = find.text('Ouvrir les réglages');
+      await tester.ensureVisible(settings);
+      await tester.tap(settings);
+      await tester.pumpAndSettle();
+      expect(source.settingsCalls, 1);
+      expect(source.services, isTrue);
+      expect(writes, 0);
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
+
   test('consent withdrawal and logout cancel native work and ignore late private responses', () async {
     var granted = true;
     final fix = Completer<LocationFix>();
@@ -449,4 +502,16 @@ void main() {
       );
     },
   );
+}
+
+class _SettingsLocationSource extends TestLocationSource {
+  int settingsCalls = 0;
+  bool? services;
+
+  @override
+  Future<bool> openSettings({required bool services}) async {
+    settingsCalls++;
+    this.services = services;
+    return true;
+  }
 }

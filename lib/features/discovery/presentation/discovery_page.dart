@@ -157,6 +157,19 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
     await c.publishLocation();
   }
 
+  Future<void> _openLocationSettings() async {
+    final opened = await c.location.openSettings(
+      services: c.locationIssue == LocationIssue.disabled,
+    );
+    if (!opened && mounted) {
+      setState(() {
+        _message = AppStrings.of(context)
+            .messages
+            .discoveryPageOpenYourDeviceSLocationSettings;
+      });
+    }
+  }
+
   Future<void> _showEncounter(EncounterReceipt receipt) async {
     if (!mounted || !c.accessible || c.session.resourceKey != _key) return;
     await Navigator.of(context).push(
@@ -233,6 +246,14 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
           (c.pending == null || (c.sending && !c.uncertain)) &&
           c.failure == null;
       final enabled = !c.busy && c.retrySeconds == 0;
+      final locationInCard =
+          !c.ready && required.contains(DiscoveryAction.freshPresence);
+      final locationFeedback = c.locationIssue == null
+          ? null
+          : DiscoveryLocationFeedback(
+              issue: c.locationIssue!,
+              onOpenSettings: enabled ? _openLocationSettings : null,
+            );
       final statusBody = <Widget>[
         if (c.status == null && !c.busy && c.failure == null)
           Text(
@@ -248,6 +269,9 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
             DiscoveryReadinessCard(
               action: action,
               onRepair: enabled && !_opening ? () => _repair(action) : null,
+              feedback: action == DiscoveryAction.freshPresence
+                  ? locationFeedback
+                  : null,
             ),
         ],
         if (c.ready && profile == null && !c.loading && c.failure == null)
@@ -316,35 +340,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
               ),
             ),
           ),
-        if (c.locationIssue case final issue?) ...[
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Text(
-              DiscoveryStrings(AppStrings.of(context)).location(issue),
-            ),
-          ),
-          if (issue == LocationIssue.deniedForever ||
-              issue == LocationIssue.disabled)
-            HistaeButton.outlined(
-              onPressed: enabled
-                  ? () async {
-                      final opened = await c.location.openSettings(
-                        services: issue == LocationIssue.disabled,
-                      );
-                      if (!opened && mounted) {
-                        setState(() {
-                          _message = AppStrings.of(context)
-                              .messages
-                              .discoveryPageOpenYourDeviceSLocationSettings;
-                        });
-                      }
-                    }
-                  : null,
-              child: Text(
-                AppStrings.of(context).messages.discoveryPageOpenSettings,
-              ),
-            ),
-        ],
+        if (!locationInCard && locationFeedback != null) locationFeedback,
         if (_message != null) Text(_message!),
         if (c.retrySeconds > 0)
           Text(

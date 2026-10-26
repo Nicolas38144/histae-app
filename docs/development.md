@@ -29,6 +29,7 @@ payments. Run the relevant existing suite rather than testing every visual or do
 | --- | --- |
 | Session/cache behavior | `flutter test test/read_snapshots_test.dart test/cache_lifecycle_regressions_test.dart` |
 | Feed expiry, location or pause | `flutter test test/discovery_test.dart test/discovery_pause_test.dart` |
+| Native location activation, refusal and cancellation | `flutter test test/device_location_test.dart test/discovery_test.dart` |
 | Photo readiness, withdrawal and private thumbnails | `flutter test test/photo_sharing_test.dart test/continuation_test.dart` |
 | Conversation profile, cached navigation and full-size photo privacy | `flutter test test/match_profile_test.dart test/cached_conversation_test.dart` |
 | Feed reading delay and transitions | `flutter test test/feed_reading_delay_test.dart` |
@@ -130,6 +131,12 @@ masking and active recording/mirroring on iOS 15–17 and iOS 18+. A still scree
 is active remains possible on iOS; there is no supported global screenshot-blocking API. Avoid
 secure-text-field view-hierarchy workarounds. Native shields do not protect other applications,
 an external camera or a compromised OS.
+
+On Android, disable device location, request a position from the feed and accept the native
+activation prompt: the same request should then obtain one fresh fix. Declining must show
+feedback in the location card and send no position. Check permission denial, cancellation,
+and the settings fallback on devices where native activation is unavailable. On iOS, disabled
+services retain a settings action. Mocked provider tests do not verify the real system dialog.
 
 Before beta, record the app/API versions, environment, tested flows and outstanding issues.
 Provider enablement and local compilation are separate from approval and availability in the stores.

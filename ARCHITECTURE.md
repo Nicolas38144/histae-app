@@ -78,6 +78,13 @@ Feed expiry retains the last server diagnostic for a coherent location prompt. I
 GPS automatically. The already-checked deadline prevents repeated reads when the server returns
 the same expired timestamp. An expired readiness response cannot load a stale candidate batch.
 
+On an explicit location request, Android's fused provider can show the native service-activation
+dialog. `DeviceLocation` must not reject disabled Android services before the provider starts;
+the platform resolves that setting after permission checks. Acquisition remains a cancellable,
+single-fix stream with no foreground service, a zero initial cache age on Android and the
+existing 25-second deadline. Refusal or unavailable resolution shows feedback and a settings
+action next to the location step. iOS retains the disabled-service settings fallback.
+
 ## Sessions, concurrency and persistence
 
 Refresh-token rotation is serialized. Secure storage is written and reread before a new session

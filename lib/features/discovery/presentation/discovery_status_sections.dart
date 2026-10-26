@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
+import '../data/device_location.dart';
 import '../data/discovery_models.dart';
 import 'discovery_strings.dart';
 
@@ -35,9 +36,11 @@ class DiscoveryReadinessCard extends StatelessWidget {
     super.key,
     required this.action,
     required this.onRepair,
+    this.feedback,
   });
   final DiscoveryAction action;
   final VoidCallback? onRepair;
+  final Widget? feedback;
 
   @override
   Widget build(BuildContext context) => Card(
@@ -69,9 +72,43 @@ class DiscoveryReadinessCard extends StatelessWidget {
                         .discoveryStatusSectionsCompleteThisStep,
             ),
           ),
+          ?feedback,
         ],
       ),
     ),
+  );
+}
+
+class DiscoveryLocationFeedback extends StatelessWidget {
+  const DiscoveryLocationFeedback({
+    super.key,
+    required this.issue,
+    required this.onOpenSettings,
+  });
+
+  final LocationIssue issue;
+  final VoidCallback? onOpenSettings;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Semantics(
+          liveRegion: true,
+          child: Text(DiscoveryStrings(AppStrings.of(context)).location(issue)),
+        ),
+      ),
+      if (issue == LocationIssue.deniedForever ||
+          issue == LocationIssue.disabled)
+        HistaeButton.outlined(
+          onPressed: onOpenSettings,
+          child: Text(
+            AppStrings.of(context).messages.discoveryPageOpenSettings,
+          ),
+        ),
+    ],
   );
 }
 
