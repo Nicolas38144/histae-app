@@ -960,5 +960,9 @@
         "type": "Object"
       }
     }
+  },
+  "messageShowDate": "Mostra la data del messaggio",
+  "@messageShowDate": {
+    "description": "Accessibility hint for tapping a message to show its date briefly."
   }
 }

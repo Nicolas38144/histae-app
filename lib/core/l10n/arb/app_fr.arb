@@ -3896,5 +3896,9 @@
         "type": "Object"
       }
     }
+  },
+  "messageShowDate": "Afficher la date du message",
+  "@messageShowDate": {
+    "description": "Accessibility hint for tapping a message to show its date briefly."
   }
 }

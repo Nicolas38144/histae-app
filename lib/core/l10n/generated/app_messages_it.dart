@@ -3337,4 +3337,7 @@ class AppMessagesIt extends AppMessages {
   String matchesStringsFirstPeriodEndsOn(Object arg0) {
     return 'Fine del primo periodo il $arg0';
   }
+
+  @override
+  String get messageShowDate => 'Mostra la data del messaggio';
 }

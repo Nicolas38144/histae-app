@@ -13,7 +13,7 @@ import '../application/matches_controller.dart';
 import 'conversation_header.dart';
 import 'match_photo_avatar.dart';
 import 'matches_strings.dart';
-import 'message_metadata.dart';
+import 'message_bubble.dart';
 import 'partner_page.dart';
 
 class ChatPage extends StatefulWidget {
@@ -398,60 +398,13 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                                       : MainAxisAlignment.start,
                                   children: [
                                     Flexible(
-                                      child: Container(
+                                      child: ConstrainedBox(
                                         constraints: BoxConstraints(
                                           maxWidth: layout.maxWidth * .86,
                                         ),
-                                        padding: const EdgeInsets.all(18),
-                                        decoration: BoxDecoration(
-                                          color: own
-                                              ? Theme.of(context)
-                                                    .colorScheme
-                                                    .primaryContainer
-                                              : Theme.of(context)
-                                                    .colorScheme
-                                                    .surfaceContainerLow,
-                                          border: Border.all(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .outlineVariant,
-                                          ),
-                                          borderRadius: BorderRadius.only(
-                                            topLeft: const Radius.circular(20),
-                                            topRight: const Radius.circular(20),
-                                            bottomLeft: Radius.circular(
-                                              own ? 20 : 6,
-                                            ),
-                                            bottomRight: Radius.circular(
-                                              own ? 6 : 20,
-                                            ),
-                                          ),
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            SelectableText(
-                                              m.content,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyMedium
-                                                  ?.copyWith(
-                                                    color: own
-                                                        ? Theme.of(context)
-                                                              .colorScheme
-                                                              .onPrimaryContainer
-                                                        : Theme.of(context)
-                                                              .colorScheme
-                                                              .onSurface,
-                                                  ),
-                                            ),
-                                            const SizedBox(height: 8),
-                                            MessageMetadata(
-                                              message: m,
-                                              own: own,
-                                            ),
-                                          ],
+                                        child: MessageBubble(
+                                          message: m,
+                                          own: own,
                                         ),
                                       ),
                                     ),

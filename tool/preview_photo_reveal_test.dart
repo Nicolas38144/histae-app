@@ -25,6 +25,7 @@ const _output = String.fromEnvironment(
   defaultValue: 'build/previews/photo-reveal',
 );
 const _extended = bool.fromEnvironment('PHOTO_PREVIEW_LONG');
+const _receiptsOnly = bool.fromEnvironment('PHOTO_PREVIEW_RECEIPTS_ONLY');
 const _boundary = Key('photo-reveal-preview');
 
 void main() {
@@ -172,6 +173,11 @@ void main() {
     }
 
     Future<void> record(double seconds) async {
+      if (_receiptsOnly) {
+        await tester.pump(Duration(microseconds: (seconds * 1000000).round()));
+        await tester.pumpAndSettle();
+        return;
+      }
       for (var i = 0; i < (seconds * 15).round(); i++) {
         await tester.pump(const Duration(microseconds: 66667));
         await capture(
@@ -286,6 +292,21 @@ void main() {
         await tap(find.text('Léa, 29'));
         await hold(2);
         await capture('$_output/conversation-before.png', ratio: 2);
+        if (_receiptsOnly) {
+          const answer = 'Oui, ça me ferait plaisir. On se les dévoile ?';
+          await tester.enterText(find.byType(TextField), answer);
+          await tap(find.text('Envoyer'));
+          FocusManager.instance.primaryFocus?.unfocus();
+          await record(0.4);
+          await capture('$_output/message-sent.png', ratio: 2);
+          await tap(find.text(answer));
+          await record(0.1);
+          await capture('$_output/message-date.png', ratio: 2);
+          await record(3.1);
+          await capture('$_output/message-date-hidden.png', ratio: 2);
+          await tester.pumpWidget(const SizedBox.shrink());
+          return;
+        }
         expect(
           find.textContaining('Fin de la première période le'),
           findsNothing,
@@ -390,6 +411,7 @@ void main() {
           'capture_fps': 15,
           'duration_seconds': frame / 15,
           'extended': _extended,
+          'receipts_only': _receiptsOnly,
         }),
       ),
     );

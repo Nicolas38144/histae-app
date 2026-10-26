@@ -5449,6 +5449,12 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Fin de la première période le {arg0}'**
   String matchesStringsFirstPeriodEndsOn(Object arg0);
+
+  /// Accessibility hint for tapping a message to show its date briefly.
+  ///
+  /// In fr, this message translates to:
+  /// **'Afficher la date du message'**
+  String get messageShowDate;
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

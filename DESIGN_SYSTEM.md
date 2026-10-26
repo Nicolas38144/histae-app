@@ -69,9 +69,11 @@ Matches shows a compact, scrollable credit card with an explicit view-credits ac
 Free users see available included/ad credits and Videos; Premium users get an appropriate message
 without a video button. A failed or unknown quota read must not appear as a zero balance.
 
-Conversation receipts stay in the 11 px message metadata: a small neutral check for Sent,
-and a lavender double check for Read, with translated labels. Received messages show only
-their timestamp. Read state always comes from the API; metadata wraps on narrow screens.
+Conversation receipts stay at the bottom right of outgoing bubbles in 11 px metadata:
+a small neutral check for Sent, and a lavender double check for Read, with translated labels.
+Read state always comes from the API. Dates are hidden until a message is tapped, then appear
+above that bubble for three seconds without moving the history. Scrolling, another tap or
+leaving the conversation dismisses the date. Long-press text selection remains available.
 
 Profile groups the introduction, answers, feed preview, account details, pause mode and settings.
 Its subscription entry shows Premium for Free or the subscription-management label for Premium,

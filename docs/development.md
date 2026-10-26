@@ -79,6 +79,8 @@ the actions at the bottom of the photo screen.
 Use `--dart-define=PHOTO_PREVIEW_OUTPUT=build/previews/<name>` for a separate export directory.
 The conversation and match-list preview share the same synthetic message history.
 Each export writes `recording.json` with its frame count, capture rate and duration.
+For receipt screenshots only, use `--dart-define=PHOTO_PREVIEW_RECEIPTS_ONLY=true`.
+This skips video frames and exports sent/read states, the tapped message date and its dismissal.
 Encode frames with FFmpeg, padding odd dimensions for H.264:
 
 ```bash
