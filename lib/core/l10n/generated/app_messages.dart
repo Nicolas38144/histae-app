@@ -3198,7 +3198,7 @@ abstract class AppMessages {
   /// Interface: lib/features/privacy/presentation/privacy_detail_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Ces demandes nécessitent une intervention de Histae. La modification du profil, l’export des données et la suppression du compte se font directement depuis leurs rubriques.'**
+  /// **'Pour une information que vous ne pouvez pas corriger depuis « Mon profil », décrivez la modification souhaitée. L’export des données et la suppression du compte restent accessibles dans leurs rubriques.'**
   String get privacyDetailPageTheseRequestsAreSubmittedForProcessing;
 
   /// Interface: lib/features/privacy/presentation/privacy_detail_page.dart
@@ -5467,6 +5467,36 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'À quoi sert cette demande ?'**
   String get privacyRightExplanationTitle;
+
+  /// No description provided for @privacyRequestDetailsLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Précisez votre demande'**
+  String get privacyRequestDetailsLabel;
+
+  /// No description provided for @privacyRequestRectificationPrompt.
+  ///
+  /// In fr, this message translates to:
+  /// **'Indiquez la donnée à corriger et la modification souhaitée.'**
+  String get privacyRequestRectificationPrompt;
+
+  /// No description provided for @privacyRequestDetailsInvalid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Précisez votre demande en 2 000 caractères maximum.'**
+  String get privacyRequestDetailsInvalid;
+
+  /// No description provided for @privacyRequestYourMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre message'**
+  String get privacyRequestYourMessage;
+
+  /// No description provided for @privacyRequestTeamResponse.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réponse de l’équipe'**
+  String get privacyRequestTeamResponse;
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

@@ -9,17 +9,9 @@ import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../application/privacy_controller.dart';
-import '../data/privacy_models.dart';
-import 'privacy_choice.dart';
 import 'privacy_frame.dart';
+import 'privacy_request_form.dart';
 import 'privacy_strings.dart';
-
-// Self-service export, account deletion and profile edits have dedicated flows.
-const _manualRequestTypes = [
-  DataRight.rectification,
-  DataRight.restriction,
-  DataRight.objection,
-];
 
 class PrivacyDetailPage extends StatefulWidget {
   const PrivacyDetailPage({
@@ -36,7 +28,6 @@ class PrivacyDetailPage extends StatefulWidget {
 
 class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
   PrivacyController get c => widget.controller;
-  DataRight _type = _manualRequestTypes.first;
   final _confirmation = TextEditingController();
 
   @override
@@ -337,21 +328,6 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
   ];
 
   List<Widget> _rights() {
-    final pending = c.pendingRight;
-    final selected =
-        pending ??
-        (_manualRequestTypes.contains(_type)
-            ? _type
-            : _manualRequestTypes.first);
-    final choices = {
-      for (final type in _manualRequestTypes)
-        type: rightLabel(AppStrings.of(context), type),
-    };
-    // Keep an uncertain existing request immutable, even if its type now has
-    // a self-service flow. This read-only choice cannot create a new request.
-    if (pending != null) {
-      choices[pending] = rightLabel(AppStrings.of(context), pending);
-    }
     return [
       Text(
         AppStrings.of(context)
@@ -359,54 +335,7 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
             .privacyDetailPageTheseRequestsAreSubmittedForProcessing,
       ),
       const SizedBox(height: 24),
-      PrivacyChoice<DataRight>(
-        key: const Key('privacy-right-choice'),
-        value: selected,
-        label: AppStrings.of(context).messages.privacyDetailPageYourRequest,
-        choices: choices,
-        descriptions: {
-          for (final type in choices.keys)
-            type: rightDescription(AppStrings.of(context), type),
-        },
-        onChanged: enabled && c.pendingRight == null
-            ? (value) => setState(() => _type = value)
-            : null,
-      ),
-      if (c.pendingRight != null)
-        Padding(
-          padding: EdgeInsets.symmetric(vertical: 16),
-          child: Text(
-            AppStrings.of(context)
-                .messages
-                .privacyDetailPageTheResponseStillNeedsConfirmationRefresh,
-          ),
-        ),
-      HistaeButton(
-        onPressed: enabled
-            ? () async {
-                final type = c.pendingRight ?? selected;
-                if (await _confirm(
-                      AppStrings.of(context)
-                          .messages
-                          .privacyDetailPageSubmitThisRequest,
-                      '${rightDescription(AppStrings.of(context), type)}\n\n${AppStrings.of(context).messages.privacyDetailPageThisRequestWillBeRecordedFor(rightLabel(AppStrings.of(context), type))}',
-                      action: AppStrings.of(context)
-                          .messages
-                          .privacyDetailPageSubmit,
-                    ) &&
-                    mounted) {
-                  await c.request(type);
-                }
-              }
-            : null,
-        child: Text(
-          c.pendingRight == null
-              ? AppStrings.of(context).messages.privacyDetailPageSubmitMyRequest
-              : AppStrings.of(context)
-                    .messages
-                    .privacyDetailPageResumeThisRequest,
-        ),
-      ),
+      PrivacyRequestForm(controller: c, enabled: enabled),
       const SizedBox(height: 24),
       Text(
         AppStrings.of(context).messages.privacyDetailPageTrackYourRequests,
@@ -414,12 +343,56 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
       ),
       for (final request in c.rights)
         Card(
-          child: ListTile(
-            title: Text(rightLabel(AppStrings.of(context), request.type)),
-            subtitle: Text(
-              '${rightStatus(AppStrings.of(context), request.status)} · ${privacyDate(AppStrings.of(context), request.requestedAt)}${request.completedAt == null ? '' : AppStrings.of(context).messages.privacyDetailPageCompletedOn(privacyDate(AppStrings.of(context), request.completedAt!))}',
-            ),
-          ),
+          child: request.details == null && request.response == null
+              ? ListTile(
+                  title: Text(rightLabel(AppStrings.of(context), request.type)),
+                  subtitle: Text(
+                    '${rightStatus(AppStrings.of(context), request.status)} · ${privacyDate(AppStrings.of(context), request.requestedAt)}${request.completedAt == null ? '' : AppStrings.of(context).messages.privacyDetailPageCompletedOn(privacyDate(AppStrings.of(context), request.completedAt!))}',
+                  ),
+                )
+              : ExpansionTile(
+                  title: Text(rightLabel(AppStrings.of(context), request.type)),
+                  subtitle: Text(
+                    '${rightStatus(AppStrings.of(context), request.status)} · ${privacyDate(AppStrings.of(context), request.requestedAt)}',
+                  ),
+                  expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
+                  childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+                  children: [
+                    if (request.details != null) ...[
+                      Text(
+                        AppStrings.of(context)
+                            .messages
+                            .privacyRequestYourMessage,
+                        style: Theme.of(context).textTheme.labelLarge,
+                      ),
+                      const SizedBox(height: 8),
+                      SelectableText(request.details!),
+                    ],
+                    if (request.response != null) ...[
+                      const SizedBox(height: 16),
+                      Text(
+                        AppStrings.of(context)
+                            .messages
+                            .privacyRequestTeamResponse,
+                        style: Theme.of(context).textTheme.labelLarge,
+                      ),
+                      const SizedBox(height: 8),
+                      SelectableText(request.response!),
+                    ],
+                    if (request.completedAt != null) ...[
+                      const SizedBox(height: 12),
+                      Text(
+                        AppStrings.of(context).messages
+                            .privacyDetailPageCompletedOn(
+                              privacyDate(
+                                AppStrings.of(context),
+                                request.completedAt!,
+                              ),
+                            ),
+                      ),
+                    ],
+                  ],
+                ),
         ),
       if (!c.loading && c.rights.isEmpty)
         Text(

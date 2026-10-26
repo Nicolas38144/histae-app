@@ -1933,7 +1933,7 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get privacyDetailPageTheseRequestsAreSubmittedForProcessing =>
-      'These requests need Histae’s intervention. Profile edits, data export and account deletion are available directly in their dedicated sections.';
+      'If you cannot correct some information in “My profile”, describe the change you need. Data export and account deletion remain available in their dedicated sections.';
 
   @override
   String get privacyDetailPageYourRequest => 'Your request';
@@ -3305,4 +3305,21 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get privacyRightExplanationTitle => 'What is this request for?';
+
+  @override
+  String get privacyRequestDetailsLabel => 'Describe your request';
+
+  @override
+  String get privacyRequestRectificationPrompt =>
+      'Specify the information to correct and the change you want.';
+
+  @override
+  String get privacyRequestDetailsInvalid =>
+      'Describe your request in no more than 2,000 characters.';
+
+  @override
+  String get privacyRequestYourMessage => 'Your message';
+
+  @override
+  String get privacyRequestTeamResponse => 'Reply from the team';
 }

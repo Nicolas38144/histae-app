@@ -151,22 +151,26 @@ completion, and unverified purchases remain available for a safe retry or restor
 
 ## Privacy requests
 
-New requests offer correction of otherwise uneditable data, restriction and objection only.
-Self-service access/export and account erasure stay in their dedicated sections. History still
-supports all six server types, and an uncertain existing request retains its original type in
-a read-only selector until resolved.
+New requests in the app offer only correction of otherwise uneditable data. Profile edits,
+export, account deletion and optional privacy controls keep their dedicated flows. The retired
+restriction/objection categories remain readable in history, but the API rejects their creation
+and status transitions and the dashboard exposes no processing actions for them.
 
-Choices use plain-language labels and a collapsed explanation for the selected type. Opening
-the explanation never submits a request; submission still requires confirmation and keeps the
-same pending intention after an uncertain response. The app sends only the existing `type`
-field to the API. Export and account deletion remain separate explicit flows.
+`PrivacyRequestForm` owns presentation and validation feedback. `PrivacyController` retains the
+session-scoped draft and an immutable `RightsRequestIntent` after an uncertain write. Request
+`details` and the administrator's public `response` are bounded to 2,000 Unicode scalars. The API
+stores them separately from internal notes, and both app and dashboard render them as plain text.
+A correction cannot be completed or rejected without a public reply. Closing it records manual
+handling; it does not automatically edit arbitrary account data. Existing records without a
+message remain readable. Opening a disclosure never submits a request; sending still requires
+confirmation. A definitive validation rejection unlocks the draft; a network failure keeps the
+original payload for an explicit retry. Session changes clear the draft and pending intention.
 
-API coverage checked from source on 2026-10-26: all six rights have request creation/listing and
-administrator status tracking. Export streams a JSON file, but creating an access or portability
+API coverage checked from source on 2026-10-26: the historical six types remain readable; new
+restriction/objection requests and their status transitions are disabled. Export streams a JSON file, but creating an access or portability
 request does not start that export or complete the request. An administrator's completion of an
-erasure request schedules full account erasure through the worker. Rectification, restriction
-and objection requests update tracking metadata only: their status does not itself correct data
-or enforce processing restrictions. Editable profile data has separate self-service endpoints.
+erasure request schedules full account erasure through the worker. Rectification requests record the administrator’s response and status; closing one does not
+automatically edit the data. No additional processing-suspension controls were introduced. Editable profile data has separate self-service endpoints.
 This is a source review, not confirmation of production execution; no API tests were run.
 
 ## Presentation and language

@@ -328,6 +328,59 @@ void main() {
     expect(c.rights, isEmpty);
     expect(c.pendingUnblock, isNull);
   });
+  test('manual request validation blocks empty details and allows correction after a definitive rejection', () async {
+    final writes = <Object?>[];
+    var rejected = true;
+    final session = testSession((r) async {
+      if (r.url.path.endsWith('/data-subject-requests')) {
+        if (r.method == 'POST') {
+          final body = jsonDecode(r.body) as Map<String, dynamic>;
+          writes.add(body);
+          if (rejected) return apiError(400, 'invalid_data_request');
+          return jsonResponse({
+            ...rightsJson(type: 'rectification'),
+            'details': body['details'],
+          }, 201);
+        }
+        return jsonResponse({'requests': <Object?>[]});
+      }
+      return defaultPrivacyResponse(r);
+    });
+    addTearDown(session.dispose);
+    await session.establish(testTokens);
+    final c = PrivacyController(
+      PrivacyRepository(session),
+      exportStore: PreviewExportStore(),
+    );
+    addTearDown(c.dispose);
+    await c.enter(PrivacySection.rights);
+    for (final type in [
+      DataRight.rectification,
+      DataRight.restriction,
+      DataRight.objection,
+    ]) {
+      for (final details in [null, ' \n\t', 'a' * 2001, 'bad\u0000value']) {
+        await c.request(type, details: details);
+        expect(c.failure!.code, 'invalid_data_request');
+        expect(c.pendingRequest, isNull);
+      }
+    }
+    expect(writes, isEmpty);
+    await c.request(DataRight.rectification, details: 'My original request');
+    expect(c.pendingRequest, isNull);
+    expect(c.draftDetails, 'My original request');
+    rejected = false;
+    c.editRightDraft(details: 'My corrected request');
+    await c.request(c.draftRight, details: c.draftDetails);
+    expect(writes, [
+      {'type': 'rectification', 'details': 'My original request'},
+      {'type': 'rectification', 'details': 'My corrected request'},
+    ]);
+    c.editRightDraft(details: 'Private draft');
+    await session.logout();
+    expect(c.draftDetails, isEmpty);
+    expect(c.pendingRequest, isNull);
+  });
   test('export streams authenticated once after definitive 401 refresh, rejects truncation and cleans only own files', () async {
     final dir = await Directory.systemTemp.createTemp('histae-export-test-');
     final store = PrivateExportStore(temporaryDirectory: () async => dir);

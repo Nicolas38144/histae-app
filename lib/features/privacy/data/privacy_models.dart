@@ -15,6 +15,34 @@ enum DataRight {
 
 enum RightStatus { pending, inProgress, completed, rejected }
 
+extension DataRightDetails on DataRight {
+  bool get requiresDetails => switch (this) {
+    DataRight.rectification => true,
+    _ => false,
+  };
+}
+
+class RightsRequestIntent {
+  factory RightsRequestIntent(DataRight type, String? details) {
+    final normalized = trimOuterWhitespace(details ?? '');
+    return RightsRequestIntent._(type, normalized.isEmpty ? null : normalized);
+  }
+  const RightsRequestIntent._(this.type, this.details);
+
+  static const maxDetailsLength = 2000;
+  final DataRight type;
+  final String? details;
+
+  bool get valid =>
+      type != DataRight.restriction &&
+      type != DataRight.objection &&
+      (!type.requiresDetails || (details?.isNotEmpty ?? false)) &&
+      (details == null ||
+          (details!.runes.length <= maxDetailsLength &&
+              !RegExp(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]')
+                  .hasMatch(details!)));
+}
+
 enum ReportReason { inappropriateContent, fakeProfile, harassment, spam, other }
 
 extension ReportWire on ReportReason {
@@ -85,8 +113,10 @@ class RightsRequest {
     this.type,
     this.status,
     this.requestedAt,
-    this.completedAt,
-  );
+    this.completedAt, {
+    this.details,
+    this.response,
+  });
 
   factory RightsRequest.fromJson(Object? value, String owner) {
     final j = jsonObject(value);
@@ -106,6 +136,8 @@ class RightsRequest {
       status,
       wireTime(j['requested_at']),
       j['completed_at'] == null ? null : wireTime(j['completed_at']),
+      details: optionalText(j, 'details'),
+      response: optionalText(j, 'response'),
     );
   }
   final String id;
@@ -113,6 +145,8 @@ class RightsRequest {
   final RightStatus status;
   final DateTime requestedAt;
   final DateTime? completedAt;
+  final String? details;
+  final String? response;
 
   bool get open =>
       status == RightStatus.pending || status == RightStatus.inProgress;

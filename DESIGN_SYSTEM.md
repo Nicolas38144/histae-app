@@ -87,13 +87,12 @@ Answer editing separates the question, text, order and remove/move actions. Repl
 list is explicit. Sensitive-data and location choices use switches, separate from required terms
 acceptance and privacy-notice acknowledgement.
 
-Privacy request choices cover only manual handling: correcting otherwise uneditable data,
-restricting processing or objecting to a use. Profile editing, export and account deletion keep
-their dedicated flows; existing requests remain visible in history.
-Choices have plain action labels and an explanation hidden behind a small
-disclosure arrow. The selected explanation opens and closes on demand and resets when the
-choice changes. Clarify the difference between a request for manual handling, direct export
-and account deletion; a request status must not imply that a processing restriction was applied.
+Privacy requests offer a single correction form for data that cannot be edited in the profile.
+Keep its explanation behind a disclosure and require a precise message before confirmation.
+The administrator's reply appears alongside the original message in expandable history entries.
+Profile editing, export, account deletion and optional privacy controls keep their own screens;
+restriction/objection requests are historical records only. Never present a status change as an
+automatic modification of account data.
 
 ## Navigation and accessibility
 

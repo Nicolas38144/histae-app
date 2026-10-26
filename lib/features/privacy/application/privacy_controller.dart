@@ -39,7 +39,28 @@ class PrivacyController extends ChangeNotifier {
       _blocks = <BlockedPerson>[],
       _rights = <RightsRequest>[];
   String? cursor, pendingRevoke, pendingUnblock, exportPath;
-  DataRight? pendingRight;
+  RightsRequestIntent? _pendingRequest;
+  RightsRequestIntent? get pendingRequest => _pendingRequest;
+  DataRight? get pendingRight => _pendingRequest?.type;
+  DataRight _draftRight = DataRight.rectification;
+  String _draftDetails = '';
+  int _requestDraftRevision = 0;
+  DataRight get draftRight => _draftRight;
+  String get draftDetails => _draftDetails;
+  int get requestDraftRevision => _requestDraftRevision;
+
+  void editRightDraft({required String details}) {
+    if (!active || busy || _pendingRequest != null) return;
+    _draftDetails = details;
+    _notify();
+  }
+
+  void _clearRightDraft() {
+    _draftRight = DataRight.rectification;
+    _draftDetails = '';
+    _requestDraftRevision++;
+  }
+
   bool loading = false,
       busy = false,
       deleting = false,
@@ -81,7 +102,8 @@ class PrivacyController extends ChangeNotifier {
     cursor = null;
     pendingRevoke = null;
     pendingUnblock = null;
-    pendingRight = null;
+    _pendingRequest = null;
+    _clearRightDraft();
     failure = null;
     notice = null;
     _retryAt = null;
@@ -250,7 +272,8 @@ class PrivacyController extends ChangeNotifier {
           ..addAll(list);
         if (pendingRight != null &&
             _rights.any((r) => r.type == pendingRight && r.open)) {
-          pendingRight = null;
+          _pendingRequest = null;
+          _clearRightDraft();
         }
       }
     } on ApiFailure catch (e) {
@@ -304,7 +327,7 @@ class PrivacyController extends ChangeNotifier {
     });
   }
 
-  Future<void> request(DataRight type) async {
+  Future<void> request(DataRight type, {String? details}) async {
     if (!active ||
         busy ||
         loading ||
@@ -312,21 +335,34 @@ class PrivacyController extends ChangeNotifier {
         (pendingRight != null && pendingRight != type)) {
       return;
     }
+    // An uncertain write always resumes its exact original payload.
+    final intent = _pendingRequest ?? RightsRequestIntent(type, details);
+    if (!intent.valid) {
+      _error(
+        const ApiFailure(
+          ApiFailureKind.validation,
+          code: 'invalid_data_request',
+        ),
+      );
+      _notify();
+      return;
+    }
     if (_rights.any((r) => r.type == type && r.open)) {
       notice = 'request_open';
       _notify();
       return;
     }
-    pendingRight = type;
+    _pendingRequest = intent;
     await _change(
       () async {
-        final result = await repository.requestRight(type, _scope);
-        if (result.type != type) {
+        final result = await repository.requestRight(intent, _scope);
+        if (result.type != type || result.details != intent.details) {
           throw const ApiFailure(ApiFailureKind.invalidResponse);
         }
       },
       () {
-        pendingRight = null;
+        _pendingRequest = null;
+        _clearRightDraft();
         notice = 'request_received';
       },
     );
@@ -349,8 +385,15 @@ class PrivacyController extends ChangeNotifier {
       if (_alive(epoch)) {
         error = e;
         _error(e);
+        if (e.code == 'invalid_data_request' && _pendingRequest != null) {
+          _draftRight = _pendingRequest!.type;
+          _draftDetails = _pendingRequest!.details ?? '';
+          _pendingRequest = null;
+          _requestDraftRevision++;
+        }
         if (e.code == 'data_request_already_open') {
-          pendingRight = null;
+          _pendingRequest = null;
+          _clearRightDraft();
           notice = 'request_open';
         }
         if (e.code == 'session_not_found') pendingRevoke = null;

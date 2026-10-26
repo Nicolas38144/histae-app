@@ -18,9 +18,11 @@ import 'support/privacy_fixture.dart';
 
 void main() {
   testWidgets(
-    'manual requests exclude self-service choices and preserve existing request history',
+    'only manual correction remains and its message and reply are visible in history',
     (tester) async {
       var created = false, deletes = 0, exports = 0;
+      const details =
+          'Corriger une information historique que je ne peux pas modifier.';
       final writes = <Object?>[];
       final session = testSession((r) async {
         if (r.method == 'DELETE') deletes++;
@@ -30,7 +32,8 @@ void main() {
             writes.add(jsonDecode(r.body));
             created = true;
             return jsonResponse({
-              ...rightsJson(type: 'restriction'),
+              ...rightsJson(type: 'rectification'),
+              'details': details,
               'id': otherSessionId,
             }, 201);
           }
@@ -38,7 +41,13 @@ void main() {
             'requests': [
               rightsJson(type: 'erasure'),
               if (created)
-                {...rightsJson(type: 'restriction'), 'id': otherSessionId},
+                {
+                  ...rightsJson(type: 'rectification'),
+                  'details': details,
+                  'id': otherSessionId,
+                  'response': 'La donnée historique a été corrigée.',
+                  'status': 'completed',
+                },
             ],
           });
         }
@@ -66,19 +75,15 @@ void main() {
       await tester.pumpAndSettle();
       const strings = AppStrings();
       final help = find.text(strings.messages.privacyRightExplanationTitle);
-      final options = tester.widget<PrivacyChoice<DataRight>>(
-        find.byKey(const Key('privacy-right-choice')),
+      expect(find.byType(PrivacyChoice<DataRight>), findsNothing);
+      expect(
+        c.rights.any((request) => request.type == DataRight.erasure),
+        isTrue,
       );
-      expect(options.choices.keys.toSet(), {
-        DataRight.rectification,
-        DataRight.restriction,
-        DataRight.objection,
-      });
-      expect(find.text(rightLabel(strings, DataRight.erasure)), findsOneWidget);
-
       final initialHelp = rightDescription(strings, DataRight.rectification);
       expect(find.text(initialHelp), findsNothing);
       await tester.ensureVisible(help);
+      await tester.pumpAndSettle();
       await tester.tap(help);
       await tester.pumpAndSettle();
       expect(find.text(initialHelp), findsOneWidget);
@@ -86,73 +91,81 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text(initialHelp), findsNothing);
       expect(writes, isEmpty);
-      final choice = find.descendant(
-        of: find.byKey(const Key('privacy-right-choice')),
-        matching: find.byType(OutlinedButton),
-      );
-      await tester.ensureVisible(choice);
-      await tester.tap(choice);
-      await tester.pumpAndSettle();
-      final dialog = find.byType(SimpleDialog);
-      for (final removed in [
-        DataRight.access,
-        DataRight.erasure,
-        DataRight.portability,
-      ]) {
-        expect(
-          find.descendant(
-            of: dialog,
-            matching: find.text(rightLabel(strings, removed)),
-          ),
-          findsNothing,
-        );
-      }
-      final restriction = find.descendant(
-        of: dialog,
-        matching: find.text(rightLabel(strings, DataRight.restriction)),
-      );
-      await tester.ensureVisible(restriction);
-      await tester.tap(restriction);
-      await tester.pumpAndSettle();
-      final selectedHelp = rightDescription(strings, DataRight.restriction);
-      expect(find.text(selectedHelp), findsNothing);
-      await tester.ensureVisible(help);
-      await tester.tap(help);
-      await tester.pumpAndSettle();
-      expect(find.text(selectedHelp), findsOneWidget);
-      expect(writes, isEmpty);
       final submit = find.text(
         strings.messages.privacyDetailPageSubmitMyRequest,
       );
       await tester.ensureVisible(submit);
+      await tester.pumpAndSettle();
+      await tester.tap(submit);
+      await tester.pumpAndSettle();
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(
+        find.text(strings.messages.privacyRequestDetailsInvalid),
+        findsOneWidget,
+      );
+      final field = find.byType(TextFormField);
+      await tester.ensureVisible(field);
+      await tester.pumpAndSettle();
+      await tester.enterText(field, '  $details  ');
+      await tester.ensureVisible(submit);
+      await tester.pumpAndSettle();
       await tester.tap(submit);
       await tester.pumpAndSettle();
       expect(find.byType(AlertDialog), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.textContaining(details),
+        ),
+        findsOneWidget,
+      );
       expect(writes, isEmpty);
       await tester.tap(find.text(strings.messages.privacyDetailPageSubmit));
       await tester.pumpAndSettle();
       expect(writes, [
-        {'type': 'restriction'},
+        {'type': 'rectification', 'details': details},
       ]);
       expect(deletes, 0);
       expect(exports, 0);
       expect(session.hasSession, isTrue);
+      expect(c.draftDetails, isEmpty);
+      final recorded = find.descendant(
+        of: find.byType(ExpansionTile),
+        matching: find.text(rightLabel(strings, DataRight.rectification)),
+      );
+      await tester.scrollUntilVisible(
+        recorded,
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(recorded);
+      await tester.pumpAndSettle();
+      expect(find.text(details), findsOneWidget);
+      expect(find.text('La donnée historique a été corrigée.'), findsOneWidget);
       await tester.pumpWidget(const SizedBox.shrink());
     },
   );
   testWidgets(
-    'an uncertain existing request keeps its original type until explicitly resumed',
+    'an uncertain manual request keeps its message immutable until explicitly resumed',
     (tester) async {
+      const details = 'Corriger ma date de naissance : 15 avril 1998.';
       final writes = <Object?>[];
       final session = testSession((r) async {
         if (r.url.path.endsWith('/data-subject-requests')) {
           if (r.method == 'POST') {
             writes.add(jsonDecode(r.body));
             if (writes.length == 1) throw http.ClientException('offline');
-            return jsonResponse(rightsJson(type: 'erasure'), 201);
+            return jsonResponse({
+              ...rightsJson(type: 'rectification'),
+              'details': details,
+            }, 201);
           }
           return jsonResponse({
-            'requests': [if (writes.length > 1) rightsJson(type: 'erasure')],
+            'requests': [
+              if (writes.length > 1)
+                {...rightsJson(type: 'rectification'), 'details': details},
+            ],
           });
         }
         return defaultPrivacyResponse(r);
@@ -165,8 +178,8 @@ void main() {
       );
       addTearDown(c.dispose);
       await c.enter(PrivacySection.rights);
-      await c.request(DataRight.erasure);
-      expect(c.pendingRight, DataRight.erasure);
+      await c.request(DataRight.rectification, details: details);
+      expect(c.pendingRight, DataRight.rectification);
       await tester.pumpWidget(
         MaterialApp(
           theme: histaeTheme(Brightness.dark),
@@ -180,20 +193,21 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      final choice = find.byKey(const Key('privacy-right-choice'));
-      final pending = tester.widget<PrivacyChoice<DataRight>>(choice);
-      expect(pending.value, DataRight.erasure);
-      expect(pending.onChanged, isNull);
-      expect(pending.choices.keys, isNot(contains(DataRight.access)));
-      expect(pending.choices.keys, isNot(contains(DataRight.portability)));
+      final field = tester.widget<TextFormField>(find.byType(TextFormField));
+      expect(field.initialValue, details);
+      expect(tester.widget<TextField>(find.byType(TextField)).readOnly, isTrue);
+      expect(c.pendingRequest!.details, details);
+      c.editRightDraft(details: 'A different message');
+      expect(c.pendingRequest!.details, details);
       expect(writes, [
-        {'type': 'erasure'},
+        {'type': 'rectification', 'details': details},
       ]);
       const strings = AppStrings();
       final resume = find.text(
         strings.messages.privacyDetailPageResumeThisRequest,
       );
       await tester.ensureVisible(resume);
+      await tester.pumpAndSettle();
       await tester.tap(resume);
       await tester.pumpAndSettle();
       expect(find.byType(AlertDialog), findsOneWidget);
@@ -201,14 +215,14 @@ void main() {
       await tester.tap(find.text(strings.messages.privacyDetailPageSubmit));
       await tester.pumpAndSettle();
       expect(writes, [
-        {'type': 'erasure'},
-        {'type': 'erasure'},
+        {'type': 'rectification', 'details': details},
+        {'type': 'rectification', 'details': details},
       ]);
       expect(c.pendingRight, isNull);
-      final ready = tester.widget<PrivacyChoice<DataRight>>(choice);
-      expect(ready.value, DataRight.rectification);
-      expect(ready.choices.keys, isNot(contains(DataRight.erasure)));
-      expect(ready.onChanged, isNotNull);
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).readOnly,
+        isFalse,
+      );
       expect(session.hasSession, isTrue);
       await tester.pumpWidget(const SizedBox.shrink());
     },

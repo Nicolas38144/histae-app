@@ -2250,7 +2250,7 @@
   "@privacyDetailPageRefreshBlocks": {
     "description": "Interface: lib/features/privacy/presentation/privacy_detail_page.dart"
   },
-  "privacyDetailPageTheseRequestsAreSubmittedForProcessing": "Ces demandes nécessitent une intervention de Histae. La modification du profil, l’export des données et la suppression du compte se font directement depuis leurs rubriques.",
+  "privacyDetailPageTheseRequestsAreSubmittedForProcessing": "Pour une information que vous ne pouvez pas corriger depuis « Mon profil », décrivez la modification souhaitée. L’export des données et la suppression du compte restent accessibles dans leurs rubriques.",
   "@privacyDetailPageTheseRequestsAreSubmittedForProcessing": {
     "description": "Interface: lib/features/privacy/presentation/privacy_detail_page.dart"
   },
@@ -3903,5 +3903,10 @@
   "privacyRightExplanationTitle": "À quoi sert cette demande ?",
   "@privacyRightExplanationTitle": {
     "description": "Disclosure label that expands the explanation of the selected data-rights request."
-  }
+  },
+  "privacyRequestDetailsLabel": "Précisez votre demande",
+  "privacyRequestRectificationPrompt": "Indiquez la donnée à corriger et la modification souhaitée.",
+  "privacyRequestDetailsInvalid": "Précisez votre demande en 2 000 caractères maximum.",
+  "privacyRequestYourMessage": "Votre message",
+  "privacyRequestTeamResponse": "Réponse de l’équipe"
 }

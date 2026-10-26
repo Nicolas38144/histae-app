@@ -1951,7 +1951,7 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get privacyDetailPageTheseRequestsAreSubmittedForProcessing =>
-      'Estas solicitudes requieren la intervención de Histae. Puedes modificar tu perfil, exportar tus datos y eliminar tu cuenta directamente en sus apartados correspondientes.';
+      'Si no puedes corregir un dato en «Mi perfil», describe el cambio que solicitas. La exportación de datos y la eliminación de la cuenta siguen disponibles en sus apartados.';
 
   @override
   String get privacyDetailPageYourRequest => 'Tu trámite';
@@ -3339,4 +3339,21 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get privacyRightExplanationTitle => '¿Para qué sirve esta solicitud?';
+
+  @override
+  String get privacyRequestDetailsLabel => 'Detalla tu solicitud';
+
+  @override
+  String get privacyRequestRectificationPrompt =>
+      'Indica el dato que quieres corregir y el cambio que solicitas.';
+
+  @override
+  String get privacyRequestDetailsInvalid =>
+      'Detalla tu solicitud en un máximo de 2000 caracteres.';
+
+  @override
+  String get privacyRequestYourMessage => 'Tu mensaje';
+
+  @override
+  String get privacyRequestTeamResponse => 'Respuesta del equipo';
 }

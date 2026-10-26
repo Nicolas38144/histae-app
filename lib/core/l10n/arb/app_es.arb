@@ -515,7 +515,7 @@
   "privacyDetailPageResumeUnblocking": "Retomar el desbloqueo",
   "privacyDetailPageNoBlockedPeopleInThisList": "No hay personas bloqueadas en esta lista.",
   "privacyDetailPageRefreshBlocks": "Actualizar bloqueos",
-  "privacyDetailPageTheseRequestsAreSubmittedForProcessing": "Estas solicitudes requieren la intervención de Histae. Puedes modificar tu perfil, exportar tus datos y eliminar tu cuenta directamente en sus apartados correspondientes.",
+  "privacyDetailPageTheseRequestsAreSubmittedForProcessing": "Si no puedes corregir un dato en «Mi perfil», describe el cambio que solicitas. La exportación de datos y la eliminación de la cuenta siguen disponibles en sus apartados.",
   "privacyDetailPageYourRequest": "Tu trámite",
   "privacyDetailPageTheResponseStillNeedsConfirmationRefresh": "La respuesta está pendiente de confirmación. Actualiza el seguimiento antes de retomar este mismo trámite.",
   "privacyDetailPageSubmitThisRequest": "¿Enviar esta solicitud?",
@@ -966,5 +966,10 @@
   "privacyRightRectificationHelp": "Solicitar la corrección de información inexacta o incompleta que no puedes modificar en la app. Puedes cambiar tu presentación, respuestas y preferencias directamente en «Mi perfil».",
   "privacyRightRestrictionHelp": "Solicitar la suspensión temporal de determinados usos de tus datos, por ejemplo mientras se comprueba información que has impugnado. Los datos pueden seguir conservándose.",
   "privacyRightObjectionHelp": "Solicitar que cese un uso concreto de tus datos, según tu situación y el tratamiento correspondiente. Para retirar un consentimiento, abre «Mis consentimientos».",
-  "privacyRightExplanationTitle": "¿Para qué sirve esta solicitud?"
+  "privacyRightExplanationTitle": "¿Para qué sirve esta solicitud?",
+  "privacyRequestDetailsLabel": "Detalla tu solicitud",
+  "privacyRequestRectificationPrompt": "Indica el dato que quieres corregir y el cambio que solicitas.",
+  "privacyRequestDetailsInvalid": "Detalla tu solicitud en un máximo de 2000 caracteres.",
+  "privacyRequestYourMessage": "Tu mensaje",
+  "privacyRequestTeamResponse": "Respuesta del equipo"
 }

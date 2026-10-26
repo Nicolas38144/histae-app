@@ -34,7 +34,10 @@ abstract interface class PrivacyRepository {
     ReadPolicy policy = ReadPolicy.refresh,
   });
 
-  Future<RightsRequest> requestRight(DataRight type, RequestCancellation scope);
+  Future<RightsRequest> requestRight(
+    RightsRequestIntent intent,
+    RequestCancellation scope,
+  );
 
   Future<void> report(ReportIntent intent, RequestCancellation scope);
 
@@ -184,14 +187,14 @@ final class ApiPrivacyRepository implements PrivacyRepository {
 
   @override
   Future<RightsRequest> requestRight(
-    DataRight type,
+    RightsRequestIntent intent,
     RequestCancellation scope,
   ) async => RightsRequest.fromJson(
     await _request(
       'POST',
       '/api/users/me/data-subject-requests',
       scope,
-      body: {'type': type.name},
+      body: {'type': intent.type.name, 'details': ?intent.details},
       status: 201,
     ),
     owner,

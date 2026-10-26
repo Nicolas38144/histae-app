@@ -515,7 +515,7 @@
   "privacyDetailPageResumeUnblocking": "Resume unblocking",
   "privacyDetailPageNoBlockedPeopleInThisList": "No blocked people in this list.",
   "privacyDetailPageRefreshBlocks": "Refresh blocks",
-  "privacyDetailPageTheseRequestsAreSubmittedForProcessing": "These requests need Histae’s intervention. Profile edits, data export and account deletion are available directly in their dedicated sections.",
+  "privacyDetailPageTheseRequestsAreSubmittedForProcessing": "If you cannot correct some information in “My profile”, describe the change you need. Data export and account deletion remain available in their dedicated sections.",
   "privacyDetailPageYourRequest": "Your request",
   "privacyDetailPageTheResponseStillNeedsConfirmationRefresh": "The response still needs confirmation. Refresh tracking before resuming this same request.",
   "privacyDetailPageSubmitThisRequest": "Submit this request?",
@@ -966,5 +966,10 @@
   "privacyRightRectificationHelp": "Ask for inaccurate or incomplete information that you cannot edit in the app to be corrected. You can edit your introduction, answers and preferences directly in “My profile”.",
   "privacyRightRestrictionHelp": "Ask to temporarily suspend certain uses of your data, for example while disputed information is checked. The data may still be retained.",
   "privacyRightObjectionHelp": "Ask for a specific use of your data to stop, depending on your situation and the processing involved. To withdraw consent, open “My consents”.",
-  "privacyRightExplanationTitle": "What is this request for?"
+  "privacyRightExplanationTitle": "What is this request for?",
+  "privacyRequestDetailsLabel": "Describe your request",
+  "privacyRequestRectificationPrompt": "Specify the information to correct and the change you want.",
+  "privacyRequestDetailsInvalid": "Describe your request in no more than 2,000 characters.",
+  "privacyRequestYourMessage": "Your message",
+  "privacyRequestTeamResponse": "Reply from the team"
 }

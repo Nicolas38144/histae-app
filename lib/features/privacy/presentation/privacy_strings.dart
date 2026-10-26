@@ -28,6 +28,11 @@ String rightStatus(AppStrings strings, RightStatus status) => switch (status) {
   RightStatus.rejected => strings.messages.privacyStringsRejected,
 };
 
+String rightDetailsPrompt(AppStrings strings, DataRight type) => switch (type) {
+  DataRight.rectification => strings.messages.privacyRequestRectificationPrompt,
+  _ => strings.messages.privacyRequestDetailsLabel,
+};
+
 String reasonLabel(AppStrings strings, ReportReason reason) => switch (reason) {
   ReportReason.inappropriateContent =>
     strings.messages.privacyStringsInappropriateContent,
@@ -53,6 +58,7 @@ String privacyNotice(AppStrings strings, String? code) => switch (code) {
 
 String privacyFailure(AppStrings strings, ApiFailure failure) =>
     switch (failure.code) {
+      'invalid_data_request' => strings.messages.privacyRequestDetailsInvalid,
       'export_cleanup' =>
         strings.messages.privacyStringsTemporaryFileCleanupFailedTryErasing,
       'export_share' =>
