@@ -15,6 +15,7 @@ abstract final class HistaeTokens {
   static const serif = 'SourceSerif4';
   static const sans = 'Inter';
   static const panelRadius = 20.0;
+  static const actionSpacing = 16.0;
   static const actionGradient = LinearGradient(
     colors: [Color(0xfff2a48c), Color(0xffd8b3f7)],
     begin: Alignment.centerLeft,

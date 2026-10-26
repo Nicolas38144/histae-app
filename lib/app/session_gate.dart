@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/l10n/app_strings.dart';
+import '../core/widgets/histae_button.dart';
 import '../core/widgets/histae_scaffold.dart';
 import '../core/widgets/status_view.dart';
 import '../features/auth/application/session_controller.dart';
@@ -97,7 +98,7 @@ class _SessionGateState extends State<SessionGate> {
                 const SizedBox(height: 24),
                 Text(strings.sessionLoading),
                 if (session.hasSession)
-                  TextButton(
+                  HistaeButton.text(
                     onPressed: session.logout,
                     child: Text(strings.logout),
                   ),
@@ -116,7 +117,7 @@ class _SessionGateState extends State<SessionGate> {
                 StatusView(
                   title: strings.sessionUnavailable,
                   message: strings.authFailure(session.failure!),
-                  action: OutlinedButton(
+                  action: HistaeButton.outlined(
                     onPressed: session.retrySeconds > 0
                         ? null
                         : (session.hasSession
@@ -132,7 +133,7 @@ class _SessionGateState extends State<SessionGate> {
                 if (session.notice != null)
                   Text(sessionNotice(AppStrings.of(context), session.notice)),
                 if (session.hasSession)
-                  TextButton(
+                  HistaeButton.text(
                     onPressed: session.logout,
                     child: Text(strings.logout),
                   ),

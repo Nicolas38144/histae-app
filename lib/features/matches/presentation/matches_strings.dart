@@ -35,7 +35,7 @@ class MatchesStrings {
   String date(DateTime value) => strings.shortDateTime(value);
 
   String stateBody(UserMatch match) => switch (match.status) {
-    MatchStatus.active => strings.messages.matchesStringsInitialPeriodUntil(
+    MatchStatus.active => strings.messages.matchesStringsFirstPeriodEndsOn(
       date(match.expiresAt),
     ),
     MatchStatus.awaitingContinuation =>

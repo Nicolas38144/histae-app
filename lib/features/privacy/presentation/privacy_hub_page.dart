@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../auth/domain/authenticated_session.dart';
 import '../../consents/presentation/consents_page.dart';
@@ -205,7 +206,7 @@ class _PrivacyHubPageState extends State<PrivacyHubPage>
                 .privacyHubPageCloseMyAccountAndRequestCleanup,
             () => _open(PrivacySection.deletion),
           ),
-          TextButton(
+          HistaeButton.text(
             onPressed: widget.session.logout,
             child: Text(AppStrings.of(context).messages.appStringsSignOut),
           ),

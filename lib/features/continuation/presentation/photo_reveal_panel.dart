@@ -108,7 +108,7 @@ class PhotoRevealPanel extends StatelessWidget {
                   if (!c.pendingWithdrawal &&
                       (c.myRevealed || c.pendingReveal)) ...[
                     const SizedBox(height: 12),
-                    TextButton.icon(
+                    HistaeButton.textIcon(
                       onPressed: c.canWithdrawReveal ? onWithdraw : null,
                       icon: const Icon(Icons.visibility_off_outlined, size: 18),
                       label: Text(text.photoRevealWithdraw),

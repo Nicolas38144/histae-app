@@ -15,7 +15,7 @@ Future<bool> confirmAction(
         title: Text(title),
         content: SingleChildScrollView(child: Text(message)),
         actions: [
-          TextButton(
+          HistaeButton.text(
             onPressed: () => Navigator.pop(context, false),
             child: Text(AppStrings.of(context).messages.appStringsCancel),
           ),

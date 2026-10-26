@@ -821,11 +821,6 @@ class AppMessagesEn extends AppMessages {
       'Continue this conversation';
 
   @override
-  String continuationPageYourDecisionPeriodOpensAfterThe(Object arg0) {
-    return 'Your decision period opens after the first exchanges. Current deadline: $arg0.';
-  }
-
-  @override
   String get continuationPageYourConversationIsOpenContinuationConditions =>
       'Your conversation is open. Continuation conditions are met.';
 
@@ -1079,10 +1074,6 @@ class AppMessagesEn extends AppMessages {
   @override
   String get partnerPhotoPageThePhotoCannotBeShownRefresh =>
       'The photo cannot be shown. Refresh the temporary link.';
-
-  @override
-  String get partnerPhotoPageYouBothAgreedToRevealPhotos =>
-      'You both agreed to reveal photos. Photos remain absent from the feed.';
 
   @override
   String get partnerPhotoPageRefreshPhoto => 'Refresh photo';
@@ -1579,13 +1570,6 @@ class AppMessagesEn extends AppMessages {
   String get chatPageOlderMessages => 'Older messages';
 
   @override
-  String get chatPageAFewWordsToStart => 'A few words to start?';
-
-  @override
-  String get chatPageTheStartOfYourConversation =>
-      'The start of your conversation';
-
-  @override
   String get chatPageSent => ' · Sent';
 
   @override
@@ -1617,24 +1601,13 @@ class AppMessagesEn extends AppMessages {
   }
 
   @override
-  String get conversationHeaderReconnectingYouCanRefreshTheConversation =>
-      '\n\nReconnecting. You can refresh the conversation manually.';
-
-  @override
   String get conversationHeaderChooseWhatComesNext => 'Choose what comes next';
 
   @override
   String get conversationHeaderConversationStatus => 'Conversation status';
 
   @override
-  String get conversationHeaderPaused => 'Paused';
-
-  @override
   String get conversationHeaderYourChoices => 'Your choices';
-
-  @override
-  String get conversationHeaderReconnectingManualRefreshAvailable =>
-      'Reconnecting · manual refresh available.';
 
   @override
   String get conversationHeaderSyncingConversation => 'Syncing conversation';
@@ -1647,22 +1620,7 @@ class AppMessagesEn extends AppMessages {
       'Refreshing matches and credits';
 
   @override
-  String get matchesPageWordsContinue => 'One conversation at a time.';
-
-  @override
-  String get matchesPageMutualInterestThenASpaceTo =>
-      'A first hello, then the joy of getting to know each other. Your conversations are here.';
-
-  @override
-  String get matchesPageReconnectingUpdatesYouCanRefreshYour =>
-      'Reconnecting. Refresh if your latest conversations don’t appear.';
-
-  @override
   String get matchesPageThisMatchHasEnded => 'This match has ended.';
-
-  @override
-  String get matchesPageNoMatchesYetTheyWillAppear =>
-      'When you both want to get to know each other, you can chat here. Until then, see whose words catch your eye in the feed.';
 
   @override
   String get matchesPageViewMoreMatches => 'View more matches';
@@ -1708,11 +1666,6 @@ class AppMessagesEn extends AppMessages {
   String get matchesStringsMatchEnded => 'Match ended';
 
   @override
-  String matchesStringsInitialPeriodUntil(Object arg0) {
-    return 'Initial period until $arg0.';
-  }
-
-  @override
   String matchesStringsSendingIsPausedDuringTheContinuation(Object arg0) {
     return 'Sending is paused during the continuation decision, until $arg0. History remains accessible.';
   }
@@ -1720,10 +1673,6 @@ class AppMessagesEn extends AppMessages {
   @override
   String get matchesStringsYouCanContinueYourConversation =>
       'You can continue your conversation.';
-
-  @override
-  String get partnerPageDiscoverThisPersonThroughYourConversations =>
-      'Discover this person through your conversations.';
 
   @override
   String get devicesPageSecureSettingsAreUnavailableActivationRemains =>
@@ -3341,4 +3290,9 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get chatPageRead => ' · Read';
+
+  @override
+  String matchesStringsFirstPeriodEndsOn(Object arg0) {
+    return 'End of the first period on $arg0';
+  }
 }

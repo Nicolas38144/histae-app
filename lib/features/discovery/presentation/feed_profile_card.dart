@@ -202,7 +202,7 @@ class _FeedProfileCardState extends State<FeedProfileCard>
                         spacing: 12,
                         runSpacing: 8,
                         children: [
-                          OutlinedButton.icon(
+                          HistaeButton.outlinedIcon(
                             onPressed: _enabled ? _pass : null,
                             icon: const Icon(Icons.arrow_upward),
                             label: Text(

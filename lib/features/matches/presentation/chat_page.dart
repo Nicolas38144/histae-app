@@ -153,6 +153,22 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
     if (mounted) await c.continuation.activate();
   }
 
+  Future<void> _profile() async {
+    if (!c.accessible ||
+        c.selected?.id != widget.matchId ||
+        c.selected?.historyAllowed != true) {
+      return;
+    }
+    _readTimer?.cancel();
+    FocusScope.of(context).unfocus();
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => PartnerPage(controller: c, id: widget.matchId),
+      ),
+    );
+    if (mounted) _scheduleRead();
+  }
+
   Future<void> _report() async {
     final match = c.selected;
     if (match == null) return;
@@ -190,32 +206,47 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
     final unavailable = match == null || !match.historyAllowed;
     return HistaeScaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            if (match != null) ...[
-              MatchPhotoAvatar(
-                key: ValueKey('${c.ownerId}:${match.id}'),
-                url: match.partner.photo,
-                readAt: c.readAt,
-                allowed:
-                    c.active &&
-                    c.verified &&
-                    match.historyAllowed &&
-                    match.photosRevealed &&
-                    !c.photosBlocked(match.id),
-                size: 36,
-              ),
-              const SizedBox(width: 10),
-            ],
-            Expanded(
-              child: Text(
-                match?.partner.firstname ??
-                    AppStrings.of(context).messages.continuationPageYourMatch,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+        title: Semantics(
+          button: !unavailable,
+          child: Tooltip(
+            message: AppStrings.of(context).messages.chatPageViewTheirProfile,
+            child: InkWell(
+              onTap: unavailable ? null : _profile,
+              borderRadius: BorderRadius.circular(16),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Row(
+                  children: [
+                    if (match != null) ...[
+                      MatchPhotoAvatar(
+                        key: ValueKey('${c.ownerId}:${match.id}'),
+                        url: match.partner.photo,
+                        readAt: c.readAt,
+                        allowed:
+                            c.active &&
+                            c.verified &&
+                            match.historyAllowed &&
+                            match.photosRevealed &&
+                            !c.photosBlocked(match.id),
+                        size: 36,
+                      ),
+                      const SizedBox(width: 10),
+                    ],
+                    Expanded(
+                      child: Text(
+                        match?.partner.firstname ??
+                            AppStrings.of(context)
+                                .messages
+                                .continuationPageYourMatch,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ],
+          ),
         ),
         actions: [
           IconButton(
@@ -230,14 +261,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
               tooltip: AppStrings.of(context).messages.chatPageMatchOptions,
               onSelected: (value) {
                 if (value == 'decisions') unawaited(_decisions());
-                if (value == 'profile') {
-                  Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) =>
-                          PartnerPage(controller: c, id: widget.matchId),
-                    ),
-                  );
-                }
+                if (value == 'profile') unawaited(_profile());
                 if (value == 'end') unawaited(_end(block: false));
                 if (value == 'block') unawaited(_end(block: true));
                 if (value == 'report') unawaited(_report());
@@ -306,7 +330,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                   ),
                   if (c.failure case final error?)
                     Text(MatchesStrings(AppStrings.of(context)).failure(error)),
-                  OutlinedButton(
+                  HistaeButton.outlined(
                     onPressed: c.listLoading || c.retrySeconds > 0
                         ? null
                         : c.activate,
@@ -324,7 +348,6 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                       compact:
                           layout.maxHeight < 480 ||
                           MediaQuery.textScalerOf(context).scale(1) > 1.4,
-                      connected: c.realtimeConnected,
                       loading: c.listLoading || c.historyLoading,
                       onDecisions: _decisions,
                     ),
@@ -340,34 +363,21 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                             controller: _scroll,
                             reverse: true,
                             padding: const EdgeInsets.all(16),
-                            itemCount: messages.length + 1,
+                            itemCount:
+                                messages.length +
+                                (c.messageCursor == null ? 0 : 1),
                             itemBuilder: (context, index) {
                               if (index == messages.length) {
-                                return c.messageCursor != null
-                                    ? TextButton(
-                                        onPressed:
-                                            c.historyLoading || c.listLoading
-                                            ? null
-                                            : c.older,
-                                        child: Text(
-                                          AppStrings.of(context)
-                                              .messages
-                                              .chatPageOlderMessages,
-                                        ),
-                                      )
-                                    : Padding(
-                                        padding: const EdgeInsets.all(20),
-                                        child: Text(
-                                          messages.isEmpty
-                                              ? AppStrings.of(context)
-                                                    .messages
-                                                    .chatPageAFewWordsToStart
-                                              : AppStrings.of(context)
-                                                    .messages
-                                                    .chatPageTheStartOfYourConversation,
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      );
+                                return HistaeButton.text(
+                                  onPressed: c.historyLoading || c.listLoading
+                                      ? null
+                                      : c.older,
+                                  child: Text(
+                                    AppStrings.of(context)
+                                        .messages
+                                        .chatPageOlderMessages,
+                                  ),
+                                );
                               }
                               final m = messages[index];
                               final own = m.senderId == c.ownerId;
@@ -481,7 +491,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                                 ),
                               ),
                             if (c.readFailure != null)
-                              TextButton(
+                              HistaeButton.text(
                                 onPressed: c.reading
                                     ? null
                                     : () => _readVisible(explicitRetry: true),
@@ -508,7 +518,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                                     .messages
                                     .chatPageClosingStillNeedsConfirmationNoNew,
                               ),
-                              OutlinedButton(
+                              HistaeButton.outlined(
                                 onPressed: c.ending || c.retrySeconds > 0
                                     ? null
                                     : () => c.endCurrent(

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_button.dart';
 import '../application/profile_controller.dart';
 import '../data/profile_models.dart';
 import 'profile_editor.dart';
@@ -217,7 +218,7 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
                             }),
                       icon: const Icon(Icons.arrow_downward),
                     ),
-                    TextButton(
+                    HistaeButton.text(
                       onPressed: busy
                           ? null
                           : () => setState(() {
@@ -236,7 +237,7 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
         ),
       const SizedBox(height: 16),
       if (inputs.length < 3)
-        OutlinedButton.icon(
+        HistaeButton.outlinedIcon(
           onPressed: busy ? null : _addQuestion,
           icon: const Icon(Icons.add_rounded),
           label: Text(

@@ -175,7 +175,7 @@ class _OtpFormState extends State<OtpForm> {
                   child: Text(strings.sendOtp),
                 )
               else
-                OutlinedButton(
+                HistaeButton.outlined(
                   onPressed: canSend
                       ? () {
                           _otp.clear();
@@ -185,12 +185,12 @@ class _OtpFormState extends State<OtpForm> {
                   child: Text(strings.resendOtp),
                 ),
               if (controller.canRetrySend)
-                OutlinedButton(
+                HistaeButton.outlined(
                   onPressed: enabled ? controller.retrySend : null,
                   child: Text(strings.resumeOtp),
                 ),
               if (controller.hasIntention)
-                TextButton(
+                HistaeButton.text(
                   onPressed: controller.busy
                       ? null
                       : () {
@@ -200,7 +200,7 @@ class _OtpFormState extends State<OtpForm> {
                   child: Text(strings.changePhone),
                 ),
               if (widget.registration && widget.onSignIn != null)
-                TextButton(
+                HistaeButton.text(
                   onPressed: controller.busy ? null : widget.onSignIn,
                   child: Text(strings.existingAccount),
                 ),

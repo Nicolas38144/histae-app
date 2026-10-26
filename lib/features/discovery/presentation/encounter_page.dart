@@ -92,13 +92,13 @@ class EncounterPage extends StatelessWidget {
                         .encounterPageOpenConversation,
                   ),
                 ),
-              OutlinedButton(
+              HistaeButton.outlined(
                 onPressed: () => Navigator.of(context).pop(),
                 child: Text(
                   AppStrings.of(context).messages.encounterPageBackToDiscovery,
                 ),
               ),
-              TextButton(
+              HistaeButton.text(
                 onPressed: controller.busy
                     ? null
                     : () async {
@@ -129,7 +129,7 @@ class EncounterPage extends StatelessWidget {
                       .encounterPageBlockThisPerson447,
                 ),
               ),
-              TextButton(
+              HistaeButton.text(
                 onPressed: controller.busy
                     ? null
                     : () => Navigator.of(context).push(

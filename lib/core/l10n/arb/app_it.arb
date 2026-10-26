@@ -224,7 +224,6 @@
   "continuationPageResumeTheSamePhotoRevealConsent": "Riprendi lo stesso consenso di rivelazione",
   "continuationPageChooseToRevealPhotos": "Scegli di svelare le foto",
   "continuationPageContinueThisConversation": "Prosegui questa conversazione",
-  "continuationPageYourDecisionPeriodOpensAfterThe": "Il periodo di decisione si aprirà dopo i primi scambi. Scadenza attuale: {arg0}.",
   "continuationPageYourConversationIsOpenContinuationConditions": "La conversazione è aperta. Le condizioni per proseguire sono soddisfatte.",
   "continuationPageYouCanDecideUntilYouCan": "Puoi decidere fino al {arg0}. Puoi sempre rileggere i messaggi.",
   "continuationPageYourChoiceToContinueHasBeen": "La scelta di proseguire è registrata. La conversazione riprende quando le condizioni sono soddisfatte.",
@@ -279,7 +278,6 @@
   "partnerPhotoPageLoadingPhoto": "Caricamento della foto",
   "partnerPhotoPageYourMatchSPhoto": "Foto del tuo incontro",
   "partnerPhotoPageThePhotoCannotBeShownRefresh": "Impossibile mostrare la foto. Aggiorna il link temporaneo.",
-  "partnerPhotoPageYouBothAgreedToRevealPhotos": "Avete entrambi acconsentito a svelare le foto. Le foto restano assenti dal feed.",
   "partnerPhotoPageRefreshPhoto": "Aggiorna la foto",
   "rewardVideoCardWatchAVideo": "Guarda un video",
   "rewardVideoCardChecking": "Verifica…",
@@ -414,8 +412,6 @@
   "chatPageTheConversationIsNoLongerAvailable": "La conversazione non è più disponibile.",
   "chatPageRefreshMyMatches": "Aggiorna i miei incontri",
   "chatPageOlderMessages": "Messaggi precedenti",
-  "chatPageAFewWordsToStart": "Qualche parola per iniziare?",
-  "chatPageTheStartOfYourConversation": "L’inizio della vostra conversazione",
   "chatPageSent": " · Inviato",
   "chatPageResumeReadConfirmation": "Riprendi la conferma di lettura",
   "chatPageClosingStillNeedsConfirmationNoNew": "La chiusura resta da confermare. Nessun nuovo messaggio verrà inviato.",
@@ -425,20 +421,13 @@
   "chatPageResumeTheSameMessage": "Riprendi lo stesso invio",
   "chatPageYourMessage": "Il tuo messaggio",
   "chatPage2000Characters": "{arg0} / 2000 caratteri",
-  "conversationHeaderReconnectingYouCanRefreshTheConversation": "\n\nRiconnessione. Puoi aggiornare manualmente la conversazione.",
   "conversationHeaderChooseWhatComesNext": "Scegli il seguito",
   "conversationHeaderConversationStatus": "Stato della conversazione",
-  "conversationHeaderPaused": "In pausa",
   "conversationHeaderYourChoices": "Le tue scelte",
-  "conversationHeaderReconnectingManualRefreshAvailable": "Riconnessione · aggiornamento manuale disponibile.",
   "conversationHeaderSyncingConversation": "Sincronizzazione della conversazione",
   "matchesPageYourMatches": "I tuoi incontri",
   "matchesPageRefreshingMatchesAndCredits": "Aggiornamento di incontri e crediti",
-  "matchesPageWordsContinue": "Una conversazione alla volta.",
-  "matchesPageMutualInterestThenASpaceTo": "Un primo saluto, poi il piacere di conoscersi. Le vostre conversazioni sono qui.",
-  "matchesPageReconnectingUpdatesYouCanRefreshYour": "Connessione in ripresa. Aggiornate se non compaiono le ultime conversazioni.",
   "matchesPageThisMatchHasEnded": "Questo incontro è terminato.",
-  "matchesPageNoMatchesYetTheyWillAppear": "Quando il desiderio di conoscersi è reciproco, potete parlare qui. Nel frattempo, lasciatevi sorprendere dalle parole nel feed.",
   "matchesPageViewMoreMatches": "Vedi altri incontri",
   "matchesStringsThisMatchIsNoLongerAvailable": "Questo incontro non è più disponibile.",
   "matchesStringsSendingIsUnavailableInThisMatch": "Al momento non potete inviare messaggi. Aggiornate la conversazione per verificarne lo stato.",
@@ -451,10 +440,8 @@
   "matchesStringsSendingPaused": "Invii sospesi",
   "matchesStringsConversationOpen": "Conversazione aperta",
   "matchesStringsMatchEnded": "Incontro terminato",
-  "matchesStringsInitialPeriodUntil": "Periodo iniziale fino al {arg0}.",
   "matchesStringsSendingIsPausedDuringTheContinuation": "L’invio è sospeso durante la decisione di proseguire, fino al {arg0}. La cronologia resta accessibile.",
   "matchesStringsYouCanContinueYourConversation": "Puoi proseguire la conversazione.",
-  "partnerPageDiscoverThisPersonThroughYourConversations": "Scopri questa persona attraverso le vostre conversazioni.",
   "devicesPageSecureSettingsAreUnavailableActivationRemains": "Le impostazioni sicure non sono accessibili. L’attivazione resta in attesa.",
   "devicesPageTooManyRequestsWaitBeforeTrying": "Troppe richieste. Attendi prima di riprovare.",
   "devicesPageTheResponseWasNotConfirmedRefresh": "La risposta non è confermata. Aggiorna l’elenco prima di riprendere la stessa azione.",
@@ -964,5 +951,14 @@
   "chatPageRead": " · Letto",
   "@chatPageRead": {
     "description": "Read receipt suffix for an outgoing message."
+  },
+  "matchesStringsFirstPeriodEndsOn": "Fine del primo periodo il {arg0}",
+  "@matchesStringsFirstPeriodEndsOn": {
+    "description": "End of the first exchange period.",
+    "placeholders": {
+      "arg0": {
+        "type": "Object"
+      }
+    }
   }
 }

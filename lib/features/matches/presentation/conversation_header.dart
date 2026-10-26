@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/widgets/histae_button.dart';
 import '../data/match_models.dart';
 import 'matches_strings.dart';
 
@@ -9,12 +10,11 @@ class ConversationHeader extends StatelessWidget {
     super.key,
     required this.match,
     required this.compact,
-    required this.connected,
     required this.loading,
     required this.onDecisions,
   });
   final UserMatch match;
-  final bool compact, connected, loading;
+  final bool compact, loading;
   final Future<void> Function() onDecisions;
 
   Future<void> _details(BuildContext context) => showDialog<void>(
@@ -24,11 +24,9 @@ class ConversationHeader extends StatelessWidget {
       titleTextStyle: Theme.of(dialogContext).textTheme.titleMedium
           ?.copyWith(color: Theme.of(dialogContext).colorScheme.onSurface),
       title: Text(MatchesStrings(AppStrings.of(context)).status(match.status)),
-      content: Text(
-        '${MatchesStrings(AppStrings.of(context)).stateBody(match)}${connected ? '' : AppStrings.of(context).messages.conversationHeaderReconnectingYouCanRefreshTheConversation}',
-      ),
+      content: Text(MatchesStrings(AppStrings.of(context)).stateBody(match)),
       actions: [
-        TextButton(
+        HistaeButton.text(
           onPressed: () => Navigator.pop(dialogContext),
           child: Text(AppStrings.of(context).messages.conversationHeaderClose),
         ),
@@ -65,47 +63,21 @@ class ConversationHeader extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (compact)
-            Row(
-              children: [
-                Expanded(
-                  child: TextButton(
-                    onPressed: onDecisions,
-                    child: Text(
-                      match.status == MatchStatus.awaitingContinuation
-                          ? AppStrings.of(context)
-                                .messages
-                                .conversationHeaderPaused
-                          : _action(context),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  MatchesStrings(AppStrings.of(context)).status(match.status),
+                  style: theme.textTheme.titleMedium,
                 ),
-                info,
-              ],
-            )
-          else ...[
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    MatchesStrings(AppStrings.of(context)).status(match.status),
-                    style: theme.textTheme.titleMedium,
-                  ),
-                ),
-                info,
-              ],
-            ),
-            Text(
-              MatchesStrings(AppStrings.of(context)).stateBody(match),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
               ),
-            ),
+              info,
+            ],
+          ),
+          if (!compact)
             Align(
               alignment: Alignment.centerLeft,
-              child: TextButton.icon(
+              child: HistaeButton.textIcon(
                 onPressed: onDecisions,
                 icon: Icon(
                   match.photosRevealed
@@ -116,16 +88,6 @@ class ConversationHeader extends StatelessWidget {
                 label: Text(_action(context)),
               ),
             ),
-            if (!connected)
-              Text(
-                AppStrings.of(context)
-                    .messages
-                    .conversationHeaderReconnectingManualRefreshAvailable,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-          ],
           if (loading)
             LinearProgressIndicator(
               semanticsLabel: AppStrings.of(context)

@@ -157,7 +157,7 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
                 if (message != null ||
                     messageFailure != null ||
                     controller.uncertain)
-                  OutlinedButton(
+                  HistaeButton.outlined(
                     onPressed:
                         busy ||
                             controller.loading ||

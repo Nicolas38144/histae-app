@@ -7,6 +7,7 @@ import '../../../core/l10n/language_picker.dart';
 import '../../../core/widgets/account_benefits_actions.dart';
 import '../../../core/widgets/account_identifier.dart';
 import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../billing/presentation/billing_scope.dart';
 import '../../billing/presentation/subscription_page.dart';
@@ -157,7 +158,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       .profilePageAWayToTellYourStory,
                 ),
                 const SizedBox(height: 16),
-                OutlinedButton.icon(
+                HistaeButton.outlinedIcon(
                   key: const Key('profile-feed-preview'),
                   onPressed: editable && c.hasFeedPreview
                       ? () => _open(ProfileFeedPreviewPage(controller: c))
@@ -292,7 +293,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                TextButton(
+                HistaeButton.text(
                   onPressed: controller.session.logout,
                   child: Text(strings.logout),
                 ),

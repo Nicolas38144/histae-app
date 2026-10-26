@@ -17,11 +17,11 @@ class EditorialCard extends StatelessWidget {
   const EditorialCard({
     super.key,
     required this.title,
-    required this.body,
+    this.body,
     this.eyebrow,
   });
   final String title;
-  final String body;
+  final String? body;
   final String? eyebrow;
 
   @override
@@ -48,13 +48,15 @@ class EditorialCard extends StatelessWidget {
               style: theme.textTheme.headlineLarge,
             ),
           ),
-          const SizedBox(height: 12),
-          Text(
-            body,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+          if (body case final description?) ...[
+            const SizedBox(height: 12),
+            Text(
+              description,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );

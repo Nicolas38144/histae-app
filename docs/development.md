@@ -30,6 +30,7 @@ payments. Run the relevant existing suite rather than testing every visual or do
 | Session/cache behavior | `flutter test test/read_snapshots_test.dart test/cache_lifecycle_regressions_test.dart` |
 | Feed expiry, location or pause | `flutter test test/discovery_test.dart test/discovery_pause_test.dart` |
 | Photo readiness, withdrawal and private thumbnails | `flutter test test/photo_sharing_test.dart test/continuation_test.dart` |
+| Conversation profile, cached navigation and full-size photo privacy | `flutter test test/match_profile_test.dart test/cached_conversation_test.dart` |
 | Feed reading delay and transitions | `flutter test test/feed_reading_delay_test.dart` |
 | Native billing | `flutter test test/billing_test.dart` |
 | Interface/request language | `flutter test test/localization_test.dart test/api_language_test.dart` |
@@ -72,7 +73,13 @@ Supply a fictional portrait with `--dart-define=PHOTO_PREVIEW_PORTRAIT=<local PN
 default points to the delivered preview under `pictures/previews/photo-reveal-2026-10-25/`).
 The other participant's agreement is simulated; no provider or production API is contacted.
 Native screen protections stay enabled. The preview label and touch markers belong only to the
-recording. Encode frames with FFmpeg, padding odd dimensions for H.264:
+recording. Add `--dart-define=PHOTO_PREVIEW_LONG=true` for a longer tour covering credits,
+conversation details, message composition, the match profile before/after photo consent and
+the actions at the bottom of the photo screen.
+Use `--dart-define=PHOTO_PREVIEW_OUTPUT=build/previews/<name>` for a separate export directory.
+The conversation and match-list preview share the same synthetic message history.
+Each export writes `recording.json` with its frame count, capture rate and duration.
+Encode frames with FFmpeg, padding odd dimensions for H.264:
 
 ```bash
 ffmpeg -framerate 15 -i build/previews/photo-reveal/frames/%04d.png -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2,fps=30" -c:v libx264 -crf 20 -pix_fmt yuv420p -movflags +faststart build/previews/photo-reveal/demo.mp4

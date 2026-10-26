@@ -825,11 +825,6 @@ class AppMessagesEs extends AppMessages {
       'Continuar esta conversación';
 
   @override
-  String continuationPageYourDecisionPeriodOpensAfterThe(Object arg0) {
-    return 'El periodo de decisión se abrirá tras los primeros mensajes. Plazo actual: $arg0.';
-  }
-
-  @override
   String get continuationPageYourConversationIsOpenContinuationConditions =>
       'Tu conversación está abierta. Se cumplen las condiciones para continuar.';
 
@@ -1083,10 +1078,6 @@ class AppMessagesEs extends AppMessages {
   @override
   String get partnerPhotoPageThePhotoCannotBeShownRefresh =>
       'No se puede mostrar la foto. Actualiza el enlace temporal.';
-
-  @override
-  String get partnerPhotoPageYouBothAgreedToRevealPhotos =>
-      'Ambos habéis aceptado revelar las fotos. Las fotos siguen sin aparecer en el feed.';
 
   @override
   String get partnerPhotoPageRefreshPhoto => 'Actualizar la foto';
@@ -1590,13 +1581,6 @@ class AppMessagesEs extends AppMessages {
   String get chatPageOlderMessages => 'Mensajes anteriores';
 
   @override
-  String get chatPageAFewWordsToStart => '¿Unas palabras para empezar?';
-
-  @override
-  String get chatPageTheStartOfYourConversation =>
-      'El inicio de vuestra conversación';
-
-  @override
   String get chatPageSent => ' · Enviado';
 
   @override
@@ -1629,10 +1613,6 @@ class AppMessagesEs extends AppMessages {
   }
 
   @override
-  String get conversationHeaderReconnectingYouCanRefreshTheConversation =>
-      '\n\nReconectando. Puedes actualizar la conversación manualmente.';
-
-  @override
   String get conversationHeaderChooseWhatComesNext => 'Elegir cómo seguir';
 
   @override
@@ -1640,14 +1620,7 @@ class AppMessagesEs extends AppMessages {
       'Estado de la conversación';
 
   @override
-  String get conversationHeaderPaused => 'En pausa';
-
-  @override
   String get conversationHeaderYourChoices => 'Tus decisiones';
-
-  @override
-  String get conversationHeaderReconnectingManualRefreshAvailable =>
-      'Reconectando · puedes actualizar manualmente.';
 
   @override
   String get conversationHeaderSyncingConversation =>
@@ -1661,22 +1634,7 @@ class AppMessagesEs extends AppMessages {
       'Actualizando matches y créditos';
 
   @override
-  String get matchesPageWordsContinue => 'Una conversación a la vez.';
-
-  @override
-  String get matchesPageMutualInterestThenASpaceTo =>
-      'Un primer hola y el placer de conocerse. Sus conversaciones están aquí.';
-
-  @override
-  String get matchesPageReconnectingUpdatesYouCanRefreshYour =>
-      'Reconectando. Actualice si no aparecen sus últimas conversaciones.';
-
-  @override
   String get matchesPageThisMatchHasEnded => 'Este match ha terminado.';
-
-  @override
-  String get matchesPageNoMatchesYetTheyWillAppear =>
-      'Cuando ambos quieran conocerse, podrán conversar aquí. Mientras tanto, descubra qué palabras le sorprenden en el feed.';
 
   @override
   String get matchesPageViewMoreMatches => 'Ver más matches';
@@ -1722,11 +1680,6 @@ class AppMessagesEs extends AppMessages {
   String get matchesStringsMatchEnded => 'Match terminado';
 
   @override
-  String matchesStringsInitialPeriodUntil(Object arg0) {
-    return 'Periodo inicial hasta $arg0.';
-  }
-
-  @override
   String matchesStringsSendingIsPausedDuringTheContinuation(Object arg0) {
     return 'Los envíos están suspendidos durante la decisión de continuar, hasta $arg0. El historial sigue accesible.';
   }
@@ -1734,10 +1687,6 @@ class AppMessagesEs extends AppMessages {
   @override
   String get matchesStringsYouCanContinueYourConversation =>
       'Puedes continuar la conversación.';
-
-  @override
-  String get partnerPageDiscoverThisPersonThroughYourConversations =>
-      'Descubre a esta persona a través de vuestros mensajes.';
 
   @override
   String get devicesPageSecureSettingsAreUnavailableActivationRemains =>
@@ -3372,4 +3321,9 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get chatPageRead => ' · Leído';
+
+  @override
+  String matchesStringsFirstPeriodEndsOn(Object arg0) {
+    return 'Fin del primer período el $arg0';
+  }
 }

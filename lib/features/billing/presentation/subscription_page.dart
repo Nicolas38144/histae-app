@@ -121,7 +121,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
           ),
         ),
         actions: [
-          TextButton(
+          HistaeButton.text(
             onPressed: () => Navigator.pop(context, false),
             child: Text(
               AppStrings.of(context).messages.notificationOverlayLater,
@@ -220,7 +220,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                     ],
                     _plans(context),
                     const SizedBox(height: 20),
-                    OutlinedButton.icon(
+                    HistaeButton.outlinedIcon(
                       onPressed: c.loading || c.busy || c.retrySeconds > 0
                           ? null
                           : _refresh,
@@ -243,7 +243,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                       Text(AppStrings.of(context).messages.billingStorePending),
                     if (c.config.available) ...[
                       const SizedBox(height: 12),
-                      OutlinedButton.icon(
+                      HistaeButton.outlinedIcon(
                         onPressed: c.busy || c.loading
                             ? null
                             : c.restorePurchases,
@@ -271,7 +271,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                       'app_store',
                       'google_play',
                     ].contains(c.subscription?.provider))
-                      OutlinedButton.icon(
+                      HistaeButton.outlinedIcon(
                         onPressed: _canAct ? c.portal : null,
                         icon: const Icon(Icons.open_in_new),
                         label: Text(

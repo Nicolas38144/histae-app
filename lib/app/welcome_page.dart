@@ -75,7 +75,7 @@ class WelcomePage extends StatelessWidget {
                     child: Text(strings.createAccount),
                   ),
                   const SizedBox(height: 12),
-                  OutlinedButton(
+                  HistaeButton.outlined(
                     onPressed: () => Navigator.of(context).push(
                       MaterialPageRoute<void>(
                         builder: (_) => OtpPage(session: auth),
@@ -85,7 +85,7 @@ class WelcomePage extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                 ],
-                OutlinedButton(
+                HistaeButton.outlined(
                   onPressed: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
                       settings: const RouteSettings(name: '/catalog'),

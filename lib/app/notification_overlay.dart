@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/l10n/app_strings.dart';
+import '../core/widgets/histae_button.dart';
 import '../features/notifications/application/push_controller.dart';
 
 class NotificationOverlay extends StatelessWidget {
@@ -40,7 +41,7 @@ class NotificationOverlay extends StatelessWidget {
                           Wrap(
                             spacing: 12,
                             children: [
-                              TextButton(
+                              HistaeButton.text(
                                 onPressed: controller!.openForeground,
                                 child: Text(
                                   AppStrings.of(context)
@@ -48,7 +49,7 @@ class NotificationOverlay extends StatelessWidget {
                                       .viewNotification,
                                 ),
                               ),
-                              TextButton(
+                              HistaeButton.text(
                                 onPressed: controller!.dismiss,
                                 child: Text(
                                   AppStrings.of(context)

@@ -1,5 +1,6 @@
 // Real Flutter screens, synthetic accounts and an explicitly supplied fictional
 // portrait. No real API/storage traffic and no native privacy changes.
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -9,8 +10,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
 import 'package:histae_app/core/l10n/locale_controller.dart';
+import 'package:histae_app/features/continuation/presentation/partner_photo.dart';
 import 'package:histae_app/features/continuation/presentation/partner_photo_page.dart';
-import 'package:histae_app/features/matches/presentation/chat_page.dart';
+import 'package:histae_app/features/matches/presentation/matches_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
@@ -18,7 +20,11 @@ import '../test/support/auth_fixture.dart';
 import '../test/support/continuation_fixture.dart';
 import '../test/support/matches_fixture.dart';
 
-const _output = 'build/previews/photo-reveal';
+const _output = String.fromEnvironment(
+  'PHOTO_PREVIEW_OUTPUT',
+  defaultValue: 'build/previews/photo-reveal',
+);
+const _extended = bool.fromEnvironment('PHOTO_PREVIEW_LONG');
 const _boundary = Key('photo-reveal-preview');
 
 void main() {
@@ -57,6 +63,33 @@ void main() {
     ))!;
     var mine = false, partner = false;
     final writes = <String>[];
+    final started = DateTime.now().toUtc().subtract(
+      const Duration(minutes: 20),
+    );
+    final thread = <Map<String, dynamic>>[
+      {
+        ...messageJson(
+          content:
+              'Ça me ferait plaisir de mettre un visage sur nos discussions.',
+          readAt: started.add(const Duration(minutes: 19)).toIso8601String(),
+        ),
+        'created_at': started
+            .add(const Duration(minutes: 18))
+            .toIso8601String(),
+      },
+      {
+        ...messageJson(
+          id: outgoingId,
+          sender: testUser,
+          content: 'Et moi qui pensais être le seul à finir un roman dans le train !',
+          readAt: started.add(const Duration(minutes: 17)).toIso8601String(),
+        ),
+        'created_at': started
+            .add(const Duration(minutes: 16))
+            .toIso8601String(),
+      },
+    ];
+
     final session = testSession((r) async {
       if (r.url.path == '/api/matches/me') {
         final item = publicMatchJson();
@@ -64,6 +97,11 @@ void main() {
           'matches': [
             {
               ...item,
+              'created_at': started.toIso8601String(),
+              'expires_at': started
+                  .add(const Duration(days: 1))
+                  .toIso8601String(),
+              'last_message': thread.first,
               'my_revealed': mine,
               'photos_revealed': mine && partner,
               'unread_count': 0,
@@ -71,6 +109,16 @@ void main() {
                 ...item['other_user'] as Map,
                 'firstname': 'Léa',
                 'age': 29,
+                'bio':
+                    'Je vis avec des livres sur toutes les surfaces et une liste de '
+                    'balades qui grandit plus vite que je ne la coche. Le samedi, '
+                    'je pars souvent acheter du pain et je rentre deux heures plus tard : '
+                    'un café en terrasse, une librairie ouverte, quelqu’un avec qui '
+                    'la conversation a continué.\n\n'
+                    'J’aimerais rencontrer une personne avec qui on peut parler '
+                    'longtemps, mais aussi se taire sans chercher à remplir le vide. '
+                    'Je cuisine assez bien les plats qui demandent de la patience ; '
+                    'pour les desserts, mieux vaut prévoir une boulangerie pas loin.',
                 'photo': mine && partner
                     ? 'https://photos.example/fictional-portrait'
                     : null,
@@ -85,23 +133,21 @@ void main() {
         mine = r.method == 'PATCH';
         return jsonResponse({'photos_revealed': mine && partner});
       }
-      if (r.url.path == '/api/matches/$testMatch/messages' &&
-          r.method == 'GET') {
-        return jsonResponse({
-          'messages': [
-            messageJson(
-              content: 'Ça me ferait plaisir de mettre un visage sur nos discussions.',
-              readAt: DateTime.now().toUtc().toIso8601String(),
-            ),
-            messageJson(
-              id: outgoingId,
+      if (r.url.path == '/api/matches/$testMatch/messages') {
+        if (r.method == 'POST') {
+          final body = jsonDecode(r.body) as Map<String, dynamic>;
+          final message = {
+            ...messageJson(
+              id: '12121212-1212-4212-8212-121212121212',
               sender: testUser,
-              content: 'Et moi qui pensais être le seul à finir un roman dans le train !',
-              readAt: DateTime.now().toUtc().toIso8601String(),
+              content: body['content'] as String,
             ),
-          ],
-          'next_cursor': null,
-        });
+            'created_at': DateTime.now().toUtc().toIso8601String(),
+          };
+          thread.insert(0, message);
+          return jsonResponse(message, 201);
+        }
+        return jsonResponse({'messages': thread, 'next_cursor': null});
       }
       return defaultContinuationResponse(r);
     });
@@ -134,6 +180,8 @@ void main() {
       }
     }
 
+    Future<void> hold(double seconds) => record(seconds * (_extended ? 2 : 1));
+
     Future<void> tap(Finder finder) async {
       await tester.ensureVisible(finder);
       await tester.pumpAndSettle();
@@ -142,6 +190,22 @@ void main() {
       await tester.tap(finder);
       await record(0.35);
       touch.value = null;
+    }
+
+    Future<void> profileTour(String name, {required bool revealed}) async {
+      await tap(find.byTooltip('Voir son profil'));
+      await hold(2.5);
+      expect(
+        find.byType(PartnerPhoto),
+        revealed ? findsOneWidget : findsNothing,
+      );
+      await capture('$_output/profile-$name.png', ratio: 2);
+      await tester.drag(find.byType(Scrollable).last, const Offset(0, -650));
+      await record(0.8);
+      await hold(2);
+      await capture('$_output/profile-$name-text.png', ratio: 2);
+      await tap(find.byTooltip('Retour'));
+      await hold(0.6);
     }
 
     await http.runWithClient(
@@ -202,57 +266,110 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(find.text('Matchs').last);
         await tester.pumpAndSettle();
-        await record(1);
-        await tap(find.text('Léa, 29'));
-        await record(2);
-        await capture('$_output/conversation-before.png', ratio: 2);
         final controller = tester
-            .widget<ChatPage>(find.byType(ChatPage))
+            .widget<MatchesPage>(find.byType(MatchesPage))
             .controller;
         // The fixture uses finite HTTP responses rather than a live SSE stream.
-        // Stop its reconnect loop and explicitly deliver the simulated update.
+        // Stop its reconnect loop and explicitly deliver simulated updates.
         controller.setRealtimeEnabled(false);
         await controller.refresh();
         await tester.pumpAndSettle();
+        expect(find.textContaining('La connexion reprend'), findsNothing);
+        await hold(1);
+        if (_extended) {
+          await tap(find.text('Voir mes crédits'));
+          await hold(3);
+          await capture('$_output/credits.png', ratio: 2);
+          await tap(find.byTooltip('Retour'));
+          await hold(1);
+        }
+        await tap(find.text('Léa, 29'));
+        await hold(2);
+        await capture('$_output/conversation-before.png', ratio: 2);
+        expect(
+          find.textContaining('Fin de la première période le'),
+          findsNothing,
+        );
+        if (_extended) {
+          await tap(find.byTooltip('État de la conversation'));
+          await hold(3);
+          expect(
+            find.textContaining('Fin de la première période le'),
+            findsOneWidget,
+          );
+          await capture('$_output/details.png', ratio: 2);
+          await tap(find.text('Fermer'));
+          await hold(1);
+          await profileTour('private', revealed: false);
+          const answer = 'Oui, ça me ferait plaisir. On se les dévoile ?';
+          await tap(find.byType(TextField));
+          for (var end = 5; end < answer.length; end += 5) {
+            await tester.enterText(
+              find.byType(TextField),
+              answer.substring(0, end),
+            );
+            await record(0.2);
+          }
+          await tester.enterText(find.byType(TextField), answer);
+          await hold(1);
+          await tap(find.text('Envoyer'));
+          FocusManager.instance.primaryFocus?.unfocus();
+          await hold(2);
+          expect(thread.first['content'], answer);
+          await capture('$_output/message-sent.png', ratio: 2);
+        }
         await tap(find.text('Dévoiler nos photos'));
-        await record(2);
+        await hold(2);
         await capture('$_output/invitation.png', ratio: 2);
         await tap(find.text('Dévoiler nos photos').last);
-        await record(2.5);
+        await hold(2.5);
         await capture('$_output/consent.png', ratio: 2);
         expect(find.byType(AlertDialog), findsOneWidget);
         await tap(find.text('Donner mon accord'));
-        await record(2);
+        await hold(2);
         await capture('$_output/waiting.png', ratio: 2);
         partner = true;
         await controller.refresh();
-        await record(2);
+        await hold(2);
         await capture('$_output/mutual.png', ratio: 2);
+        if (_extended) {
+          await tester.drag(
+            find.byType(Scrollable).last,
+            const Offset(0, -850),
+          );
+          await record(1);
+          await hold(2);
+          await capture('$_output/actions-spacing.png', ratio: 2);
+          await tester.drag(find.byType(Scrollable).last, const Offset(0, 850));
+          await record(1);
+        }
         await tap(find.text('Voir sa photo'));
-        await record(2.5);
+        await hold(2.5);
         expect(find.byType(PartnerPhotoPage), findsOneWidget);
         await capture('$_output/discovered.png', ratio: 2);
         await tap(find.byTooltip('Retour'));
-        await record(0.6);
+        await hold(0.6);
         await tap(find.byTooltip('Retour'));
-        await record(1.2);
+        await hold(1.2);
         await capture('$_output/conversation-after.png', ratio: 2);
+        if (_extended) await profileTour('revealed', revealed: true);
         await tap(find.byTooltip('Retour'));
-        await record(1.2);
+        await hold(1.2);
         await capture('$_output/matches-after.png', ratio: 2);
         await tap(find.text('Léa, 29'));
-        await record(0.6);
+        await hold(0.6);
         await tap(find.text('Nos photos'));
-        await record(0.6);
+        await hold(0.6);
         await tap(find.text('Retirer mon accord'));
-        await record(1.5);
+        await hold(1.5);
         await tap(find.text('Retirer mon accord').last);
-        await record(1.5);
+        await hold(1.5);
         await capture('$_output/withdrawn.png', ratio: 2);
         await tap(find.byTooltip('Retour'));
-        await record(0.6);
+        await hold(0.6);
+        if (_extended) await profileTour('withdrawn', revealed: false);
         await tap(find.byTooltip('Retour'));
-        await record(1);
+        await hold(1);
         expect(writes, ['PATCH', 'DELETE']);
         await capture('$_output/matches-withdrawn.png', ratio: 2);
         await tester.pumpWidget(const SizedBox.shrink());
@@ -265,6 +382,16 @@ void main() {
         );
         return http.Response.bytes(portrait, 200);
       }),
+    );
+    await tester.runAsync(
+      () => File('$_output/recording.json').writeAsString(
+        jsonEncode({
+          'frames': frame,
+          'capture_fps': 15,
+          'duration_seconds': frame / 15,
+          'extended': _extended,
+        }),
+      ),
     );
     touch.dispose();
     // HistaeApp owns the injected controllers and disposes them on unmount.

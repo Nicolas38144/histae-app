@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../../core/widgets/status_view.dart';
 import '../../billing/data/billing_models.dart' show BillingPeriod;
@@ -97,7 +98,7 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
       CatalogStatus.empty => StatusView(
         title: strings.emptyTitle,
         message: strings.emptyBody,
-        action: OutlinedButton(
+        action: HistaeButton.outlined(
           onPressed: controller.load,
           child: Text(strings.refresh),
         ),
@@ -146,7 +147,7 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
           const SizedBox(height: 16),
           Text(strings.catalogReadOnly),
           const SizedBox(height: 16),
-          OutlinedButton(
+          HistaeButton.outlined(
             onPressed: controller.load,
             child: Text(strings.refresh),
           ),
@@ -168,7 +169,7 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
       reference: failure.requestId == null
           ? null
           : strings.requestReference(failure.requestId!),
-      action: OutlinedButton(
+      action: HistaeButton.outlined(
         onPressed: seconds > 0 ? null : controller.load,
         child: Text(seconds > 0 ? strings.retryIn(seconds) : strings.retry),
       ),

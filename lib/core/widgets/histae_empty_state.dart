@@ -4,9 +4,10 @@ import 'connection_artwork.dart';
 
 /// A quiet invitation, with no invented people, activity or promises.
 class HistaeEmptyState extends StatelessWidget {
-  const HistaeEmptyState({super.key, required this.title, required this.body});
+  const HistaeEmptyState({super.key, required this.title, this.body});
 
-  final String title, body;
+  final String title;
+  final String? body;
 
   @override
   Widget build(BuildContext context) {
@@ -22,13 +23,15 @@ class HistaeEmptyState extends StatelessWidget {
             header: true,
             child: Text(title, style: theme.textTheme.headlineSmall),
           ),
-          const SizedBox(height: 12),
-          Text(
-            body,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+          if (body case final description?) ...[
+            const SizedBox(height: 12),
+            Text(
+              description,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );

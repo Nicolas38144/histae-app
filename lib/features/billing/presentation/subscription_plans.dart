@@ -60,7 +60,7 @@ class SubscriptionPlans extends StatelessWidget {
                       .messages
                       .appStringsPlansAreCurrentlyUnavailable,
           ),
-          OutlinedButton(
+          HistaeButton.outlined(
             onPressed: catalog.retrySeconds > 0 ? null : catalog.load,
             child: Text(
               catalog.retrySeconds > 0
@@ -108,7 +108,7 @@ class SubscriptionPlans extends StatelessWidget {
                       ),
                     )
                   : offer.billingPeriod != null && !paymentsAvailable
-                  ? OutlinedButton(
+                  ? HistaeButton.outlined(
                       onPressed: null,
                       child: Text(
                         AppStrings.of(context)

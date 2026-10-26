@@ -1449,12 +1449,6 @@ abstract class AppMessages {
   /// Interface: lib/features/continuation/presentation/continuation_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Votre période de décision s’ouvrira après les premiers échanges. Échéance actuelle : {arg0}.'**
-  String continuationPageYourDecisionPeriodOpensAfterThe(Object arg0);
-
-  /// Interface: lib/features/continuation/presentation/continuation_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Votre conversation est ouverte. Les conditions de continuation sont réunies.'**
   String get continuationPageYourConversationIsOpenContinuationConditions;
 
@@ -1778,12 +1772,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'La photo ne peut pas être affichée. Actualisez le lien temporaire.'**
   String get partnerPhotoPageThePhotoCannotBeShownRefresh;
-
-  /// Interface: lib/features/continuation/presentation/partner_photo_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Vos accords de révélation sont mutuels. Les photos restent absentes du feed.'**
-  String get partnerPhotoPageYouBothAgreedToRevealPhotos;
 
   /// Interface: lib/features/continuation/presentation/partner_photo_page.dart
   ///
@@ -2592,18 +2580,6 @@ abstract class AppMessages {
   /// Interface: lib/features/matches/presentation/chat_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Quelques mots pour commencer ?'**
-  String get chatPageAFewWordsToStart;
-
-  /// Interface: lib/features/matches/presentation/chat_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Le début de votre conversation'**
-  String get chatPageTheStartOfYourConversation;
-
-  /// Interface: lib/features/matches/presentation/chat_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **' · Envoyé'**
   String get chatPageSent;
 
@@ -2658,12 +2634,6 @@ abstract class AppMessages {
   /// Interface: lib/features/matches/presentation/conversation_header.dart
   ///
   /// In fr, this message translates to:
-  /// **'\n\nConnexion en reprise. Vous pouvez actualiser la conversation manuellement.'**
-  String get conversationHeaderReconnectingYouCanRefreshTheConversation;
-
-  /// Interface: lib/features/matches/presentation/conversation_header.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Choisir la suite'**
   String get conversationHeaderChooseWhatComesNext;
 
@@ -2676,20 +2646,8 @@ abstract class AppMessages {
   /// Interface: lib/features/matches/presentation/conversation_header.dart
   ///
   /// In fr, this message translates to:
-  /// **'En pause'**
-  String get conversationHeaderPaused;
-
-  /// Interface: lib/features/matches/presentation/conversation_header.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Vos choix'**
   String get conversationHeaderYourChoices;
-
-  /// Interface: lib/features/matches/presentation/conversation_header.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Connexion en reprise · actualisation manuelle disponible.'**
-  String get conversationHeaderReconnectingManualRefreshAvailable;
 
   /// Interface: lib/features/matches/presentation/conversation_header.dart
   ///
@@ -2712,32 +2670,8 @@ abstract class AppMessages {
   /// Interface: lib/features/matches/presentation/matches_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Une conversation à la fois.'**
-  String get matchesPageWordsContinue;
-
-  /// Interface: lib/features/matches/presentation/matches_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Un premier bonjour, puis le plaisir de se découvrir. Retrouvez vos échanges ici.'**
-  String get matchesPageMutualInterestThenASpaceTo;
-
-  /// Interface: lib/features/matches/presentation/matches_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'La connexion reprend. Actualisez si vos derniers échanges n’apparaissent pas.'**
-  String get matchesPageReconnectingUpdatesYouCanRefreshYour;
-
-  /// Interface: lib/features/matches/presentation/matches_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Cette rencontre est terminée.'**
   String get matchesPageThisMatchHasEnded;
-
-  /// Interface: lib/features/matches/presentation/matches_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Quand l’envie de se connaître est partagée, vous pouvez échanger ici. En attendant, laissez-vous surprendre par les mots du feed.'**
-  String get matchesPageNoMatchesYetTheyWillAppear;
 
   /// Interface: lib/features/matches/presentation/matches_page.dart
   ///
@@ -2814,12 +2748,6 @@ abstract class AppMessages {
   /// Interface: lib/features/matches/presentation/matches_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Première période jusqu’au {arg0}.'**
-  String matchesStringsInitialPeriodUntil(Object arg0);
-
-  /// Interface: lib/features/matches/presentation/matches_strings.dart
-  ///
-  /// In fr, this message translates to:
   /// **'L’envoi est suspendu pendant la décision de continuation, jusqu’au {arg0}. L’historique reste accessible.'**
   String matchesStringsSendingIsPausedDuringTheContinuation(Object arg0);
 
@@ -2828,12 +2756,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Vous pouvez poursuivre votre conversation.'**
   String get matchesStringsYouCanContinueYourConversation;
-
-  /// Interface: lib/features/matches/presentation/partner_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Découvrez cette personne au fil de vos échanges.'**
-  String get partnerPageDiscoverThisPersonThroughYourConversations;
 
   /// Interface: lib/features/notifications/presentation/devices_page.dart
   ///
@@ -5521,6 +5443,12 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **' · Lu'**
   String get chatPageRead;
+
+  /// Interface: lib/features/matches/presentation/matches_strings.dart
+  ///
+  /// In fr, this message translates to:
+  /// **'Fin de la première période le {arg0}'**
+  String matchesStringsFirstPeriodEndsOn(Object arg0);
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

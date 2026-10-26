@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/widgets/histae_button.dart';
 import '../domain/consent_state.dart';
 import 'consent_strings.dart';
 
@@ -27,7 +28,7 @@ class ConsentControl extends StatelessWidget {
       style: Theme.of(context).textTheme.titleMedium,
     );
     final renewal = consent.granted && !consent.current;
-    final document = TextButton(
+    final document = HistaeButton.text(
       onPressed: onOpen,
       child: Text(strings.readDocument),
     );

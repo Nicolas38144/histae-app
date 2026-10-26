@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
-import '../../continuation/presentation/partner_photo_page.dart';
+import '../../continuation/presentation/partner_photo.dart';
+import '../../discovery/presentation/feed_profile_content.dart';
 import '../../privacy/presentation/report_page.dart';
 import '../application/matches_controller.dart';
 
@@ -22,11 +24,11 @@ class PartnerPage extends StatelessWidget {
               controller.selected?.historyAllowed == true
           ? controller.selected
           : null;
+      final text = AppStrings.of(context).messages;
       return HistaeScaffold(
         appBar: AppBar(
           title: Text(
-            match?.partner.firstname ??
-                AppStrings.of(context).messages.mainNavigationBarProfile,
+            match?.partner.firstname ?? text.mainNavigationBarProfile,
           ),
         ),
         body: SafeArea(
@@ -34,44 +36,21 @@ class PartnerPage extends StatelessWidget {
             padding: const EdgeInsets.all(24),
             children: [
               if (match == null)
-                Text(
-                  AppStrings.of(context)
-                      .messages
-                      .discoveryStringsThisProfileIsNoLongerAvailable,
-                )
+                Text(text.discoveryStringsThisProfileIsNoLongerAvailable)
               else ...[
-                EditorialCard(
-                  title: AppStrings.of(context).messages.encounterPage(
-                    match.partner.firstname,
-                    match.partner.age,
-                  ),
-                  body:
-                      match.partner.bio ??
-                      AppStrings.of(context)
-                          .messages
-                          .partnerPageDiscoverThisPersonThroughYourConversations,
+                if (match.photosRevealed && !controller.photosBlocked(id)) ...[
+                  PartnerPhoto(access: controller, matchId: id),
+                  const SizedBox(height: 24),
+                ],
+                FeedProfileContent(
+                  firstname: match.partner.firstname,
+                  age: match.partner.age,
+                  bio: match.partner.bio,
+                  traits: match.partner.traits,
+                  answers: match.partner.answers,
                 ),
-                const SizedBox(height: 24),
-                if (match.photosRevealed && !controller.photosBlocked(id) && match.partner.photo != null)
-                  OutlinedButton.icon(
-                    onPressed: !controller.verified
-                        ? null
-                        : () => Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (_) => PartnerPhotoPage(
-                                access: controller,
-                                matchId: id,
-                              ),
-                            ),
-                          ),
-                    icon: const Icon(Icons.photo_outlined),
-                    label: Text(
-                      AppStrings.of(context)
-                          .messages
-                          .continuationPageViewTheirPhoto,
-                    ),
-                  ),
-                TextButton(
+                const EditorialDivider(),
+                HistaeButton.text(
                   onPressed: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
                       builder: (_) => ReportPage(
@@ -82,28 +61,8 @@ class PartnerPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  child: Text(
-                    AppStrings.of(context)
-                        .messages
-                        .encounterPageReportThisPerson,
-                  ),
+                  child: Text(text.encounterPageReportThisPerson),
                 ),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: match.partner.traits
-                      .map((t) => Chip(label: Text(t)))
-                      .toList(),
-                ),
-                for (final answer in match.partner.answers) ...[
-                  const EditorialDivider(),
-                  Text(
-                    answer.question,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(answer.answer),
-                ],
               ],
             ],
           ),

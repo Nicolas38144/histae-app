@@ -82,7 +82,7 @@ class _ConsentsPageState extends State<ConsentsPage> {
         title: Text(strings.withdraw),
         content: Text(strings.withdrawalMessage(consent.type)),
         actions: [
-          TextButton(
+          HistaeButton.text(
             onPressed: () => Navigator.pop(context, false),
             child: Text(strings.cancel),
           ),
@@ -218,7 +218,7 @@ class _ConsentsPageState extends State<ConsentsPage> {
                               if (consent.granted &&
                                   !consent.current &&
                                   consent.type.withdrawable)
-                                TextButton(
+                                HistaeButton.text(
                                   key: Key('withdraw-${consent.type.wireName}'),
                                   onPressed: blocked
                                       ? null
@@ -249,13 +249,13 @@ class _ConsentsPageState extends State<ConsentsPage> {
                         ),
                       ),
                     const SizedBox(height: 12),
-                    OutlinedButton(
+                    HistaeButton.outlined(
                       onPressed: blocked ? null : widget.session.synchronize,
                       child: Text(strings.refreshChoices),
                     ),
                     const SizedBox(height: 20),
                     Text(strings.privacyScope),
-                    OutlinedButton(
+                    HistaeButton.outlined(
                       onPressed: blocked
                           ? null
                           : () => Navigator.of(context).push(
@@ -271,7 +271,7 @@ class _ConsentsPageState extends State<ConsentsPage> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    TextButton(
+                    HistaeButton.text(
                       onPressed: widget.session.logout,
                       child: Text(strings.logout),
                     ),

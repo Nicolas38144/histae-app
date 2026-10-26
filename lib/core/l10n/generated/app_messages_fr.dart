@@ -828,11 +828,6 @@ class AppMessagesFr extends AppMessages {
       'Continuer cette conversation';
 
   @override
-  String continuationPageYourDecisionPeriodOpensAfterThe(Object arg0) {
-    return 'Votre période de décision s’ouvrira après les premiers échanges. Échéance actuelle : $arg0.';
-  }
-
-  @override
   String get continuationPageYourConversationIsOpenContinuationConditions =>
       'Votre conversation est ouverte. Les conditions de continuation sont réunies.';
 
@@ -1085,10 +1080,6 @@ class AppMessagesFr extends AppMessages {
   @override
   String get partnerPhotoPageThePhotoCannotBeShownRefresh =>
       'La photo ne peut pas être affichée. Actualisez le lien temporaire.';
-
-  @override
-  String get partnerPhotoPageYouBothAgreedToRevealPhotos =>
-      'Vos accords de révélation sont mutuels. Les photos restent absentes du feed.';
 
   @override
   String get partnerPhotoPageRefreshPhoto => 'Actualiser la photo';
@@ -1592,13 +1583,6 @@ class AppMessagesFr extends AppMessages {
   String get chatPageOlderMessages => 'Messages plus anciens';
 
   @override
-  String get chatPageAFewWordsToStart => 'Quelques mots pour commencer ?';
-
-  @override
-  String get chatPageTheStartOfYourConversation =>
-      'Le début de votre conversation';
-
-  @override
   String get chatPageSent => ' · Envoyé';
 
   @override
@@ -1631,24 +1615,13 @@ class AppMessagesFr extends AppMessages {
   }
 
   @override
-  String get conversationHeaderReconnectingYouCanRefreshTheConversation =>
-      '\n\nConnexion en reprise. Vous pouvez actualiser la conversation manuellement.';
-
-  @override
   String get conversationHeaderChooseWhatComesNext => 'Choisir la suite';
 
   @override
   String get conversationHeaderConversationStatus => 'État de la conversation';
 
   @override
-  String get conversationHeaderPaused => 'En pause';
-
-  @override
   String get conversationHeaderYourChoices => 'Vos choix';
-
-  @override
-  String get conversationHeaderReconnectingManualRefreshAvailable =>
-      'Connexion en reprise · actualisation manuelle disponible.';
 
   @override
   String get conversationHeaderSyncingConversation =>
@@ -1662,22 +1635,7 @@ class AppMessagesFr extends AppMessages {
       'Actualisation des rencontres et des crédits';
 
   @override
-  String get matchesPageWordsContinue => 'Une conversation à la fois.';
-
-  @override
-  String get matchesPageMutualInterestThenASpaceTo =>
-      'Un premier bonjour, puis le plaisir de se découvrir. Retrouvez vos échanges ici.';
-
-  @override
-  String get matchesPageReconnectingUpdatesYouCanRefreshYour =>
-      'La connexion reprend. Actualisez si vos derniers échanges n’apparaissent pas.';
-
-  @override
   String get matchesPageThisMatchHasEnded => 'Cette rencontre est terminée.';
-
-  @override
-  String get matchesPageNoMatchesYetTheyWillAppear =>
-      'Quand l’envie de se connaître est partagée, vous pouvez échanger ici. En attendant, laissez-vous surprendre par les mots du feed.';
 
   @override
   String get matchesPageViewMoreMatches => 'Voir les rencontres suivantes';
@@ -1723,11 +1681,6 @@ class AppMessagesFr extends AppMessages {
   String get matchesStringsMatchEnded => 'Rencontre terminée';
 
   @override
-  String matchesStringsInitialPeriodUntil(Object arg0) {
-    return 'Première période jusqu’au $arg0.';
-  }
-
-  @override
   String matchesStringsSendingIsPausedDuringTheContinuation(Object arg0) {
     return 'L’envoi est suspendu pendant la décision de continuation, jusqu’au $arg0. L’historique reste accessible.';
   }
@@ -1735,10 +1688,6 @@ class AppMessagesFr extends AppMessages {
   @override
   String get matchesStringsYouCanContinueYourConversation =>
       'Vous pouvez poursuivre votre conversation.';
-
-  @override
-  String get partnerPageDiscoverThisPersonThroughYourConversations =>
-      'Découvrez cette personne au fil de vos échanges.';
 
   @override
   String get devicesPageSecureSettingsAreUnavailableActivationRemains =>
@@ -3381,4 +3330,9 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get chatPageRead => ' · Lu';
+
+  @override
+  String matchesStringsFirstPeriodEndsOn(Object arg0) {
+    return 'Fin de la première période le $arg0';
+  }
 }

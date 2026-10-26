@@ -216,7 +216,7 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                         ),
                       ),
                     if (p!.enabled || p!.deviceId != null || p!.stopping)
-                      OutlinedButton(
+                      HistaeButton.outlined(
                         onPressed: enabled
                             ? () async {
                                 if (await confirmAction(
@@ -330,7 +330,7 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                                       ),
                                     ),
                               ),
-                            OutlinedButton(
+                            HistaeButton.outlined(
                               onPressed:
                                   enabled &&
                                       (c.pendingRemoval == null ||
@@ -371,7 +371,7 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                         ),
                       ),
                     ),
-                  OutlinedButton(
+                  HistaeButton.outlined(
                     onPressed: enabled ? c.load : null,
                     child: Text(
                       AppStrings.of(context).messages.devicesPageRefreshDevices,

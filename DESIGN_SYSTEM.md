@@ -36,6 +36,11 @@ and system text size. Panels generally use thin borders and a 20 px radius; prim
 a pill shape. Secondary buttons use a subtle lavender surface, light outline and 16 px corners.
 Space stacked actions so their hierarchy stays clear.
 
+Use `HistaeButton` for primary, outlined and text actions, including icon variants. The shared
+component reserves 8 px above and below each action (16 px between adjacent buttons). Keep
+horizontal gaps in rows/wraps explicit. Toolbar icons, steppers and plan selectors retain their
+compact controls; do not replace external spacing with larger label padding inside a button.
+
 Bundled font licenses: [Inter](assets/fonts/inter/OFL.txt) and
 [Source Serif 4](assets/fonts/source_serif_4/OFL.txt).
 

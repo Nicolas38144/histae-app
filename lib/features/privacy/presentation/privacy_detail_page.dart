@@ -171,7 +171,7 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
                   privacyDate(AppStrings.of(context), session.expiresAt),
                 ),
               ),
-              OutlinedButton(
+              HistaeButton.outlined(
                 onPressed:
                     enabled &&
                         (c.pendingRevoke == null ||
@@ -210,19 +210,19 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
       ),
     if (!c.loading && c.sessions.isEmpty)
       Text(AppStrings.of(context).messages.privacyDetailPageNoSessionsLoaded),
-    OutlinedButton(
+    HistaeButton.outlined(
       onPressed: enabled ? c.load : null,
       child: Text(
         AppStrings.of(context).messages.privacyDetailPageRefreshSessions,
       ),
     ),
     if (c.cursor != null)
-      OutlinedButton(
+      HistaeButton.outlined(
         onPressed: enabled ? () => c.load(more: true) : null,
         child: Text(AppStrings.of(context).messages.privacyDetailPageLoadMore),
       ),
     const SizedBox(height: 20),
-    TextButton(
+    HistaeButton.text(
       onPressed: enabled
           ? () async {
               if (await _confirm(
@@ -279,7 +279,7 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
                   privacyDate(AppStrings.of(context), person.blockedAt),
                 ),
               ),
-              OutlinedButton(
+              HistaeButton.outlined(
                 onPressed:
                     enabled &&
                         (c.pendingUnblock == null ||
@@ -321,7 +321,7 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
             .messages
             .privacyDetailPageNoBlockedPeopleInThisList,
       ),
-    OutlinedButton(
+    HistaeButton.outlined(
       onPressed: enabled ? c.load : null,
       child: Text(
         AppStrings.of(context).messages.privacyDetailPageRefreshBlocks,
@@ -402,7 +402,7 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
       ),
     if (!c.loading && c.rights.isEmpty)
       Text(AppStrings.of(context).messages.privacyDetailPageNoRequestsToTrack),
-    OutlinedButton(
+    HistaeButton.outlined(
       onPressed: enabled ? c.load : null,
       child: Text(
         AppStrings.of(context).messages.privacyDetailPageRefreshTracking,
@@ -438,7 +438,7 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
     ),
     if (c.exportPath != null) ...[
       Builder(
-        builder: (buttonContext) => OutlinedButton.icon(
+        builder: (buttonContext) => HistaeButton.outlinedIcon(
           onPressed: enabled
               ? () async {
                   if (!await _confirm(
@@ -480,7 +480,7 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
         ),
       ),
     ],
-    TextButton(
+    HistaeButton.text(
       onPressed: enabled ? c.clearExport : null,
       child: Text(
         AppStrings.of(context).messages.privacyDetailPageEraseTemporaryFile,

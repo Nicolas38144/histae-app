@@ -95,7 +95,7 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
               .creditsPageCancellationPreventsAnyLaterValidationEven,
         ),
         actions: [
-          TextButton(
+          HistaeButton.text(
             onPressed: () => Navigator.pop(context, false),
             child: Text(AppStrings.of(context).messages.creditsPageKeep),
           ),
@@ -209,7 +209,7 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
                                         .failure(c.failure!),
                             ),
                             const SizedBox(height: 16),
-                            OutlinedButton.icon(
+                            HistaeButton.outlinedIcon(
                               onPressed: c.retrySeconds > 0 ? null : _refresh,
                               icon: const Icon(Icons.refresh),
                               label: Text(

@@ -49,7 +49,7 @@ class _RegistrationConsentsStepState extends State<RegistrationConsentsStep> {
             child: Text(strings.authFailure(failure)),
           ),
           const SizedBox(height: 12),
-          OutlinedButton(
+          HistaeButton.outlined(
             onPressed:
                 controller.loadingDocuments || controller.retrySeconds > 0
                 ? null

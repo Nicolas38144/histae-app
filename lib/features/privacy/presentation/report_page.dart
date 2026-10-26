@@ -162,7 +162,7 @@ class _ReportPageState extends State<ReportPage> {
                       ),
                     ),
                     if (widget.onBlock != null)
-                      OutlinedButton(
+                      HistaeButton.outlined(
                         onPressed: () async {
                           if (!await confirmAction(
                                 context,
@@ -189,7 +189,7 @@ class _ReportPageState extends State<ReportPage> {
                               .reportPageAlsoBlockThisPerson,
                         ),
                       ),
-                    TextButton(
+                    HistaeButton.text(
                       onPressed: () => Navigator.of(context).pop(),
                       child: Text(
                         AppStrings.of(context).messages.conversationHeaderClose,

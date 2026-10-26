@@ -319,7 +319,7 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
                       .appStringsTryAgainInS(c.retrySeconds),
                 ),
               const SizedBox(height: 24),
-              OutlinedButton(
+              HistaeButton.outlined(
                 onPressed: !c.canWrite || _choosing ? null : _choose,
                 child: Text(
                   intent == null && c.profile?.photo == null
@@ -343,7 +343,7 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
                   ),
                 ),
               ],
-              TextButton(
+              HistaeButton.text(
                 onPressed: c.loading || c.saving || c.retrySeconds > 0
                     ? null
                     : () async {
@@ -358,7 +358,7 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
                 ),
               ),
               if (c.profile?.photo != null)
-                TextButton(
+                HistaeButton.text(
                   onPressed: !c.canWrite || _choosing
                       ? null
                       : () async {

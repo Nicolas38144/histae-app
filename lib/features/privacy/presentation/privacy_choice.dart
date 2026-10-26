@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/widgets/histae_button.dart';
+
 // A scrolling choice dialog keeps long labels readable with large text.
 
 class PrivacyChoice<T> extends StatelessWidget {
@@ -21,7 +23,7 @@ class PrivacyChoice<T> extends StatelessWidget {
     children: [
       Text(label),
       const SizedBox(height: 8),
-      OutlinedButton(
+      HistaeButton.outlined(
         onPressed: onChanged == null
             ? null
             : () async {

@@ -53,7 +53,7 @@ class DiscoveryReadinessCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(DiscoveryStrings(AppStrings.of(context)).actionBody(action)),
           const SizedBox(height: 20),
-          OutlinedButton(
+          HistaeButton.outlined(
             onPressed: onRepair,
             child: Text(
               action == DiscoveryAction.freshPresence

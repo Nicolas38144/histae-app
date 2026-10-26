@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/widgets/histae_button.dart';
 import '../application/continuation_controller.dart';
 
 /// Displays only server-owned available balances, excluding reserved credits.
@@ -72,7 +73,7 @@ class ContinuationBalanceCard extends StatelessWidget {
                         q != null &&
                         c.quotaReadAt != null &&
                         !q.premium)
-                      TextButton.icon(
+                      HistaeButton.textIcon(
                         key: const Key('open-videos'),
                         onPressed: onOpenCredits,
                         icon: const Icon(Icons.play_circle_outline),
@@ -97,7 +98,7 @@ class ContinuationBalanceCard extends StatelessWidget {
                         .messages
                         .continuationBalanceCardYourBalanceCannotBeCheckedRight,
                   ),
-                  TextButton.icon(
+                  HistaeButton.textIcon(
                     onPressed: c.retrySeconds > 0
                         ? null
                         : () async {

@@ -956,15 +956,6 @@
   "@continuationPageContinueThisConversation": {
     "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
   },
-  "continuationPageYourDecisionPeriodOpensAfterThe": "Votre période de décision s’ouvrira après les premiers échanges. Échéance actuelle : {arg0}.",
-  "@continuationPageYourDecisionPeriodOpensAfterThe": {
-    "description": "Interface: lib/features/continuation/presentation/continuation_page.dart",
-    "placeholders": {
-      "arg0": {
-        "type": "Object"
-      }
-    }
-  },
   "continuationPageYourConversationIsOpenContinuationConditions": "Votre conversation est ouverte. Les conditions de continuation sont réunies.",
   "@continuationPageYourConversationIsOpenContinuationConditions": {
     "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
@@ -1237,10 +1228,6 @@
   },
   "partnerPhotoPageThePhotoCannotBeShownRefresh": "La photo ne peut pas être affichée. Actualisez le lien temporaire.",
   "@partnerPhotoPageThePhotoCannotBeShownRefresh": {
-    "description": "Interface: lib/features/continuation/presentation/partner_photo_page.dart"
-  },
-  "partnerPhotoPageYouBothAgreedToRevealPhotos": "Vos accords de révélation sont mutuels. Les photos restent absentes du feed.",
-  "@partnerPhotoPageYouBothAgreedToRevealPhotos": {
     "description": "Interface: lib/features/continuation/presentation/partner_photo_page.dart"
   },
   "partnerPhotoPageRefreshPhoto": "Actualiser la photo",
@@ -1811,14 +1798,6 @@
   "@chatPageOlderMessages": {
     "description": "Interface: lib/features/matches/presentation/chat_page.dart"
   },
-  "chatPageAFewWordsToStart": "Quelques mots pour commencer ?",
-  "@chatPageAFewWordsToStart": {
-    "description": "Interface: lib/features/matches/presentation/chat_page.dart"
-  },
-  "chatPageTheStartOfYourConversation": "Le début de votre conversation",
-  "@chatPageTheStartOfYourConversation": {
-    "description": "Interface: lib/features/matches/presentation/chat_page.dart"
-  },
   "chatPageSent": " · Envoyé",
   "@chatPageSent": {
     "description": "Interface: lib/features/matches/presentation/chat_page.dart"
@@ -1860,10 +1839,6 @@
       }
     }
   },
-  "conversationHeaderReconnectingYouCanRefreshTheConversation": "\n\nConnexion en reprise. Vous pouvez actualiser la conversation manuellement.",
-  "@conversationHeaderReconnectingYouCanRefreshTheConversation": {
-    "description": "Interface: lib/features/matches/presentation/conversation_header.dart"
-  },
   "conversationHeaderChooseWhatComesNext": "Choisir la suite",
   "@conversationHeaderChooseWhatComesNext": {
     "description": "Interface: lib/features/matches/presentation/conversation_header.dart"
@@ -1872,16 +1847,8 @@
   "@conversationHeaderConversationStatus": {
     "description": "Interface: lib/features/matches/presentation/conversation_header.dart"
   },
-  "conversationHeaderPaused": "En pause",
-  "@conversationHeaderPaused": {
-    "description": "Interface: lib/features/matches/presentation/conversation_header.dart"
-  },
   "conversationHeaderYourChoices": "Vos choix",
   "@conversationHeaderYourChoices": {
-    "description": "Interface: lib/features/matches/presentation/conversation_header.dart"
-  },
-  "conversationHeaderReconnectingManualRefreshAvailable": "Connexion en reprise · actualisation manuelle disponible.",
-  "@conversationHeaderReconnectingManualRefreshAvailable": {
     "description": "Interface: lib/features/matches/presentation/conversation_header.dart"
   },
   "conversationHeaderSyncingConversation": "Synchronisation de la conversation",
@@ -1896,24 +1863,8 @@
   "@matchesPageRefreshingMatchesAndCredits": {
     "description": "Interface: lib/features/matches/presentation/matches_page.dart"
   },
-  "matchesPageWordsContinue": "Une conversation à la fois.",
-  "@matchesPageWordsContinue": {
-    "description": "Interface: lib/features/matches/presentation/matches_page.dart"
-  },
-  "matchesPageMutualInterestThenASpaceTo": "Un premier bonjour, puis le plaisir de se découvrir. Retrouvez vos échanges ici.",
-  "@matchesPageMutualInterestThenASpaceTo": {
-    "description": "Interface: lib/features/matches/presentation/matches_page.dart"
-  },
-  "matchesPageReconnectingUpdatesYouCanRefreshYour": "La connexion reprend. Actualisez si vos derniers échanges n’apparaissent pas.",
-  "@matchesPageReconnectingUpdatesYouCanRefreshYour": {
-    "description": "Interface: lib/features/matches/presentation/matches_page.dart"
-  },
   "matchesPageThisMatchHasEnded": "Cette rencontre est terminée.",
   "@matchesPageThisMatchHasEnded": {
-    "description": "Interface: lib/features/matches/presentation/matches_page.dart"
-  },
-  "matchesPageNoMatchesYetTheyWillAppear": "Quand l’envie de se connaître est partagée, vous pouvez échanger ici. En attendant, laissez-vous surprendre par les mots du feed.",
-  "@matchesPageNoMatchesYetTheyWillAppear": {
     "description": "Interface: lib/features/matches/presentation/matches_page.dart"
   },
   "matchesPageViewMoreMatches": "Voir les rencontres suivantes",
@@ -1964,15 +1915,6 @@
   "@matchesStringsMatchEnded": {
     "description": "Interface: lib/features/matches/presentation/matches_strings.dart"
   },
-  "matchesStringsInitialPeriodUntil": "Première période jusqu’au {arg0}.",
-  "@matchesStringsInitialPeriodUntil": {
-    "description": "Interface: lib/features/matches/presentation/matches_strings.dart",
-    "placeholders": {
-      "arg0": {
-        "type": "Object"
-      }
-    }
-  },
   "matchesStringsSendingIsPausedDuringTheContinuation": "L’envoi est suspendu pendant la décision de continuation, jusqu’au {arg0}. L’historique reste accessible.",
   "@matchesStringsSendingIsPausedDuringTheContinuation": {
     "description": "Interface: lib/features/matches/presentation/matches_strings.dart",
@@ -1985,10 +1927,6 @@
   "matchesStringsYouCanContinueYourConversation": "Vous pouvez poursuivre votre conversation.",
   "@matchesStringsYouCanContinueYourConversation": {
     "description": "Interface: lib/features/matches/presentation/matches_strings.dart"
-  },
-  "partnerPageDiscoverThisPersonThroughYourConversations": "Découvrez cette personne au fil de vos échanges.",
-  "@partnerPageDiscoverThisPersonThroughYourConversations": {
-    "description": "Interface: lib/features/matches/presentation/partner_page.dart"
   },
   "devicesPageSecureSettingsAreUnavailableActivationRemains": "Les réglages sécurisés ne sont pas accessibles. L’activation reste en attente.",
   "@devicesPageSecureSettingsAreUnavailableActivationRemains": {
@@ -3949,5 +3887,14 @@
   "chatPageRead": " · Lu",
   "@chatPageRead": {
     "description": "Read receipt suffix for an outgoing message."
+  },
+  "matchesStringsFirstPeriodEndsOn": "Fin de la première période le {arg0}",
+  "@matchesStringsFirstPeriodEndsOn": {
+    "description": "Interface: lib/features/matches/presentation/matches_strings.dart",
+    "placeholders": {
+      "arg0": {
+        "type": "Object"
+      }
+    }
   }
 }

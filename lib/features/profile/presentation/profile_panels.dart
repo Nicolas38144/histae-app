@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/widgets/histae_button.dart';
 import '../data/profile_models.dart';
 import 'profile_strings.dart';
 
@@ -59,7 +60,7 @@ class ProfilePanel extends StatelessWidget {
             const SizedBox(height: 16),
             Align(
               alignment: Alignment.centerLeft,
-              child: TextButton.icon(
+              child: HistaeButton.textIcon(
                 onPressed: onPressed,
                 icon: const Icon(Icons.edit_outlined, size: 18),
                 label: Text(action),
@@ -203,7 +204,7 @@ class ProfileDetailTile extends StatelessWidget {
             const SizedBox(height: 8),
             Align(
               alignment: Alignment.centerLeft,
-              child: TextButton.icon(
+              child: HistaeButton.textIcon(
                 onPressed: onTap,
                 label: Text(action),
                 icon: const Icon(Icons.arrow_forward_rounded, size: 18),

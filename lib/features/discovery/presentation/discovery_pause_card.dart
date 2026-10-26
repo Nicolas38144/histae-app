@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/widgets/histae_button.dart';
 import '../application/discovery_visibility_controller.dart';
 
 class DiscoveryPauseCard extends StatelessWidget {
@@ -78,7 +79,7 @@ class DiscoveryPauseCard extends StatelessWidget {
                       .messages
                       .discoveryPauseCardVisibilityCouldNotBeConfirmed,
                 ),
-                TextButton(
+                HistaeButton.text(
                   onPressed: c.loading || c.saving || c.retrySeconds > 0
                       ? null
                       : c.load,

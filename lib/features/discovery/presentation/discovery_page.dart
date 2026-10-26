@@ -6,6 +6,7 @@ import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_empty_state.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../../core/widgets/histae_wordmark.dart';
@@ -324,7 +325,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
           ),
           if (issue == LocationIssue.deniedForever ||
               issue == LocationIssue.disabled)
-            OutlinedButton(
+            HistaeButton.outlined(
               onPressed: enabled
                   ? () async {
                       final opened = await c.location.openSettings(
@@ -351,7 +352,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                 .appStringsTryAgainInS(c.retrySeconds),
           ),
         if (!showFeed)
-          OutlinedButton(
+          HistaeButton.outlined(
             onPressed: enabled
                 ? (c.ready &&
                           !c.exhausted &&
@@ -365,14 +366,14 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
             ),
           ),
         if (c.ready && !showFeed)
-          TextButton(
+          HistaeButton.text(
             onPressed: enabled ? _locate : null,
             child: Text(
               AppStrings.of(context).messages.discoveryPageRefreshMyLocation,
             ),
           ),
         if (c.encounter case final encounter?)
-          TextButton.icon(
+          HistaeButton.textIcon(
             onPressed: !c.busy ? () => _showEncounter(encounter) : null,
             icon: const Icon(Icons.chat_bubble_outline),
             label: Text(
@@ -380,13 +381,13 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                   .discoveryPageYourMatchWith(encounter.profile.firstname),
             ),
           ),
-        TextButton(
+        HistaeButton.text(
           onPressed: () => _open(ConsentsPage(session: c.session)),
           child: Text(
             AppStrings.of(context).messages.appStringsYourChoicesAndPrivacy,
           ),
         ),
-        TextButton(
+        HistaeButton.text(
           onPressed: c.session.logout,
           child: Text(AppStrings.of(context).messages.appStringsSignOut),
         ),
@@ -506,7 +507,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                           ),
                         ),
                       if (c.encounter case final encounter?)
-                        TextButton(
+                        HistaeButton.text(
                           onPressed: () => _showEncounter(encounter),
                           child: Text(
                             AppStrings.of(context).messages

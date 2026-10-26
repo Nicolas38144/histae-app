@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
-import '../../../core/widgets/editorial_card.dart';
+import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_empty_state.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../continuation/presentation/continuation_balance_card.dart';
@@ -191,35 +191,13 @@ class _MatchesPageState extends State<MatchesPage> {
                           title: AppStrings.of(context)
                               .messages
                               .matchesEmptyTitle,
-                          body: AppStrings.of(context)
-                              .messages
-                              .matchesPageNoMatchesYetTheyWillAppear,
-                        )
-                      else
-                        EditorialCard(
-                          eyebrow: AppStrings.of(context)
-                              .messages
-                              .discoveryPageTakeYourTime,
-                          title: AppStrings.of(context)
-                              .messages
-                              .matchesPageWordsContinue,
-                          body: AppStrings.of(context)
-                              .messages
-                              .matchesPageMutualInterestThenASpaceTo,
                         ),
-                      const SizedBox(height: 16),
                       ContinuationBalanceCard(
                         controller: c.continuation,
                         onOpenCredits: _openCredits,
                         loading: _overviewLoads > 0,
                       ),
                       const SizedBox(height: 16),
-                      if (!c.realtimeConnected)
-                        Text(
-                          AppStrings.of(context)
-                              .messages
-                              .matchesPageReconnectingUpdatesYouCanRefreshYour,
-                        ),
                       if (c.notice == 'ended')
                         Padding(
                           padding: EdgeInsets.symmetric(vertical: 16),
@@ -257,7 +235,7 @@ class _MatchesPageState extends State<MatchesPage> {
                               .appStringsTryAgainInS(c.retrySeconds),
                         ),
                       if (c.listCursor != null)
-                        OutlinedButton(
+                        HistaeButton.outlined(
                           onPressed: c.listLoading || c.retrySeconds > 0
                               ? null
                               : c.loadMore,

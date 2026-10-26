@@ -4,18 +4,19 @@ import '../../../core/l10n/app_strings.dart';
 import '../../../core/models/public_profile_answer.dart';
 import '../../../core/widgets/editorial_card.dart';
 
-/// The same public text layout is used in discovery and the owner's preview.
+/// Public profile text shared by discovery, the owner preview and matches.
 class FeedProfileContent extends StatelessWidget {
   const FeedProfileContent({
     super.key,
     required this.firstname,
     required this.age,
     required this.bio,
-    required this.distanceLabel,
+    this.distanceLabel,
     required this.traits,
     required this.answers,
   });
-  final String firstname, distanceLabel;
+  final String firstname;
+  final String? distanceLabel;
   final int age;
   final String? bio;
   final List<String> traits;
@@ -41,20 +42,22 @@ class FeedProfileContent extends StatelessWidget {
             style: theme.textTheme.headlineLarge?.copyWith(fontSize: 46),
           ),
         ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Icon(
-              Icons.location_on_outlined,
-              size: 22,
-              color: theme.colorScheme.primary,
-            ),
-            const SizedBox(width: 8),
-            Flexible(
-              child: Text(distanceLabel, style: theme.textTheme.bodyLarge),
-            ),
-          ],
-        ),
+        if (distanceLabel != null) ...[
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Icon(
+                Icons.location_on_outlined,
+                size: 22,
+                color: theme.colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(distanceLabel!, style: theme.textTheme.bodyLarge),
+              ),
+            ],
+          ),
+        ],
         if (bio != null && bio!.isNotEmpty) ...[
           const EditorialDivider(),
           Text(

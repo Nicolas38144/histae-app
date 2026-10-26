@@ -145,7 +145,9 @@ class _ContinuationPageState extends State<ContinuationPage>
                   title: AppStrings.of(context)
                       .messages
                       .continuationPageTheNextChapterIsWrittenTogether,
-                  body: MatchesStrings(AppStrings.of(context)).stateBody(m),
+                  body: m.status == MatchStatus.active
+                      ? null
+                      : MatchesStrings(AppStrings.of(context)).stateBody(m),
                 ),
                 if (c.loading || c.busy || !c.access.verified)
                   LinearProgressIndicator(
@@ -187,14 +189,6 @@ class _ContinuationPageState extends State<ContinuationPage>
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 12),
-                if (m.status == MatchStatus.active)
-                  Text(
-                    AppStrings.of(context).messages
-                        .continuationPageYourDecisionPeriodOpensAfterThe(
-                          MatchesStrings(AppStrings.of(context))
-                              .date(m.expiresAt),
-                        ),
-                  ),
                 if (m.status == MatchStatus.confirmed)
                   Text(
                     AppStrings.of(context)
@@ -264,7 +258,7 @@ class _ContinuationPageState extends State<ContinuationPage>
                       ),
                   ],
                 ],
-                TextButton(
+                HistaeButton.text(
                   onPressed: c.busy
                       ? null
                       : () async {
@@ -292,7 +286,7 @@ class _ContinuationPageState extends State<ContinuationPage>
                     AppStrings.of(context).messages
                         .appStringsTryAgainInS(c.retrySeconds),
                   ),
-                OutlinedButton.icon(
+                HistaeButton.outlinedIcon(
                   onPressed: c.busy || c.loading || c.retrySeconds > 0
                       ? null
                       : () async {

@@ -109,10 +109,20 @@ Events trigger the authorized reads required by each flow. Notifications are not
 proof: opening one verifies the session, collection and history. `MessageOutbox` retains drafts
 and immutable send intentions. Read receipts require a received message visible in the foreground.
 
+The conversation name and its profile menu entry share one navigation action. `PartnerPage`
+renders the selected match's existing public data through `FeedProfileContent`, also used by
+discovery and the owner's preview. Opening it does not reread the API or discard the message
+draft. Distance is omitted because the match projection does not supply it.
+
 `SignedPhotoLoader` downloads to memory without Bearer credentials or redirects, with a 5,000,000-byte
 limit and a fifteen-second timeout. Access is checked before display. Closing, losing access or
 reaching the display deadline evicts the image. Reopening does not extend the four-minute deadline
 measured from the resource read.
+
+`PartnerPhoto` owns full-size photo rendering for both the match profile and `PartnerPhotoPage`.
+It observes match access, route visibility, app lifecycle and the original read deadline. A
+covered route cancels its download and purges the decoded image; late bytes cannot restore it.
+Manual photo refresh remains an explicit authorized read.
 
 `MatchPhotoAvatar` applies the same four-minute resource deadline to authorized thumbnails. It
 downloads through `SignedPhotoLoader`, never through a persistent network-image cache, and purges

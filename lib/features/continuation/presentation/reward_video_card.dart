@@ -160,14 +160,14 @@ class RewardVideoCard extends StatelessWidget {
             ],
             if (pending) ...[
               const SizedBox(height: 8),
-              TextButton.icon(
+              HistaeButton.textIcon(
                 onPressed: r.busy || r.waiting || video.busy ? null : r.refresh,
                 icon: const Icon(Icons.refresh),
                 label: Text(
                   AppStrings.of(context).messages.rewardVideoCardCheckReward,
                 ),
               ),
-              TextButton(
+              HistaeButton.text(
                 onPressed: r.busy || r.waiting || video.busy ? null : onCancel,
                 child: Text(
                   AppStrings.of(context)
@@ -178,7 +178,7 @@ class RewardVideoCard extends StatelessWidget {
             ],
             if (video.gateway?.privacyOptionsRequired == true) ...[
               const SizedBox(height: 8),
-              TextButton.icon(
+              HistaeButton.textIcon(
                 onPressed: video.busy ? null : video.privacyOptions,
                 icon: const Icon(Icons.tune_rounded),
                 label: Text(
