@@ -160,10 +160,6 @@
   "@appStringsYourHistaeSpace": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsYouCanViewYourDocumentsManage": "Vous pouvez consulter vos documents, gérer vos consentements ou vous déconnecter ici, même si votre parcours n’est pas terminé.",
-  "@appStringsYouCanViewYourDocumentsManage": {
-    "description": "Interface: lib/core/l10n/app_strings.dart"
-  },
   "appStringsEnterAValidFrenchPhoneNumber": "Saisissez un numéro français valide.",
   "@appStringsEnterAValidFrenchPhoneNumber": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
@@ -677,10 +673,6 @@
   },
   "consentsPageWithdrawMyPreviousConsent": "Retirer mon consentement précédent",
   "@consentsPageWithdrawMyPreviousConsent": {
-    "description": "Interface: lib/features/consents/presentation/consents_page.dart"
-  },
-  "consentsPageSessionsDataAndAccountDeletion": "Sessions, données et suppression du compte",
-  "@consentsPageSessionsDataAndAccountDeletion": {
     "description": "Interface: lib/features/consents/presentation/consents_page.dart"
   },
   "consentControlTermsAccepted": "CGU acceptées",

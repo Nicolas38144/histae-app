@@ -168,8 +168,6 @@ class AppStrings {
 
   String get accountTitle => messages.appStringsYourHistaeSpace;
 
-  String get privacyScope => messages.appStringsYouCanViewYourDocumentsManage;
-
   String authFailure(ApiFailure error) => switch (error.code) {
     'invalid_phone_number' => messages.appStringsEnterAValidFrenchPhoneNumber,
     'invalid_otp_request' => messages.appStringsEnterTheSixDigitsOfThe,

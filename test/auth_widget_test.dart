@@ -244,7 +244,7 @@ void main() {
       expect(documents, hasLength(2));
       expect(documents.every((box) => box.value == false), isTrue);
       expect(boxes.every((box) => box.value == false), isTrue);
-      expect(find.text('Se déconnecter'), findsOneWidget);
+      expect(find.text('Se déconnecter'), findsNothing);
       await revealAndTap(tester, find.byKey(Key(ConsentType.terms.wireName)));
       await revealAndTap(tester, find.byKey(Key(ConsentType.privacy.wireName)));
       await revealAndTap(tester, find.text('Enregistrer mes choix'));
@@ -264,6 +264,9 @@ void main() {
       await revealAndTap(tester, find.text('Mes consentements'));
       expect(find.text('Vos consentements'), findsOneWidget);
       expect(find.textContaining('Accord enregistré'), findsNothing);
+      expect(find.text('Se déconnecter'), findsNothing);
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
       await revealAndTap(tester, find.text('Se déconnecter'));
       expect(find.text('Créer mon compte'), findsOneWidget);
       expect(find.text('Vos consentements'), findsNothing);

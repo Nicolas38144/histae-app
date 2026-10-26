@@ -64,8 +64,7 @@ import 'app_messages_it.dart';
 /// be consistent with the languages listed in the AppMessages.supportedLocales
 /// property.
 abstract class AppMessages {
-  AppMessages(String locale)
-    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppMessages(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -73,8 +72,7 @@ abstract class AppMessages {
     return Localizations.of<AppMessages>(context, AppMessages)!;
   }
 
-  static const LocalizationsDelegate<AppMessages> delegate =
-      _AppMessagesDelegate();
+  static const LocalizationsDelegate<AppMessages> delegate = _AppMessagesDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -86,20 +84,19 @@ abstract class AppMessages {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
-      <LocalizationsDelegate<dynamic>>[
-        delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
+    delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+  ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('fr'),
     Locale('en'),
     Locale('es'),
-    Locale('it'),
+    Locale('it')
   ];
 
   /// Interface: lib/app/app_opening.dart
@@ -341,12 +338,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Mon profil'**
   String get appStringsYourHistaeSpace;
-
-  /// Interface: lib/core/l10n/app_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Vous pouvez consulter vos documents, gérer vos consentements ou vous déconnecter ici, même si votre parcours n’est pas terminé.'**
-  String get appStringsYouCanViewYourDocumentsManage;
 
   /// Interface: lib/core/l10n/app_strings.dart
   ///
@@ -1038,12 +1029,6 @@ abstract class AppMessages {
   /// **'Retirer mon consentement précédent'**
   String get consentsPageWithdrawMyPreviousConsent;
 
-  /// Interface: lib/features/consents/presentation/consents_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Sessions, données et suppression du compte'**
-  String get consentsPageSessionsDataAndAccountDeletion;
-
   /// Interface: lib/features/consents/presentation/consent_control.dart
   ///
   /// In fr, this message translates to:
@@ -1618,10 +1603,7 @@ abstract class AppMessages {
   ///
   /// In fr, this message translates to:
   /// **'Continuations confirmées cette semaine : {arg0} sur {arg1}'**
-  String creditsBalancePanelContinuationsConfirmedThisWeekOf(
-    Object arg0,
-    Object arg1,
-  );
+  String creditsBalancePanelContinuationsConfirmedThisWeekOf(Object arg0, Object arg1);
 
   /// Interface: lib/features/continuation/presentation/credits_balance_panel.dart
   ///
@@ -4789,12 +4771,7 @@ abstract class AppMessages {
   ///
   /// In fr, this message translates to:
   /// **'{arg0} · {arg1}–{arg2} ans · {arg3} km'**
-  String profileSectionsAgesKm(
-    Object arg0,
-    Object arg1,
-    Object arg2,
-    Object arg3,
-  );
+  String profileSectionsAgesKm(Object arg0, Object arg1, Object arg2, Object arg3);
 
   /// Interface: lib/features/profile/presentation/profile_strings.dart
   ///
@@ -5466,30 +5443,27 @@ class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['en', 'es', 'fr', 'it'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['en', 'es', 'fr', 'it'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppMessagesDelegate old) => false;
 }
 
 AppMessages lookupAppMessages(Locale locale) {
+
+
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'en':
-      return AppMessagesEn();
-    case 'es':
-      return AppMessagesEs();
-    case 'fr':
-      return AppMessagesFr();
-    case 'it':
-      return AppMessagesIt();
+    case 'en': return AppMessagesEn();
+    case 'es': return AppMessagesEs();
+    case 'fr': return AppMessagesFr();
+    case 'it': return AppMessagesIt();
   }
 
   throw FlutterError(
     'AppMessages.delegate failed to load unsupported locale "$locale". This is likely '
     'an issue with the localizations generation tool. Please file an issue '
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.',
+    'that was used.'
   );
 }

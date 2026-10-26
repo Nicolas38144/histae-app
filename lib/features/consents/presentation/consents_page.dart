@@ -6,7 +6,6 @@ import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../auth/domain/authenticated_session.dart';
-import '../../privacy/presentation/privacy_hub_page.dart';
 import '../data/legal_document_opener.dart';
 import '../domain/consent_state.dart';
 import 'consent_control.dart';
@@ -248,37 +247,15 @@ class _ConsentsPageState extends State<ConsentsPage> {
                               : strings.saveChoices,
                         ),
                       ),
+                    if (_busy || widget.session.isSynchronizing)
+                      LinearProgressIndicator(
+                        semanticsLabel: strings.actionInProgress,
+                      ),
                     const SizedBox(height: 12),
                     HistaeButton.outlined(
                       onPressed: blocked ? null : widget.session.synchronize,
                       child: Text(strings.refreshChoices),
                     ),
-                    const SizedBox(height: 20),
-                    Text(strings.privacyScope),
-                    HistaeButton.outlined(
-                      onPressed: blocked
-                          ? null
-                          : () => Navigator.of(context).push(
-                              MaterialPageRoute<void>(
-                                builder: (_) =>
-                                    PrivacyHubPage(session: widget.session),
-                              ),
-                            ),
-                      child: Text(
-                        AppStrings.of(context)
-                            .messages
-                            .consentsPageSessionsDataAndAccountDeletion,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    HistaeButton.text(
-                      onPressed: widget.session.logout,
-                      child: Text(strings.logout),
-                    ),
-                    if (_busy || widget.session.isSynchronizing)
-                      LinearProgressIndicator(
-                        semanticsLabel: strings.actionInProgress,
-                      ),
                   ],
                 );
               },

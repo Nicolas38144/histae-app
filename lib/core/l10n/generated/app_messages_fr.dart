@@ -142,10 +142,6 @@ class AppMessagesFr extends AppMessages {
   String get appStringsYourHistaeSpace => 'Mon profil';
 
   @override
-  String get appStringsYouCanViewYourDocumentsManage =>
-      'Vous pouvez consulter vos documents, gérer vos consentements ou vous déconnecter ici, même si votre parcours n’est pas terminé.';
-
-  @override
   String get appStringsEnterAValidFrenchPhoneNumber =>
       'Saisissez un numéro français valide.';
 
@@ -572,10 +568,6 @@ class AppMessagesFr extends AppMessages {
   @override
   String get consentsPageWithdrawMyPreviousConsent =>
       'Retirer mon consentement précédent';
-
-  @override
-  String get consentsPageSessionsDataAndAccountDeletion =>
-      'Sessions, données et suppression du compte';
 
   @override
   String get consentControlTermsAccepted => 'CGU acceptées';
