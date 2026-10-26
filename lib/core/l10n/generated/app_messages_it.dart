@@ -1248,7 +1248,7 @@ class AppMessagesIt extends AppMessages {
   String get discoveryPageDiscoveryOptions => 'Opzioni di scoperta';
 
   @override
-  String get discoveryPageRefreshProfiles => 'Aggiorna i profili';
+  String get discoveryPageRefreshFeed => 'Aggiorna il feed';
 
   @override
   String get discoveryPageReportThisProfile => 'Segnala questo profilo';

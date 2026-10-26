@@ -1388,7 +1388,7 @@
   },
   "discoveryPageRefreshEncounters": "Actualiser les rencontres",
   "@discoveryPageRefreshEncounters": {
-    "description": "Interface: lib/features/discovery/presentation/discovery_page.dart"
+    "description": "Interface: lib/features/matches/presentation/matches_page.dart"
   },
   "discoveryPageRefreshMyLocation": "Actualiser ma position",
   "@discoveryPageRefreshMyLocation": {
@@ -1411,8 +1411,8 @@
   "@discoveryPageDiscoveryOptions": {
     "description": "Interface: lib/features/discovery/presentation/discovery_page.dart"
   },
-  "discoveryPageRefreshProfiles": "Actualiser les profils",
-  "@discoveryPageRefreshProfiles": {
+  "discoveryPageRefreshFeed": "Actualiser le feed",
+  "@discoveryPageRefreshFeed": {
     "description": "Interface: lib/features/discovery/presentation/discovery_page.dart"
   },
   "discoveryPageReportThisProfile": "Signaler ce profil",

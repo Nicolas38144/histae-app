@@ -319,7 +319,7 @@
   "discoveryPageYourMatchWith": "Il tuo incontro con {arg0}",
   "discoveryPageYourPreferences": "Le tue preferenze",
   "discoveryPageDiscoveryOptions": "Opzioni di scoperta",
-  "discoveryPageRefreshProfiles": "Aggiorna i profili",
+  "discoveryPageRefreshFeed": "Aggiorna il feed",
   "discoveryPageReportThisProfile": "Segnala questo profilo",
   "discoveryPageBlockThisProfile372": "Blocca questo profilo",
   "discoveryPauseCardPauseMode": "Modalità pausa",

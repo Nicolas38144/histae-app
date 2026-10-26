@@ -319,7 +319,7 @@
   "discoveryPageYourMatchWith": "Your match with {arg0}",
   "discoveryPageYourPreferences": "Your preferences",
   "discoveryPageDiscoveryOptions": "Discovery options",
-  "discoveryPageRefreshProfiles": "Refresh profiles",
+  "discoveryPageRefreshFeed": "Refresh feed",
   "discoveryPageReportThisProfile": "Report this profile",
   "discoveryPageBlockThisProfile372": "Block this profile",
   "discoveryPauseCardPauseMode": "Pause mode",

@@ -1989,7 +1989,7 @@ abstract class AppMessages {
   /// **'Ouvrir les réglages'**
   String get discoveryPageOpenSettings;
 
-  /// Interface: lib/features/discovery/presentation/discovery_page.dart
+  /// Interface: lib/features/matches/presentation/matches_page.dart
   ///
   /// In fr, this message translates to:
   /// **'Actualiser les rencontres'**
@@ -2022,8 +2022,8 @@ abstract class AppMessages {
   /// Interface: lib/features/discovery/presentation/discovery_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Actualiser les profils'**
-  String get discoveryPageRefreshProfiles;
+  /// **'Actualiser le feed'**
+  String get discoveryPageRefreshFeed;
 
   /// Interface: lib/features/discovery/presentation/discovery_page.dart
   ///

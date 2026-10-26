@@ -358,14 +358,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                       : c.refresh)
                 : null,
             child: Text(
-              AppStrings.of(context).messages.discoveryPageRefreshEncounters,
-            ),
-          ),
-        if (c.ready && !showFeed)
-          HistaeButton.text(
-            onPressed: enabled ? _locate : null,
-            child: Text(
-              AppStrings.of(context).messages.discoveryPageRefreshMyLocation,
+              AppStrings.of(context).messages.discoveryPageRefreshFeed,
             ),
           ),
         if (c.encounter case final encounter?)
@@ -377,16 +370,6 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                   .discoveryPageYourMatchWith(encounter.profile.firstname),
             ),
           ),
-        HistaeButton.text(
-          onPressed: () => _open(ConsentsPage(session: c.session)),
-          child: Text(
-            AppStrings.of(context).messages.appStringsYourChoicesAndPrivacy,
-          ),
-        ),
-        HistaeButton.text(
-          onPressed: c.session.logout,
-          child: Text(AppStrings.of(context).messages.appStringsSignOut),
-        ),
       ];
       return HistaeScaffold(
         appBar: AppBar(
@@ -416,9 +399,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                   value: 'refresh',
                   enabled: enabled,
                   child: Text(
-                    AppStrings.of(context)
-                        .messages
-                        .discoveryPageRefreshProfiles,
+                    AppStrings.of(context).messages.discoveryPageRefreshFeed,
                   ),
                 ),
                 PopupMenuItem(
