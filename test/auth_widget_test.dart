@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
+import 'package:histae_app/core/l10n/app_strings.dart';
+import 'package:histae_app/core/l10n/generated/app_messages.dart';
 import 'package:histae_app/core/widgets/histae_button.dart';
 import 'package:histae_app/features/auth/application/session_controller.dart';
 import 'package:histae_app/features/consents/domain/consent_state.dart';
@@ -464,7 +466,7 @@ void main() {
   );
 
   testWidgets(
-    'incomplete registration can logout at 200 percent text on a small screen',
+    'consent documents remain refreshable at 200 percent text on a small screen',
     (tester) async {
       tester.view.physicalSize = const Size(320, 568);
       tester.view.devicePixelRatio = 1;
@@ -472,16 +474,34 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
       addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
-      final session = testSession(
-        (request) async => defaultAuthResponse(request),
-      );
+      var documentReads = 0;
+      final session = testSession((request) async {
+        if (request.url.path.endsWith('/consents')) {
+          documentReads++;
+          final state = consentJson();
+          for (final document in state['consents'] as List) {
+            (document as Map<String, dynamic>)['document_date'] = '2026-10-26';
+          }
+          return jsonResponse(state);
+        }
+        return defaultAuthResponse(request);
+      });
       addTearDown(session.dispose);
       await session.establish(testTokens);
       await tester.pumpWidget(
-        MaterialApp(home: ConsentsPage(session: session, onboarding: true)),
+        MaterialApp(
+          locale: const Locale('fr'),
+          localizationsDelegates: AppMessages.localizationsDelegates,
+          supportedLocales: AppMessages.supportedLocales,
+          home: ConsentsPage(session: session, onboarding: true),
+        ),
       );
-      await revealAndTap(tester, find.text('Se déconnecter'));
-      expect(session.phase, SessionPhase.signedOut);
+      await tester.pumpAndSettle();
+      final previousReads = documentReads;
+      await revealAndTap(tester, find.text(const AppStrings().refreshChoices));
+      expect(documentReads, greaterThan(previousReads));
+      expect(session.phase, SessionPhase.needsConsents);
+      expect(find.text('Se déconnecter'), findsNothing);
       expect(tester.takeException(), isNull);
     },
   );

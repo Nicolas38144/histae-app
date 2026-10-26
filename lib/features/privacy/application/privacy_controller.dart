@@ -307,7 +307,6 @@ class PrivacyController extends ChangeNotifier {
     pendingRevoke = target.id;
     await _change(() => repository.revoke(target.id, _scope), () {
       pendingRevoke = null;
-      notice = 'session_revoked';
     });
   }
 

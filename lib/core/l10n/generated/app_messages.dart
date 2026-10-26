@@ -3552,12 +3552,6 @@ abstract class AppMessages {
   /// Interface: lib/features/privacy/presentation/privacy_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Cette session a été révoquée.'**
-  String get privacyStringsThisSessionWasRevoked;
-
-  /// Interface: lib/features/privacy/presentation/privacy_strings.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Cette personne est débloquée. Les anciennes rencontres ne sont pas rétablies.'**
   String get privacyStringsThisPersonIsUnblockedPreviousMatches;
 
@@ -5497,6 +5491,18 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Réponse de l’équipe'**
   String get privacyRequestTeamResponse;
+
+  /// Publication/update date of the legal document, never the user’s consent timestamp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Document du {date}'**
+  String consentDocumentDate(String date);
+
+  /// No description provided for @consentDocumentDatePending.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date du document en cours de validation.'**
+  String get consentDocumentDatePending;
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

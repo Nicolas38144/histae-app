@@ -28,9 +28,20 @@ class ConsentControl extends StatelessWidget {
       style: Theme.of(context).textTheme.titleMedium,
     );
     final renewal = consent.granted && !consent.current;
-    final document = HistaeButton.text(
-      onPressed: onOpen,
-      child: Text(strings.readDocument),
+    final document = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        HistaeButton.text(onPressed: onOpen, child: Text(strings.readDocument)),
+        Padding(
+          padding: const EdgeInsets.only(top: 4, bottom: 8),
+          child: Text(switch (consent.documentDate) {
+            final date? => strings.messages.consentDocumentDate(
+              strings.date(date),
+            ),
+            null => strings.messages.consentDocumentDatePending,
+          }, style: Theme.of(context).textTheme.bodySmall),
+        ),
+      ],
     );
     final key = Key(consent.type.wireName);
     if (!consent.type.withdrawable) {

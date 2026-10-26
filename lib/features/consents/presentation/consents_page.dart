@@ -126,7 +126,7 @@ class _ConsentsPageState extends State<ConsentsPage> {
                 final signature = state.consents
                     .map(
                       (c) =>
-                          '${c.type.name}:${c.requiredVersion}:${c.documentLanguage.code}:${c.documentUrl}',
+                          '${c.type.name}:${c.requiredVersion}:${c.documentLanguage.code}:${c.documentUrl}:${c.documentDate?.toIso8601String()}',
                     )
                     .join('|');
                 if (_versionSignature != signature) {

@@ -142,6 +142,7 @@ class RegistrationController extends ChangeNotifier {
                   old.type == document.type &&
                   old.requiredVersion == document.requiredVersion &&
                   old.documentUrl == document.documentUrl &&
+                  old.documentDate == document.documentDate &&
                   old.documentLanguage == document.documentLanguage,
             ),
           );

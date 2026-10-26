@@ -574,7 +574,6 @@
   "privacyStringsFakeProfile": "Profilo falso",
   "privacyStringsHarassment": "Molestie",
   "privacyStringsOtherReason": "Altro motivo",
-  "privacyStringsThisSessionWasRevoked": "Questa sessione è stata revocata.",
   "privacyStringsThisPersonIsUnblockedPreviousMatches": "Questa persona è sbloccata. Gli incontri precedenti non vengono ripristinati.",
   "privacyStringsARequestOfThisTypeIs": "Una richiesta di questo tipo è già aperta. Puoi seguirla qui sotto.",
   "privacyStringsYourRequestWasReceivedProcessingWill": "La richiesta è stata ricevuta. L’elaborazione sarà seguita qui.",
@@ -971,5 +970,7 @@
   "privacyRequestRectificationPrompt": "Indica il dato da correggere e la modifica desiderata.",
   "privacyRequestDetailsInvalid": "Descrivi la tua richiesta in un massimo di 2000 caratteri.",
   "privacyRequestYourMessage": "Il tuo messaggio",
-  "privacyRequestTeamResponse": "Risposta del team"
+  "privacyRequestTeamResponse": "Risposta del team",
+  "consentDocumentDate": "Documento del {date}",
+  "consentDocumentDatePending": "Data del documento in corso di validazione."
 }

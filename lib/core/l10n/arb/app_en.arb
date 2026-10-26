@@ -574,7 +574,6 @@
   "privacyStringsFakeProfile": "Fake profile",
   "privacyStringsHarassment": "Harassment",
   "privacyStringsOtherReason": "Other reason",
-  "privacyStringsThisSessionWasRevoked": "This session was revoked.",
   "privacyStringsThisPersonIsUnblockedPreviousMatches": "This person is unblocked. Previous matches are not restored.",
   "privacyStringsARequestOfThisTypeIs": "A request of this type is already open. You can track it below.",
   "privacyStringsYourRequestWasReceivedProcessingWill": "Your request was received. Processing will be tracked here.",
@@ -971,5 +970,7 @@
   "privacyRequestRectificationPrompt": "Specify the information to correct and the change you want.",
   "privacyRequestDetailsInvalid": "Describe your request in no more than 2,000 characters.",
   "privacyRequestYourMessage": "Your message",
-  "privacyRequestTeamResponse": "Reply from the team"
+  "privacyRequestTeamResponse": "Reply from the team",
+  "consentDocumentDate": "Document dated {date}",
+  "consentDocumentDatePending": "Document date pending validation."
 }

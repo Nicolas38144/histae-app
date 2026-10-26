@@ -2161,10 +2161,6 @@ class AppMessagesFr extends AppMessages {
   String get privacyStringsOtherReason => 'Autre motif';
 
   @override
-  String get privacyStringsThisSessionWasRevoked =>
-      'Cette session a été révoquée.';
-
-  @override
   String get privacyStringsThisPersonIsUnblockedPreviousMatches =>
       'Cette personne est débloquée. Les anciennes rencontres ne sont pas rétablies.';
 
@@ -3363,4 +3359,13 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get privacyRequestTeamResponse => 'Réponse de l’équipe';
+
+  @override
+  String consentDocumentDate(String date) {
+    return 'Document du $date';
+  }
+
+  @override
+  String get consentDocumentDatePending =>
+      'Date du document en cours de validation.';
 }

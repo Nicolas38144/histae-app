@@ -64,6 +64,10 @@ void main() {
     final fixture = RegistrationFixture();
     final controller = await prepared(fixture);
     expect(controller.step, RegistrationStep.phone);
+    expect(
+      controller.documents.map((document) => document.documentDate),
+      everyElement(DateTime(2026, 10, 26)),
+    );
     expect(fixture.requests.map((request) => request.url.path), [
       '/api/legal/documents',
     ]);

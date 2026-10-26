@@ -196,3 +196,9 @@ The wire moderation fields remain supported for manual removal; approval is not 
 as photo verification. Feed readiness still comes from the API and mutual sharing consent
 remains required. Private photo views share `privatePhotoLifetime` (50 seconds from the
 resource read), with explicit refresh after expiry.
+
+Legal document dates come from the API's optional `document_date` metadata (`YYYY-MM-DD`).
+Both public registration documents and authenticated consent records carry the same date.
+`ConsentControl` displays it using the interface locale; it never substitutes `updated_at`,
+which records the user's consent event. Missing metadata remains explicit rather than inventing
+a publication date. A document date alone does not change an existing consent's version validity.

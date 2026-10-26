@@ -30,6 +30,7 @@ class RegistrationFixture {
                 'required_document_version': version,
                 'document_url': 'https://legal.example/${type.name}/$version',
                 'document_language': 'fr',
+                'document_date': '2026-10-26',
               },
           ],
         });

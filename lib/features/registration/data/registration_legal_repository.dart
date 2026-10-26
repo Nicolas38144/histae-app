@@ -37,6 +37,7 @@ class RegistrationLegalRepository {
             requiredVersion: jsonString(document, 'required_document_version'),
             documentUrl: uri.toString(),
             updatedAt: null,
+            documentDate: parseDocumentDate(document['document_date']),
             documentLanguage: language,
           );
         })

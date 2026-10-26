@@ -2496,10 +2496,6 @@
   "@privacyStringsOtherReason": {
     "description": "Interface: lib/features/privacy/presentation/privacy_strings.dart"
   },
-  "privacyStringsThisSessionWasRevoked": "Cette session a été révoquée.",
-  "@privacyStringsThisSessionWasRevoked": {
-    "description": "Interface: lib/features/privacy/presentation/privacy_strings.dart"
-  },
   "privacyStringsThisPersonIsUnblockedPreviousMatches": "Cette personne est débloquée. Les anciennes rencontres ne sont pas rétablies.",
   "@privacyStringsThisPersonIsUnblockedPreviousMatches": {
     "description": "Interface: lib/features/privacy/presentation/privacy_strings.dart"
@@ -3908,5 +3904,15 @@
   "privacyRequestRectificationPrompt": "Indiquez la donnée à corriger et la modification souhaitée.",
   "privacyRequestDetailsInvalid": "Précisez votre demande en 2 000 caractères maximum.",
   "privacyRequestYourMessage": "Votre message",
-  "privacyRequestTeamResponse": "Réponse de l’équipe"
+  "privacyRequestTeamResponse": "Réponse de l’équipe",
+  "consentDocumentDate": "Document du {date}",
+  "consentDocumentDatePending": "Date du document en cours de validation.",
+  "@consentDocumentDate": {
+    "description": "Publication/update date of the legal document, never the user’s consent timestamp.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  }
 }

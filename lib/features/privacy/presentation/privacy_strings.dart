@@ -45,7 +45,6 @@ String reasonLabel(AppStrings strings, ReportReason reason) => switch (reason) {
 String privacyDate(AppStrings strings, DateTime time) => strings.dateTime(time);
 
 String privacyNotice(AppStrings strings, String? code) => switch (code) {
-  'session_revoked' => strings.messages.privacyStringsThisSessionWasRevoked,
   'unblocked' =>
     strings.messages.privacyStringsThisPersonIsUnblockedPreviousMatches,
   'request_open' => strings.messages.privacyStringsARequestOfThisTypeIs,

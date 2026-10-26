@@ -17,6 +17,19 @@ enum ConsentType {
   );
 }
 
+/// A document's calendar date carries no account timestamp or timezone.
+DateTime? parseDocumentDate(Object? value) {
+  if (value == null) return null;
+  if (value is! String || !RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value)) {
+    invalidResponse();
+  }
+  final date = DateTime.tryParse(value);
+  if (date == null || date.toIso8601String().substring(0, 10) != value) {
+    invalidResponse();
+  }
+  return date;
+}
+
 class PublicConsent {
   const PublicConsent({
     required this.type,
@@ -27,6 +40,7 @@ class PublicConsent {
     required this.updatedAt,
     this.documentLanguage = ApiLanguage.fr,
     this.acceptedDocumentLanguage,
+    this.documentDate,
   });
 
   factory PublicConsent.fromJson(Object? value) {
@@ -45,6 +59,7 @@ class PublicConsent {
       requiredVersion: jsonString(json, 'required_document_version'),
       documentUrl: jsonString(json, 'document_url'),
       updatedAt: updated as String?,
+      documentDate: parseDocumentDate(json['document_date']),
       documentLanguage:
           ApiLanguage.tryParse(json['document_language']) ??
           (throw const ApiFailure(ApiFailureKind.invalidResponse)),
@@ -60,6 +75,7 @@ class PublicConsent {
   final String requiredVersion;
   final String documentUrl;
   final String? updatedAt;
+  final DateTime? documentDate;
   final ApiLanguage documentLanguage;
   final ApiLanguage? acceptedDocumentLanguage;
 
