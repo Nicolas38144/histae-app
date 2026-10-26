@@ -80,8 +80,6 @@ class DiscoveryStrings {
   String notice(String? code) => switch (code) {
     'location_approximate' =>
       strings.messages.discoveryStringsApproximateLocationUsedDistancesMayBe,
-    'location_updated' =>
-      strings.messages.discoveryStringsYourLocationHasBeenUpdated,
     'presence_uncertain' =>
       strings.messages.discoveryStringsLocationSubmissionIsUncertainItsStatus,
     'blocked' => strings.messages.discoveryStringsThisProfileIsBlockedYouCan,

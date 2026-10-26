@@ -1625,10 +1625,6 @@
   "@discoveryStringsApproximateLocationUsedDistancesMayBe": {
     "description": "Interface: lib/features/discovery/presentation/discovery_strings.dart"
   },
-  "discoveryStringsYourLocationHasBeenUpdated": "Votre position a été actualisée.",
-  "@discoveryStringsYourLocationHasBeenUpdated": {
-    "description": "Interface: lib/features/discovery/presentation/discovery_strings.dart"
-  },
   "discoveryStringsLocationSubmissionIsUncertainItsStatus": "L’envoi de la position reste incertain. Son état est relu auprès de Histae ; aucun renvoi automatique.",
   "@discoveryStringsLocationSubmissionIsUncertainItsStatus": {
     "description": "Interface: lib/features/discovery/presentation/discovery_strings.dart"
@@ -2254,7 +2250,7 @@
   "@privacyDetailPageRefreshBlocks": {
     "description": "Interface: lib/features/privacy/presentation/privacy_detail_page.dart"
   },
-  "privacyDetailPageTheseRequestsAreSubmittedForProcessing": "Ces demandes sont transmises pour traitement. Une demande d’effacement ici ne ferme pas immédiatement votre compte. Pour le fermer dès maintenant, utilisez « Supprimer mon compte » dans votre espace de confidentialité.",
+  "privacyDetailPageTheseRequestsAreSubmittedForProcessing": "Ces démarches sont transmises à Histae, puis suivies ci-dessous. Pour télécharger une copie de vos données, ouvrez « Exporter mes données ». Pour fermer votre compte et lancer son effacement, ouvrez « Supprimer mon compte ».",
   "@privacyDetailPageTheseRequestsAreSubmittedForProcessing": {
     "description": "Interface: lib/features/privacy/presentation/privacy_detail_page.dart"
   },
@@ -2448,23 +2444,23 @@
   "@privacyHubPageCloseMyAccountAndRequestCleanup": {
     "description": "Interface: lib/features/privacy/presentation/privacy_hub_page.dart"
   },
-  "privacyStringsAccessToMyData": "Accès à mes données",
+  "privacyStringsAccessToMyData": "Consulter mes données",
   "@privacyStringsAccessToMyData": {
     "description": "Interface: lib/features/privacy/presentation/privacy_strings.dart"
   },
-  "privacyStringsErasureRequest": "Demande d’effacement",
+  "privacyStringsErasureRequest": "Demander l’effacement de mes données",
   "@privacyStringsErasureRequest": {
     "description": "Interface: lib/features/privacy/presentation/privacy_strings.dart"
   },
-  "privacyStringsPortability": "Portabilité",
+  "privacyStringsPortability": "Réutiliser mes données ailleurs",
   "@privacyStringsPortability": {
     "description": "Interface: lib/features/privacy/presentation/privacy_strings.dart"
   },
-  "privacyStringsRestrictionOfProcessing": "Limitation du traitement",
+  "privacyStringsRestrictionOfProcessing": "Limiter l’utilisation de mes données",
   "@privacyStringsRestrictionOfProcessing": {
     "description": "Interface: lib/features/privacy/presentation/privacy_strings.dart"
   },
-  "privacyStringsObjectionToProcessing": "Opposition au traitement",
+  "privacyStringsObjectionToProcessing": "M’opposer à certaines utilisations",
   "@privacyStringsObjectionToProcessing": {
     "description": "Interface: lib/features/privacy/presentation/privacy_strings.dart"
   },
@@ -2958,7 +2954,7 @@
   "@profileFeedPreviewPageThroughYourWords": {
     "description": "Interface: lib/features/profile/presentation/profile_feed_preview_page.dart"
   },
-  "profileFeedPreviewPageTheseAreThePartsOfYour": "Voici les éléments de votre profil présentés aux autres. Seuls les textes approuvés sont affichés. Votre photo reste absente du feed.",
+  "profileFeedPreviewPageTheseAreThePartsOfYour": "Voici les éléments de votre profil présentés aux autres. Votre photo reste absente du feed.",
   "@profileFeedPreviewPageTheseAreThePartsOfYour": {
     "description": "Interface: lib/features/profile/presentation/profile_feed_preview_page.dart"
   },
@@ -3303,7 +3299,7 @@
   "@privacyDetailPageDelete": {
     "description": "Interface: lib/features/privacy/presentation/privacy_detail_page.dart"
   },
-  "privacyStringsRectification": "Rectification",
+  "privacyStringsRectification": "Faire corriger mes données",
   "@privacyStringsRectification": {
     "description": "Interface: lib/features/privacy/presentation/privacy_strings.dart"
   },
@@ -3879,5 +3875,33 @@
   "iosCameraPermission": "Histae utilise l’appareil photo pour prendre votre photo de profil. Elle reste privée jusqu’à votre accord mutuel dans chaque rencontre.",
   "@iosCameraPermission": {
     "description": "Profile photo capture, availability and private sharing."
+  },
+  "privacyRightAccessHelp": "Demander quelles données Histae détient sur vous et comment elles sont utilisées. Pour télécharger un fichier, ouvrez « Exporter mes données ».",
+  "@privacyRightAccessHelp": {
+    "description": "Plain-language explanation of a data-rights request. Requests are processed separately from export and account deletion."
+  },
+  "privacyRightErasureHelp": "Demander à Histae l’effacement de votre compte et de ses données. Après validation de la demande, l’effacement du compte est lancé. Pour le lancer directement, utilisez « Supprimer mon compte ».",
+  "@privacyRightErasureHelp": {
+    "description": "Plain-language explanation of a data-rights request. Requests are processed separately from export and account deletion."
+  },
+  "privacyRightPortabilityHelp": "Demander un fichier réutilisable de certaines données que vous avez fournies à Histae, pour les conserver ou les transmettre à un autre service.",
+  "@privacyRightPortabilityHelp": {
+    "description": "Plain-language explanation of a data-rights request. Requests are processed separately from export and account deletion."
+  },
+  "privacyRightRectificationHelp": "Demander la correction d’une information inexacte ou incomplète. Pour votre présentation et vos préférences, vous pouvez aussi modifier directement votre profil.",
+  "@privacyRightRectificationHelp": {
+    "description": "Plain-language explanation of a data-rights request. Requests are processed separately from export and account deletion."
+  },
+  "privacyRightRestrictionHelp": "Demander de suspendre temporairement certaines utilisations de vos données, par exemple pendant la vérification d’une information contestée. Les données peuvent rester conservées.",
+  "@privacyRightRestrictionHelp": {
+    "description": "Plain-language explanation of a data-rights request. Requests are processed separately from export and account deletion."
+  },
+  "privacyRightObjectionHelp": "Demander l’arrêt d’une utilisation précise de vos données, selon votre situation et le traitement concerné. Pour retirer un consentement, ouvrez « Mes consentements ».",
+  "@privacyRightObjectionHelp": {
+    "description": "Plain-language explanation of a data-rights request. Requests are processed separately from export and account deletion."
+  },
+  "privacyRightExplanationTitle": "À quoi sert cette demande ?",
+  "@privacyRightExplanationTitle": {
+    "description": "Disclosure label that expands the explanation of the selected data-rights request."
   }
 }

@@ -1439,10 +1439,6 @@ class AppMessagesFr extends AppMessages {
       'Position approximative utilisée. Les distances peuvent être moins précises.';
 
   @override
-  String get discoveryStringsYourLocationHasBeenUpdated =>
-      'Votre position a été actualisée.';
-
-  @override
   String get discoveryStringsLocationSubmissionIsUncertainItsStatus =>
       'L’envoi de la position reste incertain. Son état est relu auprès de Histae ; aucun renvoi automatique.';
 
@@ -1957,7 +1953,7 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get privacyDetailPageTheseRequestsAreSubmittedForProcessing =>
-      'Ces demandes sont transmises pour traitement. Une demande d’effacement ici ne ferme pas immédiatement votre compte. Pour le fermer dès maintenant, utilisez « Supprimer mon compte » dans votre espace de confidentialité.';
+      'Ces démarches sont transmises à Histae, puis suivies ci-dessous. Pour télécharger une copie de vos données, ouvrez « Exporter mes données ». Pour fermer votre compte et lancer son effacement, ouvrez « Supprimer mon compte ».';
 
   @override
   String get privacyDetailPageYourRequest => 'Votre démarche';
@@ -2123,20 +2119,22 @@ class AppMessagesFr extends AppMessages {
       'Fermer mon compte et demander son nettoyage';
 
   @override
-  String get privacyStringsAccessToMyData => 'Accès à mes données';
+  String get privacyStringsAccessToMyData => 'Consulter mes données';
 
   @override
-  String get privacyStringsErasureRequest => 'Demande d’effacement';
+  String get privacyStringsErasureRequest =>
+      'Demander l’effacement de mes données';
 
   @override
-  String get privacyStringsPortability => 'Portabilité';
+  String get privacyStringsPortability => 'Réutiliser mes données ailleurs';
 
   @override
   String get privacyStringsRestrictionOfProcessing =>
-      'Limitation du traitement';
+      'Limiter l’utilisation de mes données';
 
   @override
-  String get privacyStringsObjectionToProcessing => 'Opposition au traitement';
+  String get privacyStringsObjectionToProcessing =>
+      'M’opposer à certaines utilisations';
 
   @override
   String get privacyStringsReceived => 'Reçue';
@@ -2553,7 +2551,7 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get profileFeedPreviewPageTheseAreThePartsOfYour =>
-      'Voici les éléments de votre profil présentés aux autres. Seuls les textes approuvés sont affichés. Votre photo reste absente du feed.';
+      'Voici les éléments de votre profil présentés aux autres. Votre photo reste absente du feed.';
 
   @override
   String get profileFeedPreviewPageRefreshingYourPreview =>
@@ -2846,7 +2844,7 @@ class AppMessagesFr extends AppMessages {
   String get privacyDetailPageDelete => 'SUPPRIMER';
 
   @override
-  String get privacyStringsRectification => 'Rectification';
+  String get privacyStringsRectification => 'Faire corriger mes données';
 
   @override
   String get privacyStringsSpam => 'Spam';
@@ -3320,4 +3318,31 @@ class AppMessagesFr extends AppMessages {
   @override
   String get iosCameraPermission =>
       'Histae utilise l’appareil photo pour prendre votre photo de profil. Elle reste privée jusqu’à votre accord mutuel dans chaque rencontre.';
+
+  @override
+  String get privacyRightAccessHelp =>
+      'Demander quelles données Histae détient sur vous et comment elles sont utilisées. Pour télécharger un fichier, ouvrez « Exporter mes données ».';
+
+  @override
+  String get privacyRightErasureHelp =>
+      'Demander à Histae l’effacement de votre compte et de ses données. Après validation de la demande, l’effacement du compte est lancé. Pour le lancer directement, utilisez « Supprimer mon compte ».';
+
+  @override
+  String get privacyRightPortabilityHelp =>
+      'Demander un fichier réutilisable de certaines données que vous avez fournies à Histae, pour les conserver ou les transmettre à un autre service.';
+
+  @override
+  String get privacyRightRectificationHelp =>
+      'Demander la correction d’une information inexacte ou incomplète. Pour votre présentation et vos préférences, vous pouvez aussi modifier directement votre profil.';
+
+  @override
+  String get privacyRightRestrictionHelp =>
+      'Demander de suspendre temporairement certaines utilisations de vos données, par exemple pendant la vérification d’une information contestée. Les données peuvent rester conservées.';
+
+  @override
+  String get privacyRightObjectionHelp =>
+      'Demander l’arrêt d’une utilisation précise de vos données, selon votre situation et le traitement concerné. Pour retirer un consentement, ouvrez « Mes consentements ».';
+
+  @override
+  String get privacyRightExplanationTitle => 'À quoi sert cette demande ?';
 }

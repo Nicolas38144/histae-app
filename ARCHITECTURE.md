@@ -149,6 +149,21 @@ validation grants a reward. `BillingController` operates on immutable values and
 `NativeBillingGateway` alone handles Apple/Google SDK objects. Purchase verification precedes
 completion, and unverified purchases remain available for a safe retry or restoration.
 
+## Privacy requests
+
+Choices use plain-language labels and a collapsed explanation for the selected type. Opening
+the explanation never submits a request; submission still requires confirmation and keeps the
+same pending intention after an uncertain response. The app sends only the existing `type`
+field to the API. Export and account deletion remain separate explicit flows.
+
+API coverage checked from source on 2026-10-26: all six rights have request creation/listing and
+administrator status tracking. Export streams a JSON file, but creating an access or portability
+request does not start that export or complete the request. An administrator's completion of an
+erasure request schedules full account erasure through the worker. Rectification, restriction
+and objection requests update tracking metadata only: their status does not itself correct data
+or enforce processing restrictions. Editable profile data has separate self-service endpoints.
+This is a source review, not confirmation of production execution; no API tests were run.
+
 ## Presentation and language
 
 The [design system](DESIGN_SYSTEM.md) defines the shared visual behavior. `AppOpening` owns only the

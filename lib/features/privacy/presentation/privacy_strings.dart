@@ -12,6 +12,15 @@ String rightLabel(AppStrings strings, DataRight type) => switch (type) {
   DataRight.objection => strings.messages.privacyStringsObjectionToProcessing,
 };
 
+String rightDescription(AppStrings strings, DataRight type) => switch (type) {
+  DataRight.access => strings.messages.privacyRightAccessHelp,
+  DataRight.erasure => strings.messages.privacyRightErasureHelp,
+  DataRight.portability => strings.messages.privacyRightPortabilityHelp,
+  DataRight.rectification => strings.messages.privacyRightRectificationHelp,
+  DataRight.restriction => strings.messages.privacyRightRestrictionHelp,
+  DataRight.objection => strings.messages.privacyRightObjectionHelp,
+};
+
 String rightStatus(AppStrings strings, RightStatus status) => switch (status) {
   RightStatus.pending => strings.messages.privacyStringsReceived,
   RightStatus.inProgress => strings.messages.privacyStringsInProgress,

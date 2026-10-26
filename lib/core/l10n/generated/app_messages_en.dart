@@ -1427,10 +1427,6 @@ class AppMessagesEn extends AppMessages {
       'Approximate location used. Distances may be less accurate.';
 
   @override
-  String get discoveryStringsYourLocationHasBeenUpdated =>
-      'Your location has been updated.';
-
-  @override
   String get discoveryStringsLocationSubmissionIsUncertainItsStatus =>
       'Location submission is uncertain. Its status is being checked with Histae; it will not be resent automatically.';
 
@@ -1937,7 +1933,7 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get privacyDetailPageTheseRequestsAreSubmittedForProcessing =>
-      'These requests are submitted for processing. An erasure request here does not immediately close your account. To close it now, use Delete my account in your privacy space.';
+      'These requests are sent to Histae and tracked below. To download a copy of your data, open “Export my data”. To close your account and start its erasure, open “Delete my account”.';
 
   @override
   String get privacyDetailPageYourRequest => 'Your request';
@@ -2097,20 +2093,21 @@ class AppMessagesEn extends AppMessages {
       'Close my account and request cleanup';
 
   @override
-  String get privacyStringsAccessToMyData => 'Access to my data';
+  String get privacyStringsAccessToMyData => 'Access my data';
 
   @override
-  String get privacyStringsErasureRequest => 'Erasure request';
+  String get privacyStringsErasureRequest => 'Request erasure of my data';
 
   @override
-  String get privacyStringsPortability => 'Portability';
+  String get privacyStringsPortability => 'Reuse my data elsewhere';
 
   @override
   String get privacyStringsRestrictionOfProcessing =>
-      'Restriction of processing';
+      'Limit the use of my data';
 
   @override
-  String get privacyStringsObjectionToProcessing => 'Objection to processing';
+  String get privacyStringsObjectionToProcessing =>
+      'Object to specific uses of my data';
 
   @override
   String get privacyStringsReceived => 'Received';
@@ -2520,7 +2517,7 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get profileFeedPreviewPageTheseAreThePartsOfYour =>
-      'These are the parts of your profile shown to others. Only approved text appears. Your photo stays out of the feed.';
+      'These are the parts of your profile shown to others. Your photo stays out of the feed.';
 
   @override
   String get profileFeedPreviewPageRefreshingYourPreview =>
@@ -2811,7 +2808,7 @@ class AppMessagesEn extends AppMessages {
   String get privacyDetailPageDelete => 'DELETE';
 
   @override
-  String get privacyStringsRectification => 'Rectification';
+  String get privacyStringsRectification => 'Correct my data';
 
   @override
   String get privacyStringsSpam => 'Spam';
@@ -3281,4 +3278,31 @@ class AppMessagesEn extends AppMessages {
   @override
   String get iosCameraPermission =>
       'Histae uses the camera to take your profile photo. It stays private until you both agree to reveal it in each match.';
+
+  @override
+  String get privacyRightAccessHelp =>
+      'Ask which data Histae holds about you and how it is used. To download a file, open “Export my data”.';
+
+  @override
+  String get privacyRightErasureHelp =>
+      'Ask Histae to erase your account and its data. Once the request is approved, account erasure starts. To start it directly, use “Delete my account”.';
+
+  @override
+  String get privacyRightPortabilityHelp =>
+      'Ask for a reusable file containing certain data you provided to Histae, to keep it or send it to another service.';
+
+  @override
+  String get privacyRightRectificationHelp =>
+      'Ask for inaccurate or incomplete information to be corrected. You can also edit your introduction and preferences directly in your profile.';
+
+  @override
+  String get privacyRightRestrictionHelp =>
+      'Ask to temporarily suspend certain uses of your data, for example while disputed information is checked. The data may still be retained.';
+
+  @override
+  String get privacyRightObjectionHelp =>
+      'Ask for a specific use of your data to stop, depending on your situation and the processing involved. To withdraw consent, open “My consents”.';
+
+  @override
+  String get privacyRightExplanationTitle => 'What is this request for?';
 }

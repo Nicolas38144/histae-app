@@ -368,7 +368,7 @@ class DiscoveryController extends ChangeNotifier {
       await repository.presence(fix.latitude, fix.longitude, _scope);
       if (!_alive(epoch)) return;
       approximate = fix.approximate;
-      notice = fix.approximate ? 'location_approximate' : 'location_updated';
+      notice = fix.approximate ? 'location_approximate' : null;
     } on LocationFailure catch (e) {
       if (_alive(epoch)) locationIssue = e.issue;
     } on ApiFailure catch (e) {

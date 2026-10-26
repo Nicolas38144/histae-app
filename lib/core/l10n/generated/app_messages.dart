@@ -2328,12 +2328,6 @@ abstract class AppMessages {
   /// Interface: lib/features/discovery/presentation/discovery_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Votre position a été actualisée.'**
-  String get discoveryStringsYourLocationHasBeenUpdated;
-
-  /// Interface: lib/features/discovery/presentation/discovery_strings.dart
-  ///
-  /// In fr, this message translates to:
   /// **'L’envoi de la position reste incertain. Son état est relu auprès de Histae ; aucun renvoi automatique.'**
   String get discoveryStringsLocationSubmissionIsUncertainItsStatus;
 
@@ -3204,7 +3198,7 @@ abstract class AppMessages {
   /// Interface: lib/features/privacy/presentation/privacy_detail_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Ces demandes sont transmises pour traitement. Une demande d’effacement ici ne ferme pas immédiatement votre compte. Pour le fermer dès maintenant, utilisez « Supprimer mon compte » dans votre espace de confidentialité.'**
+  /// **'Ces démarches sont transmises à Histae, puis suivies ci-dessous. Pour télécharger une copie de vos données, ouvrez « Exporter mes données ». Pour fermer votre compte et lancer son effacement, ouvrez « Supprimer mon compte ».'**
   String get privacyDetailPageTheseRequestsAreSubmittedForProcessing;
 
   /// Interface: lib/features/privacy/presentation/privacy_detail_page.dart
@@ -3480,31 +3474,31 @@ abstract class AppMessages {
   /// Interface: lib/features/privacy/presentation/privacy_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Accès à mes données'**
+  /// **'Consulter mes données'**
   String get privacyStringsAccessToMyData;
 
   /// Interface: lib/features/privacy/presentation/privacy_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Demande d’effacement'**
+  /// **'Demander l’effacement de mes données'**
   String get privacyStringsErasureRequest;
 
   /// Interface: lib/features/privacy/presentation/privacy_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Portabilité'**
+  /// **'Réutiliser mes données ailleurs'**
   String get privacyStringsPortability;
 
   /// Interface: lib/features/privacy/presentation/privacy_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Limitation du traitement'**
+  /// **'Limiter l’utilisation de mes données'**
   String get privacyStringsRestrictionOfProcessing;
 
   /// Interface: lib/features/privacy/presentation/privacy_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Opposition au traitement'**
+  /// **'M’opposer à certaines utilisations'**
   String get privacyStringsObjectionToProcessing;
 
   /// Interface: lib/features/privacy/presentation/privacy_strings.dart
@@ -4200,7 +4194,7 @@ abstract class AppMessages {
   /// Interface: lib/features/profile/presentation/profile_feed_preview_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Voici les éléments de votre profil présentés aux autres. Seuls les textes approuvés sont affichés. Votre photo reste absente du feed.'**
+  /// **'Voici les éléments de votre profil présentés aux autres. Votre photo reste absente du feed.'**
   String get profileFeedPreviewPageTheseAreThePartsOfYour;
 
   /// Interface: lib/features/profile/presentation/profile_feed_preview_page.dart
@@ -4710,7 +4704,7 @@ abstract class AppMessages {
   /// Interface: lib/features/privacy/presentation/privacy_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Rectification'**
+  /// **'Faire corriger mes données'**
   String get privacyStringsRectification;
 
   /// Interface: lib/features/privacy/presentation/privacy_strings.dart
@@ -5431,6 +5425,48 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Histae utilise l’appareil photo pour prendre votre photo de profil. Elle reste privée jusqu’à votre accord mutuel dans chaque rencontre.'**
   String get iosCameraPermission;
+
+  /// Plain-language explanation of a data-rights request. Requests are processed separately from export and account deletion.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demander quelles données Histae détient sur vous et comment elles sont utilisées. Pour télécharger un fichier, ouvrez « Exporter mes données ».'**
+  String get privacyRightAccessHelp;
+
+  /// Plain-language explanation of a data-rights request. Requests are processed separately from export and account deletion.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demander à Histae l’effacement de votre compte et de ses données. Après validation de la demande, l’effacement du compte est lancé. Pour le lancer directement, utilisez « Supprimer mon compte ».'**
+  String get privacyRightErasureHelp;
+
+  /// Plain-language explanation of a data-rights request. Requests are processed separately from export and account deletion.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demander un fichier réutilisable de certaines données que vous avez fournies à Histae, pour les conserver ou les transmettre à un autre service.'**
+  String get privacyRightPortabilityHelp;
+
+  /// Plain-language explanation of a data-rights request. Requests are processed separately from export and account deletion.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demander la correction d’une information inexacte ou incomplète. Pour votre présentation et vos préférences, vous pouvez aussi modifier directement votre profil.'**
+  String get privacyRightRectificationHelp;
+
+  /// Plain-language explanation of a data-rights request. Requests are processed separately from export and account deletion.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demander de suspendre temporairement certaines utilisations de vos données, par exemple pendant la vérification d’une information contestée. Les données peuvent rester conservées.'**
+  String get privacyRightRestrictionHelp;
+
+  /// Plain-language explanation of a data-rights request. Requests are processed separately from export and account deletion.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demander l’arrêt d’une utilisation précise de vos données, selon votre situation et le traitement concerné. Pour retirer un consentement, ouvrez « Mes consentements ».'**
+  String get privacyRightObjectionHelp;
+
+  /// Disclosure label that expands the explanation of the selected data-rights request.
+  ///
+  /// In fr, this message translates to:
+  /// **'À quoi sert cette demande ?'**
+  String get privacyRightExplanationTitle;
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

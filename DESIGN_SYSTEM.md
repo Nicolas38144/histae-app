@@ -87,6 +87,11 @@ Answer editing separates the question, text, order and remove/move actions. Repl
 list is explicit. Sensitive-data and location choices use switches, separate from required terms
 acceptance and privacy-notice acknowledgement.
 
+Privacy request choices have plain action labels and an explanation hidden behind a small
+disclosure arrow. The selected explanation opens and closes on demand and resets when the
+choice changes. Clarify the difference between a request for manual handling, direct export
+and account deletion; a request status must not imply that a processing restriction was applied.
+
 ## Navigation and accessibility
 
 The Profile / Feed / Matches bar is transparent, with no panel, shadow or separator. Icons are

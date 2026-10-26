@@ -344,6 +344,10 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
         for (final type in DataRight.values)
           type: rightLabel(AppStrings.of(context), type),
       },
+      descriptions: {
+        for (final type in DataRight.values)
+          type: rightDescription(AppStrings.of(context), type),
+      },
       onChanged: enabled && c.pendingRight == null
           ? (value) => setState(() => _type = value)
           : null,
@@ -365,10 +369,7 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
                     AppStrings.of(context)
                         .messages
                         .privacyDetailPageSubmitThisRequest,
-                    AppStrings.of(context).messages
-                        .privacyDetailPageThisRequestWillBeRecordedFor(
-                          rightLabel(AppStrings.of(context), type),
-                        ),
+                    '${rightDescription(AppStrings.of(context), type)}\n\n${AppStrings.of(context).messages.privacyDetailPageThisRequestWillBeRecordedFor(rightLabel(AppStrings.of(context), type))}',
                     action: AppStrings.of(context)
                         .messages
                         .privacyDetailPageSubmit,
