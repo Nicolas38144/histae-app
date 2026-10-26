@@ -1585,7 +1585,7 @@ class AppMessagesIt extends AppMessages {
   String get chatPageOlderMessages => 'Messaggi precedenti';
 
   @override
-  String get chatPageSent => ' · Inviato';
+  String get chatPageSent => 'Inviato';
 
   @override
   String get chatPageResumeReadConfirmation =>
@@ -3331,7 +3331,7 @@ class AppMessagesIt extends AppMessages {
       'Entrambi dovete avere una foto approvata prima di svelarle. Controlla la tua foto nel profilo.';
 
   @override
-  String get chatPageRead => ' · Letto';
+  String get chatPageRead => 'Letto';
 
   @override
   String matchesStringsFirstPeriodEndsOn(Object arg0) {

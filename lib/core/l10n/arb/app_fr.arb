@@ -1798,7 +1798,7 @@
   "@chatPageOlderMessages": {
     "description": "Interface: lib/features/matches/presentation/chat_page.dart"
   },
-  "chatPageSent": " · Envoyé",
+  "chatPageSent": "Envoyé",
   "@chatPageSent": {
     "description": "Interface: lib/features/matches/presentation/chat_page.dart"
   },
@@ -3884,9 +3884,9 @@
   "@photoRevealMissing": {
     "description": "Private photo readiness and mutual sharing controls."
   },
-  "chatPageRead": " · Lu",
+  "chatPageRead": "Lu",
   "@chatPageRead": {
-    "description": "Read receipt suffix for an outgoing message."
+    "description": "Read status for an outgoing message, confirmed by the API."
   },
   "matchesStringsFirstPeriodEndsOn": "Fin de la première période le {arg0}",
   "@matchesStringsFirstPeriodEndsOn": {

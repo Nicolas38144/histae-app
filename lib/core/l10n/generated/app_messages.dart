@@ -2580,7 +2580,7 @@ abstract class AppMessages {
   /// Interface: lib/features/matches/presentation/chat_page.dart
   ///
   /// In fr, this message translates to:
-  /// **' · Envoyé'**
+  /// **'Envoyé'**
   String get chatPageSent;
 
   /// Interface: lib/features/matches/presentation/chat_page.dart
@@ -5438,10 +5438,10 @@ abstract class AppMessages {
   /// **'Chacun doit avoir une photo approuvée avant de pouvoir dévoiler vos photos. Vérifiez votre photo depuis votre profil.'**
   String get photoRevealMissing;
 
-  /// Read receipt suffix for an outgoing message.
+  /// Read status for an outgoing message, confirmed by the API.
   ///
   /// In fr, this message translates to:
-  /// **' · Lu'**
+  /// **'Lu'**
   String get chatPageRead;
 
   /// Interface: lib/features/matches/presentation/matches_strings.dart

@@ -69,6 +69,10 @@ Matches shows a compact, scrollable credit card with an explicit view-credits ac
 Free users see available included/ad credits and Videos; Premium users get an appropriate message
 without a video button. A failed or unknown quota read must not appear as a zero balance.
 
+Conversation receipts stay in the 11 px message metadata: a small neutral check for Sent,
+and a lavender double check for Read, with translated labels. Received messages show only
+their timestamp. Read state always comes from the API; metadata wraps on narrow screens.
+
 Profile groups the introduction, answers, feed preview, account details, pause mode and settings.
 Its subscription entry shows Premium for Free or the subscription-management label for Premium,
 with neutral loading state. The copyable account UUID appears only in the private profile.

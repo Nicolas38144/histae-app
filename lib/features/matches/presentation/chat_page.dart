@@ -13,6 +13,7 @@ import '../application/matches_controller.dart';
 import 'conversation_header.dart';
 import 'match_photo_avatar.dart';
 import 'matches_strings.dart';
+import 'message_metadata.dart';
 import 'partner_page.dart';
 
 class ChatPage extends StatefulWidget {
@@ -446,17 +447,9 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                                                   ),
                                             ),
                                             const SizedBox(height: 8),
-                                            Text(
-                                              '${MatchesStrings(AppStrings.of(context)).date(m.createdAt)}${own ? (m.readAt == null ? AppStrings.of(context).messages.chatPageSent : AppStrings.of(context).messages.chatPageRead) : ''}',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodySmall
-                                                  ?.copyWith(
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .onSurfaceVariant,
-                                                    fontSize: 11,
-                                                  ),
+                                            MessageMetadata(
+                                              message: m,
+                                              own: own,
                                             ),
                                           ],
                                         ),

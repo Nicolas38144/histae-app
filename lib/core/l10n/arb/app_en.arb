@@ -412,7 +412,7 @@
   "chatPageTheConversationIsNoLongerAvailable": "The conversation is no longer available.",
   "chatPageRefreshMyMatches": "Refresh my matches",
   "chatPageOlderMessages": "Older messages",
-  "chatPageSent": " · Sent",
+  "chatPageSent": "Sent",
   "chatPageResumeReadConfirmation": "Resume read confirmation",
   "chatPageClosingStillNeedsConfirmationNoNew": "Closing still needs confirmation. No new message will be sent.",
   "chatPageResumeTheSameRequest": "Resume the same request",
@@ -948,9 +948,9 @@
   "@photoPageOnePersonalPhotoItDoesNot": {
     "description": "Private photo readiness and mutual sharing controls."
   },
-  "chatPageRead": " · Read",
+  "chatPageRead": "Read",
   "@chatPageRead": {
-    "description": "Read receipt suffix for an outgoing message."
+    "description": "Read status for an outgoing message, confirmed by the API."
   },
   "matchesStringsFirstPeriodEndsOn": "End of the first period on {arg0}",
   "@matchesStringsFirstPeriodEndsOn": {
