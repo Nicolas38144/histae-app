@@ -2404,7 +2404,7 @@
   "@privacyHubPageWithConfidence": {
     "description": "Interface: lib/features/privacy/presentation/privacy_hub_page.dart"
   },
-  "privacyHubPageFindYourChoicesAccessAndData": "Retrouvez vos choix, vos accès et vos données. Ces démarches restent disponibles avant la fin de votre inscription.",
+  "privacyHubPageFindYourChoicesAccessAndData": "Retrouvez vos choix, vos accès et vos données.",
   "@privacyHubPageFindYourChoicesAccessAndData": {
     "description": "Interface: lib/features/privacy/presentation/privacy_hub_page.dart"
   },

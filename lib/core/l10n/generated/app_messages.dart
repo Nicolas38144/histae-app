@@ -3414,7 +3414,7 @@ abstract class AppMessages {
   /// Interface: lib/features/privacy/presentation/privacy_hub_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Retrouvez vos choix, vos accès et vos données. Ces démarches restent disponibles avant la fin de votre inscription.'**
+  /// **'Retrouvez vos choix, vos accès et vos données.'**
   String get privacyHubPageFindYourChoicesAccessAndData;
 
   /// Interface: lib/features/privacy/presentation/privacy_hub_page.dart

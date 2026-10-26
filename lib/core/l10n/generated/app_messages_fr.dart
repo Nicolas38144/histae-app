@@ -2082,7 +2082,7 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get privacyHubPageFindYourChoicesAccessAndData =>
-      'Retrouvez vos choix, vos accès et vos données. Ces démarches restent disponibles avant la fin de votre inscription.';
+      'Retrouvez vos choix, vos accès et vos données.';
 
   @override
   String get privacyHubPageMyConsents => 'Mes consentements';

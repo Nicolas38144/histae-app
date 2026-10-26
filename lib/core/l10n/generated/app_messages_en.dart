@@ -2058,7 +2058,7 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get privacyHubPageFindYourChoicesAccessAndData =>
-      'Find your choices, access and data here. These actions remain available before you complete registration.';
+      'Find your choices, access and data here.';
 
   @override
   String get privacyHubPageMyConsents => 'My consents';
