@@ -3198,7 +3198,7 @@ abstract class AppMessages {
   /// Interface: lib/features/privacy/presentation/privacy_detail_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Ces démarches sont transmises à Histae, puis suivies ci-dessous. Pour télécharger une copie de vos données, ouvrez « Exporter mes données ». Pour fermer votre compte et lancer son effacement, ouvrez « Supprimer mon compte ».'**
+  /// **'Ces demandes nécessitent une intervention de Histae. La modification du profil, l’export des données et la suppression du compte se font directement depuis leurs rubriques.'**
   String get privacyDetailPageTheseRequestsAreSubmittedForProcessing;
 
   /// Interface: lib/features/privacy/presentation/privacy_detail_page.dart
@@ -4704,7 +4704,7 @@ abstract class AppMessages {
   /// Interface: lib/features/privacy/presentation/privacy_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Faire corriger mes données'**
+  /// **'Corriger une donnée non modifiable'**
   String get privacyStringsRectification;
 
   /// Interface: lib/features/privacy/presentation/privacy_strings.dart
@@ -5447,7 +5447,7 @@ abstract class AppMessages {
   /// Plain-language explanation of a data-rights request. Requests are processed separately from export and account deletion.
   ///
   /// In fr, this message translates to:
-  /// **'Demander la correction d’une information inexacte ou incomplète. Pour votre présentation et vos préférences, vous pouvez aussi modifier directement votre profil.'**
+  /// **'Demander la correction d’une information inexacte ou incomplète que vous ne pouvez pas modifier dans l’app. Votre présentation, vos réponses et vos préférences se modifient directement dans « Mon profil ».'**
   String get privacyRightRectificationHelp;
 
   /// Plain-language explanation of a data-rights request. Requests are processed separately from export and account deletion.

@@ -14,6 +14,13 @@ import 'privacy_choice.dart';
 import 'privacy_frame.dart';
 import 'privacy_strings.dart';
 
+// Self-service export, account deletion and profile edits have dedicated flows.
+const _manualRequestTypes = [
+  DataRight.rectification,
+  DataRight.restriction,
+  DataRight.objection,
+];
+
 class PrivacyDetailPage extends StatefulWidget {
   const PrivacyDetailPage({
     super.key,
@@ -29,7 +36,7 @@ class PrivacyDetailPage extends StatefulWidget {
 
 class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
   PrivacyController get c => widget.controller;
-  DataRight _type = DataRight.access;
+  DataRight _type = _manualRequestTypes.first;
   final _confirmation = TextEditingController();
 
   @override
@@ -329,87 +336,103 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
     ),
   ];
 
-  List<Widget> _rights() => [
-    Text(
-      AppStrings.of(context)
-          .messages
-          .privacyDetailPageTheseRequestsAreSubmittedForProcessing,
-    ),
-    const SizedBox(height: 24),
-    PrivacyChoice<DataRight>(
-      key: const Key('privacy-right-choice'),
-      value: c.pendingRight ?? _type,
-      label: AppStrings.of(context).messages.privacyDetailPageYourRequest,
-      choices: {
-        for (final type in DataRight.values)
-          type: rightLabel(AppStrings.of(context), type),
-      },
-      descriptions: {
-        for (final type in DataRight.values)
-          type: rightDescription(AppStrings.of(context), type),
-      },
-      onChanged: enabled && c.pendingRight == null
-          ? (value) => setState(() => _type = value)
-          : null,
-    ),
-    if (c.pendingRight != null)
-      Padding(
-        padding: EdgeInsets.symmetric(vertical: 16),
-        child: Text(
-          AppStrings.of(context)
-              .messages
-              .privacyDetailPageTheResponseStillNeedsConfirmationRefresh,
-        ),
+  List<Widget> _rights() {
+    final pending = c.pendingRight;
+    final selected =
+        pending ??
+        (_manualRequestTypes.contains(_type)
+            ? _type
+            : _manualRequestTypes.first);
+    final choices = {
+      for (final type in _manualRequestTypes)
+        type: rightLabel(AppStrings.of(context), type),
+    };
+    // Keep an uncertain existing request immutable, even if its type now has
+    // a self-service flow. This read-only choice cannot create a new request.
+    if (pending != null) {
+      choices[pending] = rightLabel(AppStrings.of(context), pending);
+    }
+    return [
+      Text(
+        AppStrings.of(context)
+            .messages
+            .privacyDetailPageTheseRequestsAreSubmittedForProcessing,
       ),
-    HistaeButton(
-      onPressed: enabled
-          ? () async {
-              final type = c.pendingRight ?? _type;
-              if (await _confirm(
-                    AppStrings.of(context)
-                        .messages
-                        .privacyDetailPageSubmitThisRequest,
-                    '${rightDescription(AppStrings.of(context), type)}\n\n${AppStrings.of(context).messages.privacyDetailPageThisRequestWillBeRecordedFor(rightLabel(AppStrings.of(context), type))}',
-                    action: AppStrings.of(context)
-                        .messages
-                        .privacyDetailPageSubmit,
-                  ) &&
-                  mounted) {
-                await c.request(type);
-              }
-            }
-          : null,
-      child: Text(
-        c.pendingRight == null
-            ? AppStrings.of(context).messages.privacyDetailPageSubmitMyRequest
-            : AppStrings.of(context)
-                  .messages
-                  .privacyDetailPageResumeThisRequest,
+      const SizedBox(height: 24),
+      PrivacyChoice<DataRight>(
+        key: const Key('privacy-right-choice'),
+        value: selected,
+        label: AppStrings.of(context).messages.privacyDetailPageYourRequest,
+        choices: choices,
+        descriptions: {
+          for (final type in choices.keys)
+            type: rightDescription(AppStrings.of(context), type),
+        },
+        onChanged: enabled && c.pendingRight == null
+            ? (value) => setState(() => _type = value)
+            : null,
       ),
-    ),
-    const SizedBox(height: 24),
-    Text(
-      AppStrings.of(context).messages.privacyDetailPageTrackYourRequests,
-      style: Theme.of(context).textTheme.headlineSmall,
-    ),
-    for (final request in c.rights)
-      Card(
-        child: ListTile(
-          title: Text(rightLabel(AppStrings.of(context), request.type)),
-          subtitle: Text(
-            '${rightStatus(AppStrings.of(context), request.status)} · ${privacyDate(AppStrings.of(context), request.requestedAt)}${request.completedAt == null ? '' : AppStrings.of(context).messages.privacyDetailPageCompletedOn(privacyDate(AppStrings.of(context), request.completedAt!))}',
+      if (c.pendingRight != null)
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 16),
+          child: Text(
+            AppStrings.of(context)
+                .messages
+                .privacyDetailPageTheResponseStillNeedsConfirmationRefresh,
           ),
         ),
+      HistaeButton(
+        onPressed: enabled
+            ? () async {
+                final type = c.pendingRight ?? selected;
+                if (await _confirm(
+                      AppStrings.of(context)
+                          .messages
+                          .privacyDetailPageSubmitThisRequest,
+                      '${rightDescription(AppStrings.of(context), type)}\n\n${AppStrings.of(context).messages.privacyDetailPageThisRequestWillBeRecordedFor(rightLabel(AppStrings.of(context), type))}',
+                      action: AppStrings.of(context)
+                          .messages
+                          .privacyDetailPageSubmit,
+                    ) &&
+                    mounted) {
+                  await c.request(type);
+                }
+              }
+            : null,
+        child: Text(
+          c.pendingRight == null
+              ? AppStrings.of(context).messages.privacyDetailPageSubmitMyRequest
+              : AppStrings.of(context)
+                    .messages
+                    .privacyDetailPageResumeThisRequest,
+        ),
       ),
-    if (!c.loading && c.rights.isEmpty)
-      Text(AppStrings.of(context).messages.privacyDetailPageNoRequestsToTrack),
-    HistaeButton.outlined(
-      onPressed: enabled ? c.load : null,
-      child: Text(
-        AppStrings.of(context).messages.privacyDetailPageRefreshTracking,
+      const SizedBox(height: 24),
+      Text(
+        AppStrings.of(context).messages.privacyDetailPageTrackYourRequests,
+        style: Theme.of(context).textTheme.headlineSmall,
       ),
-    ),
-  ];
+      for (final request in c.rights)
+        Card(
+          child: ListTile(
+            title: Text(rightLabel(AppStrings.of(context), request.type)),
+            subtitle: Text(
+              '${rightStatus(AppStrings.of(context), request.status)} · ${privacyDate(AppStrings.of(context), request.requestedAt)}${request.completedAt == null ? '' : AppStrings.of(context).messages.privacyDetailPageCompletedOn(privacyDate(AppStrings.of(context), request.completedAt!))}',
+            ),
+          ),
+        ),
+      if (!c.loading && c.rights.isEmpty)
+        Text(
+          AppStrings.of(context).messages.privacyDetailPageNoRequestsToTrack,
+        ),
+      HistaeButton.outlined(
+        onPressed: enabled ? c.load : null,
+        child: Text(
+          AppStrings.of(context).messages.privacyDetailPageRefreshTracking,
+        ),
+      ),
+    ];
+  }
 
   List<Widget> _export() => [
     EditorialCard(

@@ -1953,7 +1953,7 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get privacyDetailPageTheseRequestsAreSubmittedForProcessing =>
-      'Ces démarches sont transmises à Histae, puis suivies ci-dessous. Pour télécharger une copie de vos données, ouvrez « Exporter mes données ». Pour fermer votre compte et lancer son effacement, ouvrez « Supprimer mon compte ».';
+      'Ces demandes nécessitent une intervention de Histae. La modification du profil, l’export des données et la suppression du compte se font directement depuis leurs rubriques.';
 
   @override
   String get privacyDetailPageYourRequest => 'Votre démarche';
@@ -2844,7 +2844,8 @@ class AppMessagesFr extends AppMessages {
   String get privacyDetailPageDelete => 'SUPPRIMER';
 
   @override
-  String get privacyStringsRectification => 'Faire corriger mes données';
+  String get privacyStringsRectification =>
+      'Corriger une donnée non modifiable';
 
   @override
   String get privacyStringsSpam => 'Spam';
@@ -3333,7 +3334,7 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get privacyRightRectificationHelp =>
-      'Demander la correction d’une information inexacte ou incomplète. Pour votre présentation et vos préférences, vous pouvez aussi modifier directement votre profil.';
+      'Demander la correction d’une information inexacte ou incomplète que vous ne pouvez pas modifier dans l’app. Votre présentation, vos réponses et vos préférences se modifient directement dans « Mon profil ».';
 
   @override
   String get privacyRightRestrictionHelp =>

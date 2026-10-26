@@ -1933,7 +1933,7 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get privacyDetailPageTheseRequestsAreSubmittedForProcessing =>
-      'These requests are sent to Histae and tracked below. To download a copy of your data, open “Export my data”. To close your account and start its erasure, open “Delete my account”.';
+      'These requests need Histae’s intervention. Profile edits, data export and account deletion are available directly in their dedicated sections.';
 
   @override
   String get privacyDetailPageYourRequest => 'Your request';
@@ -2808,7 +2808,7 @@ class AppMessagesEn extends AppMessages {
   String get privacyDetailPageDelete => 'DELETE';
 
   @override
-  String get privacyStringsRectification => 'Correct my data';
+  String get privacyStringsRectification => 'Correct data I cannot edit';
 
   @override
   String get privacyStringsSpam => 'Spam';
@@ -3293,7 +3293,7 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get privacyRightRectificationHelp =>
-      'Ask for inaccurate or incomplete information to be corrected. You can also edit your introduction and preferences directly in your profile.';
+      'Ask for inaccurate or incomplete information that you cannot edit in the app to be corrected. You can edit your introduction, answers and preferences directly in “My profile”.';
 
   @override
   String get privacyRightRestrictionHelp =>

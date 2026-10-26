@@ -151,6 +151,11 @@ completion, and unverified purchases remain available for a safe retry or restor
 
 ## Privacy requests
 
+New requests offer correction of otherwise uneditable data, restriction and objection only.
+Self-service access/export and account erasure stay in their dedicated sections. History still
+supports all six server types, and an uncertain existing request retains its original type in
+a read-only selector until resolved.
+
 Choices use plain-language labels and a collapsed explanation for the selected type. Opening
 the explanation never submits a request; submission still requires confirmation and keeps the
 same pending intention after an uncertain response. The app sends only the existing `type`
