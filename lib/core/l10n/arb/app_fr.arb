@@ -1,5 +1,5 @@
 {
-  "@@locale": "fr",
+  "@locale": "fr",
   "appOpeningHistae": "Histae",
   "@appOpeningHistae": {
     "description": "Interface: lib/app/app_opening.dart"
@@ -876,9 +876,9 @@
   "@continuationPageRevealYourPhotos": {
     "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
   },
-  "continuationPageYourPhotoMayBecomeVisibleIn": "Votre photo actuelle sera visible pour cette rencontre lorsque vous aurez tous les deux accepté. Si vous la remplacez, la nouvelle photo sera également partagée ici après validation. Vous pourrez retirer votre accord à tout moment.",
+  "continuationPageYourPhotoMayBecomeVisibleIn": "Votre photo actuelle sera visible pour cette rencontre lorsque vous aurez tous les deux accepté. Si vous la remplacez, la nouvelle photo sera également partagée ici. Vous pourrez retirer votre accord à tout moment.",
   "@continuationPageYourPhotoMayBecomeVisibleIn": {
-    "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
+    "description": "Profile photo capture, availability and private sharing."
   },
   "continuationPageGiveMyConsent": "Donner mon accord",
   "@continuationPageGiveMyConsent": {
@@ -2833,9 +2833,9 @@
   "@photoPageChooseAnotherPhoto": {
     "description": "Interface: lib/features/profile/presentation/photo_page.dart"
   },
-  "photoPagePhotoReceivedItsReviewStatusIs": "Photo reçue. Son état de vérification est affiché ci-dessous.",
-  "@photoPagePhotoReceivedItsReviewStatusIs": {
-    "description": "Interface: lib/features/profile/presentation/photo_page.dart"
+  "photoPageSaved": "Photo enregistrée.",
+  "@photoPageSaved": {
+    "description": "Profile photo capture, availability and private sharing."
   },
   "photoPageYourPhoto": "Votre photo",
   "@photoPageYourPhoto": {
@@ -2845,9 +2845,9 @@
   "@photoPageAFaceAtTheRightTime": {
     "description": "Interface: lib/features/profile/presentation/photo_page.dart"
   },
-  "photoPageOnePersonalPhotoItDoesNot": "Une photo approuvée est nécessaire pour accéder au feed. Elle reste privée jusqu’à votre accord mutuel dans chaque rencontre. Si vous la remplacez, la nouvelle photo sera visible dans vos rencontres déjà autorisées après validation.",
+  "photoPageOnePersonalPhotoItDoesNot": "Une photo est nécessaire pour accéder au feed. Elle reste privée jusqu’à votre accord mutuel dans chaque rencontre. Si vous la remplacez, la nouvelle photo sera utilisée dans vos rencontres déjà autorisées.",
   "@photoPageOnePersonalPhotoItDoesNot": {
-    "description": "Interface: lib/features/profile/presentation/photo_page.dart"
+    "description": "Profile photo capture, availability and private sharing."
   },
   "photoPageYourCurrentPhoto": "Votre photo actuelle",
   "@photoPageYourCurrentPhoto": {
@@ -2864,15 +2864,6 @@
   "photoPagePreparingOrLoadingPhoto": "Préparation ou chargement de la photo",
   "@photoPagePreparingOrLoadingPhoto": {
     "description": "Interface: lib/features/profile/presentation/photo_page.dart"
-  },
-  "photoPageCurrentPhoto": "Photo actuelle : {arg0}",
-  "@photoPageCurrentPhoto": {
-    "description": "Interface: lib/features/profile/presentation/photo_page.dart",
-    "placeholders": {
-      "arg0": {
-        "type": "Object"
-      }
-    }
   },
   "photoPagePreparedSelectionBytesItWillReplace": "Sélection préparée : {arg0} octets. Elle remplacera votre photo actuelle après envoi.",
   "@photoPagePreparedSelectionBytesItWillReplace": {
@@ -2895,9 +2886,9 @@
   "@photoPageSendOrResumeThisPhoto": {
     "description": "Interface: lib/features/profile/presentation/photo_page.dart"
   },
-  "photoPageRefreshPhotoAndStatus": "Actualiser la photo et son état",
-  "@photoPageRefreshPhotoAndStatus": {
-    "description": "Interface: lib/features/profile/presentation/photo_page.dart"
+  "photoPageRefreshPhoto": "Actualiser la photo",
+  "@photoPageRefreshPhoto": {
+    "description": "Profile photo capture, availability and private sharing."
   },
   "photoPageRemoveYourPhoto": "Retirer votre photo ?",
   "@photoPageRemoveYourPhoto": {
@@ -3112,9 +3103,9 @@
   "@profileSectionsAPhotoForLater": {
     "description": "Interface: lib/features/profile/presentation/profile_sections.dart"
   },
-  "profileSectionsYourPhotoCouldNotBeChecked": "Votre photo n’a pas pu être vérifiée.",
-  "@profileSectionsYourPhotoCouldNotBeChecked": {
-    "description": "Interface: lib/features/profile/presentation/profile_sections.dart"
+  "profilePhotoLoadFailed": "Votre photo n’a pas pu être chargée.",
+  "@profilePhotoLoadFailed": {
+    "description": "Profile photo capture, availability and private sharing."
   },
   "profileSectionsOnePhotoRevealedAfterMutualConsent": "Une seule photo, révélée après votre accord mutuel.",
   "@profileSectionsOnePhotoRevealedAfterMutualConsent": {
@@ -3148,9 +3139,9 @@
   "@profileStringsCreateYourProfileFirst": {
     "description": "Interface: lib/features/profile/presentation/profile_strings.dart"
   },
-  "profileStringsThePhotoCouldNotBePrepared": "La photo n’a pas pu être préparée. Vérifiez l’accès aux photos dans les réglages, ou choisissez une autre image.",
+  "profileStringsThePhotoCouldNotBePrepared": "La photo n’a pas pu être préparée. Vérifiez les autorisations de l’appareil photo ou de la photothèque dans les réglages, ou choisissez une autre image.",
   "@profileStringsThePhotoCouldNotBePrepared": {
-    "description": "Interface: lib/features/profile/presentation/profile_strings.dart"
+    "description": "Profile photo capture, availability and private sharing."
   },
   "profileStringsThisPhotoIsNotRecognizedChoose": "Cette photo n’est pas reconnue. Choisissez une autre image.",
   "@profileStringsThisPhotoIsNotRecognizedChoose": {
@@ -3202,22 +3193,6 @@
   },
   "profileStringsExplicitContent": "contenu explicite",
   "@profileStringsExplicitContent": {
-    "description": "Interface: lib/features/profile/presentation/profile_strings.dart"
-  },
-  "profileStringsNoFaceDetected": "visage non détecté",
-  "@profileStringsNoFaceDetected": {
-    "description": "Interface: lib/features/profile/presentation/profile_strings.dart"
-  },
-  "profileStringsMultipleFaces": "plusieurs visages",
-  "@profileStringsMultipleFaces": {
-    "description": "Interface: lib/features/profile/presentation/profile_strings.dart"
-  },
-  "profileStringsBlurryImage": "image floue",
-  "@profileStringsBlurryImage": {
-    "description": "Interface: lib/features/profile/presentation/profile_strings.dart"
-  },
-  "profileStringsAnalysisTemporarilyUnavailable": "analyse temporairement indisponible",
-  "@profileStringsAnalysisTemporarilyUnavailable": {
     "description": "Interface: lib/features/profile/presentation/profile_strings.dart"
   },
   "profileStringsContentNeedsRechecking": "contenu à revérifier",
@@ -3816,9 +3791,9 @@
   "@discoveryPhotoTitle": {
     "description": "Private photo readiness and mutual sharing controls."
   },
-  "discoveryPhotoBody": "Ajoutez une photo et attendez sa validation pour accéder au feed. Elle restera privée : seuls vos matchs pourront la découvrir après votre accord mutuel.",
+  "discoveryPhotoBody": "Ajoutez une photo pour accéder au feed. Elle restera privée : seuls vos matchs pourront la découvrir après votre accord mutuel.",
   "@discoveryPhotoBody": {
-    "description": "Private photo readiness and mutual sharing controls."
+    "description": "Profile photo capture, availability and private sharing."
   },
   "photoRevealTitle": "Un visage derrière les mots.",
   "@photoRevealTitle": {
@@ -3872,9 +3847,9 @@
   "@photoRevealWithdrawn": {
     "description": "Private photo readiness and mutual sharing controls."
   },
-  "photoRevealMissing": "Chacun doit avoir une photo approuvée avant de pouvoir dévoiler vos photos. Vérifiez votre photo depuis votre profil.",
+  "photoRevealMissing": "Vous devez avoir chacun une photo disponible pour dévoiler vos photos. Gérez la vôtre depuis votre profil.",
   "@photoRevealMissing": {
-    "description": "Private photo readiness and mutual sharing controls."
+    "description": "Profile photo capture, availability and private sharing."
   },
   "chatPageRead": "Lu",
   "@chatPageRead": {
@@ -3892,5 +3867,17 @@
   "messageShowDate": "Afficher la date du message",
   "@messageShowDate": {
     "description": "Accessibility hint for tapping a message to show its date briefly."
+  },
+  "photoPageTakeAPhoto": "Prendre une photo",
+  "@photoPageTakeAPhoto": {
+    "description": "Profile photo capture, availability and private sharing."
+  },
+  "profilePhotoProcessingUnavailable": "La photo ne peut pas être préparée pour le moment. Réessayez dans un instant.",
+  "@profilePhotoProcessingUnavailable": {
+    "description": "Profile photo capture, availability and private sharing."
+  },
+  "iosCameraPermission": "Histae utilise l’appareil photo pour prendre votre photo de profil. Elle reste privée jusqu’à votre accord mutuel dans chaque rencontre.",
+  "@iosCameraPermission": {
+    "description": "Profile photo capture, availability and private sharing."
   }
 }

@@ -2,8 +2,6 @@ import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_failure.dart';
 import '../data/profile_models.dart';
 
-// Feature copy is kept together to support a later localization catalogue.
-
 class ProfileStrings {
   const ProfileStrings(this.strings);
   final AppStrings strings;
@@ -29,6 +27,8 @@ class ProfileStrings {
       strings.messages.profileStringsThePreparedPhotoMustBeNo,
     'photo_storage_unavailable' =>
       strings.messages.profileStringsPhotosAreTemporarilyUnavailable,
+    'photo_processing_unavailable' =>
+      strings.messages.profilePhotoProcessingUnavailable,
     'photo_update_in_progress' || 'photo_update_conflict' =>
       strings.messages.profileStringsAPhotoUpdateIsInProgress,
     'idempotency_key_consumed' || 'idempotency_key_conflict' =>
@@ -48,11 +48,7 @@ class ProfileStrings {
       'spam' => strings.messages.profileStringsRepetitiveOrPromotionalContent,
       'insult' => strings.messages.profileStringsInsultingLanguage,
       'personal_contact' => strings.messages.profileStringsPersonalContactDetails,
-      'sexual_content' || 'explicit_image' => strings.messages.profileStringsExplicitContent,
-      'face_not_detected' => strings.messages.profileStringsNoFaceDetected,
-      'multiple_faces' => strings.messages.profileStringsMultipleFaces,
-      'blurry' => strings.messages.profileStringsBlurryImage,
-      'analysis_unavailable' => strings.messages.profileStringsAnalysisTemporarilyUnavailable,
+      'sexual_content' => strings.messages.profileStringsExplicitContent,
       'legacy_unreviewed' => strings.messages.profileStringsContentNeedsRechecking,
       _ => strings.messages.profileStringsReviewNeeded,
     }).join(', ')}';

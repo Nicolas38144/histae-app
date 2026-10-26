@@ -1,5 +1,5 @@
 {
-  "@@locale": "en",
+  "@locale": "en",
   "appOpeningHistae": "Histae",
   "mainNavigationBarFeed": "Feed",
   "mainNavigationBarMatches": "Matches",
@@ -204,7 +204,7 @@
   "continuationPageContinueWithoutCredits": "Continue without credits",
   "continuationPageAcceptUpTo1Credit": "Accept up to 1 credit",
   "continuationPageRevealYourPhotos": "Reveal your photos?",
-  "continuationPageYourPhotoMayBecomeVisibleIn": "Your current photo will be visible to this match once you both agree. If you replace it, your new photo will also be shared here after approval. You can withdraw your consent at any time.",
+  "continuationPageYourPhotoMayBecomeVisibleIn": "Your current photo will be visible in this match once you both agree. If you replace it, the new photo will also be shared here. You can withdraw your consent at any time.",
   "continuationPageGiveMyConsent": "Give my consent",
   "continuationPageYourMatch": "Your match",
   "continuationPageThisMatchIsNoLongerAvailable": "This match\nis no longer available.",
@@ -652,20 +652,19 @@
   "photoPageChangeSelection": "Change selection?",
   "photoPageTheSavedPhotoRequestWillBe": "The saved photo request will be discarded.",
   "photoPageChooseAnotherPhoto": "Choose another photo",
-  "photoPagePhotoReceivedItsReviewStatusIs": "Photo received. Its review status is shown below.",
+  "photoPageSaved": "Photo saved.",
   "photoPageYourPhoto": "Your photo",
   "photoPageAFaceAtTheRightTime": "A face,\nat the right time.",
-  "photoPageOnePersonalPhotoItDoesNot": "An approved photo is required to access the feed. It stays private until you both agree in each match. If you replace it, your new photo will be visible in matches you have already authorized after approval.",
+  "photoPageOnePersonalPhotoItDoesNot": "A photo is required to access the feed. It stays private until you both agree to reveal it in each match. If you replace it, the new photo will be used in your already authorized matches.",
   "photoPageYourCurrentPhoto": "Your current photo",
   "photoPageYourSelectionNotYetConfirmedBy": "Your selection, not yet saved",
   "photoPagePreviewUnavailable": "Preview unavailable",
   "photoPagePreparingOrLoadingPhoto": "Preparing or loading photo",
-  "photoPageCurrentPhoto": "Current photo: {arg0}",
   "photoPagePreparedSelectionBytesItWillReplace": "Prepared selection: {arg0} bytes. It will replace your current photo after sending.",
   "photoPageTheUploadMayHaveSucceededResuming": "The upload may have succeeded. Resuming keeps exactly the same photo and request. No automatic resend.",
   "photoPageChooseAPhoto": "Choose a photo",
   "photoPageSendOrResumeThisPhoto": "Send or resume this photo",
-  "photoPageRefreshPhotoAndStatus": "Refresh photo and status",
+  "photoPageRefreshPhoto": "Refresh photo",
   "photoPageRemoveYourPhoto": "Remove your photo?",
   "photoPageThePhotoWillNoLongerBe": "The photo will no longer be available. Storage cleanup continues in the background.",
   "photoPageRemovePhoto": "Remove photo",
@@ -718,7 +717,7 @@
   "profileSectionsTheTraitsYouChoseToTell": "Your own personal touches.",
   "profileSectionsChooseMyTraits": "Choose my traits",
   "profileSectionsAPhotoForLater": "A photo, for later",
-  "profileSectionsYourPhotoCouldNotBeChecked": "Your photo could not be checked.",
+  "profilePhotoLoadFailed": "Your photo could not be loaded.",
   "profileSectionsOnePhotoRevealedAfterMutualConsent": "One photo, revealed after mutual consent.",
   "profileSectionsManageMyPhoto": "Manage my photo",
   "profileStringsCheckYourFirstNameDateOf": "Check your first name, date of birth, sex and introduction.",
@@ -727,7 +726,7 @@
   "profileStringsAQuestionIsNoLongerAvailable": "A question is no longer available. Refresh the catalog before changing your selection; your draft stays visible.",
   "profileStringsThisTraitIsNoLongerAvailable": "This trait is no longer available. Refresh traits.",
   "profileStringsCreateYourProfileFirst": "Create your profile first.",
-  "profileStringsThePhotoCouldNotBePrepared": "The photo could not be prepared. Check photo access in settings or choose another image.",
+  "profileStringsThePhotoCouldNotBePrepared": "Your photo could not be prepared. Check camera or photo library permissions in your settings, or choose another image.",
   "profileStringsThisPhotoIsNotRecognizedChoose": "This photo is not recognized. Choose another image.",
   "profileStringsThePreparedPhotoMustBeNo": "The prepared photo must be no larger than 500,000 bytes.",
   "profileStringsPhotosAreTemporarilyUnavailable": "Photos are temporarily unavailable.",
@@ -741,10 +740,6 @@
   "profileStringsInsultingLanguage": "insulting language",
   "profileStringsPersonalContactDetails": "personal contact details",
   "profileStringsExplicitContent": "explicit content",
-  "profileStringsNoFaceDetected": "no face detected",
-  "profileStringsMultipleFaces": "multiple faces",
-  "profileStringsBlurryImage": "blurry image",
-  "profileStringsAnalysisTemporarilyUnavailable": "analysis temporarily unavailable",
   "profileStringsContentNeedsRechecking": "content needs rechecking",
   "profileStringsReviewNeeded": "review needed",
   "profileStringsNotProvided": "Not provided",
@@ -880,7 +875,7 @@
   "@discoveryPhotoTitle": {
     "description": "Private photo readiness and mutual sharing controls."
   },
-  "discoveryPhotoBody": "Add a photo and wait for its approval to access the feed. It stays private: only your matches can discover it after you both agree.",
+  "discoveryPhotoBody": "Add a photo to access the feed. It will stay private: only your matches can see it after you both agree to reveal your photos.",
   "@discoveryPhotoBody": {
     "description": "Private photo readiness and mutual sharing controls."
   },
@@ -936,7 +931,7 @@
   "@photoRevealWithdrawn": {
     "description": "Private photo readiness and mutual sharing controls."
   },
-  "photoRevealMissing": "You each need an approved photo before revealing your photos. Check your photo in your profile.",
+  "photoRevealMissing": "You both need an available photo to reveal your photos. Manage yours from your profile.",
   "@photoRevealMissing": {
     "description": "Private photo readiness and mutual sharing controls."
   },
@@ -962,5 +957,8 @@
   "messageShowDate": "Show message date",
   "@messageShowDate": {
     "description": "Accessibility hint for tapping a message to show its date briefly."
-  }
+  },
+  "photoPageTakeAPhoto": "Take a photo",
+  "profilePhotoProcessingUnavailable": "Your photo cannot be prepared right now. Please try again shortly.",
+  "iosCameraPermission": "Histae uses the camera to take your profile photo. It stays private until you both agree to reveal it in each match."
 }

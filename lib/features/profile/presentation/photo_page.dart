@@ -94,12 +94,12 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
       _purgeRemote();
       _url = url;
       _readAt = c.photoReadAt;
-      // Owner URLs last 300 s in the server contract. Refresh before expiry,
+      // Owner URLs last 60 s in the server contract. Refresh before expiry,
       // including when the signer happens to return the same URL.
       final age = DateTime.now().difference(
         _readAt ?? DateTime.fromMillisecondsSinceEpoch(0),
       );
-      final remaining = const Duration(minutes: 4) - age;
+      final remaining = privatePhotoLifetime - age;
       if (remaining > Duration.zero && url != null) {
         _expiry = Timer(remaining, () {
           if (mounted) {
@@ -157,7 +157,7 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
     }
   }
 
-  Future<void> _choose() async {
+  Future<void> _choose(PhotoSource source) async {
     if (_choosing || !c.canWrite) return;
     if (c.photoIntent != null &&
         !await confirmAction(
@@ -174,7 +174,7 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
       _message = null;
     });
     try {
-      final bytes = await preparer.choose();
+      final bytes = await preparer.choose(source: source);
       if (mounted &&
           c.accessible &&
           c.session.resourceKey == _ownerScope &&
@@ -201,8 +201,7 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
       await c.upload();
       if (mounted) {
         setState(() {
-          _message = (strings) =>
-              strings.messages.photoPagePhotoReceivedItsReviewStatusIs;
+          _message = (strings) => strings.messages.photoPageSaved;
         });
       }
     } on ApiFailure catch (e) {
@@ -282,16 +281,6 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
                       .messages
                       .photoPagePreparingOrLoadingPhoto,
                 ),
-              if (c.profile?.photo != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: Text(
-                    AppStrings.of(context).messages.photoPageCurrentPhoto(
-                      ProfileStrings(AppStrings.of(context))
-                          .moderation(c.profile!.photoModeration),
-                    ),
-                  ),
-                ),
               if (intent != null)
                 Text(
                   AppStrings.of(context).messages
@@ -319,8 +308,19 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
                       .appStringsTryAgainInS(c.retrySeconds),
                 ),
               const SizedBox(height: 24),
+              HistaeButton.outlinedIcon(
+                onPressed: !c.canWrite || _choosing
+                    ? null
+                    : () => _choose(PhotoSource.camera),
+                icon: const Icon(Icons.camera_alt_outlined),
+                label: Text(
+                  AppStrings.of(context).messages.photoPageTakeAPhoto,
+                ),
+              ),
               HistaeButton.outlined(
-                onPressed: !c.canWrite || _choosing ? null : _choose,
+                onPressed: !c.canWrite || _choosing
+                    ? null
+                    : () => _choose(PhotoSource.gallery),
                 child: Text(
                   intent == null && c.profile?.photo == null
                       ? AppStrings.of(context).messages.photoPageChooseAPhoto
@@ -352,9 +352,7 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
                         if (mounted) _changed();
                       },
                 child: Text(
-                  AppStrings.of(context)
-                      .messages
-                      .photoPageRefreshPhotoAndStatus,
+                  AppStrings.of(context).messages.photoPageRefreshPhoto,
                 ),
               ),
               if (c.profile?.photo != null)

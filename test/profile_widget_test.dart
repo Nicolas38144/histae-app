@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
 import 'package:histae_app/app/theme.dart';
+import 'package:histae_app/core/network/signed_photo_loader.dart';
 import 'package:histae_app/features/consents/domain/consent_state.dart';
 import 'package:histae_app/features/profile/application/profile_controller.dart';
 import 'package:histae_app/features/profile/data/photo_preparer.dart';
@@ -13,15 +14,39 @@ import 'package:histae_app/features/profile/presentation/photo_page.dart';
 import 'package:histae_app/features/profile/presentation/profile_editors.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'support/auth_fixture.dart';
 import 'support/profile_fixture.dart';
 
 class TestPhotoPreparer extends PhotoPreparer {
+  Uint8List? selection;
   @override
   Future<bool> discardInterruptedSelection() async => false;
   @override
-  Future<Uint8List?> choose() async => null;
+  Future<Uint8List?> choose({PhotoSource source = PhotoSource.gallery}) async =>
+      selection;
+}
+
+class _CancelledPicker extends ImagePicker {
+  final sources = <ImageSource>[];
+  CameraDevice? preferred;
+  bool? metadata;
+
+  @override
+  Future<XFile?> pickImage({
+    required ImageSource source,
+    double? maxWidth,
+    double? maxHeight,
+    int? imageQuality,
+    CameraDevice preferredCameraDevice = CameraDevice.rear,
+    bool requestFullMetadata = true,
+  }) async {
+    sources.add(source);
+    preferred = preferredCameraDevice;
+    metadata = requestFullMetadata;
+    return null;
+  }
 }
 
 Future<void> tapVisible(WidgetTester tester, Finder finder) async {
@@ -45,6 +70,100 @@ Future<void> tapVisible(WidgetTester tester, Finder finder) async {
 }
 
 void main() {
+  testWidgets(
+    'camera and gallery use their native sources and cancellation does not upload',
+    (tester) async {
+      var writes = 0;
+      final picker = _CancelledPicker();
+      final session = testSession((r) async {
+        if (r.url.path.endsWith('/photo') && r.method == 'PUT') writes++;
+        return defaultProfileResponse(r);
+      });
+      addTearDown(session.dispose);
+      await session.establish(testTokens);
+      final c = ProfileController(ProfileRepository(session));
+      addTearDown(c.dispose);
+      await c.load();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: PhotoPage(
+            controller: c,
+            preparer: PhotoPreparer(picker: picker),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        tester.getTopLeft(find.text('Prendre une photo')).dy,
+        lessThan(tester.getTopLeft(find.text('Choisir une photo')).dy),
+      );
+      await tapVisible(tester, find.text('Prendre une photo'));
+      expect(picker.sources, [ImageSource.camera]);
+      expect(picker.preferred, CameraDevice.front);
+      expect(picker.metadata, isFalse);
+      expect(c.photoIntent, isNull);
+      await tapVisible(tester, find.text('Choisir une photo'));
+      expect(picker.sources, [ImageSource.camera, ImageSource.gallery]);
+      expect(c.photoIntent, isNull);
+      expect(writes, 0);
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
+
+  testWidgets(
+    'a captured photo stays staged until sent and an available upload has no review step',
+    (tester) async {
+      var writes = 0;
+      final pixels = base64Decode(
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jLZkAAAAASUVORK5CYII=',
+      );
+      final session = testSession((r) async {
+        if (r.url.path.endsWith('/photo') && r.method == 'PUT') writes++;
+        if (r.url.path == '/api/users/me') {
+          return jsonResponse({
+            ...ownerJson(
+              photo: writes == 0 ? null : 'https://storage.example/synthetic',
+            ),
+            'moderation': {
+              'bio': null,
+              'photo': writes == 0
+                  ? null
+                  : {'status': 'approved', 'reasons': <Object?>[]},
+            },
+          });
+        }
+        return defaultProfileResponse(r);
+      });
+      addTearDown(session.dispose);
+      await session.establish(testTokens);
+      final c = ProfileController(ProfileRepository(session));
+      addTearDown(c.dispose);
+      await c.load();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: PhotoPage(
+            controller: c,
+            preparer: TestPhotoPreparer()..selection = pixels,
+            photoClient: () =>
+                MockClient((_) async => http.Response.bytes(pixels, 200)),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tapVisible(tester, find.text('Prendre une photo'));
+      expect(c.photoIntent, isNotNull);
+      expect(writes, 0);
+      await tapVisible(tester, find.text('Envoyer ou reprendre cette photo'));
+      expect(writes, 1);
+      expect(c.photoIntent, isNull);
+      expect(c.profile?.photo, isNotNull);
+      expect(find.text('Photo enregistrée.'), findsOneWidget);
+      expect(find.textContaining('vérification'), findsNothing);
+      expect(find.textContaining('après validation'), findsNothing);
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
+
   testWidgets(
     'question picker excludes selected questions and saves the explicit order of three answers',
     (tester) async {
@@ -404,7 +523,7 @@ void main() {
       final before = reads;
       final downloadsBefore = downloads;
       expect(downloads, greaterThan(0));
-      await tester.pump(const Duration(minutes: 4));
+      await tester.pump(privatePhotoLifetime);
       await tester.pumpAndSettle();
       expect(reads, before);
       expect(downloads, downloadsBefore);

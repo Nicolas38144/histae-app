@@ -7,6 +7,9 @@ import 'api_failure.dart';
 
 typedef PhotoClientFactory = http.Client Function();
 
+// The API signs private photos for 60 seconds; leave a margin for download time.
+const privatePhotoLifetime = Duration(seconds: 50);
+
 /// Downloads a signed storage resource without authentication headers, redirects,
 /// persistence or logging. Authorization to reveal it belongs to the caller.
 class SignedPhotoLoader {

@@ -196,15 +196,12 @@ class ProfilePhotoTile extends StatelessWidget {
       title: AppStrings.of(context).messages.profileSectionsAPhotoForLater,
       icon: Icons.photo_outlined,
       summary: c.errors.containsKey('profile')
-          ? AppStrings.of(context)
-                .messages
-                .profileSectionsYourPhotoCouldNotBeChecked
+          ? AppStrings.of(context).messages.profilePhotoLoadFailed
           : p?.photo == null
           ? AppStrings.of(context)
                 .messages
                 .profileSectionsOnePhotoRevealedAfterMutualConsent
-          : ProfileStrings(AppStrings.of(context))
-                .moderation(p?.photoModeration),
+          : AppStrings.of(context).messages.photoPageSaved,
       action: AppStrings.of(context).messages.profileSectionsManageMyPhoto,
       onTap: p != null && !c.loading && !c.errors.containsKey('profile')
           ? onEdit

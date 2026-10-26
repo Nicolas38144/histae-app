@@ -31,6 +31,7 @@ payments. Run the relevant existing suite rather than testing every visual or do
 | Feed expiry, location or pause | `flutter test test/discovery_test.dart test/discovery_pause_test.dart` |
 | Native location activation, refusal and cancellation | `flutter test test/device_location_test.dart test/discovery_test.dart` |
 | Photo readiness, withdrawal and private thumbnails | `flutter test test/photo_sharing_test.dart test/continuation_test.dart` |
+| Camera/gallery selection, staged upload and photo errors | `flutter test test/profile_widget_test.dart test/profile_test.dart` |
 | Conversation profile, cached navigation and full-size photo privacy | `flutter test test/match_profile_test.dart test/cached_conversation_test.dart` |
 | Feed reading delay and transitions | `flutter test test/feed_reading_delay_test.dart` |
 | Native billing | `flutter test test/billing_test.dart` |
@@ -137,6 +138,14 @@ activation prompt: the same request should then obtain one fresh fix. Declining 
 feedback in the location card and send no position. Check permission denial, cancellation,
 and the settings fallback on devices where native activation is unavailable. On iOS, disabled
 services retain a settings action. Mocked provider tests do not verify the real system dialog.
+
+For photos, verify camera capture and gallery selection on a real device, including permission
+denial, cancellation, front-camera preference and returning to the preview without an automatic
+upload. Confirm that an interrupted Android capture is discarded after process recreation.
+iOS requires `NSCameraUsageDescription` in both plist configurations and all four localized
+permission resources; regenerate those resources after editing their ARB copy. Camera capture
+uses no video or microphone permission. Uploaded photos become available immediately; do not
+present the API's compatibility moderation status as an automated photo verification.
 
 Before beta, record the app/API versions, environment, tested flows and outstanding issues.
 Provider enablement and local compilation are separate from approval and availability in the stores.

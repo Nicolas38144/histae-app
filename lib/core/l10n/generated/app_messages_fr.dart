@@ -754,7 +754,7 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get continuationPageYourPhotoMayBecomeVisibleIn =>
-      'Votre photo actuelle sera visible pour cette rencontre lorsque vous aurez tous les deux accepté. Si vous la remplacez, la nouvelle photo sera également partagée ici après validation. Vous pourrez retirer votre accord à tout moment.';
+      'Votre photo actuelle sera visible pour cette rencontre lorsque vous aurez tous les deux accepté. Si vous la remplacez, la nouvelle photo sera également partagée ici. Vous pourrez retirer votre accord à tout moment.';
 
   @override
   String get continuationPageGiveMyConsent => 'Donner mon accord';
@@ -2449,8 +2449,7 @@ class AppMessagesFr extends AppMessages {
   String get photoPageChooseAnotherPhoto => 'Choisir une autre photo';
 
   @override
-  String get photoPagePhotoReceivedItsReviewStatusIs =>
-      'Photo reçue. Son état de vérification est affiché ci-dessous.';
+  String get photoPageSaved => 'Photo enregistrée.';
 
   @override
   String get photoPageYourPhoto => 'Votre photo';
@@ -2460,7 +2459,7 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get photoPageOnePersonalPhotoItDoesNot =>
-      'Une photo approuvée est nécessaire pour accéder au feed. Elle reste privée jusqu’à votre accord mutuel dans chaque rencontre. Si vous la remplacez, la nouvelle photo sera visible dans vos rencontres déjà autorisées après validation.';
+      'Une photo est nécessaire pour accéder au feed. Elle reste privée jusqu’à votre accord mutuel dans chaque rencontre. Si vous la remplacez, la nouvelle photo sera utilisée dans vos rencontres déjà autorisées.';
 
   @override
   String get photoPageYourCurrentPhoto => 'Votre photo actuelle';
@@ -2475,11 +2474,6 @@ class AppMessagesFr extends AppMessages {
   @override
   String get photoPagePreparingOrLoadingPhoto =>
       'Préparation ou chargement de la photo';
-
-  @override
-  String photoPageCurrentPhoto(Object arg0) {
-    return 'Photo actuelle : $arg0';
-  }
 
   @override
   String photoPagePreparedSelectionBytesItWillReplace(Object arg0) {
@@ -2498,8 +2492,7 @@ class AppMessagesFr extends AppMessages {
       'Envoyer ou reprendre cette photo';
 
   @override
-  String get photoPageRefreshPhotoAndStatus =>
-      'Actualiser la photo et son état';
+  String get photoPageRefreshPhoto => 'Actualiser la photo';
 
   @override
   String get photoPageRemoveYourPhoto => 'Retirer votre photo ?';
@@ -2684,8 +2677,7 @@ class AppMessagesFr extends AppMessages {
   String get profileSectionsAPhotoForLater => 'Une photo, pour plus tard';
 
   @override
-  String get profileSectionsYourPhotoCouldNotBeChecked =>
-      'Votre photo n’a pas pu être vérifiée.';
+  String get profilePhotoLoadFailed => 'Votre photo n’a pas pu être chargée.';
 
   @override
   String get profileSectionsOnePhotoRevealedAfterMutualConsent =>
@@ -2720,7 +2712,7 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get profileStringsThePhotoCouldNotBePrepared =>
-      'La photo n’a pas pu être préparée. Vérifiez l’accès aux photos dans les réglages, ou choisissez une autre image.';
+      'La photo n’a pas pu être préparée. Vérifiez les autorisations de l’appareil photo ou de la photothèque dans les réglages, ou choisissez une autre image.';
 
   @override
   String get profileStringsThisPhotoIsNotRecognizedChoose =>
@@ -2766,19 +2758,6 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get profileStringsExplicitContent => 'contenu explicite';
-
-  @override
-  String get profileStringsNoFaceDetected => 'visage non détecté';
-
-  @override
-  String get profileStringsMultipleFaces => 'plusieurs visages';
-
-  @override
-  String get profileStringsBlurryImage => 'image floue';
-
-  @override
-  String get profileStringsAnalysisTemporarilyUnavailable =>
-      'analyse temporairement indisponible';
 
   @override
   String get profileStringsContentNeedsRechecking => 'contenu à revérifier';
@@ -3269,7 +3248,7 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get discoveryPhotoBody =>
-      'Ajoutez une photo et attendez sa validation pour accéder au feed. Elle restera privée : seuls vos matchs pourront la découvrir après votre accord mutuel.';
+      'Ajoutez une photo pour accéder au feed. Elle restera privée : seuls vos matchs pourront la découvrir après votre accord mutuel.';
 
   @override
   String get photoRevealTitle => 'Un visage derrière les mots.';
@@ -3318,7 +3297,7 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get photoRevealMissing =>
-      'Chacun doit avoir une photo approuvée avant de pouvoir dévoiler vos photos. Vérifiez votre photo depuis votre profil.';
+      'Vous devez avoir chacun une photo disponible pour dévoiler vos photos. Gérez la vôtre depuis votre profil.';
 
   @override
   String get chatPageRead => 'Lu';
@@ -3330,4 +3309,15 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get messageShowDate => 'Afficher la date du message';
+
+  @override
+  String get photoPageTakeAPhoto => 'Prendre une photo';
+
+  @override
+  String get profilePhotoProcessingUnavailable =>
+      'La photo ne peut pas être préparée pour le moment. Réessayez dans un instant.';
+
+  @override
+  String get iosCameraPermission =>
+      'Histae utilise l’appareil photo pour prendre votre photo de profil. Elle reste privée jusqu’à votre accord mutuel dans chaque rencontre.';
 }

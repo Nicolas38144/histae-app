@@ -75,7 +75,7 @@ http.Response defaultProfileResponse(http.Request request) =>
             : jsonResponse({
                 'message': 'photo updated',
                 'photo': 'https://storage.example/owner?signature=synthetic',
-                'moderation_status': 'pending',
+                'moderation_status': 'approved',
                 'moderation_reasons': <Object?>[],
               }),
       _ when request.url.path.startsWith('/api/users/me/traits/') =>

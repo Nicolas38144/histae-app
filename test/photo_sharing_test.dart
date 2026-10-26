@@ -19,7 +19,7 @@ import 'support/matches_fixture.dart';
 
 void main() {
   testWidgets(
-    'missing approved photo shows the feed requirement and opens photo management',
+    'missing photo shows the feed requirement and opens photo management',
     (tester) async {
       final session = testSession((r) async {
         if (r.url.path == '/api/users/me/discovery-status') {
@@ -30,7 +30,7 @@ void main() {
           });
         }
         if (r.url.path == '/api/feed') {
-          fail('Feed must not load without an approved photo');
+          fail('Feed must not load without a photo');
         }
         return defaultContinuationResponse(r);
       });

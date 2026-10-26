@@ -1326,10 +1326,10 @@ abstract class AppMessages {
   /// **'Révéler vos photos ?'**
   String get continuationPageRevealYourPhotos;
 
-  /// Interface: lib/features/continuation/presentation/continuation_page.dart
+  /// Profile photo capture, availability and private sharing.
   ///
   /// In fr, this message translates to:
-  /// **'Votre photo actuelle sera visible pour cette rencontre lorsque vous aurez tous les deux accepté. Si vous la remplacez, la nouvelle photo sera également partagée ici après validation. Vous pourrez retirer votre accord à tout moment.'**
+  /// **'Votre photo actuelle sera visible pour cette rencontre lorsque vous aurez tous les deux accepté. Si vous la remplacez, la nouvelle photo sera également partagée ici. Vous pourrez retirer votre accord à tout moment.'**
   String get continuationPageYourPhotoMayBecomeVisibleIn;
 
   /// Interface: lib/features/continuation/presentation/continuation_page.dart
@@ -4017,11 +4017,11 @@ abstract class AppMessages {
   /// **'Choisir une autre photo'**
   String get photoPageChooseAnotherPhoto;
 
-  /// Interface: lib/features/profile/presentation/photo_page.dart
+  /// Profile photo capture, availability and private sharing.
   ///
   /// In fr, this message translates to:
-  /// **'Photo reçue. Son état de vérification est affiché ci-dessous.'**
-  String get photoPagePhotoReceivedItsReviewStatusIs;
+  /// **'Photo enregistrée.'**
+  String get photoPageSaved;
 
   /// Interface: lib/features/profile/presentation/photo_page.dart
   ///
@@ -4035,10 +4035,10 @@ abstract class AppMessages {
   /// **'Un visage,\nau bon moment.'**
   String get photoPageAFaceAtTheRightTime;
 
-  /// Interface: lib/features/profile/presentation/photo_page.dart
+  /// Profile photo capture, availability and private sharing.
   ///
   /// In fr, this message translates to:
-  /// **'Une photo approuvée est nécessaire pour accéder au feed. Elle reste privée jusqu’à votre accord mutuel dans chaque rencontre. Si vous la remplacez, la nouvelle photo sera visible dans vos rencontres déjà autorisées après validation.'**
+  /// **'Une photo est nécessaire pour accéder au feed. Elle reste privée jusqu’à votre accord mutuel dans chaque rencontre. Si vous la remplacez, la nouvelle photo sera utilisée dans vos rencontres déjà autorisées.'**
   String get photoPageOnePersonalPhotoItDoesNot;
 
   /// Interface: lib/features/profile/presentation/photo_page.dart
@@ -4068,12 +4068,6 @@ abstract class AppMessages {
   /// Interface: lib/features/profile/presentation/photo_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Photo actuelle : {arg0}'**
-  String photoPageCurrentPhoto(Object arg0);
-
-  /// Interface: lib/features/profile/presentation/photo_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Sélection préparée : {arg0} octets. Elle remplacera votre photo actuelle après envoi.'**
   String photoPagePreparedSelectionBytesItWillReplace(Object arg0);
 
@@ -4095,11 +4089,11 @@ abstract class AppMessages {
   /// **'Envoyer ou reprendre cette photo'**
   String get photoPageSendOrResumeThisPhoto;
 
-  /// Interface: lib/features/profile/presentation/photo_page.dart
+  /// Profile photo capture, availability and private sharing.
   ///
   /// In fr, this message translates to:
-  /// **'Actualiser la photo et son état'**
-  String get photoPageRefreshPhotoAndStatus;
+  /// **'Actualiser la photo'**
+  String get photoPageRefreshPhoto;
 
   /// Interface: lib/features/profile/presentation/photo_page.dart
   ///
@@ -4413,11 +4407,11 @@ abstract class AppMessages {
   /// **'Une photo, pour plus tard'**
   String get profileSectionsAPhotoForLater;
 
-  /// Interface: lib/features/profile/presentation/profile_sections.dart
+  /// Profile photo capture, availability and private sharing.
   ///
   /// In fr, this message translates to:
-  /// **'Votre photo n’a pas pu être vérifiée.'**
-  String get profileSectionsYourPhotoCouldNotBeChecked;
+  /// **'Votre photo n’a pas pu être chargée.'**
+  String get profilePhotoLoadFailed;
 
   /// Interface: lib/features/profile/presentation/profile_sections.dart
   ///
@@ -4467,10 +4461,10 @@ abstract class AppMessages {
   /// **'Créez d’abord votre profil.'**
   String get profileStringsCreateYourProfileFirst;
 
-  /// Interface: lib/features/profile/presentation/profile_strings.dart
+  /// Profile photo capture, availability and private sharing.
   ///
   /// In fr, this message translates to:
-  /// **'La photo n’a pas pu être préparée. Vérifiez l’accès aux photos dans les réglages, ou choisissez une autre image.'**
+  /// **'La photo n’a pas pu être préparée. Vérifiez les autorisations de l’appareil photo ou de la photothèque dans les réglages, ou choisissez une autre image.'**
   String get profileStringsThePhotoCouldNotBePrepared;
 
   /// Interface: lib/features/profile/presentation/profile_strings.dart
@@ -4550,30 +4544,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'contenu explicite'**
   String get profileStringsExplicitContent;
-
-  /// Interface: lib/features/profile/presentation/profile_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'visage non détecté'**
-  String get profileStringsNoFaceDetected;
-
-  /// Interface: lib/features/profile/presentation/profile_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'plusieurs visages'**
-  String get profileStringsMultipleFaces;
-
-  /// Interface: lib/features/profile/presentation/profile_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'image floue'**
-  String get profileStringsBlurryImage;
-
-  /// Interface: lib/features/profile/presentation/profile_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'analyse temporairement indisponible'**
-  String get profileStringsAnalysisTemporarilyUnavailable;
 
   /// Interface: lib/features/profile/presentation/profile_strings.dart
   ///
@@ -5336,10 +5306,10 @@ abstract class AppMessages {
   /// **'Un visage, pour plus tard'**
   String get discoveryPhotoTitle;
 
-  /// Private photo readiness and mutual sharing controls.
+  /// Profile photo capture, availability and private sharing.
   ///
   /// In fr, this message translates to:
-  /// **'Ajoutez une photo et attendez sa validation pour accéder au feed. Elle restera privée : seuls vos matchs pourront la découvrir après votre accord mutuel.'**
+  /// **'Ajoutez une photo pour accéder au feed. Elle restera privée : seuls vos matchs pourront la découvrir après votre accord mutuel.'**
   String get discoveryPhotoBody;
 
   /// Private photo readiness and mutual sharing controls.
@@ -5420,10 +5390,10 @@ abstract class AppMessages {
   /// **'Votre accord est retiré. Vos deux photos sont masquées.'**
   String get photoRevealWithdrawn;
 
-  /// Private photo readiness and mutual sharing controls.
+  /// Profile photo capture, availability and private sharing.
   ///
   /// In fr, this message translates to:
-  /// **'Chacun doit avoir une photo approuvée avant de pouvoir dévoiler vos photos. Vérifiez votre photo depuis votre profil.'**
+  /// **'Vous devez avoir chacun une photo disponible pour dévoiler vos photos. Gérez la vôtre depuis votre profil.'**
   String get photoRevealMissing;
 
   /// Read status for an outgoing message, confirmed by the API.
@@ -5443,6 +5413,24 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Afficher la date du message'**
   String get messageShowDate;
+
+  /// Profile photo capture, availability and private sharing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prendre une photo'**
+  String get photoPageTakeAPhoto;
+
+  /// Profile photo capture, availability and private sharing.
+  ///
+  /// In fr, this message translates to:
+  /// **'La photo ne peut pas être préparée pour le moment. Réessayez dans un instant.'**
+  String get profilePhotoProcessingUnavailable;
+
+  /// Profile photo capture, availability and private sharing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Histae utilise l’appareil photo pour prendre votre photo de profil. Elle reste privée jusqu’à votre accord mutuel dans chaque rencontre.'**
+  String get iosCameraPermission;
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

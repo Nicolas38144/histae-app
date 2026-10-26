@@ -7,8 +7,11 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../../core/network/api_failure.dart';
 
+enum PhotoSource { camera, gallery }
+
 class PhotoPreparer {
-  final _picker = ImagePicker();
+  PhotoPreparer({ImagePicker? picker}) : _picker = picker ?? ImagePicker();
+  final ImagePicker _picker;
   // Never attach an Android recovered selection to a session restored after a
   // process death. The owner binding of that selection is no longer known.
 
@@ -21,11 +24,14 @@ class PhotoPreparer {
     return !data.isEmpty;
   }
 
-  Future<Uint8List?> choose() async {
+  Future<Uint8List?> choose({PhotoSource source = PhotoSource.gallery}) async {
     XFile? file;
     try {
       file = await _picker.pickImage(
-        source: ImageSource.gallery,
+        source: source == PhotoSource.camera
+            ? ImageSource.camera
+            : ImageSource.gallery,
+        preferredCameraDevice: CameraDevice.front,
         requestFullMetadata: false,
       );
       if (file == null) return null;

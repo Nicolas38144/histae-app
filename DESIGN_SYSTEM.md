@@ -79,6 +79,10 @@ Profile groups the introduction, answers, feed preview, account details, pause m
 Its subscription entry shows Premium for Free or the subscription-management label for Premium,
 with neutral loading state. The copyable account UUID appears only in the private profile.
 
+Photo management places Take a photo above Choose a photo. Both actions stage an image for
+explicit upload. Available photos are described as saved, without approval badges or a pending
+verification step. Mutual consent still controls when a match can see the photo.
+
 Answer editing separates the question, text, order and remove/move actions. Replacing the full answer
 list is explicit. Sensitive-data and location choices use switches, separate from required terms
 acceptance and privacy-notice acknowledgement.

@@ -6,6 +6,7 @@ void main() {
   const keys = {
     'NSLocationWhenInUseUsageDescription': 'iosLocationPermission',
     'NSPhotoLibraryUsageDescription': 'iosPhotoPermission',
+    'NSCameraUsageDescription': 'iosCameraPermission',
     'NSLocalNetworkUsageDescription': 'iosLocalNetworkPermission',
     'HistaePrivacyShieldTitle': 'screenPrivacyLabel',
     'HistaePrivacyShieldCaptureHelp': 'screenCaptureHelp',

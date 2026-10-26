@@ -39,8 +39,7 @@ class _MatchPhotoAvatarState extends State<MatchPhotoAvatar>
       widget.allowed &&
       widget.url != null &&
       widget.readAt != null &&
-      DateTime.now().toUtc().difference(widget.readAt!) <
-          const Duration(minutes: 4);
+      DateTime.now().toUtc().difference(widget.readAt!) < privatePhotoLifetime;
 
   bool get _foreground =>
       WidgetsBinding.instance.lifecycleState == null ||
@@ -95,7 +94,7 @@ class _MatchPhotoAvatarState extends State<MatchPhotoAvatar>
     }
     _expiry?.cancel();
     final remaining = widget.readAt!
-        .add(const Duration(minutes: 4))
+        .add(privatePhotoLifetime)
         .difference(DateTime.now().toUtc());
     _expiry = Timer(remaining.isNegative ? Duration.zero : remaining, () {
       if (mounted) setState(_purge);

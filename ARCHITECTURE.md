@@ -123,15 +123,15 @@ draft. Distance is omitted because the match projection does not supply it.
 
 `SignedPhotoLoader` downloads to memory without Bearer credentials or redirects, with a 5,000,000-byte
 limit and a fifteen-second timeout. Access is checked before display. Closing, losing access or
-reaching the display deadline evicts the image. Reopening does not extend the four-minute deadline
-measured from the resource read.
+reaching the display deadline evicts the image. Reopening does not extend the 50-second deadline
+measured from the resource read. This leaves a margin before the API’s 60-second signed URL expiry.
 
 `PartnerPhoto` owns full-size photo rendering for both the match profile and `PartnerPhotoPage`.
 It observes match access, route visibility, app lifecycle and the original read deadline. A
 covered route cancels its download and purges the decoded image; late bytes cannot restore it.
 Manual photo refresh remains an explicit authorized read.
 
-`MatchPhotoAvatar` applies the same four-minute resource deadline to authorized thumbnails. It
+`MatchPhotoAvatar` applies the same 50-second resource deadline to authorized thumbnails. It
 downloads through `SignedPhotoLoader`, never through a persistent network-image cache, and purges
 on hidden routes/tabs, backgrounding, withdrawal or replacement. `ContinuationController` keeps
 grant and withdrawal retry intentions distinct. `MatchAccess` owns an immediate local photo
@@ -158,3 +158,17 @@ account. A separate localization revision refreshes reads without discarding dra
 
 See [Localization](lib/core/l10n/README.md), [API languages](docs/api-languages.md) and
 [Development](docs/development.md) for the corresponding contracts and checks.
+
+## Photo capture and availability
+
+`PhotoPreparer` supports the camera and gallery through the same local preparation
+pipeline. Camera capture prefers the front camera. Both sources bound input size,
+normalize to JPEG under 500,000 bytes, remove EXIF data and clean picker cache copies.
+`PhotoPage` stages the result in memory; capture and selection never upload automatically.
+Android interrupted selections are discarded rather than attached to a restored session.
+
+A valid API upload is immediately available without automated content/face analysis.
+The wire moderation fields remain supported for manual removal; approval is not presented
+as photo verification. Feed readiness still comes from the API and mutual sharing consent
+remains required. Private photo views share `privatePhotoLifetime` (50 seconds from the
+resource read), with explicit refresh after expiry.
