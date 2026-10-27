@@ -120,6 +120,23 @@ void main() {
           reads.update(r.url.path, (count) => count + 1, ifAbsent: () => 1);
         }
         if (r.url.path == '/api/swipes') choices++;
+        if (r.url.path == '/api/feed') {
+          return jsonResponse({
+            'profiles': [
+              candidateJson(
+                candidateOne,
+                bio: List.filled(
+                  8,
+                  'Je peux passer des heures à discuter de nos lectures, des '
+                  'endroits où nous aimerions retourner et des petits moments '
+                  'qui ont marqué notre semaine.',
+                ).join('\n\n'),
+              ),
+              candidateJson(candidateTwo),
+            ],
+            'next_cursor': null,
+          });
+        }
         return defaultContinuationResponse(r);
       });
       await session.establish(testTokens);
@@ -148,9 +165,42 @@ void main() {
       );
 
       Future<void> swipe(double dx) async {
-        await tester.drag(pages, Offset(dx, 0));
+        await tester.timedDrag(
+          pages,
+          Offset(dx, 0),
+          const Duration(milliseconds: 350),
+        );
         await tester.pumpAndSettle();
       }
+
+      // An initially sideways drift must yield to vertical profile reading.
+      final feedScroll = find.descendant(
+        of: find.byKey(const Key('feed-profile-scroll')),
+        matching: find.byType(Scrollable),
+      );
+      final reading = await tester.startGesture(tester.getCenter(pages));
+      await reading.moveBy(const Offset(-28, -12));
+      await tester.pump();
+      await reading.moveBy(const Offset(-10, -180));
+      await tester.pump();
+      await reading.moveBy(const Offset(6, -120));
+      await tester.pump();
+      await reading.up();
+      await tester.pumpAndSettle();
+      selected(MainTab.discovery);
+      expect(
+        tester.state<ScrollableState>(feedScroll).position.pixels,
+        greaterThan(0),
+      );
+      expect(discovery.current?.id, initialProfile);
+      expect(choices, 0);
+
+      final shortDrag = await tester.startGesture(tester.getCenter(pages));
+      await shortDrag.moveBy(const Offset(30, 0));
+      await tester.pump();
+      await shortDrag.up();
+      await tester.pumpAndSettle();
+      selected(MainTab.discovery);
 
       await swipe(-300);
       selected(MainTab.matches);

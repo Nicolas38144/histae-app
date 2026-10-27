@@ -21,6 +21,33 @@ class HistaeScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final dark = colors.brightness == Brightness.dark;
+    final sharedBackground =
+        context.dependOnInheritedWidgetOfExactType<_HistaeBackground>() != null;
+    final scaffold = Scaffold(
+      backgroundColor: Colors.transparent,
+      extendBody: extendBody,
+      appBar: appBar == null
+          ? null
+          : PreferredSize(
+              preferredSize: appBar!.preferredSize,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: sharedBackground ? Colors.transparent : colors.surface,
+                  border: Border(
+                    bottom: BorderSide(
+                      color: colors.outlineVariant.withValues(alpha: 0.6),
+                    ),
+                  ),
+                ),
+                child: appBar!,
+              ),
+            ),
+      body: body,
+      bottomNavigationBar: bottomNavigationBar,
+    );
+    // Nested tab scaffolds share the route's stationary background. A pushed
+    // route has its own ancestor chain and continues to paint its own backdrop.
+    if (sharedBackground) return scaffold;
     return DecoratedBox(
       decoration: BoxDecoration(color: colors.surface),
       child: DecoratedBox(
@@ -45,30 +72,16 @@ class HistaeScaffold extends StatelessWidget {
               ],
             ),
           ),
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            extendBody: extendBody,
-            appBar: appBar == null
-                ? null
-                : PreferredSize(
-                    preferredSize: appBar!.preferredSize,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: colors.surface,
-                        border: Border(
-                          bottom: BorderSide(
-                            color: colors.outlineVariant.withValues(alpha: 0.6),
-                          ),
-                        ),
-                      ),
-                      child: appBar!,
-                    ),
-                  ),
-            body: body,
-            bottomNavigationBar: bottomNavigationBar,
-          ),
+          child: _HistaeBackground(child: scaffold),
         ),
       ),
     );
   }
+}
+
+class _HistaeBackground extends InheritedWidget {
+  const _HistaeBackground({required super.child});
+
+  @override
+  bool updateShouldNotify(_HistaeBackground oldWidget) => false;
 }

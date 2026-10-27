@@ -101,6 +101,8 @@ The Profile / Feed / Matches bar is transparent, with no panel, shadow or separa
 of at least 48 px. Compact spacing leaves more room for content without reducing label text size.
 Horizontal swipes slide between these three screens and synchronize the selected tab. Vertical
 feed gestures still navigate profiles; detail routes and their carousels retain their own gestures.
+Changing tabs requires a more deliberate horizontal drag, allowing vertical reading to win over
+small sideways drift. The decorative background stays fixed beneath the moving tab content.
 Reduced motion removes programmatic page and circle transitions. System bars remain transparent
 with appropriate bottom spacing for scrollable content.
 

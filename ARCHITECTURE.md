@@ -54,6 +54,9 @@ the bottom navigation. Its viewport cache initializes and retains all three view
 including their scroll state, without reloading data on a tab change. Offscreen views exclude
 focus, touch, semantics and tickers; reading time pauses during page transitions. Pushed detail
 routes retain their own gestures. The session resource key rebuilds the private scope when access changes.
+The pager increases only its own horizontal touch threshold; each child receives the original
+device gesture settings so vertical scrolling and controls keep their usual sensitivity.
+Nested `HistaeScaffold` instances inherit one stationary route background; pushed routes own theirs.
 A page disposes a controller it creates. A received controller remains owned by its parent.
 Suspending activity and disposing resources are distinct operations.
 

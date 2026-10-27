@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 
@@ -37,8 +38,16 @@ class _MainTabPagerState extends State<MainTabPager> {
   }
 
   @override
-  Widget build(BuildContext context) =>
-      NotificationListener<ScrollNotification>(
+  Widget build(BuildContext context) {
+    final media = MediaQuery.of(context);
+    final touchSlop = media.gestureSettings.touchSlop ?? kTouchSlop;
+    return MediaQuery(
+      // Only the pager needs a deliberate horizontal gesture. Restore device
+      // settings below it so vertical reading and child controls stay responsive.
+      data: media.copyWith(
+        gestureSettings: DeviceGestureSettings(touchSlop: touchSlop * 2.5),
+      ),
+      child: NotificationListener<ScrollNotification>(
         onNotification: _scrollChanged,
         child: PageView(
           key: const Key('main-tab-pages'),
@@ -52,17 +61,20 @@ class _MainTabPagerState extends State<MainTabPager> {
           ),
           children: [
             for (var index = 0; index < widget.children.length; index++)
-              Offstage(
-                offstage: !_scrolling && index != widget.selectedIndex,
-                child: TickerMode(
-                  enabled: !_scrolling && index == widget.selectedIndex,
-                  child: ExcludeFocus(
-                    excluding: _scrolling || index != widget.selectedIndex,
-                    child: ExcludeSemantics(
+              MediaQuery(
+                data: media,
+                child: Offstage(
+                  offstage: !_scrolling && index != widget.selectedIndex,
+                  child: TickerMode(
+                    enabled: !_scrolling && index == widget.selectedIndex,
+                    child: ExcludeFocus(
                       excluding: _scrolling || index != widget.selectedIndex,
-                      child: IgnorePointer(
-                        ignoring: _scrolling || index != widget.selectedIndex,
-                        child: widget.children[index],
+                      child: ExcludeSemantics(
+                        excluding: _scrolling || index != widget.selectedIndex,
+                        child: IgnorePointer(
+                          ignoring: _scrolling || index != widget.selectedIndex,
+                          child: widget.children[index],
+                        ),
                       ),
                     ),
                   ),
@@ -70,5 +82,7 @@ class _MainTabPagerState extends State<MainTabPager> {
               ),
           ],
         ),
-      );
+      ),
+    );
+  }
 }
