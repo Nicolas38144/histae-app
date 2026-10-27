@@ -180,6 +180,7 @@ class _MainShellState extends State<MainShell> {
                   MainTab.matches => MatchesPage(
                     key: const PageStorageKey('main-matches'),
                     controller: _matches,
+                    catalog: widget.catalog,
                     initialMatchId: _initialMatchId,
                     onInitialMatchHandled: () => _initialMatchId = null,
                   ),

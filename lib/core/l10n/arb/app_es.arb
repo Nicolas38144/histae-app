@@ -972,5 +972,10 @@
   "privacyRequestYourMessage": "Tu mensaje",
   "privacyRequestTeamResponse": "Respuesta del equipo",
   "consentDocumentDate": "Documento del {date}",
-  "consentDocumentDatePending": "Fecha del documento en proceso de validación."
+  "consentDocumentDatePending": "Fecha del documento en proceso de validación.",
+  "creditRecoveryFreeTitle": "Has agotado tus créditos gratuitos",
+  "creditRecoveryWatchDescription": "Un vídeo opcional te permite ganar un crédito para continuar.",
+  "creditRecoveryWeeklyTitle": "Has alcanzado tu límite semanal",
+  "creditRecoveryWeeklyLimit": "Has alcanzado tu límite semanal. Se renueva el lunes a las 00:00 UTC. Con Premium, las continuaciones son ilimitadas.",
+  "creditRecoveryViewSubscriptions": "Descubrir las suscripciones"
 }

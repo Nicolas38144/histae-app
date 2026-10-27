@@ -5503,6 +5503,36 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Date du document en cours de validation.'**
   String get consentDocumentDatePending;
+
+  /// Continuation credit recovery and subscription guidance.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos crédits gratuits sont épuisés'**
+  String get creditRecoveryFreeTitle;
+
+  /// Continuation credit recovery and subscription guidance.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une vidéo facultative vous permet de gagner un crédit pour continuer.'**
+  String get creditRecoveryWatchDescription;
+
+  /// Continuation credit recovery and subscription guidance.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre limite de la semaine est atteinte'**
+  String get creditRecoveryWeeklyTitle;
+
+  /// Continuation credit recovery and subscription guidance.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre plafond hebdomadaire est atteint. Il se renouvelle le lundi à 00:00 UTC. Avec Premium, les continuations sont illimitées.'**
+  String get creditRecoveryWeeklyLimit;
+
+  /// Continuation credit recovery and subscription guidance.
+  ///
+  /// In fr, this message translates to:
+  /// **'Découvrir les abonnements'**
+  String get creditRecoveryViewSubscriptions;
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

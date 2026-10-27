@@ -23,6 +23,37 @@ import 'support/matches_fixture.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  test('credit recovery distinguishes exhausted free credits, stock and weekly confirmations', () {
+    ContinuationQuota quota(Map<String, Object?> values) =>
+        ContinuationQuota.fromJson({...quotaJson(), ...values});
+    final emptyFree = quota({
+      'used': 2,
+      'free_remaining': 0,
+      'advertising_balance': 0,
+      'advertising_remaining': 0,
+      'remaining': 0,
+      'reserved': 0,
+    });
+    expect(emptyFree.suggestsRewardedVideo, isTrue);
+    expect(emptyFree.weeklyLimitReached, isFalse);
+    final spent = quota({'used': 5, 'free_remaining': 0, 'remaining': 0});
+    expect(spent.weeklyLimitReached, isTrue);
+    expect(spent.canEarnAdvertisingCredit, isFalse);
+    expect(spent.suggestsRewardedVideo, isFalse);
+    final reserved = quota({
+      'used': 2,
+      'reserved': 3,
+      'free_remaining': 0,
+      'remaining': 0,
+    });
+    expect(reserved.weeklyLimitReached, isFalse);
+    final fullStock = quota({'free_remaining': 0, 'advertising_balance': 3});
+    expect(fullStock.suggestsRewardedVideo, isFalse);
+    expect(quota({'used': 5, 'weekly_limit': 7}).weeklyLimitReached, isFalse);
+    final premium = ContinuationQuota.fromJson(quotaJson(premium: true));
+    expect(premium.weeklyLimitReached, isFalse);
+    expect(premium.suggestsRewardedVideo, isFalse);
+  });
   test('continuation uses fresh owner quota; lost response keeps accepted cost through plan change and navigation', () async {
     var premium = false, recorded = false, lost = true;
     final costs = <int>[];

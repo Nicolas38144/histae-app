@@ -7,10 +7,13 @@ import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
+import '../../catalog/data/catalog_repository.dart';
 import '../../matches/data/match_models.dart';
 import '../../matches/presentation/matches_strings.dart';
 import '../application/continuation_controller.dart';
 import 'continuation_strings.dart';
+import 'continuation_subscription_navigation.dart';
+import 'credit_recovery_card.dart';
 import 'credits_page.dart';
 import 'partner_photo_page.dart';
 import 'photo_reveal_panel.dart';
@@ -20,9 +23,11 @@ class ContinuationPage extends StatefulWidget {
     super.key,
     required this.controller,
     required this.matchId,
+    this.catalog,
   });
   final ContinuationController controller;
   final String matchId;
+  final CatalogRepository? catalog;
 
   @override
   State<ContinuationPage> createState() => _ContinuationPageState();
@@ -64,7 +69,18 @@ class _ContinuationPageState extends State<ContinuationPage>
 
   Future<void> _continue() async {
     final offer = await c.prepareContinuation();
-    if (!mounted || offer == null) return;
+    if (!mounted) return;
+    if (offer == null) {
+      final quota = c.quota;
+      if (c.quotaReadAt != null && c.canContinue && c.pendingCost == null) {
+        if (quota?.weeklyLimitReached == true) {
+          await _openSubscription();
+        } else if (quota?.suggestsRewardedVideo == true && !quota!.canStart) {
+          await _openCredits(focusVideo: true);
+        }
+      }
+      return;
+    }
     final accepted = await confirmAction(
       context,
       AppStrings.of(context).messages.continuationPageContinueThisMatch,
@@ -83,6 +99,25 @@ class _ContinuationPageState extends State<ContinuationPage>
     );
     if (accepted && mounted) await c.accept(offer);
   }
+
+  Future<void> _openCredits({bool focusVideo = false}) async {
+    final route = MaterialPageRoute<void>(
+      builder: (_) => CreditsPage(
+        controller: c,
+        catalog: widget.catalog,
+        focusVideo: focusVideo,
+      ),
+    );
+    await Navigator.of(context).push(route);
+    await route.completed;
+    if (mounted) await c.activate();
+  }
+
+  Future<void> _openSubscription() => openContinuationSubscription(
+    context,
+    credits: c,
+    catalog: widget.catalog,
+  );
 
   Future<void> _reveal() async {
     if (await confirmAction(
@@ -250,7 +285,18 @@ class _ContinuationPageState extends State<ContinuationPage>
                             .continuationPageReadTheCostAndChooseTo,
                       ),
                     ),
-                    if (c.quota?.canStart == false)
+                    if (c.quotaReadAt != null &&
+                        c.quota != null &&
+                        (c.quota!.weeklyLimitReached ||
+                            c.quota!.suggestsRewardedVideo)) ...[
+                      const SizedBox(height: 16),
+                      CreditRecoveryCard(
+                        quota: c.quota!,
+                        enabled: c.canContinue,
+                        onWatchVideo: () => _openCredits(focusVideo: true),
+                        onOpenSubscription: _openSubscription,
+                      ),
+                    ] else if (c.quota?.canStart == false)
                       Text(
                         AppStrings.of(context)
                             .messages
@@ -259,16 +305,7 @@ class _ContinuationPageState extends State<ContinuationPage>
                   ],
                 ],
                 HistaeButton.text(
-                  onPressed: c.busy
-                      ? null
-                      : () async {
-                          await Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (_) => CreditsPage(controller: c),
-                            ),
-                          );
-                          if (mounted) await c.activate();
-                        },
+                  onPressed: c.busy ? null : _openCredits,
                   child: Text(
                     AppStrings.of(context)
                         .messages

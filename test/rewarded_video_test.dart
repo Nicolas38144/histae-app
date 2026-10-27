@@ -85,13 +85,18 @@ void main() {
   test(
     'eligibility and UMP failures prevent playback or reward creation',
     () async {
-      var premium = true, full = false, failedQuota = false, posts = 0;
+      var premium = true,
+          full = false,
+          weeklyLimit = false,
+          failedQuota = false,
+          posts = 0;
       final session = testSession((r) async {
         if (r.url.path.endsWith('/continuation-quota')) {
           if (failedQuota) return apiError(503, 'service_unavailable');
           return jsonResponse({
             ...quotaJson(premium: premium),
             if (full) 'advertising_balance': 3,
+            if (weeklyLimit) ...{'used': 5, 'remaining': 0},
           });
         }
         if (r.url.path.endsWith('/advertising-rewards')) {
@@ -118,6 +123,13 @@ void main() {
       await video.watch();
       expect(gateway.consents, 0);
       premium = false;
+      weeklyLimit = true;
+      await c.loadQuota();
+      expect(video.unavailableReason, ClientMessage.videoWeeklyLimitReached);
+      await video.watch();
+      expect(gateway.consents, 0);
+      expect(posts, 0);
+      weeklyLimit = false;
       full = true;
       await c.loadQuota();
       await video.watch();

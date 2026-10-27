@@ -5,16 +5,26 @@ import 'package:flutter/material.dart';
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
+import '../../catalog/data/catalog_repository.dart';
 import '../application/continuation_controller.dart';
 import '../application/rewarded_video_controller.dart';
 import 'continuation_strings.dart';
+import 'continuation_subscription_navigation.dart';
+import 'credit_recovery_card.dart';
 import 'credits_balance_panel.dart';
 import 'reward_video_card.dart';
 import 'rewarded_video_scope.dart';
 
 class CreditsPage extends StatefulWidget {
-  const CreditsPage({super.key, required this.controller});
+  const CreditsPage({
+    super.key,
+    required this.controller,
+    this.catalog,
+    this.focusVideo = false,
+  });
   final ContinuationController controller;
+  final CatalogRepository? catalog;
+  final bool focusVideo;
 
   @override
   State<CreditsPage> createState() => _CreditsPageState();
@@ -82,6 +92,15 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
     if (c.rewards.intent != null) await c.rewards.refresh();
   }
 
+  Future<void> _openSubscription() async {
+    await openContinuationSubscription(
+      context,
+      credits: c,
+      catalog: widget.catalog,
+    );
+    if (mounted) await _start();
+  }
+
   Future<void> _cancelReward() async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -122,6 +141,11 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
       }
       final q = c.quota, video = _video!, theme = Theme.of(context);
       final fresh = q != null && c.quotaReadAt != null;
+      final promotesVideo =
+          fresh &&
+          !q.premium &&
+          !q.weeklyLimitReached &&
+          (widget.focusVideo || q.suggestsRewardedVideo);
       return PopScope(
         canPop: !video.busy,
         child: HistaeScaffold(
@@ -179,6 +203,32 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
                     const SizedBox(height: 16),
                   ],
                   if (fresh) ...[
+                    if (q.weeklyLimitReached) ...[
+                      CreditRecoveryCard(
+                        quota: q,
+                        enabled: !c.loading && !video.busy,
+                        onWatchVideo: video.watch,
+                        onOpenSubscription: _openSubscription,
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    if (promotesVideo) ...[
+                      if (q.suggestsRewardedVideo) ...[
+                        Text(
+                          AppStrings.of(context)
+                              .messages
+                              .creditRecoveryFreeTitle,
+                          style: theme.textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                      RewardVideoCard(
+                        credits: c,
+                        video: video,
+                        onCancel: _cancelReward,
+                      ),
+                      const SizedBox(height: 16),
+                    ],
                     CreditsBalancePanel(quota: q),
                     if (!q.premium) ...[
                       const SizedBox(height: 16),
@@ -228,12 +278,16 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
                       ),
                     ),
                   if (fresh && !q.premium) ...[
-                    const SizedBox(height: 16),
-                    RewardVideoCard(
-                      credits: c,
-                      video: video,
-                      onCancel: _cancelReward,
-                    ),
+                    if (!promotesVideo &&
+                        (!q.weeklyLimitReached ||
+                            c.rewards.intent != null)) ...[
+                      const SizedBox(height: 16),
+                      RewardVideoCard(
+                        credits: c,
+                        video: video,
+                        onCancel: _cancelReward,
+                      ),
+                    ],
                     const SizedBox(height: 16),
                     CreditsExplanation(quota: q),
                   ],

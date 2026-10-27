@@ -7,6 +7,7 @@ import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
+import '../../catalog/data/catalog_repository.dart';
 import '../../continuation/presentation/continuation_page.dart';
 import '../../privacy/presentation/report_page.dart';
 import '../application/matches_controller.dart';
@@ -17,9 +18,15 @@ import 'message_bubble.dart';
 import 'partner_page.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({super.key, required this.controller, required this.matchId});
+  const ChatPage({
+    super.key,
+    required this.controller,
+    required this.matchId,
+    this.catalog,
+  });
   final MatchesController controller;
   final String matchId;
+  final CatalogRepository? catalog;
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -146,6 +153,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => ContinuationPage(
+          catalog: widget.catalog,
           controller: c.continuation,
           matchId: widget.matchId,
         ),

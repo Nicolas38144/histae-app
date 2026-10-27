@@ -10,10 +10,11 @@ class ContinuationBalanceCard extends StatelessWidget {
     super.key,
     required this.controller,
     required this.onOpenCredits,
+    required this.onOpenSubscription,
     this.loading = false,
   });
   final ContinuationController controller;
-  final VoidCallback onOpenCredits;
+  final VoidCallback onOpenCredits, onOpenSubscription;
   final bool loading;
 
   @override
@@ -74,18 +75,53 @@ class ContinuationBalanceCard extends StatelessWidget {
                         c.quotaReadAt != null &&
                         !q.premium)
                       HistaeButton.textIcon(
-                        key: const Key('open-videos'),
-                        onPressed: onOpenCredits,
-                        icon: const Icon(Icons.play_circle_outline),
+                        key: Key(
+                          q.weeklyLimitReached
+                              ? 'open-credit-subscription'
+                              : 'open-videos',
+                        ),
+                        onPressed: q.weeklyLimitReached
+                            ? onOpenSubscription
+                            : onOpenCredits,
+                        icon: Icon(
+                          q.weeklyLimitReached
+                              ? Icons.auto_awesome_outlined
+                              : Icons.play_circle_outline,
+                        ),
                         label: Text(
-                          AppStrings.of(context)
-                              .messages
-                              .continuationBalanceCardVideos,
+                          q.weeklyLimitReached
+                              ? AppStrings.of(context)
+                                    .messages
+                                    .creditRecoveryViewSubscriptions
+                              : q.suggestsRewardedVideo
+                              ? AppStrings.of(context)
+                                    .messages
+                                    .rewardVideoCardWatchAVideo
+                              : AppStrings.of(context)
+                                    .messages
+                                    .continuationBalanceCardVideos,
                         ),
                       ),
                   ],
                 ),
                 const SizedBox(height: 12),
+                if (!loading &&
+                    !c.loading &&
+                    q != null &&
+                    c.quotaReadAt != null &&
+                    (q.weeklyLimitReached || q.suggestsRewardedVideo)) ...[
+                  Text(
+                    q.weeklyLimitReached
+                        ? AppStrings.of(context)
+                              .messages
+                              .creditRecoveryWeeklyLimit
+                        : AppStrings.of(context)
+                              .messages
+                              .creditRecoveryWatchDescription,
+                    style: theme.textTheme.bodySmall,
+                  ),
+                  const SizedBox(height: 16),
+                ],
                 if (loading || c.loading) ...[
                   Text(
                     AppStrings.of(context)

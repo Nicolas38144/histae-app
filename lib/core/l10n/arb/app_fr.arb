@@ -3914,5 +3914,15 @@
         "type": "String"
       }
     }
-  }
+  },
+  "creditRecoveryFreeTitle": "Vos crédits gratuits sont épuisés",
+  "@creditRecoveryFreeTitle": {"description": "Continuation credit recovery and subscription guidance."},
+  "creditRecoveryWatchDescription": "Une vidéo facultative vous permet de gagner un crédit pour continuer.",
+  "@creditRecoveryWatchDescription": {"description": "Continuation credit recovery and subscription guidance."},
+  "creditRecoveryWeeklyTitle": "Votre limite de la semaine est atteinte",
+  "@creditRecoveryWeeklyTitle": {"description": "Continuation credit recovery and subscription guidance."},
+  "creditRecoveryWeeklyLimit": "Votre plafond hebdomadaire est atteint. Il se renouvelle le lundi à 00:00 UTC. Avec Premium, les continuations sont illimitées.",
+  "@creditRecoveryWeeklyLimit": {"description": "Continuation credit recovery and subscription guidance."},
+  "creditRecoveryViewSubscriptions": "Découvrir les abonnements",
+  "@creditRecoveryViewSubscriptions": {"description": "Continuation credit recovery and subscription guidance."}
 }

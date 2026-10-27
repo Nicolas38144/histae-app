@@ -3361,4 +3361,21 @@ class AppMessagesEs extends AppMessages {
   @override
   String get consentDocumentDatePending =>
       'Fecha del documento en proceso de validación.';
+
+  @override
+  String get creditRecoveryFreeTitle => 'Has agotado tus créditos gratuitos';
+
+  @override
+  String get creditRecoveryWatchDescription =>
+      'Un vídeo opcional te permite ganar un crédito para continuar.';
+
+  @override
+  String get creditRecoveryWeeklyTitle => 'Has alcanzado tu límite semanal';
+
+  @override
+  String get creditRecoveryWeeklyLimit =>
+      'Has alcanzado tu límite semanal. Se renueva el lunes a las 00:00 UTC. Con Premium, las continuaciones son ilimitadas.';
+
+  @override
+  String get creditRecoveryViewSubscriptions => 'Descubrir las suscripciones';
 }

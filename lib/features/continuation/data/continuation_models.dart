@@ -60,6 +60,14 @@ class ContinuationQuota {
   int get creditCost => premium ? 0 : 1;
 
   bool get canStart => premium || remaining! > 0;
+
+  bool get weeklyLimitReached => !premium && used >= weeklyLimit!;
+
+  bool get canEarnAdvertisingCredit =>
+      !premium && !weeklyLimitReached && advertisingBalance < stockLimit;
+
+  bool get suggestsRewardedVideo =>
+      freeRemaining == 0 && canEarnAdvertisingCredit;
 }
 
 enum RewardStatus { pending, credited, expired, cancelled }

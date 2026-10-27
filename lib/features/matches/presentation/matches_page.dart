@@ -6,7 +6,9 @@ import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_empty_state.dart';
 import '../../../core/widgets/histae_scaffold.dart';
+import '../../catalog/data/catalog_repository.dart';
 import '../../continuation/presentation/continuation_balance_card.dart';
+import '../../continuation/presentation/continuation_subscription_navigation.dart';
 import '../../continuation/presentation/credits_page.dart';
 import '../application/matches_controller.dart';
 import 'chat_page.dart';
@@ -17,11 +19,13 @@ class MatchesPage extends StatefulWidget {
   const MatchesPage({
     super.key,
     required this.controller,
+    this.catalog,
     this.initialMatchId,
     this.onInitialMatchHandled,
     this.notificationFlow = false,
   });
   final MatchesController controller;
+  final CatalogRepository? catalog;
   final String? initialMatchId;
   final VoidCallback? onInitialMatchHandled;
   final bool notificationFlow;
@@ -83,7 +87,8 @@ class _MatchesPageState extends State<MatchesPage> {
       if (c.selected?.id != id || c.selected?.historyAllowed != true) return;
       await Navigator.of(context).push(
         MaterialPageRoute<void>(
-          builder: (_) => ChatPage(controller: c, matchId: id),
+          builder: (_) =>
+              ChatPage(controller: c, matchId: id, catalog: widget.catalog),
         ),
       );
     } finally {
@@ -122,13 +127,31 @@ class _MatchesPageState extends State<MatchesPage> {
     _opening = true;
     try {
       final route = MaterialPageRoute<void>(
-        builder: (_) => CreditsPage(controller: c.continuation),
+        builder: (_) => CreditsPage(
+          controller: c.continuation,
+          catalog: widget.catalog,
+          focusVideo: c.continuation.quota?.suggestsRewardedVideo == true,
+        ),
       );
       await Navigator.of(context).push(route);
       await route.completed;
     } finally {
       _opening = false;
       if (mounted) await c.continuation.activate();
+    }
+  }
+
+  Future<void> _openSubscription() async {
+    if (_opening) return;
+    _opening = true;
+    try {
+      await openContinuationSubscription(
+        context,
+        credits: c.continuation,
+        catalog: widget.catalog,
+      );
+    } finally {
+      _opening = false;
     }
   }
 
@@ -193,6 +216,7 @@ class _MatchesPageState extends State<MatchesPage> {
                               .matchesEmptyTitle,
                         ),
                       ContinuationBalanceCard(
+                        onOpenSubscription: _openSubscription,
                         controller: c.continuation,
                         onOpenCredits: _openCredits,
                         loading: _overviewLoads > 0,

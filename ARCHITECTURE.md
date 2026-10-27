@@ -151,6 +151,12 @@ Profile and Matches share `ContinuationController`. It initializes quota once an
 explicit requests, spending, rewards or confirmed subscription changes. The continuation cost is
 rechecked before acceptance; the client never invents a credit debit or grant.
 
+`ContinuationQuota` derives weekly-limit and video-recovery states from server counters.
+Matches, continuation options and credits share those decisions. Presentation routes reuse the
+session billing controller and injected catalogue; only confirmed entitlement changes refresh
+quota on return. Rewarded-video eligibility checks the same weekly ceiling before starting and
+after asynchronous consent/loading steps.
+
 `RewardedVideoGateway` isolates UMP/AdMob; `RewardTracker` follows the server intent. Only server
 validation grants a reward. `BillingController` operates on immutable values and `BillingGateway`;
 `NativeBillingGateway` alone handles Apple/Google SDK objects. Purchase verification precedes

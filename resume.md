@@ -123,6 +123,11 @@ offer requires renewed confirmation; an uncertain retry retains the accepted cos
 Matches distinguishes available included credits, ad credits and the weekly cap. Reservations are
 not shown as available. Premium continuations use no credits; read failures are not zero balances.
 
+Once included credits run out, the app suggests an optional video when the advertising stock has
+room. Reaching the weekly confirmed-continuation ceiling takes priority: the action opens store
+subscriptions, and new rewarded videos are blocked. Existing advertising proofs can still settle.
+Reservations alone do not count as a reached weekly ceiling.
+
 Videos are optional for eligible Free users. The API intent supplies ad-unit/custom data; UMP
 handles ad preferences separately from Histae consent. SDK completion starts tracking, while only
 server validation grants the credit.

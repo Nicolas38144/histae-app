@@ -972,5 +972,10 @@
   "privacyRequestYourMessage": "Your message",
   "privacyRequestTeamResponse": "Reply from the team",
   "consentDocumentDate": "Document dated {date}",
-  "consentDocumentDatePending": "Document date pending validation."
+  "consentDocumentDatePending": "Document date pending validation.",
+  "creditRecoveryFreeTitle": "You have used your free credits",
+  "creditRecoveryWatchDescription": "An optional video lets you earn a credit to keep a conversation going.",
+  "creditRecoveryWeeklyTitle": "You have reached your weekly limit",
+  "creditRecoveryWeeklyLimit": "You have reached your weekly limit. It resets on Monday at 00:00 UTC. Premium includes unlimited continuations.",
+  "creditRecoveryViewSubscriptions": "Explore subscriptions"
 }

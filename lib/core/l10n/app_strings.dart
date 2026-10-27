@@ -77,6 +77,7 @@ class AppStrings {
       messages.rewardedVideoControllerYourPreferencesAreCurrentlyUnavailable,
     ClientMessage.videoConsentUnavailable =>
       messages.rewardedVideoControllerYourAdvertisingPreferencesCouldNotBe,
+    ClientMessage.videoWeeklyLimitReached => messages.creditRecoveryWeeklyLimit,
     ClientMessage.videoReserveFull =>
       messages.rewardedVideoControllerYourVideoReserveIsFullUse,
     ClientMessage.videoDeviceNotConfigured =>

@@ -89,6 +89,7 @@ class NotificationNavigation {
           settings: const RouteSettings(name: '/notification/match'),
           builder: (_) => MatchesPage(
             controller: matches,
+            catalog: catalogRepository,
             initialMatchId: intent.matchId,
             notificationFlow: true,
           ),

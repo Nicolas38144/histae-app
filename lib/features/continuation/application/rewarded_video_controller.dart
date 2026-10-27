@@ -53,6 +53,9 @@ class RewardedVideoController extends ChangeNotifier {
     if (q.premium) {
       return ClientMessage.videoPremium;
     }
+    if (q.weeklyLimitReached) {
+      return ClientMessage.videoWeeklyLimitReached;
+    }
     if (credits.catalogFailure != null) {
       return ClientMessage.videoAvailabilityUnknown;
     }

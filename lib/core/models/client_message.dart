@@ -31,6 +31,7 @@ enum ClientMessage {
   videoPrivacyUnavailable,
   videoConsentUnavailable,
   videoReserveFull,
+  videoWeeklyLimitReached,
   videoDeviceNotConfigured,
   videoPlatformUnsupported,
 }
