@@ -16,6 +16,7 @@ import 'support/auth_fixture.dart';
 import 'support/continuation_fixture.dart';
 import 'support/matches_fixture.dart';
 import 'support/rewarded_video_fixture.dart';
+import 'support/scrolling.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -265,7 +266,11 @@ void main() {
         final openCredits = entry == 'matches'
             ? find.byKey(const Key('open-videos'))
             : find.text('Mes crédits');
-        await tester.scrollUntilVisible(openCredits, 200);
+        await tester.scrollUntilVisible(
+          openCredits,
+          200,
+          scrollable: verticalScrollables.first,
+        );
         await tester.pumpAndSettle();
         await tester.ensureVisible(openCredits);
         await tester.pumpAndSettle();

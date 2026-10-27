@@ -18,6 +18,7 @@ import 'package:image_picker/image_picker.dart';
 
 import 'support/auth_fixture.dart';
 import 'support/profile_fixture.dart';
+import 'support/scrolling.dart';
 
 class TestPhotoPreparer extends PhotoPreparer {
   Uint8List? selection;
@@ -51,17 +52,14 @@ class _CancelledPicker extends ImagePicker {
 
 Future<void> tapVisible(WidgetTester tester, Finder finder) async {
   if (finder.evaluate().isEmpty) {
-    tester
-        .state<ScrollableState>(find.byType(Scrollable).first)
-        .position
-        .jumpTo(0);
+    tester.state<ScrollableState>(verticalScrollables.first).position.jumpTo(0);
     await tester.pumpAndSettle();
   }
   await tester.scrollUntilVisible(
     finder,
     180,
     maxScrolls: 80,
-    scrollable: find.byType(Scrollable).first,
+    scrollable: verticalScrollables.first,
   );
   await tester.ensureVisible(finder);
   await tester.pumpAndSettle();
@@ -442,7 +440,7 @@ void main() {
       await tester.scrollUntilVisible(
         find.text('Créer mon compte'),
         180,
-        scrollable: find.byType(Scrollable).first,
+        scrollable: verticalScrollables.first,
       );
       expect(find.text('Créer mon compte'), findsOneWidget);
       expect(tester.takeException(), isNull);

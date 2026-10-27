@@ -13,6 +13,7 @@ import 'package:histae_app/features/consents/presentation/consents_page.dart';
 import '../test/support/auth_fixture.dart';
 import '../test/support/continuation_fixture.dart';
 import '../test/support/profile_fixture.dart';
+import '../test/support/scrolling.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -103,7 +104,7 @@ void main() {
     Future<void> reveal(Finder finder) async {
       if (finder.evaluate().isEmpty) {
         tester
-            .state<ScrollableState>(find.byType(Scrollable).first)
+            .state<ScrollableState>(verticalScrollables.first)
             .position
             .jumpTo(0);
         await tester.pumpAndSettle();
@@ -111,7 +112,7 @@ void main() {
       await tester.scrollUntilVisible(
         finder,
         220,
-        scrollable: find.byType(Scrollable).first,
+        scrollable: verticalScrollables.first,
       );
       await tester.ensureVisible(finder);
       await tester.pumpAndSettle();
@@ -147,7 +148,7 @@ void main() {
     await tester.tap(find.byKey(const Key('discovery-paused')));
     await tester.pumpAndSettle();
     await reveal(find.text('Des débuts de conversation'));
-    await tester.drag(find.byType(Scrollable).first, const Offset(0, 110));
+    await tester.drag(verticalScrollables.first, const Offset(0, 110));
     await tester.pumpAndSettle();
     await capture('answers-preview');
     await reveal(find.text('Ce qui vous ressemble'));

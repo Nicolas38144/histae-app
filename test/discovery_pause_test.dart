@@ -12,6 +12,7 @@ import 'package:http/http.dart' as http;
 import 'support/auth_fixture.dart';
 import 'support/continuation_fixture.dart';
 import 'support/discovery_fixture.dart';
+import 'support/scrolling.dart';
 
 void main() {
   test('pause state is confirmed by the server, resynced after uncertainty and purged on logout', () async {
@@ -90,7 +91,11 @@ void main() {
       await tester.tap(find.byKey(const Key('main-tab-profile')));
       await tester.pumpAndSettle();
       final toggle = find.byKey(const Key('discovery-paused'));
-      await tester.scrollUntilVisible(toggle, 180);
+      await tester.scrollUntilVisible(
+        toggle,
+        180,
+        scrollable: verticalScrollables.first,
+      );
       await tester.ensureVisible(toggle);
       await tester.pumpAndSettle();
       await tester.tap(toggle);
@@ -105,7 +110,11 @@ void main() {
       expect(find.byType(FeedProfileCard), findsNothing);
       expect(find.text('Votre profil est en pause'), findsOneWidget);
       final resume = find.text('Reprendre la découverte');
-      await tester.scrollUntilVisible(resume, 160);
+      await tester.scrollUntilVisible(
+        resume,
+        160,
+        scrollable: verticalScrollables.first,
+      );
       await tester.ensureVisible(resume);
       await tester.pumpAndSettle();
       await tester.tap(resume);

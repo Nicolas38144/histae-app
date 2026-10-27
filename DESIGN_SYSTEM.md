@@ -97,9 +97,12 @@ automatic modification of account data.
 ## Navigation and accessibility
 
 The Profile / Feed / Matches bar is transparent, with no panel, shadow or separator. Icons are
-24 px; the selected icon has a 44 px lavender circle, a label below and a full-tab touch target.
-Reduced motion removes the circle transition. System bars remain transparent with appropriate
-bottom spacing for scrollable content.
+22 px; the selected icon has a 38 px lavender circle, a label below and a full-tab touch target
+of at least 48 px. Compact spacing leaves more room for content without reducing label text size.
+Horizontal swipes slide between these three screens and synchronize the selected tab. Vertical
+feed gestures still navigate profiles; detail routes and their carousels retain their own gestures.
+Reduced motion removes programmatic page and circle transitions. System bars remain transparent
+with appropriate bottom spacing for scrollable content.
 
 Shared widgets retain disabled states, focus, semantics and keyboard behavior. Keep scrolling and
 whole words on small screens, with a keyboard or at 200% text. Chat headers become compact while

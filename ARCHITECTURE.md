@@ -48,8 +48,12 @@ The catalogue owns `SubscriptionPlanCarousel`, reused by its public read-only pa
 subscription plans. It owns selection and measured card heights only; catalogue loading and
 purchase actions remain in their respective controllers.
 
-`MainShell` owns Feed, Matches and Profile controllers. Its `IndexedStack` retains the three views
-and scroll state; its session resource key rebuilds the private scope when access changes.
+`MainShell` owns Feed, Matches and Profile controllers and the shared page controller.
+`MainTabPager` provides horizontal paging in Profile / Feed / Matches order, synchronized with
+the bottom navigation. Its viewport cache initializes and retains all three views at startup,
+including their scroll state, without reloading data on a tab change. Offscreen views exclude
+focus, touch, semantics and tickers; reading time pauses during page transitions. Pushed detail
+routes retain their own gestures. The session resource key rebuilds the private scope when access changes.
 A page disposes a controller it creates. A received controller remains owned by its parent.
 Suspending activity and disposing resources are distinct operations.
 

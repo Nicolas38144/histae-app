@@ -18,6 +18,7 @@ import 'support/billing_fixture.dart';
 import 'support/catalog_fixture.dart';
 import 'support/continuation_fixture.dart';
 import 'support/matches_fixture.dart';
+import 'support/scrolling.dart';
 
 Future<void> mountBenefits(
   WidgetTester tester, {
@@ -69,7 +70,7 @@ Future<void> revealSubscription(WidgetTester tester) async {
     entry,
     240,
     maxScrolls: 80,
-    scrollable: find.byType(Scrollable).first,
+    scrollable: verticalScrollables.first,
   );
   await tester.ensureVisible(entry);
   await tester.pumpAndSettle();
@@ -182,7 +183,7 @@ void main() {
       await tester.scrollUntilVisible(
         find.byKey(const Key('free-credits-remaining')),
         200,
-        scrollable: find.byType(Scrollable).first,
+        scrollable: verticalScrollables.first,
       );
       expect(
         tester

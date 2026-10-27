@@ -63,7 +63,7 @@ class MainNavigationBar extends StatelessWidget {
     ];
     return SafeArea(
       top: false,
-      minimum: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+      minimum: const EdgeInsets.fromLTRB(16, 0, 16, 6),
       child: Align(
         heightFactor: 1,
         child: ConstrainedBox(
@@ -73,7 +73,7 @@ class MainNavigationBar extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const SizedBox(height: 6),
+                const SizedBox(height: 2),
                 Row(
                   children: [
                     for (var index = 0; index < destinations.length; index++)
@@ -90,15 +90,15 @@ class MainNavigationBar extends StatelessWidget {
                             onTap: () => onSelected(index),
                             child: Padding(
                               padding: EdgeInsets.symmetric(
-                                vertical: 8,
+                                vertical: 5,
                                 horizontal: largeText ? 0 : 4,
                               ),
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   AnimatedContainer(
-                                    width: 44,
-                                    height: 44,
+                                    width: 38,
+                                    height: 38,
                                     duration: reduceMotion
                                         ? Duration.zero
                                         : const Duration(milliseconds: 180),
@@ -122,13 +122,13 @@ class MainNavigationBar extends StatelessWidget {
                                       index == selectedIndex
                                           ? destinations[index].selected
                                           : destinations[index].icon,
-                                      size: 24,
+                                      size: 22,
                                       color: index == selectedIndex
                                           ? colors.primary
                                           : colors.onSurfaceVariant,
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
+                                  const SizedBox(height: 2),
                                   Text(
                                     destinations[index].label,
                                     textAlign: TextAlign.center,

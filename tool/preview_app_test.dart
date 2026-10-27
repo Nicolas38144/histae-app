@@ -22,6 +22,7 @@ import '../test/support/matches_fixture.dart';
 import '../test/support/notifications_fixture.dart';
 import '../test/support/privacy_fixture.dart';
 import '../test/support/profile_fixture.dart';
+import '../test/support/scrolling.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -104,7 +105,7 @@ void main() {
       await tester.scrollUntilVisible(
         find.text('Appareils et notifications'),
         180,
-        scrollable: find.byType(Scrollable).first,
+        scrollable: verticalScrollables.first,
       );
       await tapText('Appareils et notifications');
       await expectLater(
@@ -245,7 +246,7 @@ void main() {
       await tester.scrollUntilVisible(
         find.text('Sessions, données et suppression du compte'),
         200,
-        scrollable: find.byType(Scrollable).first,
+        scrollable: verticalScrollables.first,
       );
       await tapText('Sessions, données et suppression du compte');
       expect(find.byType(PrivacyHubPage), findsOneWidget);
@@ -675,7 +676,7 @@ void main() {
     await tester.scrollUntilVisible(
       find.text('Modifier ma présentation'),
       180,
-      scrollable: find.byType(Scrollable).first,
+      scrollable: verticalScrollables.first,
     );
     await tester.ensureVisible(find.text('Modifier ma présentation'));
     await tester.pumpAndSettle();
@@ -690,7 +691,7 @@ void main() {
     await tester.scrollUntilVisible(
       find.text('Écrire mes réponses'),
       180,
-      scrollable: find.byType(Scrollable).first,
+      scrollable: verticalScrollables.first,
     );
     await tester.ensureVisible(find.text('Écrire mes réponses'));
     await tester.pumpAndSettle();

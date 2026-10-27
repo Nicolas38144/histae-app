@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../core/widgets/histae_scaffold.dart';
@@ -14,6 +16,7 @@ import '../features/notifications/presentation/push_scope.dart';
 import '../features/profile/application/profile_controller.dart';
 import '../features/profile/presentation/profile_page.dart';
 import 'main_navigation_bar.dart';
+import 'main_tab_pager.dart';
 import 'session_repositories.dart';
 
 /// Keeps the three main views and their data alive for the current session.
@@ -47,6 +50,7 @@ class _MainShellState extends State<MainShell> {
     onRemoved: _discovery.forgetEncounter,
   );
   final _pageStorage = PageStorageBucket();
+  final _pages = PageController(initialPage: MainTab.discovery.index);
   PushController? _push;
   bool _covered = false;
   MainTab _selected = MainTab.discovery;
@@ -101,11 +105,25 @@ class _MainShellState extends State<MainShell> {
   }
 
   void _select(int index) {
+    _initialMatchId = null;
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _pages.jumpToPage(index);
+    } else {
+      unawaited(
+        _pages.animateToPage(
+          index,
+          duration: const Duration(milliseconds: 280),
+          curve: Curves.easeInOutCubic,
+        ),
+      );
+    }
+  }
+
+  void _pageChanged(int index) {
     final tab = MainTab.values[index];
     if (_selected == tab) return;
     setState(() {
       _selected = tab;
-      _initialMatchId = null;
     });
   }
 
@@ -117,14 +135,15 @@ class _MainShellState extends State<MainShell> {
     }
     Navigator.of(context).popUntil((route) => route.isFirst);
     setState(() {
-      _selected = MainTab.matches;
       _initialMatchId = id;
     });
+    _pages.jumpToPage(MainTab.matches.index);
   }
 
   @override
   void dispose() {
     _push?.removeListener(_pushRouteChanged);
+    _pages.dispose();
     _matches.dispose();
     _discovery.dispose();
     _visibility.dispose();
@@ -141,39 +160,41 @@ class _MainShellState extends State<MainShell> {
       bucket: _pageStorage,
       child: Offstage(
         offstage: _covered,
-        child: IndexedStack(
-          index: _selected.index,
-          children: [
-            for (final tab in MainTab.values)
-              switch (tab) {
-                MainTab.discovery => DiscoveryPage(
-                  key: const PageStorageKey('main-discovery'),
-                  controller: _discovery,
-                  profile: _profile,
-                  visibility: _visibility,
-                  visible: _selected == MainTab.discovery && !_covered,
-                  openMatches: _openMatches,
-                ),
-                MainTab.matches => TickerMode(
-                  enabled: _selected == MainTab.matches && !_covered,
-                  child: MatchesPage(
+        child: TickerMode(
+          enabled: !_covered,
+          child: MainTabPager(
+            controller: _pages,
+            selectedIndex: _selected.index,
+            onPageChanged: _pageChanged,
+            children: [
+              for (final tab in MainTab.values)
+                switch (tab) {
+                  MainTab.discovery => DiscoveryPage(
+                    key: const PageStorageKey('main-discovery'),
+                    controller: _discovery,
+                    profile: _profile,
+                    visibility: _visibility,
+                    visible: _selected == MainTab.discovery && !_covered,
+                    openMatches: _openMatches,
+                  ),
+                  MainTab.matches => MatchesPage(
                     key: const PageStorageKey('main-matches'),
                     controller: _matches,
                     initialMatchId: _initialMatchId,
                     onInitialMatchHandled: () => _initialMatchId = null,
                   ),
-                ),
-                MainTab.profile => ProfilePage(
-                  key: const PageStorageKey('main-profile'),
-                  controller: _profile,
-                  privacyRepository: _repositories.privacy,
-                  deviceRepository: _repositories.devices,
-                  continuation: _matches.continuation,
-                  catalog: widget.catalog,
-                  visibility: _visibility,
-                ),
-              },
-          ],
+                  MainTab.profile => ProfilePage(
+                    key: const PageStorageKey('main-profile'),
+                    controller: _profile,
+                    privacyRepository: _repositories.privacy,
+                    deviceRepository: _repositories.devices,
+                    continuation: _matches.continuation,
+                    catalog: widget.catalog,
+                    visibility: _visibility,
+                  ),
+                },
+            ],
+          ),
         ),
       ),
     ),

@@ -9,6 +9,7 @@ import 'package:histae_app/app/session_repositories.dart';
 import 'package:histae_app/app/theme.dart';
 import 'package:histae_app/core/network/api_client.dart';
 import 'package:histae_app/core/network/read_snapshots.dart';
+import 'package:histae_app/core/network/signed_photo_loader.dart';
 import 'package:histae_app/features/auth/application/session_controller.dart';
 import 'package:histae_app/features/auth/data/auth_repository.dart';
 import 'package:histae_app/features/billing/application/billing_controller.dart';
@@ -312,8 +313,9 @@ void main() {
     );
     await c.activate();
     await c.openChat(testMatch);
+    const remaining = Duration(seconds: 2);
     c.readAt = DateTime.now().toUtc().subtract(
-      const Duration(minutes: 3, seconds: 59),
+      privatePhotoLifetime - remaining,
     );
     final png = base64Decode(
       'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aL1sAAAAASUVORK5CYII=',
@@ -332,14 +334,13 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(Image), findsOneWidget);
     await tester.runAsync(
-      () => Future<void>.delayed(const Duration(milliseconds: 1200)),
+      () => Future<void>.delayed(remaining + const Duration(milliseconds: 100)),
     );
     await tester.pump();
     final expired =
-        DateTime.now().toUtc().difference(c.readAt!) >=
-        const Duration(minutes: 4);
+        DateTime.now().toUtc().difference(c.readAt!) >= privatePhotoLifetime;
     expect(expired, isTrue);
-    await tester.pump(const Duration(milliseconds: 1200));
+    await tester.pump(remaining + const Duration(milliseconds: 100));
     expect(find.byType(Image), findsNothing);
     await tester.pumpWidget(const SizedBox());
     c.dispose();

@@ -15,6 +15,7 @@ import 'package:histae_app/features/profile/presentation/identity_editor.dart';
 
 import 'support/auth_fixture.dart';
 import 'support/profile_fixture.dart';
+import 'support/scrolling.dart';
 
 class MemoryLocaleStore implements LocalePreferenceStore {
   String? saved;
@@ -313,7 +314,7 @@ void main() {
       await tester.scrollUntilVisible(
         find.text('Modifier ma présentation'),
         160,
-        scrollable: find.byType(Scrollable).first,
+        scrollable: verticalScrollables.first,
       );
       await tester.ensureVisible(find.text('Modifier ma présentation'));
       await tester.pumpAndSettle();
