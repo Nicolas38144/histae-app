@@ -286,6 +286,7 @@ void main() {
       expect(requests, 1);
       expect(find.byType(Image), findsOneWidget);
       await tester.scrollUntilVisible(find.text('Actualiser la photo'), 200);
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Actualiser la photo'));
       await tester.pump();
       expect(requests, 2);

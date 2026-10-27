@@ -1010,7 +1010,7 @@ class AppMessagesIt extends AppMessages {
   }
 
   @override
-  String get creditsBalancePanelVideoCreditsAreKeptIncludingReserved =>
+  String get creditsBalancePanelVideoCreditsExpireOnMondays =>
       'I crediti gratuiti si rinnovano il lunedì alle 00:00 UTC. I crediti video inutilizzati, inclusi quelli prenotati, scadono nello stesso momento e devono essere guadagnati di nuovo tramite video. Una prenotazione gratuita può restare legata alla settimana del consenso.';
 
   @override
@@ -1148,7 +1148,7 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get rewardVideoCardTheRequestExpiredAVideoCompleted =>
-      'La richiesta è scaduta. Un video completato in tempo può ancora essere convalidato.';
+      'La richiesta è scaduta. Un video completato in tempo può ancora essere convalidato se la prova arriva prima del rinnovo del lunedì alle 00:00 UTC.';
 
   @override
   String get rewardVideoCardThisRequestWasCanceled =>

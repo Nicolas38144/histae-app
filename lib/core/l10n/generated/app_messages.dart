@@ -1651,7 +1651,7 @@ abstract class AppMessages {
   ///
   /// In fr, this message translates to:
   /// **'Les crédits gratuits se renouvellent le lundi à 00:00 UTC. Les crédits vidéo inutilisés, y compris réservés, expirent au même instant et doivent être regagnés par vidéo. Une réservation gratuite peut rester rattachée à la semaine de votre accord.'**
-  String get creditsBalancePanelVideoCreditsAreKeptIncludingReserved;
+  String get creditsBalancePanelVideoCreditsExpireOnMondays;
 
   /// Interface: lib/features/continuation/presentation/credits_page.dart
   ///
@@ -1848,7 +1848,7 @@ abstract class AppMessages {
   /// Interface: lib/features/continuation/presentation/reward_video_card.dart
   ///
   /// In fr, this message translates to:
-  /// **'La demande a expiré. Une vidéo terminée à temps peut encore être validée.'**
+  /// **'La demande a expiré. Une vidéo terminée à temps peut encore être validée si la preuve arrive avant le renouvellement du lundi à 00:00 UTC.'**
   String get rewardVideoCardTheRequestExpiredAVideoCompleted;
 
   /// Interface: lib/features/continuation/presentation/reward_video_card.dart

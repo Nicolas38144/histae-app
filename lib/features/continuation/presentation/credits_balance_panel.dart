@@ -295,7 +295,7 @@ class CreditsExplanation extends StatelessWidget {
             Text(
               AppStrings.of(context)
                   .messages
-                  .creditsBalancePanelVideoCreditsAreKeptIncludingReserved,
+                  .creditsBalancePanelVideoCreditsExpireOnMondays,
             ),
           ],
         ),

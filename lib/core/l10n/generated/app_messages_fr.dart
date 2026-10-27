@@ -1008,7 +1008,7 @@ class AppMessagesFr extends AppMessages {
   }
 
   @override
-  String get creditsBalancePanelVideoCreditsAreKeptIncludingReserved =>
+  String get creditsBalancePanelVideoCreditsExpireOnMondays =>
       'Les crédits gratuits se renouvellent le lundi à 00:00 UTC. Les crédits vidéo inutilisés, y compris réservés, expirent au même instant et doivent être regagnés par vidéo. Une réservation gratuite peut rester rattachée à la semaine de votre accord.';
 
   @override
@@ -1146,7 +1146,7 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get rewardVideoCardTheRequestExpiredAVideoCompleted =>
-      'La demande a expiré. Une vidéo terminée à temps peut encore être validée.';
+      'La demande a expiré. Une vidéo terminée à temps peut encore être validée si la preuve arrive avant le renouvellement du lundi à 00:00 UTC.';
 
   @override
   String get rewardVideoCardThisRequestWasCanceled =>

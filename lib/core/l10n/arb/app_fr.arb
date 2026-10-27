@@ -1146,8 +1146,8 @@
       }
     }
   },
-  "creditsBalancePanelVideoCreditsAreKeptIncludingReserved": "Les crédits gratuits se renouvellent le lundi à 00:00 UTC. Les crédits vidéo inutilisés, y compris réservés, expirent au même instant et doivent être regagnés par vidéo. Une réservation gratuite peut rester rattachée à la semaine de votre accord.",
-  "@creditsBalancePanelVideoCreditsAreKeptIncludingReserved": {
+  "creditsBalancePanelVideoCreditsExpireOnMondays": "Les crédits gratuits se renouvellent le lundi à 00:00 UTC. Les crédits vidéo inutilisés, y compris réservés, expirent au même instant et doivent être regagnés par vidéo. Une réservation gratuite peut rester rattachée à la semaine de votre accord.",
+  "@creditsBalancePanelVideoCreditsExpireOnMondays": {
     "description": "Interface: lib/features/continuation/presentation/credits_balance_panel.dart"
   },
   "creditsPageCancelThisRequest": "Annuler cette demande ?",
@@ -1290,7 +1290,7 @@
       }
     }
   },
-  "rewardVideoCardTheRequestExpiredAVideoCompleted": "La demande a expiré. Une vidéo terminée à temps peut encore être validée.",
+  "rewardVideoCardTheRequestExpiredAVideoCompleted": "La demande a expiré. Une vidéo terminée à temps peut encore être validée si la preuve arrive avant le renouvellement du lundi à 00:00 UTC.",
   "@rewardVideoCardTheRequestExpiredAVideoCompleted": {
     "description": "Interface: lib/features/continuation/presentation/reward_video_card.dart"
   },
