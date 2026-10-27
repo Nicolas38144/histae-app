@@ -31,6 +31,8 @@ are the implementation references.
 | Apricot | `#F09A82` |
 | Primary action | `#F2A48C` → `#D8B3F7` gradient with dark text |
 
+Screen backgrounds use the theme's solid surface color: night blue in dark mode.
+
 Inter is used for body text, forms and buttons; Source Serif 4 for headings. Respect screen width
 and system text size. Panels generally use thin borders and a 20 px radius; primary actions use
 a pill shape. Secondary buttons use a subtle lavender surface, light outline and 16 px corners.
@@ -102,7 +104,7 @@ of at least 48 px. Compact spacing leaves more room for content without reducing
 Horizontal swipes slide between these three screens and synchronize the selected tab. Vertical
 feed gestures still navigate profiles; detail routes and their carousels retain their own gestures.
 Changing tabs requires a more deliberate horizontal drag, allowing vertical reading to win over
-small sideways drift. The decorative background stays fixed beneath the moving tab content.
+small sideways drift. Every tab uses the same solid background during transitions.
 Reduced motion removes programmatic page and circle transitions. System bars remain transparent
 with appropriate bottom spacing for scrollable content.
 

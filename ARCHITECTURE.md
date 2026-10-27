@@ -56,7 +56,7 @@ focus, touch, semantics and tickers; reading time pauses during page transitions
 routes retain their own gestures. The session resource key rebuilds the private scope when access changes.
 The pager increases only its own horizontal touch threshold; each child receives the original
 device gesture settings so vertical scrolling and controls keep their usual sensitivity.
-Nested `HistaeScaffold` instances inherit one stationary route background; pushed routes own theirs.
+`HistaeScaffold` uses the same solid theme surface for tab and detail backgrounds.
 A page disposes a controller it creates. A received controller remains owned by its parent.
 Suspending activity and disposing resources are distinct operations.
 

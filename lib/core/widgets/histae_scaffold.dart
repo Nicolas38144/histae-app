@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../theme/histae_tokens.dart';
-
-/// A route background matching the site's quiet, two-corner ambient light.
+/// A solid route background using the app's theme surface.
 /// Scaffold retains keyboard avoidance, semantics and navigation behavior.
 class HistaeScaffold extends StatelessWidget {
   const HistaeScaffold({
@@ -20,11 +18,8 @@ class HistaeScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final dark = colors.brightness == Brightness.dark;
-    final sharedBackground =
-        context.dependOnInheritedWidgetOfExactType<_HistaeBackground>() != null;
-    final scaffold = Scaffold(
-      backgroundColor: Colors.transparent,
+    return Scaffold(
+      backgroundColor: colors.surface,
       extendBody: extendBody,
       appBar: appBar == null
           ? null
@@ -32,7 +27,7 @@ class HistaeScaffold extends StatelessWidget {
               preferredSize: appBar!.preferredSize,
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  color: sharedBackground ? Colors.transparent : colors.surface,
+                  color: colors.surface,
                   border: Border(
                     bottom: BorderSide(
                       color: colors.outlineVariant.withValues(alpha: 0.6),
@@ -45,43 +40,5 @@ class HistaeScaffold extends StatelessWidget {
       body: body,
       bottomNavigationBar: bottomNavigationBar,
     );
-    // Nested tab scaffolds share the route's stationary background. A pushed
-    // route has its own ancestor chain and continues to paint its own backdrop.
-    if (sharedBackground) return scaffold;
-    return DecoratedBox(
-      decoration: BoxDecoration(color: colors.surface),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: RadialGradient(
-            center: const Alignment(-1.1, -1.1),
-            radius: 1.25,
-            colors: [
-              HistaeTokens.lavender.withValues(alpha: dark ? 0.1 : 0.08),
-              Colors.transparent,
-            ],
-          ),
-        ),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: RadialGradient(
-              center: const Alignment(1.25, 1.25),
-              radius: 1,
-              colors: [
-                HistaeTokens.coral.withValues(alpha: dark ? 0.05 : 0.04),
-                Colors.transparent,
-              ],
-            ),
-          ),
-          child: _HistaeBackground(child: scaffold),
-        ),
-      ),
-    );
   }
-}
-
-class _HistaeBackground extends InheritedWidget {
-  const _HistaeBackground({required super.child});
-
-  @override
-  bool updateShouldNotify(_HistaeBackground oldWidget) => false;
 }
