@@ -9,17 +9,19 @@ import '../../../core/network/read_snapshots.dart';
 import '../../../core/network/retry_after.dart';
 import '../../auth/domain/authenticated_session.dart';
 import '../../consents/domain/consent_state.dart';
+import '../../drafts/application/draft_controller.dart';
 import '../data/profile_models.dart';
 import '../data/profile_repository.dart';
 import 'profile_feed_preview.dart';
 
 class ProfileController extends ChangeNotifier {
-  ProfileController(this.repository) {
+  ProfileController(this.repository, {this.drafts}) {
     _key = session.resourceKey;
     _localeRevision = session.localizationRevision;
     session.addListener(_sessionChanged);
   }
   final ProfileRepository repository;
+  final DraftController? drafts;
 
   AuthenticatedSession get session => repository.session;
   OwnerProfile? profile;

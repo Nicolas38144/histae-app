@@ -10,6 +10,7 @@ import '../../../core/network/retry_after.dart';
 import '../../auth/domain/authenticated_session.dart';
 import '../../continuation/application/continuation_controller.dart';
 import '../../continuation/application/match_access.dart';
+import '../../drafts/application/draft_controller.dart';
 import '../data/match_models.dart';
 import '../data/matches_repository.dart';
 import '../data/realtime_client.dart';
@@ -21,6 +22,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     RealtimeClient? realtime,
     DateTime Function()? now,
     this.onRemoved,
+    this.drafts,
   }) : realtime = realtime ?? RealtimeClient(repository.session),
        _now = now ?? DateTime.now {
     _key = session.resourceKey;
@@ -34,6 +36,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     };
   }
   final MatchesRepository repository;
+  final DraftController? drafts;
 
   String get ownerId => repository.owner;
   ContinuationController? _continuation;
@@ -119,7 +122,9 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   final _checkedDeadlines = <String>{},
       _removed = <String>{},
       _readAttempted = <String>{};
-  final _outbox = MessageOutbox();
+  late final _outbox = MessageOutbox(
+    onChanged: (id, text) => drafts?.setMessage(id, text),
+  );
   final _closures = <String, bool>{};
   final _items = <UserMatch>[];
   final _messages = <ChatMessage>[];
@@ -249,6 +254,11 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       _chatScope = RequestCancellation();
     }
     final epoch = _epoch;
+    if (drafts case final drafts?) {
+      await drafts.ready;
+      if (!_alive(epoch)) return;
+      _outbox.restore(drafts.messages);
+    }
     await _sync;
     if (!_alive(epoch)) return;
     await _read(refresh ? ReadPolicy.refresh : ReadPolicy.cached);
@@ -472,6 +482,9 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       listCursor = cursor;
       readRevision++;
       for (final item in items) {
+        if (!item.historyAllowed && _outbox.matchIds.contains(item.id)) {
+          _outbox.forget(item.id);
+        }
         if (!item.myRevealed) _photoBarriers.remove(item.id);
       }
       readAt = repository.matchesReadAt;
@@ -609,6 +622,12 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   }
 
   Future<void> openChat(String id) async {
+    if (drafts case final drafts?) {
+      final owner = session.resourceKey;
+      await drafts.ready;
+      if (!accessible || session.resourceKey != owner) return;
+      _outbox.restore(drafts.messages);
+    }
     _chatEpoch++;
     _chatScope.cancel();
     _chatScope = RequestCancellation();
@@ -716,6 +735,10 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     validation = null;
     _notify();
     try {
+      if (drafts != null && !await drafts!.flush()) {
+        throw const ApiFailure(ApiFailureKind.secureStorage);
+      }
+      if (!_chatAlive(epoch, chatEpoch, match.id)) return;
       final message = await repository.send(match, intent, _chatScope);
       if (!_chatAlive(epoch, chatEpoch, match.id)) return;
       if (!_messages.any((m) => m.id == message.id)) {

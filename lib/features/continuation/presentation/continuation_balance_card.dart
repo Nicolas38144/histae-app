@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../application/continuation_controller.dart';
+import 'weekly_renewal_label.dart';
 
 /// Displays only server-owned available balances, excluding reserved credits.
 class ContinuationBalanceCard extends StatelessWidget {
@@ -205,6 +206,14 @@ class ContinuationBalanceCard extends StatelessWidget {
                   ),
                 ],
                 const SizedBox(height: 20),
+                if (!loading &&
+                    !c.loading &&
+                    q != null &&
+                    c.quotaReadAt != null &&
+                    !q.premium) ...[
+                  const WeeklyRenewalLabel(),
+                  const SizedBox(height: 16),
+                ],
                 Divider(height: 1, color: theme.colorScheme.outlineVariant),
                 const SizedBox(height: 14),
                 Row(

@@ -3387,4 +3387,159 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get creditRecoveryViewSubscriptions => 'Scopri gli abbonamenti';
+
+  @override
+  String get draftsAutosave =>
+      'La bozza viene salvata automaticamente su questo dispositivo.';
+
+  @override
+  String get draftsKeptOnDevice =>
+      'La bozza resterà su questo dispositivo. Le risposte non verranno pubblicate.';
+
+  @override
+  String get draftsStorageFailed =>
+      'Al momento non è possibile salvare la bozza su questo dispositivo. Tieni aperta questa schermata per conservare il testo.';
+
+  @override
+  String get draftsDiscardTitle => 'Eliminare questa bozza?';
+
+  @override
+  String get draftsDiscardBody =>
+      'Il modulo tornerà alle risposte salvate. Le risposte pubblicate non cambieranno.';
+
+  @override
+  String get draftsDiscard => 'Elimina la bozza';
+
+  @override
+  String get feedGuideTitle => 'Trova il tuo ritmo';
+
+  @override
+  String get feedGuideIntro =>
+      'Qualche indicazione per scoprire i profili con i tuoi tempi.';
+
+  @override
+  String get feedGuideReadTitle => 'Tre secondi per iniziare';
+
+  @override
+  String get feedGuideReadBody =>
+      'Lascia che la barra in alto si riempia. Poi potrai mettere mi piace al profilo o passare al successivo.';
+
+  @override
+  String get feedGuideLikeTitle => 'Due tocchi per un mi piace';
+
+  @override
+  String get feedGuideLikeBody =>
+      'Tocca due volte il profilo per inviare un mi piace. Puoi anche usare il pulsante con il cuore.';
+
+  @override
+  String get feedGuidePassTitle => 'Leggi, poi passa';
+
+  @override
+  String get feedGuidePassBody =>
+      'Scorri fino in fondo al profilo, poi verso l’alto per passare. Il pulsante Passa fa la stessa cosa.';
+
+  @override
+  String get feedGuideTabsTitle => 'Passa da uno spazio all’altro';
+
+  @override
+  String get feedGuideTabsBody =>
+      'Scorri orizzontalmente tra Profilo, Feed e Match oppure usa i pulsanti in basso.';
+
+  @override
+  String get feedGuideDone => 'Ho capito';
+
+  @override
+  String get helpTitle => 'Aiuto e contatti';
+
+  @override
+  String get helpIntro =>
+      'Hai una domanda su Histae? Qui trovi le indicazioni utili.';
+
+  @override
+  String get helpReviewGuide => 'Rivedi la guida del feed';
+
+  @override
+  String get helpFeedQuestion => 'Perché il feed è vuoto?';
+
+  @override
+  String get helpFeedAnswer =>
+      'Controlla i passaggi indicati nel feed: profilo, foto, preferenze, consensi e posizione recente. Se è tutto pronto, al momento potrebbero non esserci altri profili compatibili. Puoi modificare le preferenze o aggiornare il feed.';
+
+  @override
+  String get helpPhotoQuestion => 'Chi può vedere la mia foto?';
+
+  @override
+  String get helpPhotoAnswer =>
+      'La foto è necessaria per accedere al feed, dove resta nascosta. In una conversazione diventa visibile solo dopo entrambi i consensi. Puoi ritirare il tuo consenso nelle opzioni della conversazione.';
+
+  @override
+  String get helpCreditsQuestion => 'Come funzionano i crediti?';
+
+  @override
+  String get helpCreditsAnswer =>
+      'I crediti gratuiti si rinnovano il lunedì alle 00:00 UTC. Un video facoltativo permette di guadagnare un credito se il saldo ha spazio. I crediti video inutilizzati scadono nello stesso momento. Il limite settimanale dei proseguimenti vale per tutte le fonti; Premium elimina questo limite. Trovi i saldi e il prossimo rinnovo in ora locale in I tuoi crediti.';
+
+  @override
+  String get helpPurchasesQuestion => 'Dove gestisco il mio abbonamento?';
+
+  @override
+  String get helpPurchasesAnswer =>
+      'Apri Il mio abbonamento dal profilo. Gli acquisti mobili passano dallo store del telefono. Le opzioni di gestione e disdetta dipendono dal fornitore indicato per l’abbonamento. Un abbonamento acquistato sul sito si gestisce sul sito.';
+
+  @override
+  String get helpRestoreQuestion => 'A cosa serve Ripristina acquisti?';
+
+  @override
+  String get helpRestoreAnswer =>
+      'Questo pulsante chiede allo store di trovare un acquisto esistente, ad esempio dopo una reinstallazione. Usa l’account dello store e quello Histae collegati all’acquisto. Non crea un nuovo abbonamento.';
+
+  @override
+  String get helpDraftsQuestion => 'Dove sono le mie bozze?';
+
+  @override
+  String get helpDraftsAnswer =>
+      'Le risposte che stai preparando e i messaggi non inviati restano cifrati su questo dispositivo. Riapri l’editor delle risposte o la conversazione per ritrovarli. Le risposte vengono pubblicate solo dopo la conferma. Le bozze vengono eliminate alla disconnessione e non vengono sincronizzate tra dispositivi.';
+
+  @override
+  String get helpSafetyQuestion =>
+      'Come segnalo un problema o proteggo il mio account?';
+
+  @override
+  String get helpSafetyAnswer =>
+      'Puoi segnalare o bloccare una persona dal suo profilo nel feed o dalle opzioni della conversazione. In Privacy e sicurezza trovi i consensi, le sessioni e le richieste relative ai dati.';
+
+  @override
+  String get helpContactTitle => 'Ti serve una mano?';
+
+  @override
+  String get helpEmailComingSoon => 'Indirizzo e-mail in arrivo.';
+
+  @override
+  String get helpContactButton => 'Contatta l’assistenza';
+
+  @override
+  String get helpEmailSubject => 'Assistenza Histae';
+
+  @override
+  String get helpEmailFailed =>
+      'Non è stato possibile aprire l’app di posta. Puoi usare l’indirizzo mostrato nel tuo servizio di posta abituale.';
+
+  @override
+  String get matchesSearchLabel => 'Cerca un match per nome';
+
+  @override
+  String get matchesSearchClear => 'Cancella la ricerca';
+
+  @override
+  String get matchesSearchEmpty =>
+      'Nessun match caricato corrisponde a questo nome.';
+
+  @override
+  String get matchesSearchLoadedOnly =>
+      'La ricerca comprende i match già caricati. Puoi caricarne altri qui sotto.';
+
+  @override
+  String creditRenewalNext(String date) {
+    return 'Prossimo rinnovo: $date (ora locale).';
+  }
 }

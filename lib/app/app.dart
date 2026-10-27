@@ -13,6 +13,8 @@ import '../features/billing/presentation/billing_scope.dart';
 import '../features/catalog/data/catalog_repository.dart';
 import '../features/continuation/data/rewarded_video_gateway.dart';
 import '../features/continuation/presentation/rewarded_video_scope.dart';
+import '../features/help/application/help_controller.dart';
+import '../features/help/presentation/help_scope.dart';
 import '../features/notifications/application/push_controller.dart';
 import '../features/notifications/presentation/push_scope.dart';
 import 'account_language_binding.dart';
@@ -34,6 +36,7 @@ class HistaeApp extends StatefulWidget {
     this.billingController,
     this.rewardedVideoGateway,
     this.repositories,
+    this.helpController,
   });
   // Ownership is transferred to the app; requests close when it is disposed.
   final CatalogRepository? catalogRepository;
@@ -43,6 +46,7 @@ class HistaeApp extends StatefulWidget {
   final BillingController? billingController;
   final RewardedVideoGateway? rewardedVideoGateway;
   final SessionRepositories? repositories;
+  final HelpController? helpController;
 
   @override
   State<HistaeApp> createState() => _HistaeAppState();
@@ -62,6 +66,7 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    unawaited(widget.helpController?.load());
     widget.sessionController?.addListener(_sessionChanged);
     if (widget.sessionController case final session?) {
       _repositories =
@@ -115,6 +120,9 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) {
+      unawaited(_repositories?.drafts.flush());
+    }
     final push = widget.pushController;
     if (state == AppLifecycleState.resumed) {
       if (push != null) unawaited(push.resume());
@@ -139,6 +147,7 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
     widget.sessionController?.dispose();
     widget.catalogRepository?.close();
     _locale.dispose();
+    widget.helpController?.dispose();
     super.dispose();
   }
 
@@ -168,9 +177,12 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
                   controller: widget.billingController,
                   child: PushScope(
                     controller: widget.pushController,
-                    child: NotificationOverlay(
-                      controller: widget.pushController,
-                      child: child!,
+                    child: HelpScope(
+                      controller: widget.helpController,
+                      child: NotificationOverlay(
+                        controller: widget.pushController,
+                        child: child!,
+                      ),
                     ),
                   ),
                 ),

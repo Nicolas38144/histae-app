@@ -263,14 +263,14 @@ class _ContinuationPageState extends State<ContinuationPage>
                       ),
                     ),
                   ] else ...[
-                    if (c.quota case final q?)
+                    if (c.quotaReadAt != null && c.quota != null)
                       Text(
-                        q.premium
+                        c.quota!.premium
                             ? AppStrings.of(context)
                                   .messages
                                   .continuationPageYourCurrentPlanNoCreditNeeded
                             : AppStrings.of(context).messages
-                                  .continuationsAndCost(q.remaining!),
+                                  .continuationsAndCost(c.quota!.remaining!),
                       ),
                     HistaeButton(
                       onPressed:
@@ -296,7 +296,8 @@ class _ContinuationPageState extends State<ContinuationPage>
                         onWatchVideo: () => _openCredits(focusVideo: true),
                         onOpenSubscription: _openSubscription,
                       ),
-                    ] else if (c.quota?.canStart == false)
+                    ] else if (c.quotaReadAt != null &&
+                        c.quota?.canStart == false)
                       Text(
                         AppStrings.of(context)
                             .messages

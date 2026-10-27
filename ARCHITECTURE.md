@@ -49,6 +49,26 @@ subscription plans. It owns selection and measured card heights only; catalogue 
 purchase actions remain in their respective controllers.
 
 `MainShell` owns Feed, Matches and Profile controllers and the shared page controller.
+
+`SessionRepositories` also owns `DraftController`. Production injects `SecureDraftVault`, while
+tests explicitly use an in-memory vault. A typed snapshot holds only pending profile answers
+and unsent message text, scoped to the verified account and API origin. Writes are serialized,
+debounced while typing and flushed when leaving a form or backgrounding. Sign-out clears memory
+and queues deletion after outstanding writes. Account changes never restore a previous owner's
+snapshot. Biography, photos and credentials are excluded.
+
+`MessageOutbox` removes persisted text before an HTTP send begins. An uncertain send keeps its
+original key in memory and is not restored as a fresh, sendable draft after process death.
+`AnswersEditor` restores local inputs without publishing them; saving still uses the explicit
+replacement confirmation. `DraftSnapshot` owns decoding and `DraftVault` owns native storage.
+
+`HelpController` owns the device's first-feed-guide flag. Its injected store performs only local
+operations. Discovery pauses its reading timer while the initial guide is shown; Help can reopen
+the same guide. Match-name search filters loaded snapshots locally and keeps pagination explicit.
+The next credit-renewal label converts Monday midnight UTC to the device's locale/time zone;
+displaying or updating this date never grants credits or refreshes the API.
+At the weekly boundary, a Free quota snapshot becomes unavailable locally and asks for a manual
+refresh. Its old ceiling must not keep offering a subscription as though the week had not reset.
 `MainTabPager` provides horizontal paging in Profile / Feed / Matches order, synchronized with
 the bottom navigation. Its viewport cache initializes and retains all three views at startup,
 including their scroll state, without reloading data on a tab change. Offscreen views exclude

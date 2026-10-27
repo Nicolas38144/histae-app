@@ -1,6 +1,7 @@
 import 'billing_config.dart';
 import 'public_env.dart';
 import 'push_config.dart';
+import 'support_config.dart';
 
 enum AppEnvironment { development, staging, production }
 
@@ -14,6 +15,7 @@ class AppConfig {
     this.admobIosRewardedAdUnit,
     this.push,
     this.billing,
+    this.support,
   );
 
   factory AppConfig.fromDotEnv(String source, {required bool isDebug}) {
@@ -28,6 +30,7 @@ class AppConfig {
         'ADMOB_IOS_REWARDED_AD_UNIT',
         ...PushConfig.keys,
         ...BillingConfig.keys,
+        'SUPPORT_EMAIL',
       },
     );
     return AppConfig.fromValues(
@@ -41,6 +44,7 @@ class AppConfig {
       admobIosRewardedAdUnit: values['ADMOB_IOS_REWARDED_AD_UNIT'] ?? '',
       push: PushConfig.fromValues(values),
       billing: BillingConfig.fromValues(values),
+      support: SupportConfig.fromValues(values),
     );
   }
 
@@ -54,6 +58,7 @@ class AppConfig {
     String admobIosRewardedAdUnit = '',
     PushConfig push = const PushConfig(),
     BillingConfig billing = const BillingConfig(),
+    SupportConfig support = const SupportConfig(),
   }) {
     final env = AppEnvironment.values.where((e) => e.name == environment);
     final uri = Uri.tryParse(apiBaseUrl);
@@ -99,6 +104,7 @@ class AppConfig {
       adUnit(admobIosRewardedAdUnit),
       push,
       billing,
+      support,
     );
   }
   final AppEnvironment environment;
@@ -106,6 +112,7 @@ class AppConfig {
   final Uri apiOrigin;
   final PushConfig push;
   final BillingConfig billing;
+  final SupportConfig support;
   // Public IDs also read by native builds. Empty fields disable playback.
   final String? admobAndroidAppId, admobIosAppId;
   // The API's intent remains authoritative; these never replace its ad_unit.

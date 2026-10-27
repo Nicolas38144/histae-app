@@ -22,6 +22,16 @@ For a local API on the standard Android emulator, use `APP_ENV=development` and
 HTTP is accepted only for a debug build in development; other configurations require HTTPS.
 Invalid or missing configuration shows the unavailable-service flow rather than a fallback host.
 
+## Support contact
+
+```dotenv
+SUPPORT_EMAIL=
+```
+
+Leave this public field empty to show the localized “Email address coming soon” message in
+Help and contact. Filling it enables a button that opens the person's email app; nothing is sent
+automatically. No support backend or API change is required. Rebuild after changing the asset.
+
 ## Optional provider fields
 
 Leave optional services disabled until their platform and API configuration is ready:

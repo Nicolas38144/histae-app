@@ -11,6 +11,9 @@ import '../../../core/widgets/histae_empty_state.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../../core/widgets/histae_wordmark.dart';
 import '../../consents/presentation/consents_page.dart';
+import '../../help/application/help_controller.dart';
+import '../../help/presentation/feed_guide.dart';
+import '../../help/presentation/help_scope.dart';
 import '../../privacy/presentation/report_page.dart';
 import '../../profile/application/profile_controller.dart';
 import '../../profile/presentation/photo_page.dart';
@@ -50,6 +53,56 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
   late final _key = c.session.resourceKey;
   String? _message;
   bool _opening = false;
+  HelpController? _help;
+  bool _guideScheduled = false, _guideOpen = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _help = HelpScope.maybeOf(context);
+  }
+
+  void _offerGuide(bool showFeed) {
+    final help = _help;
+    if (!showFeed ||
+        !widget.visible ||
+        _opening ||
+        c.busy ||
+        _guideScheduled ||
+        help == null ||
+        !help.loaded ||
+        help.seen ||
+        help.showing) {
+      return;
+    }
+    _guideScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted ||
+          !widget.visible ||
+          !c.accessible ||
+          c.session.resourceKey != _key ||
+          help.seen ||
+          help.showing ||
+          c.busy ||
+          !c.ready ||
+          c.current == null ||
+          ModalRoute.of(context)?.isCurrent != true) {
+        _guideScheduled = false;
+        return;
+      }
+      setState(() => _guideOpen = true);
+      try {
+        await showFeedGuide(context);
+      } finally {
+        if (mounted) {
+          setState(() {
+            _guideOpen = false;
+            _guideScheduled = false;
+          });
+        }
+      }
+    });
+  }
 
   @override
   void initState() {
@@ -231,7 +284,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
-    listenable: Listenable.merge([c, widget.visibility]),
+    listenable: Listenable.merge([c, widget.visibility, _help]),
     builder: (context, _) {
       if (!c.accessible || c.session.resourceKey != _key) {
         return const HistaeScaffold(body: SizedBox.shrink());
@@ -246,6 +299,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
           (c.pending == null || (c.sending && !c.uncertain)) &&
           c.failure == null;
       final enabled = !c.busy && c.retrySeconds == 0;
+      _offerGuide(showFeed);
       final locationInCard =
           !c.ready && required.contains(DiscoveryAction.freshPresence);
       final locationFeedback = c.locationIssue == null
@@ -449,7 +503,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                             child: FeedProfileCard(
                               key: ValueKey(profile.id),
                               profile: profile,
-                              active: widget.visible,
+                              active: widget.visible && !_guideOpen,
                               enabled:
                                   c.canChoose &&
                                   widget.visibility?.saving != true &&

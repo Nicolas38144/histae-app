@@ -18,6 +18,7 @@ import '../../continuation/application/continuation_controller.dart';
 import '../../continuation/presentation/credits_page.dart';
 import '../../discovery/application/discovery_visibility_controller.dart';
 import '../../discovery/presentation/discovery_pause_card.dart';
+import '../../help/presentation/help_page.dart';
 import '../../notifications/data/device_repository.dart';
 import '../../notifications/presentation/devices_page.dart';
 import '../../notifications/presentation/push_scope.dart';
@@ -261,8 +262,12 @@ class _ProfilePageState extends State<ProfilePage> {
                   title: Text(
                     strings.messages.profilePageMyContinuationCredits,
                   ),
-                  onTap: () =>
-                      _open(CreditsPage(controller: widget.continuation)),
+                  onTap: () => _open(
+                    CreditsPage(
+                      controller: widget.continuation,
+                      catalog: widget.catalog,
+                    ),
+                  ),
                 ),
                 ListTile(
                   contentPadding: EdgeInsets.zero,
@@ -296,6 +301,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 HistaeButton.text(
                   onPressed: controller.session.logout,
                   child: Text(strings.logout),
+                ),
+                HistaeButton.outlinedIcon(
+                  key: const Key('profile-help'),
+                  onPressed: () => _open(const HelpPage()),
+                  icon: const Icon(Icons.help_outline_rounded),
+                  label: Text(strings.messages.helpTitle),
                 ),
               ],
             ),

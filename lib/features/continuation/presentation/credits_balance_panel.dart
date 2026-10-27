@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../data/continuation_models.dart';
+import 'weekly_renewal_label.dart';
 
 class CreditsBalancePanel extends StatelessWidget {
   const CreditsBalancePanel({super.key, required this.quota});
@@ -241,6 +242,8 @@ class CreditsWeekPanel extends StatelessWidget {
                 color: colors.onSurfaceVariant,
               ),
             ),
+            const SizedBox(height: 10),
+            const WeeklyRenewalLabel(),
             if (q.remaining == 0) ...[
               const SizedBox(height: 10),
               Text(

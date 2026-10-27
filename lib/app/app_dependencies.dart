@@ -9,6 +9,9 @@ import '../features/billing/data/billing_repository.dart';
 import '../features/billing/data/native_billing_gateway.dart';
 import '../features/catalog/data/catalog_repository.dart';
 import '../features/continuation/data/rewarded_video_gateway.dart';
+import '../features/drafts/data/draft_vault.dart';
+import '../features/help/application/help_controller.dart';
+import '../features/help/data/feed_guide_store.dart';
 import '../features/notifications/application/push_controller.dart';
 import '../features/notifications/data/device_repository.dart';
 import '../features/notifications/data/push_gateway.dart';
@@ -25,6 +28,7 @@ class AppDependencies {
     this.billing,
     this.videos,
     this.repositories,
+    this.help,
   });
 
   factory AppDependencies.fromConfig(
@@ -41,8 +45,13 @@ class AppDependencies {
       languageChanges: locale,
     );
     final devices = DeviceRepository(session);
-    final repositories = SessionRepositories(session, devices: devices);
+    final repositories = SessionRepositories(
+      session,
+      devices: devices,
+      draftVault: const SecureDraftVault(),
+    );
     return AppDependencies(
+      help: HelpController(config.support, store: const SecureFeedGuideStore()),
       repositories: repositories,
       catalog: CatalogRepository(client(), languageChanges: locale),
       session: session,
@@ -68,4 +77,5 @@ class AppDependencies {
   final BillingController? billing;
   final SessionRepositories? repositories;
   final RewardedVideoGateway? videos;
+  final HelpController? help;
 }

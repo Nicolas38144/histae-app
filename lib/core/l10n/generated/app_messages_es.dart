@@ -3378,4 +3378,159 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get creditRecoveryViewSubscriptions => 'Descubrir las suscripciones';
+
+  @override
+  String get draftsAutosave =>
+      'El borrador se guarda automáticamente en este dispositivo.';
+
+  @override
+  String get draftsKeptOnDevice =>
+      'Tu borrador permanecerá en este dispositivo. Tus respuestas no se publicarán.';
+
+  @override
+  String get draftsStorageFailed =>
+      'No se puede guardar el borrador en este dispositivo ahora. Mantén esta pantalla abierta para conservar tu texto.';
+
+  @override
+  String get draftsDiscardTitle => '¿Eliminar este borrador?';
+
+  @override
+  String get draftsDiscardBody =>
+      'El formulario volverá a tus respuestas guardadas. Tus respuestas publicadas no cambiarán.';
+
+  @override
+  String get draftsDiscard => 'Eliminar el borrador';
+
+  @override
+  String get feedGuideTitle => 'Encuentra tu ritmo';
+
+  @override
+  String get feedGuideIntro =>
+      'Algunas indicaciones para descubrir los perfiles a tu ritmo.';
+
+  @override
+  String get feedGuideReadTitle => 'Tres segundos para empezar';
+
+  @override
+  String get feedGuideReadBody =>
+      'Deja que se llene la barra de arriba. Después podrás indicar que te gusta el perfil o pasar al siguiente.';
+
+  @override
+  String get feedGuideLikeTitle => 'Dos toques para dar un me gusta';
+
+  @override
+  String get feedGuideLikeBody =>
+      'Toca dos veces el perfil para enviar un me gusta. También puedes usar el botón del corazón.';
+
+  @override
+  String get feedGuidePassTitle => 'Lee y después pasa';
+
+  @override
+  String get feedGuidePassBody =>
+      'Desplázate hasta el final del perfil y desliza hacia arriba para pasar. El botón Pasar hace lo mismo.';
+
+  @override
+  String get feedGuideTabsTitle => 'Cambia de sección';
+
+  @override
+  String get feedGuideTabsBody =>
+      'Desliza horizontalmente entre Perfil, Feed y Matches, o usa los botones de la parte inferior.';
+
+  @override
+  String get feedGuideDone => 'Entendido';
+
+  @override
+  String get helpTitle => 'Ayuda y contacto';
+
+  @override
+  String get helpIntro =>
+      '¿Tienes alguna pregunta sobre Histae? Aquí encontrarás indicaciones útiles.';
+
+  @override
+  String get helpReviewGuide => 'Volver a ver la guía del feed';
+
+  @override
+  String get helpFeedQuestion => '¿Por qué está vacío mi feed?';
+
+  @override
+  String get helpFeedAnswer =>
+      'Comprueba los pasos indicados en el feed: tu perfil, foto, preferencias, consentimientos y una ubicación reciente. Si todo está listo, puede que no haya otros perfiles compatibles disponibles por ahora. Puedes ajustar tus preferencias o actualizar el feed.';
+
+  @override
+  String get helpPhotoQuestion => '¿Quién puede ver mi foto?';
+
+  @override
+  String get helpPhotoAnswer =>
+      'Tu foto es necesaria para acceder al feed, donde permanece oculta. En una conversación, solo se muestra cuando ambos aceptáis. Puedes retirar tu consentimiento en las opciones de la conversación.';
+
+  @override
+  String get helpCreditsQuestion => '¿Cómo funcionan los créditos?';
+
+  @override
+  String get helpCreditsAnswer =>
+      'Los créditos gratuitos se renuevan el lunes a las 00:00 UTC. Un vídeo opcional permite ganar un crédito si tu saldo tiene espacio. Los créditos de vídeo no utilizados caducan al mismo tiempo. El límite semanal de continuaciones se aplica a todas las fuentes; Premium elimina ese límite. Consulta tus saldos y la próxima renovación en hora local en Tus créditos.';
+
+  @override
+  String get helpPurchasesQuestion => '¿Dónde gestiono mi suscripción?';
+
+  @override
+  String get helpPurchasesAnswer =>
+      'Abre Mi suscripción desde tu perfil. Las compras móviles se realizan en la tienda del teléfono. Las opciones de gestión y cancelación dependen del proveedor indicado en tu suscripción. Una suscripción comprada en el sitio web se gestiona en el sitio web.';
+
+  @override
+  String get helpRestoreQuestion => '¿Para qué sirve Restaurar compras?';
+
+  @override
+  String get helpRestoreAnswer =>
+      'Este botón pide a la tienda que encuentre una compra existente, por ejemplo tras reinstalar la app. Usa la cuenta de la tienda y la cuenta Histae vinculadas a la compra. No crea una suscripción nueva.';
+
+  @override
+  String get helpDraftsQuestion => '¿Dónde están mis borradores?';
+
+  @override
+  String get helpDraftsAnswer =>
+      'Las respuestas que estás preparando y los mensajes sin enviar permanecen cifrados en este dispositivo. Abre de nuevo el editor de respuestas o la conversación para recuperarlos. Las respuestas solo se publican cuando confirmas. Los borradores se eliminan al cerrar sesión y no se sincronizan entre dispositivos.';
+
+  @override
+  String get helpSafetyQuestion =>
+      '¿Cómo denuncio un problema o protejo mi cuenta?';
+
+  @override
+  String get helpSafetyAnswer =>
+      'Puedes denunciar o bloquear a una persona desde su perfil en el feed o las opciones de la conversación. En Privacidad y seguridad encontrarás tus consentimientos, sesiones y solicitudes sobre datos.';
+
+  @override
+  String get helpContactTitle => '¿Necesitas ayuda?';
+
+  @override
+  String get helpEmailComingSoon => 'Correo electrónico próximamente.';
+
+  @override
+  String get helpContactButton => 'Contactar con soporte';
+
+  @override
+  String get helpEmailSubject => 'Ayuda Histae';
+
+  @override
+  String get helpEmailFailed =>
+      'No se ha podido abrir tu aplicación de correo. Puedes usar la dirección mostrada en tu servicio de correo habitual.';
+
+  @override
+  String get matchesSearchLabel => 'Buscar un match por nombre';
+
+  @override
+  String get matchesSearchClear => 'Borrar la búsqueda';
+
+  @override
+  String get matchesSearchEmpty =>
+      'Ningún match cargado coincide con este nombre.';
+
+  @override
+  String get matchesSearchLoadedOnly =>
+      'La búsqueda incluye los matches ya cargados. Puedes cargar más abajo.';
+
+  @override
+  String creditRenewalNext(String date) {
+    return 'Próxima renovación: $date (hora local).';
+  }
 }

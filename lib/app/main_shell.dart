@@ -39,7 +39,10 @@ class _MainShellState extends State<MainShell> {
   late final _repositories =
       widget.repositories ?? SessionRepositories(widget.session);
   late final _visibility = DiscoveryVisibilityController(widget.session);
-  late final _profile = ProfileController(_repositories.profile);
+  late final _profile = ProfileController(
+    _repositories.profile,
+    drafts: _repositories.drafts,
+  );
   late final _discovery = DiscoveryController(
     _repositories.discovery,
     DeviceLocation(),
@@ -47,6 +50,7 @@ class _MainShellState extends State<MainShell> {
   late final _matches = MatchesController(
     _repositories.matches,
     realtime: _repositories.realtime.channel(),
+    drafts: _repositories.drafts,
     onRemoved: _discovery.forgetEncounter,
   );
   final _pageStorage = PageStorageBucket();

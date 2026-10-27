@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -5,6 +7,7 @@ import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
+import '../../drafts/data/saved_answer_draft.dart';
 import '../application/profile_controller.dart';
 import '../data/profile_models.dart';
 import 'profile_editor.dart';
@@ -35,9 +38,92 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
           .map((a) => _AnswerInput(a.questionId, a.question, a.answer))
           .toList();
   final removedInputs = <_AnswerInput>[];
+  late final _draftKey = controller.session.resourceKey;
+
+  @override
+  bool get retainsDraft => controller.drafts?.storageFailed == false;
+
+  @override
+  void initState() {
+    super.initState();
+    controller.drafts?.addListener(_draftChanged);
+    if (controller.drafts != null) {
+      busy = true;
+      unawaited(_restoreDraft());
+    }
+  }
+
+  void _draftChanged() {
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _restoreDraft() async {
+    final local = controller.drafts!;
+    await local.ready;
+    if (!mounted || controller.session.resourceKey != _draftKey) return;
+    final saved = local.answers;
+    final same =
+        saved != null &&
+        saved.length == inputs.length &&
+        List.generate(
+          inputs.length,
+          (i) =>
+              saved[i].questionId == inputs[i].id &&
+              saved[i].answer.trim() == inputs[i].text.text.trim(),
+        ).every((v) => v);
+    setState(() {
+      busy = false;
+      if (saved != null && !same) {
+        removedInputs.addAll(inputs);
+        inputs
+          ..clear()
+          ..addAll(
+            saved.map((a) => _AnswerInput(a.questionId, a.prompt, a.answer)),
+          );
+        dirty = true;
+      }
+    });
+    if (same) local.setAnswers(null);
+  }
+
+  @override
+  void changed() {
+    super.changed();
+    controller.drafts?.setAnswers([
+      for (final input in inputs)
+        SavedAnswerDraft(input.id, input.prompt, input.text.text),
+    ]);
+  }
+
+  Future<void> _discardDraft() async {
+    if (!await confirmAction(
+          context,
+          AppStrings.of(context).messages.draftsDiscardTitle,
+          AppStrings.of(context).messages.draftsDiscardBody,
+          action: AppStrings.of(context).messages.draftsDiscard,
+        ) ||
+        !mounted) {
+      return;
+    }
+    setState(() {
+      removedInputs.addAll(inputs);
+      inputs
+        ..clear()
+        ..addAll(
+          (controller.answers.toList()
+                ..sort((a, b) => a.position.compareTo(b.position)))
+              .map((a) => _AnswerInput(a.questionId, a.question, a.answer)),
+        );
+      dirty = false;
+    });
+    controller.drafts?.setAnswers(null);
+    await controller.drafts?.flush();
+  }
 
   @override
   void dispose() {
+    controller.drafts?.removeListener(_draftChanged);
+    unawaited(controller.drafts?.flush());
     for (final a in [...inputs, ...removedInputs]) {
       a.text.dispose();
     }
@@ -80,6 +166,20 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
             .answersEditorChooseWhatYouWantToShare,
       ),
       const SizedBox(height: 24),
+      if (controller.drafts case final local?) ...[
+        Text(
+          local.storageFailed
+              ? AppStrings.of(context).messages.draftsStorageFailed
+              : AppStrings.of(context).messages.draftsAutosave,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+        if (dirty)
+          HistaeButton.text(
+            onPressed: busy ? null : _discardDraft,
+            child: Text(AppStrings.of(context).messages.draftsDiscard),
+          ),
+        const SizedBox(height: 16),
+      ],
       Wrap(
         spacing: 12,
         runSpacing: 8,
@@ -300,7 +400,11 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
           !mounted) {
         return;
       }
-      await submit(() => controller.saveAnswers(drafts));
+      await submit(() async {
+        await controller.saveAnswers(drafts);
+        controller.drafts?.setAnswers(null);
+        await controller.drafts?.flush();
+      });
     },
   );
 }

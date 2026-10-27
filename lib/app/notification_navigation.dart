@@ -83,6 +83,7 @@ class NotificationNavigation {
       if (intent.matchId != null) {
         final matches = _pushMatches ??= MatchesController(
           repositories?.matches ?? MatchesRepository(session),
+          drafts: repositories?.drafts,
           realtime: repositories?.realtime.channel(),
         );
         _pushRoute = MaterialPageRoute<void>(

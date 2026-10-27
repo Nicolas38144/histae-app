@@ -3386,4 +3386,159 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get creditRecoveryViewSubscriptions => 'Découvrir les abonnements';
+
+  @override
+  String get draftsAutosave =>
+      'Enregistrement automatique du brouillon sur cet appareil.';
+
+  @override
+  String get draftsKeptOnDevice =>
+      'Votre brouillon restera sur cet appareil. Vos réponses ne seront pas publiées.';
+
+  @override
+  String get draftsStorageFailed =>
+      'Le brouillon ne peut pas être enregistré sur cet appareil pour le moment. Gardez cet écran ouvert pour conserver votre texte.';
+
+  @override
+  String get draftsDiscardTitle => 'Effacer ce brouillon ?';
+
+  @override
+  String get draftsDiscardBody =>
+      'Vos réponses déjà enregistrées seront remises dans le formulaire. Leur contenu publié ne changera pas.';
+
+  @override
+  String get draftsDiscard => 'Effacer le brouillon';
+
+  @override
+  String get feedGuideTitle => 'Prenez vos marques';
+
+  @override
+  String get feedGuideIntro =>
+      'Quelques repères pour découvrir les profils à votre rythme.';
+
+  @override
+  String get feedGuideReadTitle => 'Trois secondes pour commencer';
+
+  @override
+  String get feedGuideReadBody =>
+      'Laissez la barre en haut se remplir. Vous pourrez ensuite aimer le profil ou passer au suivant.';
+
+  @override
+  String get feedGuideLikeTitle => 'Deux appuis pour dire j’aime';
+
+  @override
+  String get feedGuideLikeBody =>
+      'Touchez deux fois le profil pour envoyer un j’aime. Vous pouvez aussi utiliser le bouton avec le cœur.';
+
+  @override
+  String get feedGuidePassTitle => 'Lire, puis passer';
+
+  @override
+  String get feedGuidePassBody =>
+      'Faites défiler le profil jusqu’en bas, puis glissez vers le haut pour passer. Le bouton « Passer » fait la même chose.';
+
+  @override
+  String get feedGuideTabsTitle => 'Retrouver vos espaces';
+
+  @override
+  String get feedGuideTabsBody =>
+      'Glissez horizontalement entre Profil, Feed et Matchs, ou utilisez les boutons en bas de l’écran.';
+
+  @override
+  String get feedGuideDone => 'C’est compris';
+
+  @override
+  String get helpTitle => 'Aide et contact';
+
+  @override
+  String get helpIntro =>
+      'Une question sur Histae ? Retrouvez ici les repères utiles.';
+
+  @override
+  String get helpReviewGuide => 'Revoir le guide du feed';
+
+  @override
+  String get helpFeedQuestion => 'Pourquoi le feed est-il vide ?';
+
+  @override
+  String get helpFeedAnswer =>
+      'Vérifiez les étapes indiquées dans le feed : votre profil, votre photo, vos préférences, vos consentements et une position récente. Si tout est prêt, aucun autre profil compatible n’est peut-être disponible pour le moment. Vous pouvez ajuster vos préférences ou actualiser le feed.';
+
+  @override
+  String get helpPhotoQuestion => 'Qui peut voir ma photo ?';
+
+  @override
+  String get helpPhotoAnswer =>
+      'Votre photo est nécessaire pour accéder au feed, où elle reste masquée. Dans une conversation, elle devient visible seulement après vos deux accords. Vous pouvez retirer votre accord dans les options de la conversation.';
+
+  @override
+  String get helpCreditsQuestion => 'Comment utiliser mes crédits ?';
+
+  @override
+  String get helpCreditsAnswer =>
+      'Les crédits gratuits sont renouvelés le lundi à 00:00 UTC. Une vidéo facultative permet de gagner un crédit lorsque votre stock le permet. Les crédits vidéo inutilisés expirent au même moment. Le plafond de continuations hebdomadaires concerne toutes les sources ; Premium permet de continuer sans ce plafond. Retrouvez vos compteurs et la prochaine date en heure locale dans « Vos crédits ».';
+
+  @override
+  String get helpPurchasesQuestion => 'Où gérer mon abonnement ?';
+
+  @override
+  String get helpPurchasesAnswer =>
+      'Ouvrez « Mon abonnement » depuis votre profil. Les achats mobiles passent par le store de votre téléphone. La gestion et les options de résiliation dépendent du fournisseur indiqué pour votre abonnement. Un abonnement souscrit sur le site se gère sur le site.';
+
+  @override
+  String get helpRestoreQuestion => 'À quoi sert « Restaurer mes achats » ?';
+
+  @override
+  String get helpRestoreAnswer =>
+      'Ce bouton demande au store de retrouver un achat existant, par exemple après une réinstallation. Utilisez le compte du store et le compte Histae associés à l’achat. Il ne crée pas un nouvel abonnement.';
+
+  @override
+  String get helpDraftsQuestion => 'Où sont mes brouillons ?';
+
+  @override
+  String get helpDraftsAnswer =>
+      'Vos réponses en préparation et vos messages non envoyés restent chiffrés sur cet appareil. Rouvrez l’éditeur de réponses ou la conversation pour les retrouver. Les réponses sont publiées uniquement après votre validation. Les brouillons sont effacés à la déconnexion et ne sont pas synchronisés entre vos appareils.';
+
+  @override
+  String get helpSafetyQuestion =>
+      'Comment signaler un problème ou protéger mon compte ?';
+
+  @override
+  String get helpSafetyAnswer =>
+      'Vous pouvez signaler ou bloquer une personne depuis son profil dans le feed ou les options de la conversation. Dans « Vie privée et sécurité », retrouvez vos consentements, vos sessions et vos démarches liées aux données.';
+
+  @override
+  String get helpContactTitle => 'Besoin d’un coup de main ?';
+
+  @override
+  String get helpEmailComingSoon => 'E-mail à venir.';
+
+  @override
+  String get helpContactButton => 'Contacter le support';
+
+  @override
+  String get helpEmailSubject => 'Aide Histae';
+
+  @override
+  String get helpEmailFailed =>
+      'L’application de messagerie n’a pas pu être ouverte. Vous pouvez utiliser l’adresse affichée dans votre messagerie habituelle.';
+
+  @override
+  String get matchesSearchLabel => 'Rechercher un match par prénom';
+
+  @override
+  String get matchesSearchClear => 'Effacer la recherche';
+
+  @override
+  String get matchesSearchEmpty =>
+      'Aucun match ne correspond à ce prénom parmi les rencontres chargées.';
+
+  @override
+  String get matchesSearchLoadedOnly =>
+      'La recherche porte sur les rencontres déjà chargées. Vous pouvez en afficher davantage ci-dessous.';
+
+  @override
+  String creditRenewalNext(String date) {
+    return 'Prochain renouvellement : $date (heure locale).';
+  }
 }

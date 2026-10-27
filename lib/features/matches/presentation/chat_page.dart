@@ -195,6 +195,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    unawaited(c.drafts?.flush());
     WidgetsBinding.instance.removeObserver(this);
     _readTimer?.cancel();
     c.removeListener(_changed);

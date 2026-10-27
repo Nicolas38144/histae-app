@@ -10,6 +10,7 @@ import '../../catalog/data/subscription_plan.dart';
 import '../../matches/data/match_models.dart';
 import '../data/continuation_models.dart';
 import '../data/continuation_repository.dart';
+import '../domain/weekly_renewal.dart';
 import 'match_access.dart';
 import 'reward_tracker.dart';
 
@@ -48,6 +49,7 @@ class ContinuationController extends ChangeNotifier {
   DateTime? _retryAt;
   ContinuationQuota? quota;
   DateTime? quotaReadAt;
+  Timer? _quotaDeadline;
   List<SubscriptionPlan> plans = const [];
   bool loading = false, busy = false;
   ApiFailure? failure, catalogFailure;
@@ -127,6 +129,7 @@ class ContinuationController extends ChangeNotifier {
       suspend(notify: false);
       quota = null;
       quotaReadAt = null;
+      _quotaDeadline?.cancel();
       plans = const [];
       failure = null;
       catalogFailure = null;
@@ -182,11 +185,13 @@ class ContinuationController extends ChangeNotifier {
 
   Future<void> _activate({required bool loadIfMissing}) async {
     if (!accessible) return;
+    _expireWeeklySnapshot();
     if (!_active) {
       _active = true;
       _scope = RequestCancellation();
       _notify();
     }
+    _armWeeklySnapshot();
     final epoch = _epoch;
     await _load;
     if (loadIfMissing && _alive(epoch) && quota == null && failure == null) {
@@ -210,6 +215,7 @@ class ContinuationController extends ChangeNotifier {
   }
 
   void suspend({bool notify = true}) {
+    _quotaDeadline?.cancel();
     _rewards?.suspend(notify: false);
     _active = false;
     _epoch++;
@@ -260,6 +266,7 @@ class ContinuationController extends ChangeNotifier {
       if (!_alive(epoch)) return;
       quota = q;
       quotaReadAt = _now().toUtc();
+      _armWeeklySnapshot();
       try {
         final result = await repository.plans(_scope);
         if (_alive(epoch)) plans = result;
@@ -273,6 +280,7 @@ class ContinuationController extends ChangeNotifier {
     } on ApiFailure catch (e) {
       if (_alive(epoch)) {
         quotaReadAt = null;
+        _quotaDeadline?.cancel();
         _error(e);
       }
     } finally {
@@ -281,6 +289,31 @@ class ContinuationController extends ChangeNotifier {
         _notify();
       }
     }
+  }
+
+  void _armWeeklySnapshot() {
+    _quotaDeadline?.cancel();
+    final readAt = quotaReadAt;
+    if (readAt == null || quota?.premium != false) return;
+    final remaining = nextWeeklyRenewal(readAt).difference(_now().toUtc());
+    _quotaDeadline = Timer(
+      remaining.isNegative ? Duration.zero : remaining,
+      _expireWeeklySnapshot,
+    );
+  }
+
+  void _expireWeeklySnapshot() {
+    final readAt = quotaReadAt;
+    if (_disposed ||
+        readAt == null ||
+        quota?.premium != false ||
+        _now().toUtc().isBefore(nextWeeklyRenewal(readAt))) {
+      return;
+    }
+    quotaReadAt = null;
+    _offer = null;
+    _quotaDeadline?.cancel();
+    _notify();
   }
 
   Future<ContinuationOffer?> prepareContinuation() async {
@@ -432,6 +465,7 @@ class ContinuationController extends ChangeNotifier {
 
   @override
   void dispose() {
+    _quotaDeadline?.cancel();
     _rewards?.dispose();
     _disposed = true;
     suspend(notify: false);

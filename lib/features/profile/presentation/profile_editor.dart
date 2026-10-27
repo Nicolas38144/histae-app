@@ -11,6 +11,7 @@ import 'profile_strings.dart';
 abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
   ProfileController get controller;
   bool dirty = false, busy = false, leaving = false;
+  bool get retainsDraft => false;
   ClientMessage? message;
   ApiFailure? messageFailure;
   late final String _resourceKey = controller.session.resourceKey;
@@ -86,9 +87,11 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
           if (await confirmAction(
                 context,
                 AppStrings.of(context).messages.profileEditorLeaveWithoutSaving,
-                AppStrings.of(context)
-                    .messages
-                    .profileEditorYourDraftWillBeDiscarded,
+                retainsDraft
+                    ? AppStrings.of(context).messages.draftsKeptOnDevice
+                    : AppStrings.of(context)
+                          .messages
+                          .profileEditorYourDraftWillBeDiscarded,
                 action: AppStrings.of(context).messages.profileEditorLeave,
               ) &&
               mounted &&

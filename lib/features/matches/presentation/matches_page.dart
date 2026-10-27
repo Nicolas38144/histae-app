@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/text/search_text.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_empty_state.dart';
 import '../../../core/widgets/histae_scaffold.dart';
@@ -39,6 +40,7 @@ class _MatchesPageState extends State<MatchesPage> {
   late final _key = c.session.resourceKey;
   bool _opening = false;
   int _overviewLoads = 1;
+  final _search = TextEditingController();
 
   bool get _loading =>
       _overviewLoads > 0 || c.listLoading || c.continuation.loading;
@@ -157,6 +159,7 @@ class _MatchesPageState extends State<MatchesPage> {
 
   @override
   void dispose() {
+    _search.dispose();
     c.suspend(notify: false);
     c.continuation.suspend(notify: false);
     super.dispose();
@@ -169,6 +172,13 @@ class _MatchesPageState extends State<MatchesPage> {
       if (!c.accessible || c.session.resourceKey != _key) {
         return const HistaeScaffold(body: SizedBox.shrink());
       }
+      final query = normalizeSearchText(_search.text);
+      final results = c.items
+          .where(
+            (match) =>
+                normalizeSearchText(match.partner.firstname).contains(query),
+          )
+          .toList();
       return HistaeScaffold(
         appBar: AppBar(
           title: Text(AppStrings.of(context).messages.matchesPageYourMatches),
@@ -190,6 +200,30 @@ class _MatchesPageState extends State<MatchesPage> {
         body: SafeArea(
           child: Column(
             children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
+                child: TextField(
+                  key: const Key('matches-search'),
+                  controller: _search,
+                  onChanged: (_) => setState(() {}),
+                  textInputAction: TextInputAction.search,
+                  decoration: InputDecoration(
+                    labelText: AppStrings.of(context)
+                        .messages
+                        .matchesSearchLabel,
+                    prefixIcon: const Icon(Icons.search_rounded),
+                    suffixIcon: _search.text.isEmpty
+                        ? null
+                        : IconButton(
+                            onPressed: () => setState(_search.clear),
+                            tooltip: AppStrings.of(context)
+                                .messages
+                                .matchesSearchClear,
+                            icon: const Icon(Icons.close_rounded),
+                          ),
+                  ),
+                ),
+              ),
               SizedBox(
                 height: 3,
                 child: _loading
@@ -208,20 +242,40 @@ class _MatchesPageState extends State<MatchesPage> {
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(24),
                     children: [
-                      if (!_loading && c.items.isEmpty && c.failure == null)
+                      if (query.isEmpty &&
+                          !_loading &&
+                          c.items.isEmpty &&
+                          c.failure == null)
                         HistaeEmptyState(
                           key: const Key('matches-empty'),
                           title: AppStrings.of(context)
                               .messages
                               .matchesEmptyTitle,
                         ),
-                      ContinuationBalanceCard(
-                        onOpenSubscription: _openSubscription,
-                        controller: c.continuation,
-                        onOpenCredits: _openCredits,
-                        loading: _overviewLoads > 0,
-                      ),
+                      if (query.isEmpty)
+                        ContinuationBalanceCard(
+                          onOpenSubscription: _openSubscription,
+                          controller: c.continuation,
+                          onOpenCredits: _openCredits,
+                          loading: _overviewLoads > 0,
+                        ),
                       const SizedBox(height: 16),
+                      if (query.isNotEmpty && c.listCursor != null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: Text(
+                            AppStrings.of(context)
+                                .messages
+                                .matchesSearchLoadedOnly,
+                          ),
+                        ),
+                      if (query.isNotEmpty && results.isEmpty && !_loading)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 24),
+                          child: Text(
+                            AppStrings.of(context).messages.matchesSearchEmpty,
+                          ),
+                        ),
                       if (c.notice == 'ended')
                         Padding(
                           padding: EdgeInsets.symmetric(vertical: 16),
@@ -242,7 +296,7 @@ class _MatchesPageState extends State<MatchesPage> {
                             ),
                           ),
                         ),
-                      for (final match in c.items)
+                      for (final match in results)
                         MatchPreviewCard(
                           match: match,
                           ownerId: c.ownerId,

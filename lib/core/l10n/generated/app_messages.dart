@@ -5533,6 +5533,270 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Découvrir les abonnements'**
   String get creditRecoveryViewSubscriptions;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrement automatique du brouillon sur cet appareil.'**
+  String get draftsAutosave;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre brouillon restera sur cet appareil. Vos réponses ne seront pas publiées.'**
+  String get draftsKeptOnDevice;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le brouillon ne peut pas être enregistré sur cet appareil pour le moment. Gardez cet écran ouvert pour conserver votre texte.'**
+  String get draftsStorageFailed;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Effacer ce brouillon ?'**
+  String get draftsDiscardTitle;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos réponses déjà enregistrées seront remises dans le formulaire. Leur contenu publié ne changera pas.'**
+  String get draftsDiscardBody;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Effacer le brouillon'**
+  String get draftsDiscard;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prenez vos marques'**
+  String get feedGuideTitle;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quelques repères pour découvrir les profils à votre rythme.'**
+  String get feedGuideIntro;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Trois secondes pour commencer'**
+  String get feedGuideReadTitle;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Laissez la barre en haut se remplir. Vous pourrez ensuite aimer le profil ou passer au suivant.'**
+  String get feedGuideReadBody;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Deux appuis pour dire j’aime'**
+  String get feedGuideLikeTitle;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Touchez deux fois le profil pour envoyer un j’aime. Vous pouvez aussi utiliser le bouton avec le cœur.'**
+  String get feedGuideLikeBody;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lire, puis passer'**
+  String get feedGuidePassTitle;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Faites défiler le profil jusqu’en bas, puis glissez vers le haut pour passer. Le bouton « Passer » fait la même chose.'**
+  String get feedGuidePassBody;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retrouver vos espaces'**
+  String get feedGuideTabsTitle;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Glissez horizontalement entre Profil, Feed et Matchs, ou utilisez les boutons en bas de l’écran.'**
+  String get feedGuideTabsBody;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'C’est compris'**
+  String get feedGuideDone;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aide et contact'**
+  String get helpTitle;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une question sur Histae ? Retrouvez ici les repères utiles.'**
+  String get helpIntro;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Revoir le guide du feed'**
+  String get helpReviewGuide;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pourquoi le feed est-il vide ?'**
+  String get helpFeedQuestion;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifiez les étapes indiquées dans le feed : votre profil, votre photo, vos préférences, vos consentements et une position récente. Si tout est prêt, aucun autre profil compatible n’est peut-être disponible pour le moment. Vous pouvez ajuster vos préférences ou actualiser le feed.'**
+  String get helpFeedAnswer;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Qui peut voir ma photo ?'**
+  String get helpPhotoQuestion;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre photo est nécessaire pour accéder au feed, où elle reste masquée. Dans une conversation, elle devient visible seulement après vos deux accords. Vous pouvez retirer votre accord dans les options de la conversation.'**
+  String get helpPhotoAnswer;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment utiliser mes crédits ?'**
+  String get helpCreditsQuestion;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les crédits gratuits sont renouvelés le lundi à 00:00 UTC. Une vidéo facultative permet de gagner un crédit lorsque votre stock le permet. Les crédits vidéo inutilisés expirent au même moment. Le plafond de continuations hebdomadaires concerne toutes les sources ; Premium permet de continuer sans ce plafond. Retrouvez vos compteurs et la prochaine date en heure locale dans « Vos crédits ».'**
+  String get helpCreditsAnswer;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Où gérer mon abonnement ?'**
+  String get helpPurchasesQuestion;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ouvrez « Mon abonnement » depuis votre profil. Les achats mobiles passent par le store de votre téléphone. La gestion et les options de résiliation dépendent du fournisseur indiqué pour votre abonnement. Un abonnement souscrit sur le site se gère sur le site.'**
+  String get helpPurchasesAnswer;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'À quoi sert « Restaurer mes achats » ?'**
+  String get helpRestoreQuestion;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce bouton demande au store de retrouver un achat existant, par exemple après une réinstallation. Utilisez le compte du store et le compte Histae associés à l’achat. Il ne crée pas un nouvel abonnement.'**
+  String get helpRestoreAnswer;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Où sont mes brouillons ?'**
+  String get helpDraftsQuestion;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos réponses en préparation et vos messages non envoyés restent chiffrés sur cet appareil. Rouvrez l’éditeur de réponses ou la conversation pour les retrouver. Les réponses sont publiées uniquement après votre validation. Les brouillons sont effacés à la déconnexion et ne sont pas synchronisés entre vos appareils.'**
+  String get helpDraftsAnswer;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comment signaler un problème ou protéger mon compte ?'**
+  String get helpSafetyQuestion;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous pouvez signaler ou bloquer une personne depuis son profil dans le feed ou les options de la conversation. Dans « Vie privée et sécurité », retrouvez vos consentements, vos sessions et vos démarches liées aux données.'**
+  String get helpSafetyAnswer;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Besoin d’un coup de main ?'**
+  String get helpContactTitle;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'E-mail à venir.'**
+  String get helpEmailComingSoon;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Contacter le support'**
+  String get helpContactButton;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aide Histae'**
+  String get helpEmailSubject;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'L’application de messagerie n’a pas pu être ouverte. Vous pouvez utiliser l’adresse affichée dans votre messagerie habituelle.'**
+  String get helpEmailFailed;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher un match par prénom'**
+  String get matchesSearchLabel;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Effacer la recherche'**
+  String get matchesSearchClear;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun match ne correspond à ce prénom parmi les rencontres chargées.'**
+  String get matchesSearchEmpty;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'La recherche porte sur les rencontres déjà chargées. Vous pouvez en afficher davantage ci-dessous.'**
+  String get matchesSearchLoadedOnly;
+
+  /// Local drafts, feed guidance, help, local match search and weekly renewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prochain renouvellement : {date} (heure locale).'**
+  String creditRenewalNext(String date);
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

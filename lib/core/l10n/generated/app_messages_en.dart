@@ -3344,4 +3344,157 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get creditRecoveryViewSubscriptions => 'Explore subscriptions';
+
+  @override
+  String get draftsAutosave => 'Draft saved automatically on this device.';
+
+  @override
+  String get draftsKeptOnDevice =>
+      'Your draft will stay on this device. Your answers will not be published.';
+
+  @override
+  String get draftsStorageFailed =>
+      'Your draft cannot be saved on this device right now. Keep this screen open to retain your text.';
+
+  @override
+  String get draftsDiscardTitle => 'Delete this draft?';
+
+  @override
+  String get draftsDiscardBody =>
+      'The form will return to your saved answers. Your published answers will stay the same.';
+
+  @override
+  String get draftsDiscard => 'Delete draft';
+
+  @override
+  String get feedGuideTitle => 'Find your bearings';
+
+  @override
+  String get feedGuideIntro =>
+      'A few pointers to help you discover profiles at your own pace.';
+
+  @override
+  String get feedGuideReadTitle => 'Three seconds to begin';
+
+  @override
+  String get feedGuideReadBody =>
+      'Let the bar at the top fill up. You can then like the profile or move on to the next one.';
+
+  @override
+  String get feedGuideLikeTitle => 'Double tap to like';
+
+  @override
+  String get feedGuideLikeBody =>
+      'Tap the profile twice to send a like. You can also use the heart button.';
+
+  @override
+  String get feedGuidePassTitle => 'Read, then move on';
+
+  @override
+  String get feedGuidePassBody =>
+      'Scroll to the bottom of the profile, then swipe up to pass. The Pass button does the same thing.';
+
+  @override
+  String get feedGuideTabsTitle => 'Move between your spaces';
+
+  @override
+  String get feedGuideTabsBody =>
+      'Swipe horizontally between Profile, Feed and Matches, or use the buttons at the bottom of the screen.';
+
+  @override
+  String get feedGuideDone => 'Got it';
+
+  @override
+  String get helpTitle => 'Help and contact';
+
+  @override
+  String get helpIntro =>
+      'Have a question about Histae? Find useful guidance here.';
+
+  @override
+  String get helpReviewGuide => 'View the feed guide again';
+
+  @override
+  String get helpFeedQuestion => 'Why is my feed empty?';
+
+  @override
+  String get helpFeedAnswer =>
+      'Check the steps shown in your feed: your profile, photo, preferences, consents and a recent location. If everything is ready, there may be no other compatible profiles available right now. You can adjust your preferences or refresh the feed.';
+
+  @override
+  String get helpPhotoQuestion => 'Who can see my photo?';
+
+  @override
+  String get helpPhotoAnswer =>
+      'Your photo is required to access the feed, where it stays hidden. In a conversation, it becomes visible only after both of you agree. You can withdraw your agreement in the conversation options.';
+
+  @override
+  String get helpCreditsQuestion => 'How do credits work?';
+
+  @override
+  String get helpCreditsAnswer =>
+      'Free credits renew on Monday at 00:00 UTC. An optional video earns a credit when your balance has room. Unused video credits expire at the same time. The weekly continuation limit applies to all credit sources; Premium removes this limit. Find your balances and the next renewal in local time under Your credits.';
+
+  @override
+  String get helpPurchasesQuestion => 'Where do I manage my subscription?';
+
+  @override
+  String get helpPurchasesAnswer =>
+      'Open My subscription from your profile. Mobile purchases use your phone’s store. Management and cancellation options depend on the provider shown for your subscription. A subscription purchased on the website is managed on the website.';
+
+  @override
+  String get helpRestoreQuestion => 'What does Restore purchases do?';
+
+  @override
+  String get helpRestoreAnswer =>
+      'This button asks the store to find an existing purchase, for example after reinstalling the app. Use the store account and Histae account linked to the purchase. It does not create a new subscription.';
+
+  @override
+  String get helpDraftsQuestion => 'Where are my drafts?';
+
+  @override
+  String get helpDraftsAnswer =>
+      'Answers you are preparing and unsent messages stay encrypted on this device. Reopen the answer editor or conversation to find them. Answers are published only after you confirm. Drafts are deleted when you sign out and are not synced between devices.';
+
+  @override
+  String get helpSafetyQuestion =>
+      'How do I report a problem or protect my account?';
+
+  @override
+  String get helpSafetyAnswer =>
+      'You can report or block someone from their feed profile or the conversation options. Under Privacy and security, you can find your consents, sessions and data requests.';
+
+  @override
+  String get helpContactTitle => 'Need a hand?';
+
+  @override
+  String get helpEmailComingSoon => 'Email address coming soon.';
+
+  @override
+  String get helpContactButton => 'Contact support';
+
+  @override
+  String get helpEmailSubject => 'Histae support';
+
+  @override
+  String get helpEmailFailed =>
+      'Your email app could not be opened. You can use the address shown in your usual email service.';
+
+  @override
+  String get matchesSearchLabel => 'Search matches by first name';
+
+  @override
+  String get matchesSearchClear => 'Clear search';
+
+  @override
+  String get matchesSearchEmpty => 'No loaded matches have this first name.';
+
+  @override
+  String get matchesSearchLoadedOnly =>
+      'Search covers matches already loaded. You can load more below.';
+
+  @override
+  String creditRenewalNext(String date) {
+    return 'Next renewal: $date (local time).';
+  }
 }

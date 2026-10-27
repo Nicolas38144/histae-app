@@ -123,6 +123,10 @@ offer requires renewed confirmation; an uncertain retry retains the accepted cos
 Matches distinguishes available included credits, ad credits and the weekly cap. Reservations are
 not shown as available. Premium continuations use no credits; read failures are not zero balances.
 
+Matches and credits show the next renewal in the device's local date and time. The API still owns
+the actual Monday reset. Matches also offers an accent-insensitive first-name search over already
+loaded rows, with explicit load-more behavior and no search requests.
+
 Once included credits run out, the app suggests an optional video when the advertising stock has
 room. Reaching the weekly confirmed-continuation ceiling takes priority: the action opens store
 subscriptions, and new rewarded videos are blocked. Existing advertising proofs can still settle.
@@ -142,6 +146,20 @@ Google Play and StoreKit provide native purchase UI and localized prices. The AP
 product identifiers and verifies receipts before purchase completion. Restoration preserves the
 purchase's Histae owner. Effective Free/Premium rights come from the API, never a success URL or
 SDK status alone. Stripe subscriptions are managed on the website; the app offers no Stripe checkout.
+
+## Local drafts and help
+
+Unpublished answers and unsent message text can be recovered on the same device after restarting.
+They use encrypted storage scoped to the account, are erased on sign-out and exclude biographies.
+Answer recovery never publishes content. A message already submitted for sending does not become
+a fresh sendable draft after restarting; uncertain sends retain their original in-memory retry.
+Abrupt OS termination can still interrupt an in-flight local write; validate real background and
+process-recreation behavior on both platforms.
+
+A short guide opens on the first usable feed and can be reopened from Help and contact, available
+at the bottom of Profile. It explains the reading bar, likes, passing and horizontal navigation.
+The help screen also explains photos, credits, purchases, restoration, drafts and safety. Support
+shows an email-coming-soon message until the optional public `SUPPORT_EMAIL` setting is supplied.
 
 ## Privacy and deletion
 
