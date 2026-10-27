@@ -257,7 +257,7 @@
   "reservedCredits": "{count, plural, one {{count} reserved credit} other {{count} reserved credits}}",
   "creditsBalancePanelACreditIsReservedWhenYou": "A credit is reserved when you choose to continue. It is charged once both agreements are confirmed. Charged credits are not refunded when the match ends.",
   "creditsBalancePanelVideoReserve": "Video reserve: {arg0} / {arg1}",
-  "creditsBalancePanelVideoCreditsAreKeptIncludingReserved": "Video credits are kept, including reserved credits. Free credits renew weekly without carrying over. A reservation may stay linked to the week you agreed.",
+  "creditsBalancePanelVideoCreditsAreKeptIncludingReserved": "Free credits renew on Monday at 00:00 UTC. Unused video credits, including reserved credits, expire at the same time and must be earned again through videos. A free-credit reservation may stay linked to the week you agreed.",
   "creditsPageCancelThisRequest": "Cancel this request?",
   "creditsPageCancellationPreventsAnyLaterValidationEven": "Cancellation prevents any later validation, even if a completed video is still being checked.",
   "creditsPageCancelRequest": "Cancel request",

@@ -7,8 +7,8 @@ import 'matches_fixture.dart';
 Map<String, dynamic> quotaJson({bool premium = false, int remaining = 2}) => {
   'plan': premium ? 'premium' : 'free',
   'used': premium ? 0 : 1,
-  if (!premium) ...{'weekly_limit': 6, 'remaining': remaining},
-  'weekly_credits': premium ? 0 : 3,
+  if (!premium) ...{'weekly_limit': 5, 'remaining': remaining},
+  'weekly_credits': premium ? 0 : 2,
   'free_remaining': premium ? 0 : 1,
   'advertising_balance': 2,
   'advertising_remaining': premium ? 0 : 1,

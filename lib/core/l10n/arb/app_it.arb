@@ -257,7 +257,7 @@
   "reservedCredits": "{count, plural, one {{count} credito riservato} other {{count} crediti riservati}}",
   "creditsBalancePanelACreditIsReservedWhenYou": "Un credito viene riservato quando scegli di proseguire. Viene addebitato dopo la conferma di entrambi i consensi. I crediti addebitati non vengono rimborsati alla chiusura.",
   "creditsBalancePanelVideoReserve": "Riserva video: {arg0} / {arg1}",
-  "creditsBalancePanelVideoCreditsAreKeptIncludingReserved": "I crediti video si conservano, inclusi quelli riservati. I gratuiti si rinnovano ogni settimana senza accumularsi. Una prenotazione può restare legata alla settimana del consenso.",
+  "creditsBalancePanelVideoCreditsAreKeptIncludingReserved": "I crediti gratuiti si rinnovano il lunedì alle 00:00 UTC. I crediti video inutilizzati, inclusi quelli prenotati, scadono nello stesso momento e devono essere guadagnati di nuovo tramite video. Una prenotazione gratuita può restare legata alla settimana del consenso.",
   "creditsPageCancelThisRequest": "Annullare questa richiesta?",
   "creditsPageCancellationPreventsAnyLaterValidationEven": "L’annullamento impedisce qualsiasi convalida successiva, anche se un video completato è ancora in verifica.",
   "creditsPageCancelRequest": "Annulla la richiesta",

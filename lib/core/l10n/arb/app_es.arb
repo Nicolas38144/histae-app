@@ -257,7 +257,7 @@
   "reservedCredits": "{count, plural, one {{count} crédito reservado} other {{count} créditos reservados}}",
   "creditsBalancePanelACreditIsReservedWhenYou": "Se reserva un crédito cuando eliges continuar. Se cobra cuando ambos acuerdos están confirmados. Los créditos cobrados no se devuelven al terminar el match.",
   "creditsBalancePanelVideoReserve": "Reserva de vídeos: {arg0} / {arg1}",
-  "creditsBalancePanelVideoCreditsAreKeptIncludingReserved": "Los créditos de vídeos se conservan, incluidos los reservados. Los gratuitos se renuevan semanalmente sin acumularse. Una reserva puede seguir vinculada a la semana de tu acuerdo.",
+  "creditsBalancePanelVideoCreditsAreKeptIncludingReserved": "Los créditos gratuitos se renuevan el lunes a las 00:00 UTC. Los créditos de vídeos no utilizados, incluidos los reservados, caducan al mismo tiempo y deben ganarse de nuevo mediante vídeos. Una reserva gratuita puede seguir vinculada a la semana de tu acuerdo.",
   "creditsPageCancelThisRequest": "¿Cancelar esta solicitud?",
   "creditsPageCancellationPreventsAnyLaterValidationEven": "La cancelación impide cualquier validación posterior, aunque un vídeo terminado aún se esté verificando.",
   "creditsPageCancelRequest": "Cancelar la solicitud",

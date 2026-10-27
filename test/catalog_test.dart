@@ -43,8 +43,8 @@ void main() {
       ]);
       expect(catalog.offers.last.priceCents, 9876);
       expect(plans.map((p) => p.code), ['free', 'premium']);
-      expect(plans.first.weeklyIncludedCredits, 3);
-      expect(plans.first.weeklyContinuationLimit, 6);
+      expect(plans.first.weeklyIncludedCredits, 2);
+      expect(plans.first.weeklyContinuationLimit, 5);
       expect(plans.first.features.single.value, {'enabled': true});
       final premium = plans.last;
       expect(premium.weeklyIncludedCredits, isNull);

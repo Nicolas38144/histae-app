@@ -1002,7 +1002,7 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get creditsBalancePanelVideoCreditsAreKeptIncludingReserved =>
-      'Video credits are kept, including reserved credits. Free credits renew weekly without carrying over. A reservation may stay linked to the week you agreed.';
+      'Free credits renew on Monday at 00:00 UTC. Unused video credits, including reserved credits, expire at the same time and must be earned again through videos. A free-credit reservation may stay linked to the week you agreed.';
 
   @override
   String get creditsPageCancelThisRequest => 'Cancel this request?';

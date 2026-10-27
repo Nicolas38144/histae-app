@@ -1650,7 +1650,7 @@ abstract class AppMessages {
   /// Interface: lib/features/continuation/presentation/credits_balance_panel.dart
   ///
   /// In fr, this message translates to:
-  /// **'Les crédits vidéo sont conservés, réservations comprises. Les crédits gratuits sont renouvelés chaque semaine, sans cumul. Une réservation peut rester rattachée à la semaine de votre accord.'**
+  /// **'Les crédits gratuits se renouvellent le lundi à 00:00 UTC. Les crédits vidéo inutilisés, y compris réservés, expirent au même instant et doivent être regagnés par vidéo. Une réservation gratuite peut rester rattachée à la semaine de votre accord.'**
   String get creditsBalancePanelVideoCreditsAreKeptIncludingReserved;
 
   /// Interface: lib/features/continuation/presentation/credits_page.dart

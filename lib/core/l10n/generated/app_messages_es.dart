@@ -1006,7 +1006,7 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get creditsBalancePanelVideoCreditsAreKeptIncludingReserved =>
-      'Los créditos de vídeos se conservan, incluidos los reservados. Los gratuitos se renuevan semanalmente sin acumularse. Una reserva puede seguir vinculada a la semana de tu acuerdo.';
+      'Los créditos gratuitos se renuevan el lunes a las 00:00 UTC. Los créditos de vídeos no utilizados, incluidos los reservados, caducan al mismo tiempo y deben ganarse de nuevo mediante vídeos. Una reserva gratuita puede seguir vinculada a la semana de tu acuerdo.';
 
   @override
   String get creditsPageCancelThisRequest => '¿Cancelar esta solicitud?';
