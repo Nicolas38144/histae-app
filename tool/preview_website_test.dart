@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
 import 'package:histae_app/core/l10n/locale_controller.dart';
+import 'package:histae_app/features/consents/domain/consent_state.dart';
 import 'package:histae_app/features/consents/presentation/consents_page.dart';
 import 'package:histae_app/features/continuation/presentation/credits_page.dart';
 import 'package:histae_app/features/matches/presentation/chat_page.dart';
@@ -100,6 +101,49 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
     for (final language in copy.keys) {
       final text = copy[language]!;
+      final consentState = consentJson(
+        complete: true,
+        grants: {ConsentType.sensitive: true, ConsentType.location: true},
+      );
+      consentState['consents'] = [
+        for (final document in consentState['consents'] as List<dynamic>)
+          {
+            ...document as Map<String, dynamic>,
+            // The published legal documents are dated 26 October 2026.
+            'document_date': '2026-10-26',
+            'document_language': language,
+            'accepted_document_language': language,
+          },
+      ];
+      Map<String, dynamic> message({
+        required String id,
+        required String sender,
+        required String content,
+        required int minute,
+        bool read = false,
+      }) => {
+        ...messageJson(id: id, sender: sender, content: content),
+        'created_at': DateTime.utc(2026, 10, 27, 10, minute).toIso8601String(),
+        'read_at': read
+            ? DateTime.utc(2026, 10, 27, 10, minute + 1).toIso8601String()
+            : null,
+      };
+      final messages = [
+        message(id: outgoingId, sender: testUser, content: text[8], minute: 34),
+        message(
+          id: incomingId,
+          sender: candidateOne,
+          content: text[7],
+          minute: 32,
+        ),
+        message(
+          id: secondMatch,
+          sender: testUser,
+          content: text[6],
+          minute: 30,
+          read: true,
+        ),
+      ];
       Map<String, dynamic> candidate() => {
         ...candidateJson(candidateOne, bio: text[0]),
         'traits': text.sublist(3, 6),
@@ -115,6 +159,7 @@ void main() {
       };
       final session = testSession((r) async {
         return switch (r.url.path) {
+          '/api/users/me/consents' => jsonResponse(consentState),
           '/api/users/me' => jsonResponse(ownerJson(bio: text[9])),
           '/api/feed' => jsonResponse({
             'profiles': [candidate()],
@@ -143,16 +188,13 @@ void main() {
                 ...publicMatchJson(),
                 'other_user': {...candidate(), 'photo': null},
                 'unread_count': 0,
+                'last_message': messages.first,
               },
             ],
             'next_cursor': null,
           }),
           '/api/matches/$testMatch/messages' => jsonResponse({
-            'messages': [
-              messageJson(content: text[8], sender: testUser, id: outgoingId),
-              messageJson(content: text[7]),
-              messageJson(content: text[6], sender: testUser, id: secondMatch),
-            ],
+            'messages': messages,
             'next_cursor': null,
           }),
           '/api/plans' => jsonResponse(rewardedCatalogJson()),
