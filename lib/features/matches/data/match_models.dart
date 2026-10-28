@@ -120,8 +120,10 @@ class UserMatch {
     this.photosRevealed,
     this.myContinued,
     this.unreadCount,
-    this.lastMessage,
-  );
+    this.lastMessage, {
+    this.archived = false,
+    this.inactivityExpiresAt,
+  });
 
   factory UserMatch.fromJson(Object? value, String owner) {
     final j = jsonObject(value);
@@ -156,6 +158,9 @@ class UserMatch {
               owner,
               partner.id,
             }, summary: true),
+      archived: j['archived'] == null ? false : jsonField<bool>(j, 'archived'),
+      inactivityExpiresAt: j['inactivity_expires_at'] == null
+          ? null : wireTime(j['inactivity_expires_at']),
     );
   }
   final String id;
@@ -165,6 +170,20 @@ class UserMatch {
   final bool myRevealed, photosRevealed, myContinued;
   final int unreadCount;
   final ChatMessage? lastMessage;
+  final bool archived;
+  final DateTime? inactivityExpiresAt;
+
+  bool isInactivityExpiredAt(DateTime now) =>
+      status == MatchStatus.confirmed &&
+      inactivityExpiresAt != null &&
+      !inactivityExpiresAt!.isAfter(now);
+
+  bool isArchivedAt(DateTime now) =>
+      status == MatchStatus.confirmed &&
+      !isInactivityExpiredAt(now) &&
+      (inactivityExpiresAt == null
+          ? archived
+          : !inactivityExpiresAt!.subtract(const Duration(days: 20)).isAfter(now));
 
   bool get historyAllowed =>
       status == MatchStatus.active ||

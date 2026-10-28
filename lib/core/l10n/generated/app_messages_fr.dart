@@ -3596,4 +3596,17 @@ class AppMessagesFr extends AppMessages {
   @override
   String get readingSaveFailed =>
       'Ce choix est appliqué pour cette session, mais sa sauvegarde a échoué. Sélectionnez-le à nouveau pour réessayer.';
+
+  @override
+  String get matchesArchivedTitle => 'Archivées';
+
+  @override
+  String get matchesInactivityPolicy => 'Après 10 jours sans nouveau message, une conversation confirmée est archivée. Un avertissement est envoyé après 23 jours ; le match et les messages sont supprimés après 30 jours. Un nouveau message relance le délai, sans nouveau crédit.';
+
+  @override
+  String matchesInactivityDeadline(String date) => 'Sans nouveau message, cette conversation sera supprimée le $date. Sa reprise ne consomme aucun crédit.';
+
+  @override
+  String get matchesInactivityWarning => 'Une conversation sera supprimée dans les 7 prochains jours sans nouveau message.';
+
 }

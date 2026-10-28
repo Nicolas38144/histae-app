@@ -3597,4 +3597,17 @@ class AppMessagesIt extends AppMessages {
   @override
   String get readingSaveFailed =>
       'La scelta si applica a questa sessione, ma non è stato possibile salvarla. Selezionala di nuovo per riprovare.';
+
+  @override
+  String get matchesArchivedTitle => 'Archiviate';
+
+  @override
+  String get matchesInactivityPolicy => 'Dopo 10 giorni senza nuovi messaggi, una conversazione confermata viene archiviata. Un avviso viene inviato dopo 23 giorni; il match e i messaggi vengono eliminati dopo 30 giorni. Un nuovo messaggio rinnova il termine senza spendere altri crediti.';
+
+  @override
+  String matchesInactivityDeadline(String date) => 'Senza un nuovo messaggio, questa conversazione verrà eliminata il $date. Riprenderla non consuma crediti.';
+
+  @override
+  String get matchesInactivityWarning => 'Una conversazione verrà eliminata entro 7 giorni senza un nuovo messaggio.';
+
 }

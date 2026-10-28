@@ -25,7 +25,7 @@ class PushDevice {
   final DateTime? lastUsedAt;
 }
 
-enum PushKind { newMatch, newMessage, billingPaymentFailed }
+enum PushKind { newMatch, newMessage, matchExpiring, billingPaymentFailed }
 
 class PushIntent {
   const PushIntent(this.id, this.kind, this.matchId);
@@ -36,11 +36,12 @@ class PushIntent {
       final kind = switch (data['type']) {
         'new_match' => PushKind.newMatch,
         'new_message' => PushKind.newMessage,
+        'match_expiring' => PushKind.matchExpiring,
         'billing_payment_failed' => PushKind.billingPaymentFailed,
         _ => null,
       };
       if (kind == null) return null;
-      final match = [PushKind.newMatch, PushKind.newMessage].contains(kind)
+      final match = [PushKind.newMatch, PushKind.newMessage, PushKind.matchExpiring].contains(kind)
           ? serverId(data, 'match_id')
           : null;
       // Ignore all remote display text, links, senders and non-contract fields.

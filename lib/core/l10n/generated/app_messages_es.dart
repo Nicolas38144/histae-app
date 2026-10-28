@@ -3588,4 +3588,17 @@ class AppMessagesEs extends AppMessages {
   @override
   String get readingSaveFailed =>
       'Esta opción se aplica durante esta sesión, pero no se ha podido guardar. Vuelve a seleccionarla para intentarlo de nuevo.';
+
+  @override
+  String get matchesArchivedTitle => 'Archivadas';
+
+  @override
+  String get matchesInactivityPolicy => 'Tras 10 días sin un nuevo mensaje, la conversación confirmada se archiva. Se avisa a los 23 días; el match y los mensajes se eliminan a los 30 días. Un nuevo mensaje reinicia el plazo sin gastar otro crédito.';
+
+  @override
+  String matchesInactivityDeadline(String date) => 'Sin un nuevo mensaje, esta conversación se eliminará el $date. Retomarla no consume créditos.';
+
+  @override
+  String get matchesInactivityWarning => 'Una conversación se eliminará en los próximos 7 días si no se envía un nuevo mensaje.';
+
 }

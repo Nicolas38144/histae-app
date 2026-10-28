@@ -180,8 +180,9 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       active &&
       _verified &&
       selected?.sendAllowed == true &&
-      (selected!.status == MatchStatus.confirmed ||
-          selected!.expiresAt.isAfter(serverNow)) &&
+      (selected!.status == MatchStatus.confirmed
+          ? !selected!.isInactivityExpiredAt(serverNow)
+          : selected!.expiresAt.isAfter(serverNow)) &&
       !sending &&
       !ending &&
       pendingEnd != selectedId &&
@@ -189,7 +190,8 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       retrySeconds == 0;
 
   bool get canRead =>
-      active && _verified && selected?.historyAllowed == true && !ending;
+      active && _verified && selected?.historyAllowed == true &&
+      !selected!.isInactivityExpiredAt(serverNow) && !ending;
 
   int get retrySeconds => retrySecondsUntil(_retryAt, now: _now());
 
@@ -387,33 +389,47 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   void _armDeadline() {
     _deadline?.cancel();
     DateTime? next;
+    final now = serverNow;
     for (final match in _items) {
-      if (match.status != MatchStatus.active &&
-          match.status != MatchStatus.awaitingContinuation) {
-        continue;
-      }
-      if (_checkedDeadlines.contains(
-        '${match.id}:${match.status.name}:${match.expiresAt.toIso8601String()}',
-      )) {
-        continue;
-      }
-      if (next == null || match.expiresAt.isBefore(next)) {
-        next = match.expiresAt;
-      }
+      final expiry = match.status == MatchStatus.confirmed
+          ? match.inactivityExpiresAt
+          : match.historyAllowed ? match.expiresAt : null;
+      if (expiry == null) continue;
+      final key = '${match.id}:${match.status.name}:${expiry.toIso8601String()}';
+      if (_checkedDeadlines.contains(key)) continue;
+      final archive = match.status == MatchStatus.confirmed
+          ? expiry.subtract(const Duration(days: 20)) : null;
+      final deadline = archive != null && archive.isAfter(now) ? archive : expiry;
+      if (next == null || deadline.isBefore(next)) next = deadline;
     }
     if (next == null) return;
-    final delay = next.difference(serverNow);
+    final delay = next.difference(now);
     _deadline = Timer(delay.isNegative ? Duration.zero : delay, () {
       if (!active) return;
-      for (final match in _items) {
-        if (!match.expiresAt.isAfter(serverNow)) {
+      var expired = false;
+      for (final match in List<UserMatch>.of(_items)) {
+        if (match.isInactivityExpiredAt(serverNow)) {
+          _checkedDeadlines.add(
+            '${match.id}:${match.status.name}:${match.inactivityExpiresAt!.toIso8601String()}',
+          );
+          // A stale local deadline must not permanently hide a match renewed
+          // by the other participant; a fresh API read may restore it.
+          _purge(match.id);
+          _items.removeWhere((item) => item.id == match.id);
+          notice = 'ended';
+          expired = true;
+        } else if (match.status != MatchStatus.confirmed &&
+            !match.expiresAt.isAfter(serverNow)) {
           _checkedDeadlines.add(
             '${match.id}:${match.status.name}:${match.expiresAt.toIso8601String()}',
           );
+          expired = true;
         }
       }
-      _verified = false;
+      if (expired) _verified = false;
       _notify();
+      _armDeadline();
+      if (expired) unawaited(refresh());
     });
   }
 

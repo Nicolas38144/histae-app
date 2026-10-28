@@ -1089,5 +1089,10 @@
   "readingSaveFailed": "Esta opción se aplica durante esta sesión, pero no se ha podido guardar. Vuelve a seleccionarla para intentarlo de nuevo.",
   "@readingSaveFailed": {
     "description": "Device-local reading preferences; system accessibility text scaling is preserved."
-  }
+  },
+  "matchesArchivedTitle": "Archivadas",
+  "matchesInactivityPolicy": "Tras 10 días sin un nuevo mensaje, la conversación confirmada se archiva. Se avisa a los 23 días; el match y los mensajes se eliminan a los 30 días. Un nuevo mensaje reinicia el plazo sin gastar otro crédito.",
+  "matchesInactivityDeadline": "Sin un nuevo mensaje, esta conversación se eliminará el {date}. Retomarla no consume créditos.",
+  "@matchesInactivityDeadline": {"description": "Inactivity deadline for a confirmed conversation", "placeholders": {"date": {"type": "String"}}},
+  "matchesInactivityWarning": "Una conversación se eliminará en los próximos 7 días si no se envía un nuevo mensaje."
 }

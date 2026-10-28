@@ -5899,6 +5899,19 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Ce choix est appliqué pour cette session, mais sa sauvegarde a échoué. Sélectionnez-le à nouveau pour réessayer.'**
   String get readingSaveFailed;
+
+  /// Label for confirmed conversations archived after ten inactive days.
+  String get matchesArchivedTitle;
+
+  /// Explains the 10/23/30-day inactivity policy.
+  String get matchesInactivityPolicy;
+
+  /// The deletion deadline of a confirmed conversation.
+  String matchesInactivityDeadline(String date);
+
+  /// Warning for a confirmed conversation approaching deletion.
+  String get matchesInactivityWarning;
+
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

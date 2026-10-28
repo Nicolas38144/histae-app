@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../core/l10n/app_strings.dart';
 import '../core/widgets/histae_button.dart';
 import '../features/notifications/application/push_controller.dart';
+import '../features/notifications/data/notification_models.dart';
 
 class NotificationOverlay extends StatelessWidget {
   const NotificationOverlay({
@@ -34,9 +35,9 @@ class NotificationOverlay extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Text(
-                            AppStrings.of(context)
-                                .messages
-                                .notificationOverlayAHistaeUpdateIsAvailable,
+                            controller!.foreground!.kind == PushKind.matchExpiring
+                                ? AppStrings.of(context).messages.matchesInactivityWarning
+                                : AppStrings.of(context).messages.notificationOverlayAHistaeUpdateIsAvailable,
                           ),
                           Wrap(
                             spacing: 12,

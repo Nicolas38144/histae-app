@@ -4080,5 +4080,10 @@
   "readingSaveFailed": "Ce choix est appliqué pour cette session, mais sa sauvegarde a échoué. Sélectionnez-le à nouveau pour réessayer.",
   "@readingSaveFailed": {
     "description": "Device-local reading preferences; system accessibility text scaling is preserved."
-  }
+  },
+  "matchesArchivedTitle": "Archivées",
+  "matchesInactivityPolicy": "Après 10 jours sans nouveau message, une conversation confirmée est archivée. Un avertissement est envoyé après 23 jours ; le match et les messages sont supprimés après 30 jours. Un nouveau message relance le délai, sans nouveau crédit.",
+  "matchesInactivityDeadline": "Sans nouveau message, cette conversation sera supprimée le {date}. Sa reprise ne consomme aucun crédit.",
+  "@matchesInactivityDeadline": {"description": "Inactivity deadline for a confirmed conversation", "placeholders": {"date": {"type": "String"}}},
+  "matchesInactivityWarning": "Une conversation sera supprimée dans les 7 prochains jours sans nouveau message."
 }

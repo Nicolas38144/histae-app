@@ -12,6 +12,7 @@ import '../../continuation/presentation/continuation_balance_card.dart';
 import '../../continuation/presentation/continuation_subscription_navigation.dart';
 import '../../continuation/presentation/credits_page.dart';
 import '../application/matches_controller.dart';
+import '../data/match_models.dart';
 import 'chat_page.dart';
 import 'match_preview_card.dart';
 import 'matches_strings.dart';
@@ -157,6 +158,14 @@ class _MatchesPageState extends State<MatchesPage> {
     }
   }
 
+  MatchPreviewCard _matchCard(UserMatch match) => MatchPreviewCard(
+    match: match,
+    ownerId: c.ownerId,
+    photoReadAt: c.readAt,
+    photosAllowed: c.active && c.verified && !c.photosBlocked(match.id),
+    onTap: _opening ? null : () => _open(match.id),
+  );
+
   @override
   void dispose() {
     _search.dispose();
@@ -172,13 +181,18 @@ class _MatchesPageState extends State<MatchesPage> {
       if (!c.accessible || c.session.resourceKey != _key) {
         return const HistaeScaffold(body: SizedBox.shrink());
       }
-      final query = c.items.isEmpty ? '' : normalizeSearchText(_search.text);
-      final results = c.items
+      final now = c.serverNow;
+      final visible = c.items
+          .where((match) => !match.isInactivityExpiredAt(now))
+          .toList();
+      final query = visible.isEmpty ? '' : normalizeSearchText(_search.text);
+      final results = visible
           .where(
             (match) =>
                 normalizeSearchText(match.partner.firstname).contains(query),
           )
           .toList();
+      final archived = results.where((match) => match.isArchivedAt(now)).toList();
       return HistaeScaffold(
         appBar: AppBar(
           title: Text(AppStrings.of(context).messages.matchesPageYourMatches),
@@ -200,7 +214,7 @@ class _MatchesPageState extends State<MatchesPage> {
         body: SafeArea(
           child: Column(
             children: [
-              if (c.items.isNotEmpty)
+              if (visible.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
                   child: TextField(
@@ -245,7 +259,7 @@ class _MatchesPageState extends State<MatchesPage> {
                     children: [
                       if (query.isEmpty &&
                           !_loading &&
-                          c.items.isEmpty &&
+                          visible.isEmpty &&
                           c.failure == null)
                         HistaeEmptyState(
                           key: const Key('matches-empty'),
@@ -297,16 +311,23 @@ class _MatchesPageState extends State<MatchesPage> {
                             ),
                           ),
                         ),
-                      for (final match in results)
-                        MatchPreviewCard(
-                          match: match,
-                          ownerId: c.ownerId,
-                          photoReadAt: c.readAt,
-                          photosAllowed:
-                              c.active &&
-                              c.verified &&
-                              !c.photosBlocked(match.id),
-                          onTap: _opening ? null : () => _open(match.id),
+                      Text(
+                        AppStrings.of(context).messages.matchesInactivityPolicy,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      const SizedBox(height: 16),
+                      for (final match in results.where(
+                        (item) => !item.isArchivedAt(now),
+                      ))
+                        _matchCard(match),
+                      if (archived.isNotEmpty)
+                        ExpansionTile(
+                          title: Text(
+                            AppStrings.of(context).messages.matchesArchivedTitle,
+                          ),
+                          children: [
+                            for (final match in archived) _matchCard(match),
+                          ],
                         ),
                       if (c.retrySeconds > 0)
                         Text(
