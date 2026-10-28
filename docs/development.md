@@ -111,8 +111,9 @@ restore/write ordering, storage retry, unchanged API traffic and the paused feed
 flutter build apk --debug
 ```
 
-This checks an Android development artifact, not store readiness. The checked-in Android release
-build currently uses debug signing; configure production signing before distributing a release.
+This checks an Android development artifact, not store readiness. Android release builds use the
+private upload key configured in `android/key.properties`, with no fallback to debug signing.
+See [Android release signing](android-release.md) for recovery, bundle generation and verification.
 Keep signing credentials outside the public environment asset.
 
 Also verify the optimized Android build after changes to native dependencies or build settings:
@@ -121,8 +122,10 @@ Also verify the optimized Android build after changes to native dependencies or 
 flutter build apk --release
 ```
 
-Install it over the existing app without clearing data, launch it from a stopped process, and
-check that it stays open and resumes correctly. A successful build or debug launch does not
+Install it over an existing app signed with the same certificate without clearing data, launch
+it from a stopped process, and check that it stays open and resumes correctly. A development
+installation signed with the old debug key cannot be updated by an APK signed with the new key;
+use another test device or back up necessary data before uninstalling. A successful build or debug launch does not
 verify release startup. Flutter loads `android/app/proguard-rules.pro` automatically; its targeted
 Room constructor rule prevents WorkManager initialization from failing before Flutter starts
 when R8 removes the reflectively created database constructor.

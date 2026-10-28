@@ -55,3 +55,10 @@ app.*.map.json
 # Local public app configuration.
 .env
 .env.*
+
+# Private Android signing material, including accidental copies outside android/.
+**/key.properties
+*.jks
+*.keystore
+*.p12
+*.pfx

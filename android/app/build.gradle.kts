@@ -1,7 +1,35 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// Private signing credentials are never read from the bundled public .env.
+val histaeSigningFile = rootProject.file("key.properties")
+val histaeSigning = Properties().apply {
+    if (histaeSigningFile.isFile) {
+        histaeSigningFile.inputStream().use { load(it) }
+    }
+}
+val validateReleaseSigning = tasks.register("validateReleaseSigning") {
+    doLast {
+        check(histaeSigningFile.isFile) {
+            "Release signing requires android/key.properties. See docs/android-release.md."
+        }
+        for (key in listOf("storeFile", "storePassword", "keyAlias", "keyPassword")) {
+            check(!histaeSigning.getProperty(key).isNullOrBlank()) {
+                "Missing release signing property: $key. See docs/android-release.md."
+            }
+        }
+        check(rootProject.file(histaeSigning.getProperty("storeFile")).isFile) {
+            "Release upload keystore not found. Restore it before building a release."
+        }
+        check(histaeSigning.getProperty("keyAlias") != "androiddebugkey") {
+            "The Android debug key must not be used for release signing."
+        }
+    }
 }
 
 // Public client configuration only. Native resources let Firebase receive a
@@ -34,7 +62,6 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.histae.histae_app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
@@ -54,13 +81,25 @@ android {
         }
     }
 
-    buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+    signingConfigs {
+        create("release") {
+            keyAlias = histaeSigning.getProperty("keyAlias")
+            keyPassword = histaeSigning.getProperty("keyPassword")
+            storeFile = histaeSigning.getProperty("storeFile")?.let { rootProject.file(it) }
+            storePassword = histaeSigning.getProperty("storePassword")
+            storeType = histaeSigning.getProperty("storeType", "JKS")
         }
     }
+
+    buildTypes {
+        release {
+            signingConfig = signingConfigs.getByName("release")
+        }
+    }
+}
+
+tasks.matching { it.name == "preReleaseBuild" }.configureEach {
+    dependsOn(validateReleaseSigning)
 }
 
 kotlin {

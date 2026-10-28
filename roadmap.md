@@ -29,7 +29,7 @@ route inventory. Use the [Rust HTTP contract](../histae-api-rust/docs/http-contr
 
 | Area | Required verification |
 | --- | --- |
-| Android release | Replace debug signing, confirm identity/versioning and prepare store delivery |
+| Android release | Upload the signed bundle to Play testing, confirm identity/versioning and verify store delivery |
 | iOS release | Build on macOS; verify signing, Keychain, sharing, permissions and cold start |
 | Account/session | OTP delivery, rotation, lost responses, process interruption and account switching |
 | Profile/discovery | Upload limits, moderation, pause deployment and one-time expiry recovery |
