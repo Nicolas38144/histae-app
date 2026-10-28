@@ -25,12 +25,12 @@ Invalid or missing configuration shows the unavailable-service flow rather than 
 ## Support contact
 
 ```dotenv
-SUPPORT_EMAIL=
+SUPPORT_EMAIL=support.histae@gmail.com
 ```
 
-Leave this public field empty to show the localized “Email address coming soon” message in
-Help and contact. Filling it enables a button that opens the person's email app; nothing is sent
-automatically. No support backend or API change is required. Rebuild after changing the asset.
+This public address appears in Help and contact and enables a button that opens the person's
+email app; nothing is sent automatically. An empty field shows the localized “Email address
+coming soon” fallback. No support backend or API change is required. Rebuild after changing the asset.
 
 ## Optional provider fields
 

@@ -172,7 +172,10 @@ void main() {
       final profile = ProfileController(ProfileRepository(session));
       addTearDown(profile.dispose);
       final store = _GuideStore();
-      final help = HelpController(const SupportConfig(), store: store);
+      final help = HelpController(
+        SupportConfig.fromValues({'SUPPORT_EMAIL': 'support@example.test'}),
+        store: store,
+      );
       addTearDown(help.dispose);
       await help.load();
       await tester.pumpWidget(
@@ -209,17 +212,21 @@ void main() {
       Navigator.of(context)
           .push(MaterialPageRoute<void>(builder: (_) => const HelpPage()));
       await tester.pumpAndSettle();
-      final helpScroller = find.descendant(
-        of: find.byType(HelpPage),
-        matching: find.byType(Scrollable),
-      );
+      final helpScroller = find
+          .descendant(
+            of: find.byType(HelpPage),
+            matching: find.byType(Scrollable),
+          )
+          .first;
       await tester.scrollUntilVisible(
-        find.text('E-mail à venir.'),
+        find.text('support@example.test'),
         200,
         scrollable: helpScroller,
       );
       await tester.pumpAndSettle();
-      expect(find.text('E-mail à venir.'), findsOneWidget);
+      expect(find.text('support@example.test'), findsOneWidget);
+      expect(find.text('Contacter le support'), findsOneWidget);
+      expect(find.text('E-mail à venir.'), findsNothing);
       tester.state<ScrollableState>(helpScroller).position.jumpTo(0);
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('help-feed-guide')));

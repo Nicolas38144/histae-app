@@ -166,7 +166,8 @@ process-recreation behavior on both platforms.
 A short guide opens on the first usable feed and can be reopened from Help and contact, available
 at the bottom of Profile. It explains the reading bar, likes, passing and horizontal navigation.
 The help screen also explains photos, credits, purchases, restoration, drafts and safety. Support
-shows an email-coming-soon message until the optional public `SUPPORT_EMAIL` setting is supplied.
+uses the public `SUPPORT_EMAIL` setting, currently `support.histae@gmail.com`, to open the user's
+email app. An empty setting retains the localized email-coming-soon fallback.
 
 ## Privacy and deletion
 
