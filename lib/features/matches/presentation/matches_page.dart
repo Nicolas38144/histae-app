@@ -310,8 +310,10 @@ class _MatchesPageState extends State<MatchesPage> {
                             ),
                           ),
                         ),
-                      const MatchInactivityNotice(),
-                      const SizedBox(height: 16),
+                      if (list.hasConfirmedConversation) ...[
+                        const MatchInactivityNotice(),
+                        const SizedBox(height: 16),
+                      ],
                       for (final match in list.current) _matchCard(match),
                       if (list.archived.isNotEmpty)
                         ExpansionTile(

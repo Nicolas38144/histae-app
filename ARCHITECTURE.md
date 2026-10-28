@@ -145,7 +145,8 @@ alone only updates the view. An expired cached snapshot is verified once, and a 
 fresh response cannot reopen private content or cause a read loop.
 
 `MatchListProjection` performs local search and archive grouping. The view expands archived search
-results and keeps the policy behind a disclosure. List validation is separate from selected-chat
+results and shows the policy disclosure only when a confirmed conversation exists, independently
+of the search query. The same translated policy remains available in Help. List validation is separate from selected-chat
 validation, so closing a chat does not disable otherwise authorized list thumbnails. Manual chat
 refresh performs an explicit read rather than reactivating an already active controller.
 

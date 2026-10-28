@@ -275,6 +275,7 @@ void main() {
         await tester.pumpAndSettle();
         final before = reads;
         expect(find.byType(MatchPreviewCard), findsNothing);
+        expect(find.text('Archivage et suppression'), findsOneWidget);
         await tester.enterText(find.byKey(const Key('matches-search')), 'lea');
         await tester.pumpAndSettle();
         expect(find.byType(MatchPreviewCard), findsOneWidget);
@@ -283,6 +284,7 @@ void main() {
         await c.refresh();
         await tester.pumpAndSettle();
         expect(find.byKey(const Key('matches-search')), findsNothing);
+        expect(find.text('Archivage et suppression'), findsNothing);
         expect(find.byKey(const Key('open-credits')), findsOneWidget);
         await tester.pumpWidget(const SizedBox.shrink());
       } finally {

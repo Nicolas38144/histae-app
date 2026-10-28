@@ -119,6 +119,7 @@ void main() {
         );
         await tester.pumpAndSettle();
         final before = reads;
+        expect(find.text('Archivage et suppression'), findsNothing);
         await tester.enterText(find.byKey(const Key('matches-search')), 'lea');
         await tester.pumpAndSettle();
         expect(find.byType(MatchPreviewCard), findsOneWidget);

@@ -66,6 +66,7 @@ class _HelpPageState extends State<HelpPage> {
             for (final entry in [
               (text.helpFeedQuestion, text.helpFeedAnswer),
               (text.helpPhotoQuestion, text.helpPhotoAnswer),
+              (text.matchesInactivityInfo, text.matchesInactivityPolicy),
               (text.helpCreditsQuestion, text.helpCreditsAnswer),
               (text.helpPurchasesQuestion, text.helpPurchasesAnswer),
               (text.helpRestoreQuestion, text.helpRestoreAnswer),

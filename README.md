@@ -81,4 +81,5 @@ Both participants receive a warning at day 23; the match and messages are delete
 A new message unarchives it and resets the deadline without another continuation credit.
 Signing in, reading and replaying a send do not reset it. The rule is identical for Free and Premium.
 The API fields `archived` and `inactivity_expires_at` drive presentation; `confirmed` remains the
-business status. Archive rules are available through the disclosure in Matches.
+business status. Archive rules are always available in Help and appear in Matches once a confirmed
+conversation exists.

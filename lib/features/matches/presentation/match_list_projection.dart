@@ -12,6 +12,9 @@ class MatchListProjection {
         .where((match) => !match.isInactivityExpiredAt(now))
         .toList();
     hasMatches = visible.isNotEmpty;
+    hasConfirmedConversation = visible.any(
+      (match) => match.status == MatchStatus.confirmed,
+    );
     query = hasMatches ? normalizeSearchText(search) : '';
     final found = visible.where(
       (match) => normalizeSearchText(match.partner.firstname).contains(query),
@@ -24,7 +27,7 @@ class MatchListProjection {
     );
   }
 
-  late final bool hasMatches;
+  late final bool hasMatches, hasConfirmedConversation;
   late final String query;
   late final List<UserMatch> current, archived;
 
