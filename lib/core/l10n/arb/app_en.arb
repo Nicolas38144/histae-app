@@ -1098,5 +1098,9 @@
   "matchesInactivityInfo": "Archiving and deletion",
   "@matchesInactivityInfo": {
     "description": "Disclosure title for the existing conversation archiving and deletion policy."
+  },
+  "matchesArchivesEmpty": "No archived conversations yet.",
+  "@matchesArchivesEmpty": {
+    "description": "Empty state for the dedicated archived conversations screen."
   }
 }

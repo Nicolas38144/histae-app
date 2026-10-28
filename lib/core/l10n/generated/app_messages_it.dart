@@ -3616,4 +3616,8 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get matchesInactivityInfo => 'Archiviazione ed eliminazione';
+
+  @override
+  String get matchesArchivesEmpty =>
+      'Non ci sono ancora conversazioni archiviate.';
 }

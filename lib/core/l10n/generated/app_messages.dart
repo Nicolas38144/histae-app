@@ -5929,6 +5929,12 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Archivage et suppression'**
   String get matchesInactivityInfo;
+
+  /// Empty state for the dedicated archived conversations screen.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune conversation archivée pour le moment.'**
+  String get matchesArchivesEmpty;
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

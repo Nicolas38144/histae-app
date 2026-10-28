@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
 import 'package:histae_app/core/l10n/locale_controller.dart';
+import 'package:histae_app/features/help/presentation/help_page.dart';
 import 'package:histae_app/features/matches/presentation/match_preview_card.dart';
 import 'package:histae_app/features/profile/presentation/profile_page.dart';
 
@@ -198,10 +199,17 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('main-tab-matches')));
       await tester.pumpAndSettle();
       await _capture(tester, 'matches');
-      await tester.tap(find.text('Archivage et suppression'));
+      expect(find.text('Archivage et suppression'), findsNothing);
+      await tester.tap(find.byKey(const Key('matches-archives')));
       await tester.pumpAndSettle();
-      await _capture(tester, 'archive-policy');
-      await tester.tap(find.text('Archivage et suppression'));
+      await _capture(tester, 'archives');
+      await tester.enterText(
+        find.byKey(const Key('archives-search')),
+        'camille',
+      );
+      await tester.pumpAndSettle();
+      await _capture(tester, 'archives-search');
+      await tester.tap(find.byTooltip('Retour'));
       await tester.pumpAndSettle();
       await tester.enterText(
         find.byKey(const Key('matches-search')),
@@ -243,6 +251,22 @@ void main() {
       );
       await tester.pumpAndSettle();
       await _capture(tester, 'profile-actions');
+      await tester.tap(find.byKey(const Key('profile-help')));
+      await tester.pumpAndSettle();
+      final policy = find.text('Archivage et suppression');
+      await tester.scrollUntilVisible(
+        policy,
+        180,
+        scrollable: find
+            .descendant(
+              of: find.byType(HelpPage),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      await tester.tap(policy);
+      await tester.pumpAndSettle();
+      await _capture(tester, 'archive-policy');
       await tester.pumpWidget(const SizedBox.shrink());
     },
     timeout: const Timeout(Duration(minutes: 2)),

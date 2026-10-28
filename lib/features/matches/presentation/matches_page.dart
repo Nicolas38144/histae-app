@@ -12,8 +12,8 @@ import '../../continuation/presentation/continuation_subscription_navigation.dar
 import '../../continuation/presentation/credits_page.dart';
 import '../application/matches_controller.dart';
 import '../data/match_models.dart';
+import 'archived_matches_page.dart';
 import 'chat_page.dart';
-import 'match_inactivity_notice.dart';
 import 'match_list_projection.dart';
 import 'match_preview_card.dart';
 import 'matches_strings.dart';
@@ -41,6 +41,7 @@ class _MatchesPageState extends State<MatchesPage> {
   MatchesController get c => widget.controller;
   late final _key = c.session.resourceKey;
   bool _opening = false;
+  bool _archivesOpen = false;
   int _overviewLoads = 1;
   final _search = TextEditingController();
 
@@ -106,6 +107,21 @@ class _MatchesPageState extends State<MatchesPage> {
 
   void _endOverview() {
     if (mounted) setState(() => _overviewLoads--);
+  }
+
+  Future<void> _openArchives() async {
+    if (_opening || _archivesOpen) return;
+    _archivesOpen = true;
+    try {
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) =>
+              ArchivedMatchesPage(controller: c, cardBuilder: _matchCard),
+        ),
+      );
+    } finally {
+      _archivesOpen = false;
+    }
   }
 
   Future<void> _withOverview(Future<void> Function() read) async {
@@ -196,6 +212,13 @@ class _MatchesPageState extends State<MatchesPage> {
         appBar: AppBar(
           title: Text(AppStrings.of(context).messages.matchesPageYourMatches),
           actions: [
+            if (list.hasMatches)
+              IconButton(
+                key: const Key('matches-archives'),
+                tooltip: AppStrings.of(context).messages.matchesArchivedTitle,
+                onPressed: _opening ? null : _openArchives,
+                icon: const Icon(Icons.archive_outlined),
+              ),
             IconButton(
               tooltip: AppStrings.of(context).messages.creditsPageYourCredits,
               onPressed: _openCredits,
@@ -310,10 +333,6 @@ class _MatchesPageState extends State<MatchesPage> {
                             ),
                           ),
                         ),
-                      if (list.hasConfirmedConversation) ...[
-                        const MatchInactivityNotice(),
-                        const SizedBox(height: 16),
-                      ],
                       for (final match in list.current) _matchCard(match),
                       if (list.archived.isNotEmpty)
                         ExpansionTile(
