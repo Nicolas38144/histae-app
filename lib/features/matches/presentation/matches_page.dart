@@ -172,7 +172,7 @@ class _MatchesPageState extends State<MatchesPage> {
       if (!c.accessible || c.session.resourceKey != _key) {
         return const HistaeScaffold(body: SizedBox.shrink());
       }
-      final query = normalizeSearchText(_search.text);
+      final query = c.items.isEmpty ? '' : normalizeSearchText(_search.text);
       final results = c.items
           .where(
             (match) =>
@@ -200,30 +200,31 @@ class _MatchesPageState extends State<MatchesPage> {
         body: SafeArea(
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
-                child: TextField(
-                  key: const Key('matches-search'),
-                  controller: _search,
-                  onChanged: (_) => setState(() {}),
-                  textInputAction: TextInputAction.search,
-                  decoration: InputDecoration(
-                    labelText: AppStrings.of(context)
-                        .messages
-                        .matchesSearchLabel,
-                    prefixIcon: const Icon(Icons.search_rounded),
-                    suffixIcon: _search.text.isEmpty
-                        ? null
-                        : IconButton(
-                            onPressed: () => setState(_search.clear),
-                            tooltip: AppStrings.of(context)
-                                .messages
-                                .matchesSearchClear,
-                            icon: const Icon(Icons.close_rounded),
-                          ),
+              if (c.items.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
+                  child: TextField(
+                    key: const Key('matches-search'),
+                    controller: _search,
+                    onChanged: (_) => setState(() {}),
+                    textInputAction: TextInputAction.search,
+                    decoration: InputDecoration(
+                      labelText: AppStrings.of(context)
+                          .messages
+                          .matchesSearchLabel,
+                      prefixIcon: const Icon(Icons.search_rounded),
+                      suffixIcon: _search.text.isEmpty
+                          ? null
+                          : IconButton(
+                              onPressed: () => setState(_search.clear),
+                              tooltip: AppStrings.of(context)
+                                  .messages
+                                  .matchesSearchClear,
+                              icon: const Icon(Icons.close_rounded),
+                            ),
+                    ),
                   ),
                 ),
-              ),
               SizedBox(
                 height: 3,
                 child: _loading
