@@ -85,13 +85,11 @@ class ContinuationController extends ChangeNotifier {
       active &&
       access.active &&
       access.verified &&
-      match?.historyAllowed == true &&
+      match?.lifecycle.allowsDecisionAt(access.serverNow) == true &&
       !access.ending &&
       !busy &&
       !loading &&
-      retrySeconds == 0 &&
-      (match!.status == MatchStatus.confirmed ||
-          match!.expiresAt.isAfter(access.serverNow));
+      retrySeconds == 0;
 
   bool get canContinue =>
       canDecide &&

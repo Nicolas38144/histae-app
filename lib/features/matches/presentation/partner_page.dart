@@ -21,7 +21,10 @@ class PartnerPage extends StatelessWidget {
       final match =
           controller.selectedId == id &&
               controller.accessible &&
-              controller.selected?.historyAllowed == true
+              controller.selected?.lifecycle.allowsHistoryAt(
+                    controller.serverNow,
+                  ) ==
+                  true
           ? controller.selected
           : null;
       final text = AppStrings.of(context).messages;

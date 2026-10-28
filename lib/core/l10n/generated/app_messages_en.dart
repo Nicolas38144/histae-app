@@ -3481,7 +3481,7 @@ class AppMessagesEn extends AppMessages {
       'Your email app could not be opened. You can use the address shown in your usual email service.';
 
   @override
-  String get matchesSearchLabel => 'Search matches by first name';
+  String get matchesSearchLabel => 'Search by first name';
 
   @override
   String get matchesSearchClear => 'Clear search';
@@ -3557,12 +3557,18 @@ class AppMessagesEn extends AppMessages {
   String get matchesArchivedTitle => 'Archived';
 
   @override
-  String get matchesInactivityPolicy => 'After 10 days without a new message, a confirmed conversation is archived. A warning is sent after 23 days; the match and messages are deleted after 30 days. A new message resets the deadline without spending another credit.';
+  String get matchesInactivityPolicy =>
+      'After 10 days without a new message, a confirmed conversation is archived. A warning is sent after 23 days; the match and messages are deleted after 30 days. A new message resets the deadline without spending another credit.';
 
   @override
-  String matchesInactivityDeadline(String date) => 'Without a new message, this conversation will be deleted on $date. Resuming it does not spend a credit.';
+  String matchesInactivityDeadline(String date) {
+    return 'Without a new message, this conversation will be deleted on $date. Resuming it does not spend a credit.';
+  }
 
   @override
-  String get matchesInactivityWarning => 'A conversation will be deleted within 7 days unless a new message is sent.';
+  String get matchesInactivityWarning =>
+      'A conversation will be deleted within 7 days unless a new message is sent.';
 
+  @override
+  String get matchesInactivityInfo => 'Archiving and deletion';
 }

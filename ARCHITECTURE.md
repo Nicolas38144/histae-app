@@ -125,7 +125,8 @@ network retry for mutations. Retried intentions retain their idempotency key, co
 
 | Data | Storage |
 | --- | --- |
-| Access token, profiles, messages, coordinates, drafts and signed URLs | Flow/session memory |
+| Access token, profiles, messages, coordinates and signed URLs | Flow/session memory |
+| Unsent messages and pending profile answers | Owner-bound encrypted draft snapshot |
 | Refresh token and rotation/logout state | Secure storage bound to the API origin |
 | Push preference and registration metadata | Minimal owner-bound secure entries |
 | Explicit interface language | Device preference independent of the account |
@@ -134,6 +135,19 @@ network retry for mutations. Retried intentions retain their idempotency key, co
 Native store SDKs own their purchase lifecycle. The app does not persist a browser Checkout attempt.
 
 ## Real time, messages and private photos
+
+`MatchLifecycle` owns the app's projection of server deadlines: an inactive confirmed conversation
+is archived at day 10 and unavailable at day 30. A new server deadline can restore it. Older API
+snapshots without inactivity metadata retain their compatible behavior; the client never invents
+a server-side closure. `MatchDeadlineScheduler` owns one cancellable timer and reports transitions;
+`MatchesController` coordinates private-data eviction and the relevant authorized read. Archiving
+alone only updates the view. An expired cached snapshot is verified once, and a still-expired
+fresh response cannot reopen private content or cause a read loop.
+
+`MatchListProjection` performs local search and archive grouping. The view expands archived search
+results and keeps the policy behind a disclosure. List validation is separate from selected-chat
+validation, so closing a chat does not disable otherwise authorized list thumbnails. Manual chat
+refresh performs an explicit read rather than reactivating an already active controller.
 
 `RealtimeHub` shares SSE transport among matches, notifications and subscriptions. Covered routes
 suspend the relevant main-flow event handling without creating another transport. Private access

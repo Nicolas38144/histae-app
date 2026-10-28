@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
-import '../../../core/text/search_text.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_empty_state.dart';
 import '../../../core/widgets/histae_scaffold.dart';
@@ -14,6 +13,8 @@ import '../../continuation/presentation/credits_page.dart';
 import '../application/matches_controller.dart';
 import '../data/match_models.dart';
 import 'chat_page.dart';
+import 'match_inactivity_notice.dart';
+import 'match_list_projection.dart';
 import 'match_preview_card.dart';
 import 'matches_strings.dart';
 
@@ -87,7 +88,10 @@ class _MatchesPageState extends State<MatchesPage> {
     try {
       await c.openChat(id);
       if (!mounted || !c.accessible || c.session.resourceKey != _key) return;
-      if (c.selected?.id != id || c.selected?.historyAllowed != true) return;
+      if (c.selected?.id != id ||
+          c.selected?.lifecycle.allowsHistoryAt(c.serverNow) != true) {
+        return;
+      }
       await Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (_) =>
@@ -159,10 +163,11 @@ class _MatchesPageState extends State<MatchesPage> {
   }
 
   MatchPreviewCard _matchCard(UserMatch match) => MatchPreviewCard(
+    key: ValueKey(match.id),
     match: match,
     ownerId: c.ownerId,
     photoReadAt: c.readAt,
-    photosAllowed: c.active && c.verified && !c.photosBlocked(match.id),
+    photosAllowed: c.active && c.listVerified && !c.photosBlocked(match.id),
     onTap: _opening ? null : () => _open(match.id),
   );
 
@@ -181,18 +186,12 @@ class _MatchesPageState extends State<MatchesPage> {
       if (!c.accessible || c.session.resourceKey != _key) {
         return const HistaeScaffold(body: SizedBox.shrink());
       }
-      final now = c.serverNow;
-      final visible = c.items
-          .where((match) => !match.isInactivityExpiredAt(now))
-          .toList();
-      final query = visible.isEmpty ? '' : normalizeSearchText(_search.text);
-      final results = visible
-          .where(
-            (match) =>
-                normalizeSearchText(match.partner.firstname).contains(query),
-          )
-          .toList();
-      final archived = results.where((match) => match.isArchivedAt(now)).toList();
+      final list = MatchListProjection(
+        c.items,
+        now: c.serverNow,
+        search: _search.text,
+      );
+      final query = list.query;
       return HistaeScaffold(
         appBar: AppBar(
           title: Text(AppStrings.of(context).messages.matchesPageYourMatches),
@@ -214,7 +213,7 @@ class _MatchesPageState extends State<MatchesPage> {
         body: SafeArea(
           child: Column(
             children: [
-              if (visible.isNotEmpty)
+              if (list.hasMatches)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
                   child: TextField(
@@ -259,7 +258,7 @@ class _MatchesPageState extends State<MatchesPage> {
                     children: [
                       if (query.isEmpty &&
                           !_loading &&
-                          visible.isEmpty &&
+                          !list.hasMatches &&
                           c.failure == null)
                         HistaeEmptyState(
                           key: const Key('matches-empty'),
@@ -284,7 +283,7 @@ class _MatchesPageState extends State<MatchesPage> {
                                 .matchesSearchLoadedOnly,
                           ),
                         ),
-                      if (query.isNotEmpty && results.isEmpty && !_loading)
+                      if (query.isNotEmpty && !list.hasResults && !_loading)
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 24),
                           child: Text(
@@ -311,22 +310,21 @@ class _MatchesPageState extends State<MatchesPage> {
                             ),
                           ),
                         ),
-                      Text(
-                        AppStrings.of(context).messages.matchesInactivityPolicy,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
+                      const MatchInactivityNotice(),
                       const SizedBox(height: 16),
-                      for (final match in results.where(
-                        (item) => !item.isArchivedAt(now),
-                      ))
-                        _matchCard(match),
-                      if (archived.isNotEmpty)
+                      for (final match in list.current) _matchCard(match),
+                      if (list.archived.isNotEmpty)
                         ExpansionTile(
+                          key: ValueKey(('matches-archives', query.isNotEmpty)),
+                          initiallyExpanded: query.isNotEmpty,
                           title: Text(
-                            AppStrings.of(context).messages.matchesArchivedTitle,
+                            AppStrings.of(context)
+                                .messages
+                                .matchesArchivedTitle,
                           ),
                           children: [
-                            for (final match in archived) _matchCard(match),
+                            for (final match in list.archived)
+                              _matchCard(match),
                           ],
                         ),
                       if (c.retrySeconds > 0)

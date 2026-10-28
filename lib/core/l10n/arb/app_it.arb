@@ -1017,7 +1017,7 @@
   "helpContactButton": "Contatta l’assistenza",
   "helpEmailSubject": "Assistenza Histae",
   "helpEmailFailed": "Non è stato possibile aprire l’app di posta. Puoi usare l’indirizzo mostrato nel tuo servizio di posta abituale.",
-  "matchesSearchLabel": "Cerca un match per nome",
+  "matchesSearchLabel": "Cerca per nome",
   "matchesSearchClear": "Cancella la ricerca",
   "matchesSearchEmpty": "Nessun match caricato corrisponde a questo nome.",
   "matchesSearchLoadedOnly": "La ricerca comprende i match già caricati. Puoi caricarne altri qui sotto.",
@@ -1094,5 +1094,9 @@
   "matchesInactivityPolicy": "Dopo 10 giorni senza nuovi messaggi, una conversazione confermata viene archiviata. Un avviso viene inviato dopo 23 giorni; il match e i messaggi vengono eliminati dopo 30 giorni. Un nuovo messaggio rinnova il termine senza spendere altri crediti.",
   "matchesInactivityDeadline": "Senza un nuovo messaggio, questa conversazione verrà eliminata il {date}. Riprenderla non consuma crediti.",
   "@matchesInactivityDeadline": {"description": "Inactivity deadline for a confirmed conversation", "placeholders": {"date": {"type": "String"}}},
-  "matchesInactivityWarning": "Una conversazione verrà eliminata entro 7 giorni senza un nuovo messaggio."
+  "matchesInactivityWarning": "Una conversazione verrà eliminata entro 7 giorni senza un nuovo messaggio.",
+  "matchesInactivityInfo": "Archiviazione ed eliminazione",
+  "@matchesInactivityInfo": {
+    "description": "Disclosure title for the existing conversation archiving and deletion policy."
+  }
 }

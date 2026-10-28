@@ -58,7 +58,7 @@ void main() {
       () => File(
         const String.fromEnvironment(
           'PHOTO_PREVIEW_PORTRAIT',
-          defaultValue: 'pictures/previews/photo-reveal-2026-10-25/fictional-portrait.png',
+          defaultValue: 'pictures/fixtures/fictional-portrait.png',
         ),
       ).readAsBytes(),
     ))!;

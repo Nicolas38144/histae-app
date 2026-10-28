@@ -46,7 +46,7 @@ class _PartnerPhotoState extends State<PartnerPhoto>
       access.verified &&
       access.session.resourceKey == _resourceKey &&
       access.selected?.id == widget.matchId &&
-      access.selected!.historyAllowed &&
+      access.selected!.lifecycle.allowsHistoryAt(access.serverNow) &&
       access.selected!.photosRevealed &&
       !access.photosBlocked(widget.matchId) &&
       access.readAt != null &&

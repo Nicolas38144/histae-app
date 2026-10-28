@@ -98,6 +98,13 @@ Server-authorized `active` and `confirmed` matches permit sending. `awaiting_con
 history readable and disables composition. Local deadlines disable actions without inventing a
 new server state. Message ordering and cursors follow the API.
 
+Confirmed conversations are archived after 10 days without a new message, remain readable and
+writable, receive a server warning at day 23 and become unavailable at day 30. The API then purges
+the match and messages without another retention window. A new message resets inactivity without
+spending another credit; reading, signing in and replaying a send do not. The rule is identical for
+Free and Premium. Mobile projection uses `archived` and `inactivity_expires_at`, keeps archive search
+local and verifies an expired cached deadline before treating a renewed conversation as unavailable.
+
 A lost send response retains text and UUID for an explicit retry. Read receipts apply only to
 received messages visible in the foreground. Shared real time refreshes affected resources;
 notification navigation verifies access before opening the conversation.

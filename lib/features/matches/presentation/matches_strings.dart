@@ -42,9 +42,12 @@ class MatchesStrings {
       strings.messages.matchesStringsSendingIsPausedDuringTheContinuation(
         date(match.expiresAt),
       ),
-    MatchStatus.confirmed => match.inactivityExpiresAt == null
-        ? strings.messages.matchesStringsYouCanContinueYourConversation
-        : strings.messages.matchesInactivityDeadline(date(match.inactivityExpiresAt!)),
+    MatchStatus.confirmed =>
+      match.inactivityExpiresAt == null
+          ? strings.messages.matchesStringsYouCanContinueYourConversation
+          : strings.messages.matchesInactivityDeadline(
+              date(match.inactivityExpiresAt!),
+            ),
     MatchStatus.expired ||
     MatchStatus.ended => strings.messages.matchesPageThisMatchHasEnded,
   };

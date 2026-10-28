@@ -14,6 +14,7 @@ import '../../drafts/application/draft_controller.dart';
 import '../data/match_models.dart';
 import '../data/matches_repository.dart';
 import '../data/realtime_client.dart';
+import 'match_deadline_scheduler.dart';
 import 'message_outbox.dart';
 
 class MatchesController extends ChangeNotifier implements MatchAccess {
@@ -51,7 +52,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   @override
   bool isRemoved(String id) =>
       _removed.contains(id) ||
-      _items.any((m) => m.id == id && !m.historyAllowed);
+      _items.any((m) => m.id == id && !m.lifecycle.allowsHistoryAt(serverNow));
 
   final _photoBarriers = <String>{};
 
@@ -69,6 +70,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     if (!accessible) return;
     repository.invalidate();
     _verified = false;
+    _listVerified = false;
     _notify();
     if (active) unawaited(refresh());
   }
@@ -105,13 +107,18 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   late String _key;
   late int _localeRevision;
   bool _disposed = false, _active = false, _verified = false, _dirty = false;
+  bool _listVerified = false;
   int _epoch = 0, _chatEpoch = 0, _listRevision = 0;
   @override
   int privateRevision = 0;
   RequestCancellation _scope = RequestCancellation(),
       _chatScope = RequestCancellation();
   Future<void>? _sync;
-  Timer? _debounce, _deadline;
+  Timer? _debounce;
+  late final _deadlines = MatchDeadlineScheduler(
+    now: () => serverNow,
+    onElapsed: _deadlineReached,
+  );
   late final RetryTicker _cooldown = RetryTicker(
     remaining: () => retrySeconds,
     onTick: () {
@@ -119,9 +126,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     },
   );
   Duration _clockOffset = Duration.zero;
-  final _checkedDeadlines = <String>{},
-      _removed = <String>{},
-      _readAttempted = <String>{};
+  final _removed = <String>{}, _readAttempted = <String>{};
   late final _outbox = MessageOutbox(
     onChanged: (id, text) => drafts?.setMessage(id, text),
   );
@@ -161,6 +166,8 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   @override
   bool get verified => _verified;
 
+  bool get listVerified => _listVerified;
+
   @override
   DateTime get serverNow => _now().toUtc().add(_clockOffset);
 
@@ -179,10 +186,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   bool get canSend =>
       active &&
       _verified &&
-      selected?.sendAllowed == true &&
-      (selected!.status == MatchStatus.confirmed
-          ? !selected!.isInactivityExpiredAt(serverNow)
-          : selected!.expiresAt.isAfter(serverNow)) &&
+      selected?.lifecycle.allowsSendAt(serverNow) == true &&
       !sending &&
       !ending &&
       pendingEnd != selectedId &&
@@ -190,8 +194,10 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       retrySeconds == 0;
 
   bool get canRead =>
-      active && _verified && selected?.historyAllowed == true &&
-      !selected!.isInactivityExpiredAt(serverNow) && !ending;
+      active &&
+      _verified &&
+      selected?.lifecycle.allowsHistoryAt(serverNow) == true &&
+      !ending;
 
   int get retrySeconds => retrySecondsUntil(_retryAt, now: _now());
 
@@ -216,6 +222,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
         _localeRevision = session.localizationRevision;
         _dirty = true;
         _verified = false;
+        _listVerified = false;
         _notify();
         _schedule();
       }
@@ -233,7 +240,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     _readAttempted.clear();
     selectedId = null;
     _closures.clear();
-    _checkedDeadlines.clear();
+    _deadlines.reset();
     _clockOffset = Duration.zero;
     _dirty = false;
     listCursor = null;
@@ -274,9 +281,10 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     _scope.cancel();
     _chatScope.cancel();
     realtime.stop();
-    _deadline?.cancel();
+    _deadlines.cancel();
     _debounce?.cancel();
     _verified = false;
+    _listVerified = false;
     realtimeConnected = false;
     listLoading = false;
     historyLoading = false;
@@ -365,9 +373,11 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       _items.clear();
       _messages.clear();
       _verified = false;
+      _listVerified = false;
       _notify();
     } else if (signal.type != 'message.read') {
       _verified = false;
+      _listVerified = false;
       _notify();
     }
     _schedule();
@@ -386,51 +396,23 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     );
   }
 
-  void _armDeadline() {
-    _deadline?.cancel();
-    DateTime? next;
-    final now = serverNow;
-    for (final match in _items) {
-      final expiry = match.status == MatchStatus.confirmed
-          ? match.inactivityExpiresAt
-          : match.historyAllowed ? match.expiresAt : null;
-      if (expiry == null) continue;
-      final key = '${match.id}:${match.status.name}:${expiry.toIso8601String()}';
-      if (_checkedDeadlines.contains(key)) continue;
-      final archive = match.status == MatchStatus.confirmed
-          ? expiry.subtract(const Duration(days: 20)) : null;
-      final deadline = archive != null && archive.isAfter(now) ? archive : expiry;
-      if (next == null || deadline.isBefore(next)) next = deadline;
-    }
-    if (next == null) return;
-    final delay = next.difference(now);
-    _deadline = Timer(delay.isNegative ? Duration.zero : delay, () {
-      if (!active) return;
-      var expired = false;
-      for (final match in List<UserMatch>.of(_items)) {
-        if (match.isInactivityExpiredAt(serverNow)) {
-          _checkedDeadlines.add(
-            '${match.id}:${match.status.name}:${match.inactivityExpiresAt!.toIso8601String()}',
-          );
-          // A stale local deadline must not permanently hide a match renewed
-          // by the other participant; a fresh API read may restore it.
-          _purge(match.id);
-          _items.removeWhere((item) => item.id == match.id);
-          notice = 'ended';
-          expired = true;
-        } else if (match.status != MatchStatus.confirmed &&
-            !match.expiresAt.isAfter(serverNow)) {
-          _checkedDeadlines.add(
-            '${match.id}:${match.status.name}:${match.expiresAt.toIso8601String()}',
-          );
-          expired = true;
-        }
+  void _armDeadline() => _deadlines.update(_items);
+
+  void _deadlineReached(List<UserMatch> expired) {
+    if (!active) return;
+    for (final match in expired) {
+      if (match.status == MatchStatus.confirmed) {
+        // A local deadline hides private data without treating it as a
+        // permanent server removal: another person's message may renew it.
+        _purge(match.id);
+        _items.removeWhere((item) => item.id == match.id);
+        notice = 'ended';
       }
-      if (expired) _verified = false;
-      _notify();
-      _armDeadline();
-      if (expired) unawaited(refresh());
-    });
+    }
+    if (expired.isNotEmpty) _verified = false;
+    _notify();
+    _armDeadline();
+    if (expired.isNotEmpty) unawaited(refresh());
   }
 
   @override
@@ -462,11 +444,12 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     listLoading = true;
     failure = null;
     _verified = false;
+    _listVerified = false;
     _listRevision++;
     _notify();
     try {
       final items = <UserMatch>[];
-      final seen = <String>{}, cursors = <String>{};
+      final seen = <String>{}, cursors = <String>{}, unavailable = <String>{};
       String? cursor;
       do {
         final page = await repository.matches(
@@ -480,9 +463,13 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
           return;
         }
         for (final item in page.items) {
-          if (!_removed.contains(item.id) &&
-              seen.add(item.id) &&
-              item.status != MatchStatus.ended) {
+          if (_removed.contains(item.id) || !seen.add(item.id)) continue;
+          if (!item.lifecycle.allowsHistoryAt(serverNow)) {
+            unavailable.add(item.id);
+          }
+          final expired = item.isInactivityExpiredAt(serverNow);
+          if (expired && policy == ReadPolicy.cached) _dirty = true;
+          if (item.status != MatchStatus.ended && !expired) {
             items.add(item);
           }
         }
@@ -495,15 +482,17 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       _items
         ..clear()
         ..addAll(items);
+      _listVerified = true;
       listCursor = cursor;
       readRevision++;
+      readAt = repository.matchesReadAt;
+      for (final id in unavailable) {
+        _purge(id);
+        if (target == id) notice = 'ended';
+      }
       for (final item in items) {
-        if (!item.historyAllowed && _outbox.matchIds.contains(item.id)) {
-          _outbox.forget(item.id);
-        }
         if (!item.myRevealed) _photoBarriers.remove(item.id);
       }
-      readAt = repository.matchesReadAt;
       if (cursor == null) {
         for (final id in {..._outbox.matchIds, ..._closures.keys}) {
           if (!seen.contains(id)) _purge(id);
@@ -512,7 +501,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       _armDeadline();
       if (target != null && _chatAlive(epoch, chatEpoch, target)) {
         final match = selected;
-        if (match == null || !match.historyAllowed) {
+        if (match == null || !match.lifecycle.allowsHistoryAt(serverNow)) {
           _purge(target);
           notice = 'ended';
         } else {
@@ -614,6 +603,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       for (final item in page.items) {
         if (!_removed.contains(item.id) &&
             item.status != MatchStatus.ended &&
+            !item.isInactivityExpiredAt(serverNow) &&
             ids.add(item.id)) {
           _items.add(item);
         }

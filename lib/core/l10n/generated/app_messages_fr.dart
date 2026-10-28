@@ -3524,7 +3524,7 @@ class AppMessagesFr extends AppMessages {
       'L’application de messagerie n’a pas pu être ouverte. Vous pouvez utiliser l’adresse affichée dans votre messagerie habituelle.';
 
   @override
-  String get matchesSearchLabel => 'Rechercher un match par prénom';
+  String get matchesSearchLabel => 'Rechercher un prénom';
 
   @override
   String get matchesSearchClear => 'Effacer la recherche';
@@ -3601,12 +3601,18 @@ class AppMessagesFr extends AppMessages {
   String get matchesArchivedTitle => 'Archivées';
 
   @override
-  String get matchesInactivityPolicy => 'Après 10 jours sans nouveau message, une conversation confirmée est archivée. Un avertissement est envoyé après 23 jours ; le match et les messages sont supprimés après 30 jours. Un nouveau message relance le délai, sans nouveau crédit.';
+  String get matchesInactivityPolicy =>
+      'Après 10 jours sans nouveau message, une conversation confirmée est archivée. Un avertissement est envoyé après 23 jours ; le match et les messages sont supprimés après 30 jours. Un nouveau message relance le délai, sans nouveau crédit.';
 
   @override
-  String matchesInactivityDeadline(String date) => 'Sans nouveau message, cette conversation sera supprimée le $date. Sa reprise ne consomme aucun crédit.';
+  String matchesInactivityDeadline(String date) {
+    return 'Sans nouveau message, cette conversation sera supprimée le $date. Sa reprise ne consomme aucun crédit.';
+  }
 
   @override
-  String get matchesInactivityWarning => 'Une conversation sera supprimée dans les 7 prochains jours sans nouveau message.';
+  String get matchesInactivityWarning =>
+      'Une conversation sera supprimée dans les 7 prochains jours sans nouveau message.';
 
+  @override
+  String get matchesInactivityInfo => 'Archivage et suppression';
 }

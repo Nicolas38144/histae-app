@@ -5771,7 +5771,7 @@ abstract class AppMessages {
   /// Local drafts, feed guidance, help, local match search and weekly renewal.
   ///
   /// In fr, this message translates to:
-  /// **'Rechercher un match par prénom'**
+  /// **'Rechercher un prénom'**
   String get matchesSearchLabel;
 
   /// Local drafts, feed guidance, help, local match search and weekly renewal.
@@ -5900,18 +5900,35 @@ abstract class AppMessages {
   /// **'Ce choix est appliqué pour cette session, mais sa sauvegarde a échoué. Sélectionnez-le à nouveau pour réessayer.'**
   String get readingSaveFailed;
 
-  /// Label for confirmed conversations archived after ten inactive days.
+  /// No description provided for @matchesArchivedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Archivées'**
   String get matchesArchivedTitle;
 
-  /// Explains the 10/23/30-day inactivity policy.
+  /// No description provided for @matchesInactivityPolicy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Après 10 jours sans nouveau message, une conversation confirmée est archivée. Un avertissement est envoyé après 23 jours ; le match et les messages sont supprimés après 30 jours. Un nouveau message relance le délai, sans nouveau crédit.'**
   String get matchesInactivityPolicy;
 
-  /// The deletion deadline of a confirmed conversation.
+  /// Inactivity deadline for a confirmed conversation
+  ///
+  /// In fr, this message translates to:
+  /// **'Sans nouveau message, cette conversation sera supprimée le {date}. Sa reprise ne consomme aucun crédit.'**
   String matchesInactivityDeadline(String date);
 
-  /// Warning for a confirmed conversation approaching deletion.
+  /// No description provided for @matchesInactivityWarning.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une conversation sera supprimée dans les 7 prochains jours sans nouveau message.'**
   String get matchesInactivityWarning;
 
+  /// Disclosure title for the existing conversation archiving and deletion policy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Archivage et suppression'**
+  String get matchesInactivityInfo;
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

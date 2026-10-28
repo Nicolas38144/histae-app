@@ -4003,7 +4003,7 @@
   "@helpEmailSubject": {"description": "Local drafts, feed guidance, help, local match search and weekly renewal."},
   "helpEmailFailed": "L’application de messagerie n’a pas pu être ouverte. Vous pouvez utiliser l’adresse affichée dans votre messagerie habituelle.",
   "@helpEmailFailed": {"description": "Local drafts, feed guidance, help, local match search and weekly renewal."},
-  "matchesSearchLabel": "Rechercher un match par prénom",
+  "matchesSearchLabel": "Rechercher un prénom",
   "@matchesSearchLabel": {"description": "Local drafts, feed guidance, help, local match search and weekly renewal."},
   "matchesSearchClear": "Effacer la recherche",
   "@matchesSearchClear": {"description": "Local drafts, feed guidance, help, local match search and weekly renewal."},
@@ -4085,5 +4085,9 @@
   "matchesInactivityPolicy": "Après 10 jours sans nouveau message, une conversation confirmée est archivée. Un avertissement est envoyé après 23 jours ; le match et les messages sont supprimés après 30 jours. Un nouveau message relance le délai, sans nouveau crédit.",
   "matchesInactivityDeadline": "Sans nouveau message, cette conversation sera supprimée le {date}. Sa reprise ne consomme aucun crédit.",
   "@matchesInactivityDeadline": {"description": "Inactivity deadline for a confirmed conversation", "placeholders": {"date": {"type": "String"}}},
-  "matchesInactivityWarning": "Une conversation sera supprimée dans les 7 prochains jours sans nouveau message."
+  "matchesInactivityWarning": "Une conversation sera supprimée dans les 7 prochains jours sans nouveau message.",
+  "matchesInactivityInfo": "Archivage et suppression",
+  "@matchesInactivityInfo": {
+    "description": "Disclosure title for the existing conversation archiving and deletion policy."
+  }
 }

@@ -165,7 +165,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   Future<void> _profile() async {
     if (!c.accessible ||
         c.selected?.id != widget.matchId ||
-        c.selected?.historyAllowed != true) {
+        c.selected?.lifecycle.allowsHistoryAt(c.serverNow) != true) {
       return;
     }
     _readTimer?.cancel();
@@ -213,7 +213,8 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
     }
     final messages = c.messages;
     final match = c.selectedId == widget.matchId ? c.selected : null;
-    final unavailable = match == null || !match.historyAllowed;
+    final unavailable =
+        match == null || !match.lifecycle.allowsHistoryAt(c.serverNow);
     return HistaeScaffold(
       appBar: AppBar(
         title: Semantics(
@@ -260,10 +261,11 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
         ),
         actions: [
           IconButton(
+            key: const Key('chat-refresh'),
             tooltip: AppStrings.of(context)
                 .messages
                 .chatPageRefreshConversation,
-            onPressed: c.listLoading || c.retrySeconds > 0 ? null : c.activate,
+            onPressed: c.listLoading || c.retrySeconds > 0 ? null : c.refresh,
             icon: const Icon(Icons.refresh),
           ),
           if (match != null)
@@ -343,7 +345,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                   HistaeButton.outlined(
                     onPressed: c.listLoading || c.retrySeconds > 0
                         ? null
-                        : c.activate,
+                        : c.refresh,
                     child: Text(
                       AppStrings.of(context).messages.chatPageRefreshMyMatches,
                     ),

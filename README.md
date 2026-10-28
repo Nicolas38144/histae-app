@@ -74,10 +74,11 @@ applicable exceptions. External contributions are not accepted.
 Third-party dependencies, SDKs and fonts retain their own licenses; these restrictions do not
 override their rights or notices. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-## Inactivité des conversations confirmées
+## Confirmed conversation inactivity
 
-Après 10 jours sans nouveau message, la conversation est archivée mais reste accessible. À J23,
-les deux participants reçoivent un avertissement ; à J30, le match et les messages sont supprimés.
-Un nouveau message désarchive et relance le délai sans crédit supplémentaire. Connexion, lecture
-et rejeu ne le relancent pas. La même règle vaut pour Free et Premium. Les champs API `archived`
-et `inactivity_expires_at` pilotent la présentation ; `confirmed` reste le statut métier.
+After 10 days without a new message, a confirmed conversation is archived but stays accessible.
+Both participants receive a warning at day 23; the match and messages are deleted at day 30.
+A new message unarchives it and resets the deadline without another continuation credit.
+Signing in, reading and replaying a send do not reset it. The rule is identical for Free and Premium.
+The API fields `archived` and `inactivity_expires_at` drive presentation; `confirmed` remains the
+business status. Archive rules are available through the disclosure in Matches.

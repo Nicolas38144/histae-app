@@ -4,10 +4,10 @@ import '../../../core/network/api_client.dart';
 import '../../../core/network/json_fields.dart';
 import '../../../core/text/whitespace.dart';
 import '../../profile/data/profile_models.dart';
+import '../domain/match_lifecycle.dart';
 
 export '../../../core/network/json_fields.dart' show pageCursor;
-
-enum MatchStatus { active, awaitingContinuation, confirmed, expired, ended }
+export '../domain/match_lifecycle.dart' show MatchStatus;
 
 MatchStatus parseMatchStatus(String value) => switch (value) {
   'active' => MatchStatus.active,
@@ -160,7 +160,8 @@ class UserMatch {
             }, summary: true),
       archived: j['archived'] == null ? false : jsonField<bool>(j, 'archived'),
       inactivityExpiresAt: j['inactivity_expires_at'] == null
-          ? null : wireTime(j['inactivity_expires_at']),
+          ? null
+          : wireTime(j['inactivity_expires_at']),
     );
   }
   final String id;
@@ -173,25 +174,21 @@ class UserMatch {
   final bool archived;
   final DateTime? inactivityExpiresAt;
 
+  MatchLifecycle get lifecycle => MatchLifecycle(
+    status: status,
+    expiresAt: expiresAt,
+    inactivityExpiresAt: inactivityExpiresAt,
+    archived: archived,
+  );
+
   bool isInactivityExpiredAt(DateTime now) =>
-      status == MatchStatus.confirmed &&
-      inactivityExpiresAt != null &&
-      !inactivityExpiresAt!.isAfter(now);
+      lifecycle.isInactivityExpiredAt(now);
 
-  bool isArchivedAt(DateTime now) =>
-      status == MatchStatus.confirmed &&
-      !isInactivityExpiredAt(now) &&
-      (inactivityExpiresAt == null
-          ? archived
-          : !inactivityExpiresAt!.subtract(const Duration(days: 20)).isAfter(now));
+  bool isArchivedAt(DateTime now) => lifecycle.isArchivedAt(now);
 
-  bool get historyAllowed =>
-      status == MatchStatus.active ||
-      status == MatchStatus.awaitingContinuation ||
-      status == MatchStatus.confirmed;
+  bool get historyAllowed => lifecycle.historyAllowed;
 
-  bool get sendAllowed =>
-      status == MatchStatus.active || status == MatchStatus.confirmed;
+  bool get sendAllowed => lifecycle.sendAllowed;
 }
 
 class MatchPage {

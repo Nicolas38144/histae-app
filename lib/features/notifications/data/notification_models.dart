@@ -25,7 +25,17 @@ class PushDevice {
   final DateTime? lastUsedAt;
 }
 
-enum PushKind { newMatch, newMessage, matchExpiring, billingPaymentFailed }
+enum PushKind {
+  newMatch,
+  newMessage,
+  matchExpiring,
+  billingPaymentFailed;
+
+  bool get opensMatch => switch (this) {
+    PushKind.newMatch || PushKind.newMessage || PushKind.matchExpiring => true,
+    PushKind.billingPaymentFailed => false,
+  };
+}
 
 class PushIntent {
   const PushIntent(this.id, this.kind, this.matchId);
@@ -41,9 +51,7 @@ class PushIntent {
         _ => null,
       };
       if (kind == null) return null;
-      final match = [PushKind.newMatch, PushKind.newMessage, PushKind.matchExpiring].contains(kind)
-          ? serverId(data, 'match_id')
-          : null;
+      final match = kind.opensMatch ? serverId(data, 'match_id') : null;
       // Ignore all remote display text, links, senders and non-contract fields.
       return PushIntent(id, kind, match);
     } catch (_) {
