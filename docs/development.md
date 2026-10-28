@@ -92,6 +92,13 @@ ffmpeg -framerate 15 -i build/previews/photo-reveal/frames/%04d.png -vf "pad=cei
 For website screenshots, run `flutter test tool/preview_website_test.dart`, then the site's
 `scripts/export-app-screenshots.mjs` converter. Keep profiles and conversations fictional and labelled.
 
+`flutter test tool/preview_reading_test.dart` records the Aa settings and a fictional long profile
+under `build/previews/reading/`, with localized reviews at 100% and 200% system text size.
+Set `FLUTTER_ROOT` to load the SDK's Material icons. Encode `frames/%04d.png` at 15 fps with the
+FFmpeg recipe above; `recording.json` records the frame count and duration. Only the preview adds
+the fictional-profile label and touch markers. `test/reading_preferences_test.dart` covers local
+restore/write ordering, storage retry, unchanged API traffic and the paused feed reading delay.
+
 ## Builds and release preparation
 
 ```bash

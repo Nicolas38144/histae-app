@@ -112,6 +112,12 @@ Shared widgets retain disabled states, focus, semantics and keyboard behavior. K
 whole words on small screens, with a keyboard or at 200% text. Chat headers become compact while
 details and confirmations remain scrollable. Never globally shrink the person's chosen text scale.
 
+The feed's Aa toolbar action opens device-local reading preferences with three prose sizes and
+three line spacings, a live preview and a reset action. These choices apply to biographies and
+answers in the feed, owner preview and match profile. Headings and controls retain their usual
+styles, and the phone's text scaling still applies. Opening the sheet pauses the feed reading delay;
+changing preferences preserves the current profile and does not refresh the API.
+
 Use [visual previews](docs/development.md#visual-previews) for relevant states and translations.
 Native icon masks, fonts and cold starts still need Android/iOS device review.
 

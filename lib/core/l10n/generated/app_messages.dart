@@ -5797,6 +5797,108 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Prochain renouvellement : {date} (heure locale).'**
   String creditRenewalNext(String date);
+
+  /// Device-local reading preferences; system accessibility text scaling is preserved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aa'**
+  String get readingButtonLabel;
+
+  /// Device-local reading preferences; system accessibility text scaling is preserved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confort de lecture'**
+  String get readingTitle;
+
+  /// Device-local reading preferences; system accessibility text scaling is preserved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fermer les réglages de lecture'**
+  String get readingClose;
+
+  /// Device-local reading preferences; system accessibility text scaling is preserved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajustez le texte des bios et des réponses. Vos choix restent sur cet appareil.'**
+  String get readingIntro;
+
+  /// Device-local reading preferences; system accessibility text scaling is preserved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Taille du texte'**
+  String get readingTextSize;
+
+  /// Device-local reading preferences; system accessibility text scaling is preserved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Standard'**
+  String get readingSizeStandard;
+
+  /// Device-local reading preferences; system accessibility text scaling is preserved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confort'**
+  String get readingSizeComfortable;
+
+  /// Device-local reading preferences; system accessibility text scaling is preserved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Grand'**
+  String get readingSizeLarge;
+
+  /// Device-local reading preferences; system accessibility text scaling is preserved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Espacement des lignes'**
+  String get readingLineSpacing;
+
+  /// Device-local reading preferences; system accessibility text scaling is preserved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Normal'**
+  String get readingSpacingStandard;
+
+  /// Device-local reading preferences; system accessibility text scaling is preserved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aéré'**
+  String get readingSpacingRelaxed;
+
+  /// Device-local reading preferences; system accessibility text scaling is preserved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Très aéré'**
+  String get readingSpacingSpacious;
+
+  /// Device-local reading preferences; system accessibility text scaling is preserved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aperçu'**
+  String get readingPreview;
+
+  /// Device-local reading preferences; system accessibility text scaling is preserved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une librairie où passer des heures, un café qui se prolonge et une promenade sans itinéraire. Et vous, à quoi ressemble votre dimanche idéal ?'**
+  String get readingPreviewText;
+
+  /// Device-local reading preferences; system accessibility text scaling is preserved.
+  ///
+  /// In fr, this message translates to:
+  /// **'La taille de texte choisie dans les réglages du téléphone reste prise en compte.'**
+  String get readingSystemScale;
+
+  /// Device-local reading preferences; system accessibility text scaling is preserved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rétablir les réglages par défaut'**
+  String get readingReset;
+
+  /// Device-local reading preferences; system accessibility text scaling is preserved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce choix est appliqué pour cette session, mais sa sauvegarde a échoué. Sélectionnez-le à nouveau pour réessayer.'**
+  String get readingSaveFailed;
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

@@ -11,6 +11,7 @@ Future<void> main() async {
   final locale = LocaleController(store: const SecureLocalePreferenceStore());
   await locale.restore();
   final dependencies = await bootstrap(locale: locale);
+  await dependencies.reading?.load();
   runApp(
     HistaeApp(
       localeController: locale,
@@ -21,6 +22,7 @@ Future<void> main() async {
       rewardedVideoGateway: dependencies.videos,
       repositories: dependencies.repositories,
       helpController: dependencies.help,
+      readingController: dependencies.reading,
     ),
   );
 }

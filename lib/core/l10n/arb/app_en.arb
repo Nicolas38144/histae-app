@@ -1021,5 +1021,73 @@
   "matchesSearchClear": "Clear search",
   "matchesSearchEmpty": "No loaded matches have this first name.",
   "matchesSearchLoadedOnly": "Search covers matches already loaded. You can load more below.",
-  "creditRenewalNext": "Next renewal: {date} (local time)."
+  "creditRenewalNext": "Next renewal: {date} (local time).",
+  "readingButtonLabel": "Aa",
+  "@readingButtonLabel": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingTitle": "Reading comfort",
+  "@readingTitle": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingClose": "Close reading settings",
+  "@readingClose": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingIntro": "Adjust the text in bios and answers. Your choices stay on this device.",
+  "@readingIntro": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingTextSize": "Text size",
+  "@readingTextSize": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingSizeStandard": "Standard",
+  "@readingSizeStandard": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingSizeComfortable": "Comfort",
+  "@readingSizeComfortable": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingSizeLarge": "Large",
+  "@readingSizeLarge": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingLineSpacing": "Line spacing",
+  "@readingLineSpacing": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingSpacingStandard": "Normal",
+  "@readingSpacingStandard": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingSpacingRelaxed": "Relaxed",
+  "@readingSpacingRelaxed": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingSpacingSpacious": "Spacious",
+  "@readingSpacingSpacious": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingPreview": "Preview",
+  "@readingPreview": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingPreviewText": "A bookshop to spend hours in, a coffee that turns into a long chat and a walk with no route in mind. What does your ideal Sunday look like?",
+  "@readingPreviewText": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingSystemScale": "The text size set on your phone still applies.",
+  "@readingSystemScale": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingReset": "Restore default settings",
+  "@readingReset": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingSaveFailed": "This choice applies for this session, but could not be saved. Select it again to retry.",
+  "@readingSaveFailed": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  }
 }

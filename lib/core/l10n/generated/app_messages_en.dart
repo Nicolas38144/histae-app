@@ -3497,4 +3497,59 @@ class AppMessagesEn extends AppMessages {
   String creditRenewalNext(String date) {
     return 'Next renewal: $date (local time).';
   }
+
+  @override
+  String get readingButtonLabel => 'Aa';
+
+  @override
+  String get readingTitle => 'Reading comfort';
+
+  @override
+  String get readingClose => 'Close reading settings';
+
+  @override
+  String get readingIntro =>
+      'Adjust the text in bios and answers. Your choices stay on this device.';
+
+  @override
+  String get readingTextSize => 'Text size';
+
+  @override
+  String get readingSizeStandard => 'Standard';
+
+  @override
+  String get readingSizeComfortable => 'Comfort';
+
+  @override
+  String get readingSizeLarge => 'Large';
+
+  @override
+  String get readingLineSpacing => 'Line spacing';
+
+  @override
+  String get readingSpacingStandard => 'Normal';
+
+  @override
+  String get readingSpacingRelaxed => 'Relaxed';
+
+  @override
+  String get readingSpacingSpacious => 'Spacious';
+
+  @override
+  String get readingPreview => 'Preview';
+
+  @override
+  String get readingPreviewText =>
+      'A bookshop to spend hours in, a coffee that turns into a long chat and a walk with no route in mind. What does your ideal Sunday look like?';
+
+  @override
+  String get readingSystemScale =>
+      'The text size set on your phone still applies.';
+
+  @override
+  String get readingReset => 'Restore default settings';
+
+  @override
+  String get readingSaveFailed =>
+      'This choice applies for this session, but could not be saved. Select it again to retry.';
 }

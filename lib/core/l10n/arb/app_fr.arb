@@ -4012,5 +4012,73 @@
   "matchesSearchLoadedOnly": "La recherche porte sur les rencontres déjà chargées. Vous pouvez en afficher davantage ci-dessous.",
   "@matchesSearchLoadedOnly": {"description": "Local drafts, feed guidance, help, local match search and weekly renewal."},
   "creditRenewalNext": "Prochain renouvellement : {date} (heure locale).",
-  "@creditRenewalNext": {"description": "Local drafts, feed guidance, help, local match search and weekly renewal.", "placeholders": {"date": {"type": "String"}}}
+  "@creditRenewalNext": {"description": "Local drafts, feed guidance, help, local match search and weekly renewal.", "placeholders": {"date": {"type": "String"}}},
+  "readingButtonLabel": "Aa",
+  "@readingButtonLabel": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingTitle": "Confort de lecture",
+  "@readingTitle": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingClose": "Fermer les réglages de lecture",
+  "@readingClose": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingIntro": "Ajustez le texte des bios et des réponses. Vos choix restent sur cet appareil.",
+  "@readingIntro": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingTextSize": "Taille du texte",
+  "@readingTextSize": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingSizeStandard": "Standard",
+  "@readingSizeStandard": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingSizeComfortable": "Confort",
+  "@readingSizeComfortable": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingSizeLarge": "Grand",
+  "@readingSizeLarge": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingLineSpacing": "Espacement des lignes",
+  "@readingLineSpacing": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingSpacingStandard": "Normal",
+  "@readingSpacingStandard": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingSpacingRelaxed": "Aéré",
+  "@readingSpacingRelaxed": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingSpacingSpacious": "Très aéré",
+  "@readingSpacingSpacious": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingPreview": "Aperçu",
+  "@readingPreview": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingPreviewText": "Une librairie où passer des heures, un café qui se prolonge et une promenade sans itinéraire. Et vous, à quoi ressemble votre dimanche idéal ?",
+  "@readingPreviewText": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingSystemScale": "La taille de texte choisie dans les réglages du téléphone reste prise en compte.",
+  "@readingSystemScale": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingReset": "Rétablir les réglages par défaut",
+  "@readingReset": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  },
+  "readingSaveFailed": "Ce choix est appliqué pour cette session, mais sa sauvegarde a échoué. Sélectionnez-le à nouveau pour réessayer.",
+  "@readingSaveFailed": {
+    "description": "Device-local reading preferences; system accessibility text scaling is preserved."
+  }
 }

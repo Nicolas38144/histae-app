@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/models/public_profile_answer.dart';
 import '../../../core/widgets/editorial_card.dart';
+import '../../reading/domain/reading_preferences.dart';
+import '../../reading/presentation/reading_scope.dart';
 
 /// Public profile text shared by discovery, the owner preview and matches.
 class FeedProfileContent extends StatelessWidget {
@@ -25,6 +27,13 @@ class FeedProfileContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final reading =
+        ReadingScope.maybeOf(context)?.preferences ??
+        const ReadingPreferences();
+    final prose = theme.textTheme.bodyLarge?.copyWith(
+      fontSize: reading.fontSize,
+      height: reading.lineHeight,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -60,13 +69,7 @@ class FeedProfileContent extends StatelessWidget {
         ],
         if (bio != null && bio!.isNotEmpty) ...[
           const EditorialDivider(),
-          Text(
-            bio!,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              fontSize: 18,
-              height: 1.55,
-            ),
-          ),
+          Text(bio!, key: const Key('feed-biography'), style: prose),
         ],
         if (traits.isNotEmpty) ...[
           const EditorialDivider(),
@@ -93,7 +96,7 @@ class FeedProfileContent extends StatelessWidget {
           const EditorialDivider(),
           Text(answer.question, style: theme.textTheme.titleLarge),
           const SizedBox(height: 14),
-          Text(answer.answer, style: theme.textTheme.bodyLarge),
+          Text(answer.answer, style: prose),
         ],
       ],
     );

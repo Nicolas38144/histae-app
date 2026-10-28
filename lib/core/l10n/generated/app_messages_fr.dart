@@ -3541,4 +3541,59 @@ class AppMessagesFr extends AppMessages {
   String creditRenewalNext(String date) {
     return 'Prochain renouvellement : $date (heure locale).';
   }
+
+  @override
+  String get readingButtonLabel => 'Aa';
+
+  @override
+  String get readingTitle => 'Confort de lecture';
+
+  @override
+  String get readingClose => 'Fermer les réglages de lecture';
+
+  @override
+  String get readingIntro =>
+      'Ajustez le texte des bios et des réponses. Vos choix restent sur cet appareil.';
+
+  @override
+  String get readingTextSize => 'Taille du texte';
+
+  @override
+  String get readingSizeStandard => 'Standard';
+
+  @override
+  String get readingSizeComfortable => 'Confort';
+
+  @override
+  String get readingSizeLarge => 'Grand';
+
+  @override
+  String get readingLineSpacing => 'Espacement des lignes';
+
+  @override
+  String get readingSpacingStandard => 'Normal';
+
+  @override
+  String get readingSpacingRelaxed => 'Aéré';
+
+  @override
+  String get readingSpacingSpacious => 'Très aéré';
+
+  @override
+  String get readingPreview => 'Aperçu';
+
+  @override
+  String get readingPreviewText =>
+      'Une librairie où passer des heures, un café qui se prolonge et une promenade sans itinéraire. Et vous, à quoi ressemble votre dimanche idéal ?';
+
+  @override
+  String get readingSystemScale =>
+      'La taille de texte choisie dans les réglages du téléphone reste prise en compte.';
+
+  @override
+  String get readingReset => 'Rétablir les réglages par défaut';
+
+  @override
+  String get readingSaveFailed =>
+      'Ce choix est appliqué pour cette session, mais sa sauvegarde a échoué. Sélectionnez-le à nouveau pour réessayer.';
 }

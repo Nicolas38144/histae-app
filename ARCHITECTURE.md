@@ -235,3 +235,13 @@ Both public registration documents and authenticated consent records carry the s
 `ConsentControl` displays it using the interface locale; it never substitutes `updated_at`,
 which records the user's consent event. Missing metadata remains explicit rather than inventing
 a publication date. A document date alone does not change an existing consent's version validity.
+
+## Reading preferences
+
+`ReadingController` owns device-local prose preferences, separate from account data and the API.
+`AppDependencies` injects `SecureReadingPreferencesStore`; startup restores it before the first
+frame, and `HistaeApp` owns disposal. `ReadingScope` shares it across routes. The settings sheet
+edits typed choices; `FeedProfileContent` renders them without altering the system text scaler.
+Local operations are serialized and a delayed restore cannot overwrite a newer choice. Storage
+failure leaves the choice usable in memory and allows an explicit retry. No profile text is stored
+with these settings.

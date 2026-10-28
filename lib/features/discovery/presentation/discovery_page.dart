@@ -18,6 +18,7 @@ import '../../privacy/presentation/report_page.dart';
 import '../../profile/application/profile_controller.dart';
 import '../../profile/presentation/photo_page.dart';
 import '../../profile/presentation/profile_editors.dart';
+import '../../reading/presentation/reading_settings_sheet.dart';
 import '../application/discovery_controller.dart';
 import '../application/discovery_visibility_controller.dart';
 import '../data/device_location.dart';
@@ -55,6 +56,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
   bool _opening = false;
   HelpController? _help;
   bool _guideScheduled = false, _guideOpen = false;
+  bool _readingOpen = false;
 
   @override
   void didChangeDependencies() {
@@ -67,6 +69,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
     if (!showFeed ||
         !widget.visible ||
         _opening ||
+        _readingOpen ||
         c.busy ||
         _guideScheduled ||
         help == null ||
@@ -79,6 +82,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted ||
           !widget.visible ||
+          _readingOpen ||
           !c.accessible ||
           c.session.resourceKey != _key ||
           help.seen ||
@@ -122,6 +126,16 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
   Future<void> _open(Widget page) async {
     await Navigator.of(context)
         .push(MaterialPageRoute<void>(builder: (_) => page));
+  }
+
+  Future<void> _openReading() async {
+    if (_readingOpen || _guideOpen) return;
+    setState(() => _readingOpen = true);
+    try {
+      await showReadingSettings(context);
+    } finally {
+      if (mounted) setState(() => _readingOpen = false);
+    }
   }
 
   Future<void> _repair(DiscoveryAction action) async {
@@ -429,6 +443,25 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
         appBar: AppBar(
           title: const HistaeWordmark(),
           actions: [
+            if (showFeed)
+              IconButton(
+                key: const Key('feed-reading-settings'),
+                tooltip: AppStrings.of(context).messages.readingTitle,
+                onPressed: enabled && !_guideOpen ? _openReading : null,
+                icon: SizedBox(
+                  width: 26,
+                  height: 26,
+                  child: FittedBox(
+                    child: Text(
+                      AppStrings.of(context).messages.readingButtonLabel,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             IconButton(
               tooltip: AppStrings.of(context)
                   .messages
@@ -503,7 +536,10 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                             child: FeedProfileCard(
                               key: ValueKey(profile.id),
                               profile: profile,
-                              active: widget.visible && !_guideOpen,
+                              active:
+                                  widget.visible &&
+                                  !_guideOpen &&
+                                  !_readingOpen,
                               enabled:
                                   c.canChoose &&
                                   widget.visibility?.saving != true &&

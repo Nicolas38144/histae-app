@@ -17,6 +17,8 @@ import '../features/help/application/help_controller.dart';
 import '../features/help/presentation/help_scope.dart';
 import '../features/notifications/application/push_controller.dart';
 import '../features/notifications/presentation/push_scope.dart';
+import '../features/reading/application/reading_controller.dart';
+import '../features/reading/presentation/reading_scope.dart';
 import 'account_language_binding.dart';
 import 'app_opening.dart';
 import 'notification_navigation.dart';
@@ -37,6 +39,7 @@ class HistaeApp extends StatefulWidget {
     this.rewardedVideoGateway,
     this.repositories,
     this.helpController,
+    this.readingController,
   });
   // Ownership is transferred to the app; requests close when it is disposed.
   final CatalogRepository? catalogRepository;
@@ -47,6 +50,7 @@ class HistaeApp extends StatefulWidget {
   final RewardedVideoGateway? rewardedVideoGateway;
   final SessionRepositories? repositories;
   final HelpController? helpController;
+  final ReadingController? readingController;
 
   @override
   State<HistaeApp> createState() => _HistaeAppState();
@@ -55,6 +59,7 @@ class HistaeApp extends StatefulWidget {
 class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
   final _navigator = GlobalKey<NavigatorState>();
   late final _locale = widget.localeController ?? LocaleController();
+  late final _reading = widget.readingController ?? ReadingController();
   AccountLanguageBinding? _accountLanguage;
   bool _hadSession = false;
   int _resourceRevision = 0;
@@ -67,6 +72,7 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     unawaited(widget.helpController?.load());
+    unawaited(_reading.load());
     widget.sessionController?.addListener(_sessionChanged);
     if (widget.sessionController case final session?) {
       _repositories =
@@ -148,40 +154,44 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
     widget.catalogRepository?.close();
     _locale.dispose();
     widget.helpController?.dispose();
+    _reading.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) => LocaleScope(
-    controller: _locale,
-    child: ListenableBuilder(
-      listenable: _locale,
-      builder: (context, _) => MaterialApp(
-        navigatorKey: _navigator,
-        onGenerateTitle: (context) => AppStrings.of(context).appName,
-        debugShowCheckedModeBanner: false,
-        theme: histaeTheme(Brightness.light),
-        darkTheme: histaeTheme(Brightness.dark),
-        themeMode: ThemeMode.dark,
-        locale: _locale.locale,
-        supportedLocales: AppMessages.supportedLocales,
-        localeResolutionCallback: LocaleController.resolve,
-        localizationsDelegates: AppMessages.localizationsDelegates,
-        builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
-          value: Theme.of(context).appBarTheme.systemOverlayStyle!,
-          child: AppPrivacyShield(
-            child: AppOpening(
-              child: RewardedVideoScope(
-                gateway: widget.rewardedVideoGateway,
-                child: BillingScope(
-                  controller: widget.billingController,
-                  child: PushScope(
-                    controller: widget.pushController,
-                    child: HelpScope(
-                      controller: widget.helpController,
-                      child: NotificationOverlay(
-                        controller: widget.pushController,
-                        child: child!,
+  Widget build(BuildContext context) => ReadingScope(
+    controller: _reading,
+    child: LocaleScope(
+      controller: _locale,
+      child: ListenableBuilder(
+        listenable: _locale,
+        builder: (context, _) => MaterialApp(
+          navigatorKey: _navigator,
+          onGenerateTitle: (context) => AppStrings.of(context).appName,
+          debugShowCheckedModeBanner: false,
+          theme: histaeTheme(Brightness.light),
+          darkTheme: histaeTheme(Brightness.dark),
+          themeMode: ThemeMode.dark,
+          locale: _locale.locale,
+          supportedLocales: AppMessages.supportedLocales,
+          localeResolutionCallback: LocaleController.resolve,
+          localizationsDelegates: AppMessages.localizationsDelegates,
+          builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
+            value: Theme.of(context).appBarTheme.systemOverlayStyle!,
+            child: AppPrivacyShield(
+              child: AppOpening(
+                child: RewardedVideoScope(
+                  gateway: widget.rewardedVideoGateway,
+                  child: BillingScope(
+                    controller: widget.billingController,
+                    child: PushScope(
+                      controller: widget.pushController,
+                      child: HelpScope(
+                        controller: widget.helpController,
+                        child: NotificationOverlay(
+                          controller: widget.pushController,
+                          child: child!,
+                        ),
                       ),
                     ),
                   ),
@@ -189,17 +199,17 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
               ),
             ),
           ),
-        ),
-        home: widget.sessionController == null
-            ? WelcomePage(repository: widget.catalogRepository)
-            : ListenableBuilder(
-                listenable: widget.sessionController!,
-                builder: (context, _) => SessionGate(
-                  session: widget.sessionController!,
-                  catalog: widget.catalogRepository,
-                  repositories: _repositories,
+          home: widget.sessionController == null
+              ? WelcomePage(repository: widget.catalogRepository)
+              : ListenableBuilder(
+                  listenable: widget.sessionController!,
+                  builder: (context, _) => SessionGate(
+                    session: widget.sessionController!,
+                    catalog: widget.catalogRepository,
+                    repositories: _repositories,
+                  ),
                 ),
-              ),
+        ),
       ),
     ),
   );
