@@ -34,5 +34,7 @@ abstract interface class MatchAccess implements Listenable {
 
   Future<void> refresh();
 
+  Future<void> refreshPhotos();
+
   void removeUnavailable(String id);
 }

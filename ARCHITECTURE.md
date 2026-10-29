@@ -159,6 +159,11 @@ loss or owner disposal stops the stream.
 Events trigger the authorized reads required by each flow. Notifications are not authorization
 proof: opening one verifies the session, collection and history. `MessageOutbox` retains drafts
 and immutable send intentions. Read receipts require a received message visible in the foreground.
+Message and receipt events refresh existing data silently, preserving verified access, editor
+focus and IME composition. Access-changing events still invalidate private access immediately.
+Successful sends completing during a history read are merged into its snapshot. Explicit refresh
+and initial loading retain visible progress. Match cards show an accessible unread-number badge;
+the credit disclosure follows the matches and expands locally without an API read.
 
 The conversation name and its profile menu entry share one navigation action. `PartnerPage`
 renders the selected match's existing public data through `FeedProfileContent`, also used by
@@ -167,16 +172,20 @@ draft. Distance is omitted because the match projection does not supply it.
 
 `SignedPhotoLoader` downloads to memory without Bearer credentials or redirects, with a 5,000,000-byte
 limit and a fifteen-second timeout. Access is checked before display. Closing, losing access or
-reaching the display deadline evicts the image. Reopening does not extend the 50-second deadline
-measured from the resource read. This leaves a margin before the API’s 60-second signed URL expiry.
+backgrounding evicts the image. The 50-second window measured from the resource read bounds new
+downloads, leaving a margin before the API's 60-second signed URL expiry. It does not expire
+already downloaded bytes while their visible route remains authorized.
 
 `PartnerPhoto` owns full-size photo rendering for both the match profile and `PartnerPhotoPage`.
-It observes match access, route visibility, app lifecycle and the original read deadline. A
+Its sliver keep-alive retains the photo while scrolling the same profile. The shared `PrivatePhoto`
+widget observes route visibility and app lifecycle; the feature supplies current match access. A
 covered route cancels its download and purges the decoded image; late bytes cannot restore it.
-Manual photo refresh remains an explicit authorized read.
+Stale or rejected signed links cause at most one coalesced authorized refresh per visible attempt,
+without a loading bar in the conversation or a retry loop. Manual refresh remains available.
 
-`MatchPhotoAvatar` applies the same 50-second resource deadline to authorized thumbnails. It
-downloads through `SignedPhotoLoader`, never through a persistent network-image cache, and purges
+`MatchPhotoAvatar` uses `PrivatePhoto` for authorized thumbnails. Renewing only S3 signing parameters
+retains the existing pixels; a different object path or version reloads the image. It downloads
+through `SignedPhotoLoader`, never through a persistent network-image cache, and purges
 on hidden routes/tabs, backgrounding, withdrawal or replacement. `ContinuationController` keeps
 grant and withdrawal retry intentions distinct. `MatchAccess` owns an immediate local photo
 barrier until a fresh server snapshot confirms withdrawal, so a lost response cannot restore an

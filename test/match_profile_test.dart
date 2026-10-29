@@ -158,6 +158,42 @@ void main() {
   );
 
   testWidgets(
+    'scrolling a profile away and back retains its authorized photo',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final c = await revealedMatch();
+      var downloads = 0;
+      await http.runWithClient(
+        () async {
+          await tester.pumpWidget(
+            localized(PartnerPage(controller: c, id: testMatch)),
+          );
+          await tester.pumpAndSettle();
+          expect(downloads, 1);
+          await tester.scrollUntilVisible(
+            find.text('Signaler cette personne'),
+            300,
+          );
+          await tester.pumpAndSettle();
+          await tester.drag(find.byType(ListView), const Offset(0, 2500));
+          await tester.pumpAndSettle();
+          expect(find.byType(Image), findsOneWidget);
+          expect(downloads, 1);
+          c.suspend();
+          await tester.pumpWidget(const SizedBox.shrink());
+        },
+        () => MockClient((_) async {
+          downloads++;
+          return http.Response.bytes(pixels, 200);
+        }),
+      );
+    },
+  );
+
+  testWidgets(
     'covering a full photo cancels its display and rejects late bytes',
     (tester) async {
       final c = await revealedMatch();

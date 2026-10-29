@@ -14,12 +14,14 @@ class MatchPreviewCard extends StatelessWidget {
     required this.onTap,
     this.photoReadAt,
     this.photosAllowed = false,
+    this.refreshPhotoAccess,
   });
   final UserMatch match;
   final String ownerId;
   final VoidCallback? onTap;
   final DateTime? photoReadAt;
   final bool photosAllowed;
+  final Future<void> Function()? refreshPhotoAccess;
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +42,7 @@ class MatchPreviewCard extends StatelessWidget {
                     key: ValueKey('$ownerId:${match.id}'),
                     url: match.partner.photo,
                     readAt: photoReadAt,
+                    refreshAccess: refreshPhotoAccess,
                     allowed:
                         photosAllowed &&
                         match.historyAllowed &&
@@ -95,11 +98,36 @@ class MatchPreviewCard extends StatelessWidget {
               if (match.unreadCount > 0)
                 Padding(
                   padding: const EdgeInsets.only(top: 14),
-                  child: Text(
-                    AppStrings.of(context).messages
-                        .unreadMessages(match.unreadCount),
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: colors.primary,
+                  child: Align(
+                    alignment: Alignment.bottomRight,
+                    child: Semantics(
+                      label: AppStrings.of(context).messages
+                          .unreadMessages(match.unreadCount),
+                      child: ExcludeSemantics(
+                        child: Container(
+                          key: ValueKey('match-unread-${match.id}'),
+                          constraints: const BoxConstraints(
+                            minWidth: 24,
+                            minHeight: 24,
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 7,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: colors.primary,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            '${match.unreadCount}',
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: colors.onPrimary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),

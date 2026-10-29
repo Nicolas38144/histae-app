@@ -33,6 +33,7 @@ payments. Run the relevant existing suite rather than testing every visual or do
 | Photo readiness, withdrawal and private thumbnails | `flutter test test/photo_sharing_test.dart test/continuation_test.dart` |
 | Camera/gallery selection, staged upload and photo errors | `flutter test test/profile_widget_test.dart test/profile_test.dart` |
 | Conversation profile, cached navigation and full-size photo privacy | `flutter test test/match_profile_test.dart test/cached_conversation_test.dart` |
+| Live conversation editing, private URL renewal and unread indicators | `flutter test test/conversation_updates_test.dart test/private_photo_test.dart` |
 | Feed reading delay and transitions | `flutter test test/feed_reading_delay_test.dart` |
 | Match inactivity, archives, cache expiry and manual refresh | `flutter test test/matches_inactivity_test.dart test/matches_test.dart` |
 | Native billing | `flutter test test/billing_test.dart` |

@@ -365,7 +365,7 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.byKey(const Key('matches-search')), findsNothing);
         expect(find.text('Archivage et suppression'), findsNothing);
-        expect(find.byKey(const Key('open-credits')), findsOneWidget);
+        expect(find.byKey(const Key('matches-credits-toggle')), findsOneWidget);
         await tester.pumpWidget(const SizedBox.shrink());
       } finally {
         c.dispose();

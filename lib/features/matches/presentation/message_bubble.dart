@@ -149,7 +149,10 @@ class _MessageBubbleState extends State<MessageBubble>
               onTap: _showDate,
               behavior: HitTestBehavior.opaque,
               child: Container(
-                padding: const EdgeInsets.all(18),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: widget.own
                       ? colors.primaryContainer
@@ -176,7 +179,7 @@ class _MessageBubbleState extends State<MessageBubble>
                       ),
                     ),
                     if (widget.own) ...[
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 2),
                       Align(
                         alignment: Alignment.centerRight,
                         child: MessageMetadata(message: widget.message),

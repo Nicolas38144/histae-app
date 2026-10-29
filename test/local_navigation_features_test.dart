@@ -170,7 +170,7 @@ void main() {
         );
         await tester.tap(find.byTooltip('Effacer la recherche'));
         await tester.pumpAndSettle();
-        expect(find.byKey(const Key('open-credits')), findsOneWidget);
+        expect(find.byKey(const Key('matches-credits-toggle')), findsOneWidget);
         expect(reads, before);
         await tester.pumpWidget(const SizedBox.shrink());
       } finally {

@@ -233,6 +233,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                         key: ValueKey('${c.ownerId}:${match.id}'),
                         url: match.partner.photo,
                         readAt: c.readAt,
+                        refreshAccess: c.refreshPhotos,
                         allowed:
                             c.active &&
                             c.verified &&
@@ -360,7 +361,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                       compact:
                           layout.maxHeight < 480 ||
                           MediaQuery.textScalerOf(context).scale(1) > 1.4,
-                      loading: c.listLoading || c.historyLoading,
+                      loading: c.showLoading,
                       onDecisions: _decisions,
                     ),
                     Expanded(
@@ -508,6 +509,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                             ],
                             if (match.sendAllowed)
                               TextField(
+                                key: const Key('chat-composer'),
                                 controller: _text,
                                 minLines: 1,
                                 maxLines: 4,

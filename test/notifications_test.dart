@@ -382,7 +382,7 @@ void main() {
     expect(restored.enabled, isFalse);
     expect(restored.stopping, isFalse);
   });
-  test('notification payloads are narrowed, foreground deduplicated and opened IDs survive owner-bound restart', () async {
+  test('notification payloads are narrowed, foreground stays silent and opened IDs survive owner-bound restart', () async {
     final payload = {
       'notification_id': notificationOne,
       'type': 'new_message',
@@ -414,10 +414,8 @@ void main() {
     await pumpEventQueue();
     await p.enable();
     gateway.foreground.add(intent);
-    expect(p.foreground?.id, notificationOne);
-    p.dismiss();
-    gateway.foreground.add(intent);
-    expect(p.foreground, isNull);
+    expect(p.pendingOpen, isNull);
+    expect(gateway.foreground.hasListener, isFalse);
     gateway.taps.add(intent);
     expect((await p.authorizeOpen())?.id, notificationOne);
     expect(vault.record!.opened, [notificationOne]);

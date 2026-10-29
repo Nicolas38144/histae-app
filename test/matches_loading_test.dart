@@ -15,7 +15,7 @@ import 'support/matches_fixture.dart';
 
 void main() {
   testWidgets(
-    'matches and quota keep one fixed loading indicator through initial read and realtime revalidation',
+    'matches and quota share a fixed initial indicator; realtime revalidation stays silent',
     (tester) async {
       final matches = [
         Completer<http.Response>(),
@@ -55,6 +55,8 @@ void main() {
         expect(tester.getTopLeft(find.byKey(key)), position);
       }
 
+      await tester.tap(find.byKey(const Key('matches-credits-toggle')));
+      await tester.pump(const Duration(milliseconds: 250));
       fixedIndicator();
       expect(
         find.text('Votre solde ne peut pas être vérifié pour le moment.'),
@@ -82,7 +84,7 @@ void main() {
       expect(find.byKey(const Key('free-credits-remaining')), findsOneWidget);
       realtime.emit(const MobileSignal('connected'));
       await tester.pump(const Duration(milliseconds: 180));
-      fixedIndicator();
+      expect(find.byType(LinearProgressIndicator), findsNothing);
       matches[1].complete(
         jsonResponse({
           'matches': [publicMatchJson()],

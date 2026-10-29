@@ -16,14 +16,6 @@
   "@mainNavigationBarProfile": {
     "description": "Interface: lib/app/main_navigation_bar.dart"
   },
-  "notificationOverlayAHistaeUpdateIsAvailable": "Une mise à jour Histae est disponible.",
-  "@notificationOverlayAHistaeUpdateIsAvailable": {
-    "description": "Interface: lib/app/notification_overlay.dart"
-  },
-  "notificationOverlayLater": "Plus tard",
-  "@notificationOverlayLater": {
-    "description": "Interface: lib/app/notification_overlay.dart"
-  },
   "welcomePageAnotherWayToMeet": "D’ABORD, UNE CONVERSATION",
   "@welcomePageAnotherWayToMeet": {
     "description": "Interface: lib/app/welcome_page.dart"
@@ -3526,10 +3518,6 @@
   "iosLocalNetworkPermission": "En développement, Histae se connecte au serveur de test sur votre réseau local.",
   "@iosLocalNetworkPermission": {
     "description": "iOS permission copy; regenerate native resources with tool/generate_native_localizations.dart"
-  },
-  "viewNotification": "Consulter",
-  "@viewNotification": {
-    "description": "Open the foreground notification"
   },
   "profileAtYourPace": "À votre rythme.",
   "@profileAtYourPace": {

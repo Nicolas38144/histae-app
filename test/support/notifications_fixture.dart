@@ -92,8 +92,6 @@ class FakePushGateway implements PushGateway {
   @override
   Stream<String> get registrations => tokens.stream;
   @override
-  Stream<PushIntent> get received => foreground.stream;
-  @override
   Stream<PushIntent> get opened => taps.stream;
   Future<void> close() async {
     await tokens.close();

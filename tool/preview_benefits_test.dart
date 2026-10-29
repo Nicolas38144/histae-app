@@ -66,7 +66,7 @@ void main() {
     final billing = BillingController(
       BillingRepository(session),
       testBillingConfig,
-        FakeBillingGateway(),
+      FakeBillingGateway(),
       realtime: QuietRealtime(session),
     );
     final catalog = CatalogRepository(
@@ -114,6 +114,8 @@ void main() {
     await tester.tap(find.byKey(const Key('main-tab-matches')));
     await tester.pumpAndSettle();
     await capture('matches-free');
+    await tester.tap(find.byKey(const Key('matches-credits-toggle')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('open-videos')));
     await tester.pumpAndSettle();
     await capture('videos');

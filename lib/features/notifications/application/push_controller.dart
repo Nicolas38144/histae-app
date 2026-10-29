@@ -68,7 +68,6 @@ class PushController extends ChangeNotifier {
 
   AuthenticatedSession get session => repository.session;
   final _subscriptions = <StreamSubscription<dynamic>>[];
-  final _presented = <String>{};
   final _opened = <String>[];
   final _obsolete = <String>{};
   RequestCancellation _scope = RequestCancellation();
@@ -84,7 +83,7 @@ class PushController extends ChangeNotifier {
   String? deviceId, notice;
   DeviceRegistration? pending;
   ApiFailure? failure;
-  PushIntent? foreground, pendingOpen;
+  PushIntent? pendingOpen;
   String? _pendingOwner;
   late final RetryTicker _timer = RetryTicker(
     remaining: () => retrySeconds,
@@ -189,9 +188,7 @@ class PushController extends ChangeNotifier {
         },
       ),
     );
-    _subscriptions.add(
-      gateway.received.listen(_receive, onError: (Object _) {}),
-    );
+    // Foreground delivery stays silent; SSE updates the visible content.
     _subscriptions.add(gateway.opened.listen(_open, onError: (Object _) {}));
     final first = await gateway.initial();
     if (first != null) _open(first);
@@ -219,7 +216,6 @@ class PushController extends ChangeNotifier {
       _scope.cancel();
       _scope = RequestCancellation();
       busy = false;
-      foreground = null;
       coversMainFlow = false;
       if (temporary) _restoredKey = null;
       if (!temporary) {
@@ -234,7 +230,6 @@ class PushController extends ChangeNotifier {
         _pendingOwner = null;
         _latestRegistration = null;
         _opened.clear();
-        _presented.clear();
         _obsolete.clear();
         _saved = null;
         _restoredKey = null;
@@ -510,7 +505,6 @@ class PushController extends ChangeNotifier {
     enabled = false;
     pending = null;
     _latestRegistration = null;
-    foreground = null;
     pendingOpen = null;
     final tombstone = PushRecord(
       _origin,
@@ -551,7 +545,6 @@ class PushController extends ChangeNotifier {
     _scope.cancel();
     _scope = RequestCancellation();
     busy = false;
-    foreground = null;
     _notify();
   }
 
@@ -581,27 +574,6 @@ class PushController extends ChangeNotifier {
         _notify();
       }
     });
-  }
-
-  void _receive(PushIntent intent) {
-    if (!active || !enabled || !configured || !_presented.add(intent.id)) {
-      return;
-    }
-    if (_presented.length > 128) _presented.remove(_presented.first);
-    foreground = intent;
-    _notify();
-  }
-
-  void dismiss() {
-    foreground = null;
-    _notify();
-  }
-
-  void openForeground() {
-    final intent = foreground;
-    foreground = null;
-    if (intent != null) _open(intent);
-    _notify();
   }
 
   void _open(PushIntent intent) {
@@ -656,7 +628,6 @@ class PushController extends ChangeNotifier {
     if (!_alive(epoch)) return null;
     pendingOpen = null;
     _pendingOwner = null;
-    foreground = null;
     _notify();
     return intent;
   }
@@ -678,7 +649,6 @@ class PushController extends ChangeNotifier {
     session.removeListener(_sessionChanged);
     _languageChanges?.removeListener(_languageChanged);
     pending = null;
-    foreground = null;
     pendingOpen = null;
     super.dispose();
   }

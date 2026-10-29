@@ -180,6 +180,16 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('main-tab-matches')));
       await tester.pumpAndSettle();
+      final toggle = find.byKey(const Key('matches-credits-toggle'));
+      await tester.scrollUntilVisible(
+        toggle,
+        200,
+        scrollable: verticalScrollables.first,
+      );
+      await tester.ensureVisible(toggle);
+      await tester.pumpAndSettle();
+      await tester.tap(toggle);
+      await tester.pumpAndSettle();
       await tester.scrollUntilVisible(
         find.byKey(const Key('free-credits-remaining')),
         200,
@@ -278,6 +288,16 @@ void main() {
       expect(find.text('Premium'), findsOneWidget);
       premium = true;
       await tester.tap(find.byKey(const Key('main-tab-matches')));
+      await tester.pumpAndSettle();
+      final toggle = find.byKey(const Key('matches-credits-toggle'));
+      await tester.scrollUntilVisible(
+        toggle,
+        200,
+        scrollable: verticalScrollables.first,
+      );
+      await tester.ensureVisible(toggle);
+      await tester.pumpAndSettle();
+      await tester.tap(toggle);
       await tester.pumpAndSettle();
       await tester.tap(find.byTooltip('Actualiser les rencontres'));
       await tester.pumpAndSettle();

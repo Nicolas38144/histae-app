@@ -123,9 +123,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
         actions: [
           HistaeButton.text(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(
-              AppStrings.of(context).messages.notificationOverlayLater,
-            ),
+            child: Text(AppStrings.of(context).messages.appStringsCancel),
           ),
           HistaeButton(
             onPressed: () => Navigator.pop(context, true),

@@ -22,13 +22,6 @@ class AppMessagesIt extends AppMessages {
   String get mainNavigationBarProfile => 'Profilo';
 
   @override
-  String get notificationOverlayAHistaeUpdateIsAvailable =>
-      'È disponibile un aggiornamento di Histae.';
-
-  @override
-  String get notificationOverlayLater => 'Più tardi';
-
-  @override
   String get welcomePageAnotherWayToMeet => 'PRIMA, UNA CONVERSAZIONE';
 
   @override
@@ -3002,9 +2995,6 @@ class AppMessagesIt extends AppMessages {
   @override
   String get iosLocalNetworkPermission =>
       'Durante lo sviluppo, Histae si connette al server di test sulla rete locale.';
-
-  @override
-  String get viewNotification => 'Consulta';
 
   @override
   String get profileAtYourPace => 'Con i vostri tempi.';

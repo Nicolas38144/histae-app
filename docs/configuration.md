@@ -82,6 +82,9 @@ from the same public fields for cold-start delivery.
 Set `PUSH_ENABLED=true` only with a complete configuration for the target platform. The user must
 still enable notifications, grant native permission and register the device with the API.
 The device-management screen remains available when push is disabled.
+Push alerts are for background delivery only. No foreground banner, sound or automatic
+navigation is added while the app is open; messages and unread counters use the realtime channel.
+Tapping an OS notification still opens its authorized destination.
 
 Provider sending credentials are configured separately on the API and worker. iOS also needs its
 APNs, signing and native capabilities checked on macOS. Public options alone do not prove delivery.

@@ -4,8 +4,6 @@
   "mainNavigationBarFeed": "Feed",
   "mainNavigationBarMatches": "Match",
   "mainNavigationBarProfile": "Profilo",
-  "notificationOverlayAHistaeUpdateIsAvailable": "È disponibile un aggiornamento di Histae.",
-  "notificationOverlayLater": "Più tardi",
   "welcomePageAnotherWayToMeet": "PRIMA, UNA CONVERSAZIONE",
   "welcomePageTimeReciprocityConsent": "Con i vostri tempi. Sempre in due.",
   "appStringsGoodToSeeYouAgain": "Felici di ritrovarti.",
@@ -800,7 +798,6 @@
   "iosLocationPermission": "Histae usa una rilevazione singola per proporre incontri nelle vicinanze. La posizione esatta resta privata, senza tracciamento in background.",
   "iosPhotoPermission": "Scegli la tua unica foto profilo Histae. Verrà svelata solo dopo il consenso reciproco.",
   "iosLocalNetworkPermission": "Durante lo sviluppo, Histae si connette al server di test sulla rete locale.",
-  "viewNotification": "Consulta",
   "profileAtYourPace": "Con i vostri tempi.",
   "@profileAtYourPace": {
     "description": "Friendly interface copy for the profile or matches screen."

@@ -46,7 +46,7 @@ class _MatchesPageState extends State<MatchesPage> {
   final _search = TextEditingController();
 
   bool get _loading =>
-      _overviewLoads > 0 || c.listLoading || c.continuation.loading;
+      _overviewLoads > 0 || c.showLoading || c.continuation.loading;
 
   @override
   void initState() {
@@ -183,6 +183,7 @@ class _MatchesPageState extends State<MatchesPage> {
     match: match,
     ownerId: c.ownerId,
     photoReadAt: c.readAt,
+    refreshPhotoAccess: c.refreshPhotos,
     photosAllowed: c.active && c.listVerified && !c.photosBlocked(match.id),
     onTap: _opening ? null : () => _open(match.id),
   );
@@ -236,6 +237,17 @@ class _MatchesPageState extends State<MatchesPage> {
         body: SafeArea(
           child: Column(
             children: [
+              SizedBox(
+                height: 3,
+                child: _loading
+                    ? LinearProgressIndicator(
+                        key: Key('matches-loading'),
+                        semanticsLabel: AppStrings.of(context)
+                            .messages
+                            .matchesPageRefreshingMatchesAndCredits,
+                      )
+                    : null,
+              ),
               if (list.hasMatches)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
@@ -261,17 +273,6 @@ class _MatchesPageState extends State<MatchesPage> {
                     ),
                   ),
                 ),
-              SizedBox(
-                height: 3,
-                child: _loading
-                    ? LinearProgressIndicator(
-                        key: Key('matches-loading'),
-                        semanticsLabel: AppStrings.of(context)
-                            .messages
-                            .matchesPageRefreshingMatchesAndCredits,
-                      )
-                    : null,
-              ),
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: _refresh,
@@ -289,14 +290,6 @@ class _MatchesPageState extends State<MatchesPage> {
                               .messages
                               .matchesEmptyTitle,
                         ),
-                      if (query.isEmpty)
-                        ContinuationBalanceCard(
-                          onOpenSubscription: _openSubscription,
-                          controller: c.continuation,
-                          onOpenCredits: _openCredits,
-                          loading: _overviewLoads > 0,
-                        ),
-                      const SizedBox(height: 16),
                       if (query.isNotEmpty && c.listCursor != null)
                         Padding(
                           padding: const EdgeInsets.only(bottom: 16),
@@ -336,7 +329,11 @@ class _MatchesPageState extends State<MatchesPage> {
                       for (final match in list.current) _matchCard(match),
                       if (list.archived.isNotEmpty)
                         ExpansionTile(
-                          key: ValueKey(('matches-archives', query.isNotEmpty)),
+                          key: PageStorageKey((
+                            'matches-archives',
+                            _key,
+                            query.isNotEmpty,
+                          )),
                           initiallyExpanded: query.isNotEmpty,
                           title: Text(
                             AppStrings.of(context)
@@ -364,6 +361,16 @@ class _MatchesPageState extends State<MatchesPage> {
                                 .matchesPageViewMoreMatches,
                           ),
                         ),
+                      if (query.isEmpty) ...[
+                        const SizedBox(height: 16),
+                        ContinuationBalanceCard(
+                          key: ValueKey(('matches-credits', _key)),
+                          onOpenSubscription: _openSubscription,
+                          controller: c.continuation,
+                          onOpenCredits: _openCredits,
+                          loading: _overviewLoads > 0,
+                        ),
+                      ],
                     ],
                   ),
                 ),

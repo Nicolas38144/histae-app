@@ -218,6 +218,9 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const Key('matches-credits-toggle')));
+    await tester.tap(find.byKey(const Key('matches-credits-toggle')));
+    await tester.pumpAndSettle();
     await tester.ensureVisible(find.byKey(const Key('open-videos')));
     await tester.pumpAndSettle();
     await capture('$_output/free-exhausted.png');

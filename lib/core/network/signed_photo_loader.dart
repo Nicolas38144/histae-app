@@ -8,7 +8,27 @@ import 'api_failure.dart';
 typedef PhotoClientFactory = http.Client Function();
 
 // The API signs private photos for 60 seconds; leave a margin for download time.
+// This bounds URL use, not the lifetime of already authorized in-memory bytes.
 const privatePhotoLifetime = Duration(seconds: 50);
+
+/// S3 renews signatures for the same immutable object. Preserve other query
+/// parameters (such as versionId), the origin and path so replacements reload.
+String signedPhotoResource(String value) {
+  final uri = Uri.parse(value);
+  final query = Map<String, List<String>>.from(uri.queryParametersAll)
+    ..removeWhere(
+      (key, _) => const {
+        'x-amz-algorithm',
+        'x-amz-credential',
+        'x-amz-date',
+        'x-amz-expires',
+        'x-amz-signedheaders',
+        'x-amz-signature',
+        'x-amz-security-token',
+      }.contains(key.toLowerCase()),
+    );
+  return uri.replace(queryParameters: query).toString();
+}
 
 /// Downloads a signed storage resource without authentication headers, redirects,
 /// persistence or logging. Authorization to reveal it belongs to the caller.

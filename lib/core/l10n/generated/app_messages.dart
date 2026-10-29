@@ -126,18 +126,6 @@ abstract class AppMessages {
   /// **'Profil'**
   String get mainNavigationBarProfile;
 
-  /// Interface: lib/app/notification_overlay.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Une mise à jour Histae est disponible.'**
-  String get notificationOverlayAHistaeUpdateIsAvailable;
-
-  /// Interface: lib/app/notification_overlay.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Plus tard'**
-  String get notificationOverlayLater;
-
   /// Interface: lib/app/welcome_page.dart
   ///
   /// In fr, this message translates to:
@@ -4909,12 +4897,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'En développement, Histae se connecte au serveur de test sur votre réseau local.'**
   String get iosLocalNetworkPermission;
-
-  /// Open the foreground notification
-  ///
-  /// In fr, this message translates to:
-  /// **'Consulter'**
-  String get viewNotification;
 
   /// Friendly interface copy for the profile or matches screen.
   ///

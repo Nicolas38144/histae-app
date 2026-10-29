@@ -17,7 +17,10 @@ import '../test/support/continuation_fixture.dart';
 import '../test/support/discovery_fixture.dart';
 import '../test/support/matches_fixture.dart';
 
-const _output = 'build/previews/refactor';
+const _output = String.fromEnvironment(
+  'REFACTOR_PREVIEW_OUTPUT',
+  defaultValue: 'build/previews/refactor',
+);
 const _boundary = Key('refactor-preview');
 const _biography =
     'Je suis le genre de personne qui entre dans une librairie pour cinq minutes '
@@ -84,7 +87,7 @@ void main() {
         'inactivity_expires_at': clock
             .add(Duration(days: archived ? 6 : 29))
             .toIso8601String(),
-        'unread_count': 0,
+        'unread_count': archived ? 0 : 2,
         'other_user': candidateJson(
           archived ? candidateTwo : candidateOne,
           name: archived ? 'Camille' : 'Léa',
@@ -199,6 +202,12 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('main-tab-matches')));
       await tester.pumpAndSettle();
       await _capture(tester, 'matches');
+      final creditsToggle = find.byKey(const Key('matches-credits-toggle'));
+      await tester.tap(creditsToggle);
+      await tester.pumpAndSettle();
+      await _capture(tester, 'matches-credits');
+      await tester.tap(creditsToggle);
+      await tester.pumpAndSettle();
       expect(find.text('Archivage et suppression'), findsNothing);
       await tester.tap(find.byKey(const Key('matches-archives')));
       await tester.pumpAndSettle();

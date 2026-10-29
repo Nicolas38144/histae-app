@@ -60,12 +60,10 @@ void main() {
       })!;
       gateway.foreground.add(valid);
       await tester.pumpAndSettle();
-      expect(
-        find.text('Une mise à jour Histae est disponible.'),
-        findsOneWidget,
-      );
+      expect(find.text('Une mise à jour Histae est disponible.'), findsNothing);
       expect(find.textContaining('PRIVATE REMOTE'), findsNothing);
-      await tester.tap(find.text('Consulter'));
+      expect(find.byType(ChatPage), findsNothing);
+      gateway.taps.add(valid);
       await tester.pumpAndSettle();
       expect(find.byType(ChatPage), findsOneWidget);
       expect(paths.any((p) => p.contains('/$testMatch/messages')), isTrue);

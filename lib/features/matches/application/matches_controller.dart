@@ -149,6 +149,10 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       historyLoading = false,
       sending = false,
       reading = false;
+  bool _backgroundRead = false;
+
+  /// Server events update existing content without interrupting the editor.
+  bool get showLoading => historyLoading || (listLoading && !_backgroundRead);
   @override
   bool ending = false;
   bool realtimeConnected = false;
@@ -375,7 +379,8 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       _verified = false;
       _listVerified = false;
       _notify();
-    } else if (signal.type != 'message.read') {
+    } else if (signal.type != 'message.read' &&
+        signal.type != 'message.created') {
       _verified = false;
       _listVerified = false;
       _notify();
@@ -392,7 +397,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     _debounce?.cancel();
     _debounce = Timer(
       const Duration(milliseconds: 180),
-      () => unawaited(refresh()),
+      () => unawaited(_read(ReadPolicy.refresh, background: true)),
     );
   }
 
@@ -418,14 +423,17 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   @override
   Future<void> refresh() => _read(ReadPolicy.refresh);
 
-  Future<void> _read(ReadPolicy policy) {
+  @override
+  Future<void> refreshPhotos() => _read(ReadPolicy.refresh, background: true);
+
+  Future<void> _read(ReadPolicy policy, {bool background = false}) {
     if (_sync case final pending?) return pending;
     if (!active || retrySeconds > 0) return Future.value();
     if (listLoading || historyLoading) {
       _dirty = true;
       return Future.value();
     }
-    final task = _refresh(policy);
+    final task = _refresh(policy, background: background);
     _sync = task;
     return task.whenComplete(() {
       if (identical(_sync, task)) _sync = null;
@@ -436,15 +444,18 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     });
   }
 
-  Future<void> _refresh(ReadPolicy policy) async {
+  Future<void> _refresh(ReadPolicy policy, {required bool background}) async {
     final epoch = _epoch, chatEpoch = _chatEpoch;
     final languageRevision = session.localizationRevision;
     final target = selectedId;
     final scope = _scope;
     listLoading = true;
+    _backgroundRead = background;
     failure = null;
-    _verified = false;
-    _listVerified = false;
+    if (!background) {
+      _verified = false;
+      _listVerified = false;
+    }
     _listRevision++;
     _notify();
     try {
@@ -513,6 +524,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     } finally {
       if (_alive(epoch)) {
         listLoading = false;
+        _backgroundRead = false;
         _notify();
       }
     }
@@ -525,6 +537,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     ReadPolicy policy,
   ) async {
     final result = <ChatMessage>[];
+    final originalIds = _messages.map((message) => message.id).toSet();
     final seen = <String>{}, cursors = <String>{};
     String? cursor;
     final scope = _chatScope;
@@ -547,9 +560,19 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
         }
       }
       if (!_chatAlive(epoch, chatEpoch, match.id)) return;
+      // The editor remains usable during a background read. A successful send
+      // may finish after the server took its history snapshot.
+      final sentDuringRead = _messages
+          .where(
+            (message) =>
+                message.senderId == ownerId &&
+                !originalIds.contains(message.id) &&
+                !seen.contains(message.id),
+          )
+          .toList();
       _messages
         ..clear()
-        ..addAll(result);
+        ..addAll([...sentDuringRead, ...result]);
       messageCursor = cursor;
       _verified = true;
       chatFailure = null;

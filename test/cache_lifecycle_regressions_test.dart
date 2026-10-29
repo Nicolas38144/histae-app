@@ -285,65 +285,59 @@ void main() {
     },
   );
 
-  testWidgets('partner photo is purged at its original read deadline', (
-    tester,
-  ) async {
-    final session = testSession((r) async {
-      if (r.url.path == '/api/matches/me') {
-        return jsonResponse({
-          'matches': [
-            {
-              ...publicMatchJson(),
-              'photos_revealed': true,
-              'other_user': {
-                ...(publicMatchJson()['other_user'] as Map),
-                'photo': 'https://photos.example/synthetic',
+  testWidgets(
+    'signed URL expiry does not remove already authorized photo bytes',
+    (tester) async {
+      final session = testSession((r) async {
+        if (r.url.path == '/api/matches/me') {
+          return jsonResponse({
+            'matches': [
+              {
+                ...publicMatchJson(),
+                'photos_revealed': true,
+                'other_user': {
+                  ...(publicMatchJson()['other_user'] as Map),
+                  'photo': 'https://photos.example/synthetic',
+                },
               },
-            },
-          ],
-          'next_cursor': null,
-        });
-      }
-      return defaultMatchesResponse(r);
-    });
-    await session.establish(testTokens);
-    final c = MatchesController(
-      MatchesRepository(session),
-      realtime: QuietRealtime(session),
-    );
-    await c.activate();
-    await c.openChat(testMatch);
-    const remaining = Duration(seconds: 2);
-    c.readAt = DateTime.now().toUtc().subtract(
-      privatePhotoLifetime - remaining,
-    );
-    final png = base64Decode(
-      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aL1sAAAAASUVORK5CYII=',
-    );
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: histaeTheme(Brightness.dark),
-        home: PartnerPhotoPage(
-          access: c,
-          matchId: testMatch,
-          photoClient: () =>
-              MockClient((_) async => http.Response.bytes(png, 200)),
+            ],
+            'next_cursor': null,
+          });
+        }
+        return defaultMatchesResponse(r);
+      });
+      await session.establish(testTokens);
+      final c = MatchesController(
+        MatchesRepository(session),
+        realtime: QuietRealtime(session),
+      );
+      await c.activate();
+      await c.openChat(testMatch);
+      final png = base64Decode(
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aL1sAAAAASUVORK5CYII=',
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: histaeTheme(Brightness.dark),
+          home: PartnerPhotoPage(
+            access: c,
+            matchId: testMatch,
+            photoClient: () =>
+                MockClient((_) async => http.Response.bytes(png, 200)),
+          ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
-    expect(find.byType(Image), findsOneWidget);
-    await tester.runAsync(
-      () => Future<void>.delayed(remaining + const Duration(milliseconds: 100)),
-    );
-    await tester.pump();
-    final expired =
-        DateTime.now().toUtc().difference(c.readAt!) >= privatePhotoLifetime;
-    expect(expired, isTrue);
-    await tester.pump(remaining + const Duration(milliseconds: 100));
-    expect(find.byType(Image), findsNothing);
-    await tester.pumpWidget(const SizedBox());
-    c.dispose();
-    session.dispose();
-  });
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(Image), findsOneWidget);
+      c.readAt = DateTime.now().toUtc().subtract(privatePhotoLifetime);
+      await tester.pump(const Duration(minutes: 1));
+      expect(find.byType(Image), findsOneWidget);
+      c.blockPhotos(testMatch);
+      await tester.pump();
+      expect(find.byType(Image), findsNothing);
+      await tester.pumpWidget(const SizedBox());
+      c.dispose();
+      session.dispose();
+    },
+  );
 }

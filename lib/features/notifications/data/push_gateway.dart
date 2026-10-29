@@ -31,8 +31,6 @@ abstract interface class PushGateway {
 
   Stream<String> get registrations;
 
-  Stream<PushIntent> get received;
-
   Stream<PushIntent> get opened;
 
   Future<PushIntent?> initial();
@@ -161,9 +159,6 @@ class FirebasePushGateway implements PushGateway {
       .map((m) => PushIntent.parse(m.data))
       .where((i) => i != null)
       .cast<PushIntent>();
-
-  @override
-  Stream<PushIntent> get received => _map(FirebaseMessaging.onMessage);
 
   @override
   Stream<PushIntent> get opened => _map(FirebaseMessaging.onMessageOpenedApp);

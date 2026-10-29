@@ -22,7 +22,6 @@ import '../features/reading/presentation/reading_scope.dart';
 import 'account_language_binding.dart';
 import 'app_opening.dart';
 import 'notification_navigation.dart';
-import 'notification_overlay.dart';
 import 'session_gate.dart';
 import 'session_repositories.dart';
 import 'theme.dart';
@@ -188,10 +187,7 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
                       controller: widget.pushController,
                       child: HelpScope(
                         controller: widget.helpController,
-                        child: NotificationOverlay(
-                          controller: widget.pushController,
-                          child: child!,
-                        ),
+                        child: child!,
                       ),
                     ),
                   ),

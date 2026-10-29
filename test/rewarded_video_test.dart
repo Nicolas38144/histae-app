@@ -275,6 +275,18 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(find.byKey(Key('main-tab-$entry')));
         await tester.pumpAndSettle();
+        if (entry == 'matches') {
+          final toggle = find.byKey(const Key('matches-credits-toggle'));
+          await tester.scrollUntilVisible(
+            toggle,
+            200,
+            scrollable: verticalScrollables.first,
+          );
+          await tester.ensureVisible(toggle);
+          await tester.pumpAndSettle();
+          await tester.tap(toggle);
+          await tester.pumpAndSettle();
+        }
         final openCredits = entry == 'matches'
             ? find.byKey(const Key('open-videos'))
             : find.text('Mes crédits');
