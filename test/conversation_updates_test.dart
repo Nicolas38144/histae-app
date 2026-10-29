@@ -197,7 +197,7 @@ void main() {
   );
 
   testWidgets(
-    'unread count is a small bottom-right badge and disappears at zero',
+    'unread count sits directly below the arrow and disappears at zero',
     (tester) async {
       Widget card(int unread) => localized(
         Scaffold(
@@ -223,8 +223,10 @@ void main() {
       );
       final bounds = tester.getRect(find.byType(MatchPreviewCard));
       final number = tester.getRect(badge);
+      final arrow = tester.getRect(find.byIcon(Icons.arrow_forward_rounded));
       expect(number.center.dx, greaterThan(bounds.center.dx));
-      expect(number.center.dy, greaterThan(bounds.center.dy));
+      expect(number.center.dx, closeTo(arrow.center.dx, .1));
+      expect(number.top - arrow.bottom, closeTo(6, .1));
       await tester.pumpWidget(card(0));
       expect(badge, findsNothing);
     },

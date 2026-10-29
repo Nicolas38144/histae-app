@@ -72,10 +72,47 @@ class MatchPreviewCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Icon(
-                    Icons.arrow_forward_rounded,
-                    size: 19,
-                    color: colors.onSurfaceVariant,
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        size: 19,
+                        color: colors.onSurfaceVariant,
+                      ),
+                      if (match.unreadCount > 0) ...[
+                        const SizedBox(height: 6),
+                        Semantics(
+                          label: AppStrings.of(context).messages
+                              .unreadMessages(match.unreadCount),
+                          child: ExcludeSemantics(
+                            child: Container(
+                              key: ValueKey('match-unread-${match.id}'),
+                              constraints: const BoxConstraints(
+                                minWidth: 24,
+                                minHeight: 24,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 7,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: colors.primary,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                '${match.unreadCount}',
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: colors.onPrimary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ],
               ),
@@ -95,42 +132,6 @@ class MatchPreviewCard extends StatelessWidget {
                   ),
                 ),
               ],
-              if (match.unreadCount > 0)
-                Padding(
-                  padding: const EdgeInsets.only(top: 14),
-                  child: Align(
-                    alignment: Alignment.bottomRight,
-                    child: Semantics(
-                      label: AppStrings.of(context).messages
-                          .unreadMessages(match.unreadCount),
-                      child: ExcludeSemantics(
-                        child: Container(
-                          key: ValueKey('match-unread-${match.id}'),
-                          constraints: const BoxConstraints(
-                            minWidth: 24,
-                            minHeight: 24,
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 7,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: colors.primary,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            '${match.unreadCount}',
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: colors.onPrimary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
             ],
           ),
         ),
