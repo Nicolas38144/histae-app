@@ -243,11 +243,25 @@ void main() {
           )
           .first;
       await tester.scrollUntilVisible(
+        find.byKey(const Key('help-child-safety')),
+        200,
+        scrollable: helpScroller,
+      );
+      expect(
+        find.byKey(const Key('help-child-safety-standards')),
+        findsNothing,
+      );
+      await tester.tap(find.byKey(const Key('help-child-safety')));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
         find.byKey(const Key('help-child-safety-standards')),
         200,
         scrollable: helpScroller,
       );
-      expect(find.text('Normes de sécurité des enfants'), findsOneWidget);
+      expect(
+        find.text('Consultez nos normes de sécurité des enfants.'),
+        findsOneWidget,
+      );
       await tester.scrollUntilVisible(
         find.text('support@example.test'),
         200,

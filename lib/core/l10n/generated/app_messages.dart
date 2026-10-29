@@ -5951,7 +5951,7 @@ abstract class AppMessages {
   /// Child-safety reporting guidance and public standards link.
   ///
   /// In fr, this message translates to:
-  /// **'Normes de sécurité des enfants'**
+  /// **'Consultez nos normes de sécurité des enfants.'**
   String get helpChildSafetyStandards;
 
   /// Child-safety reporting guidance and public standards link.

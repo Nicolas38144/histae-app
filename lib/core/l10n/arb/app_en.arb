@@ -1105,7 +1105,7 @@
   },
   "helpChildSafetyQuestion": "A minor or an exploitation concern on Histae?",
   "helpChildSafetyAnswer": "Histae is for people aged 18 and over. In a profile or conversation menu, choose “Report this person”, then “Other reason” and describe what happened. You can also block the person or contact support below. Do not send explicit images or videos or forward such content. In immediate danger, contact emergency services without waiting for support.",
-  "helpChildSafetyStandards": "Child safety standards",
+  "helpChildSafetyStandards": "Read our child safety standards.",
   "helpLinkFailed": "The link could not be opened. Try again from the Histae website.",
   "reportChildSafetyHint": "Suspected minor or exploitation concern? Choose “Other reason” and describe what happened below. Do not copy explicit sexual content or try to collect copies of it."
 }

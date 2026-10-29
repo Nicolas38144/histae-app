@@ -3584,7 +3584,7 @@ class AppMessagesEn extends AppMessages {
       'Histae is for people aged 18 and over. In a profile or conversation menu, choose “Report this person”, then “Other reason” and describe what happened. You can also block the person or contact support below. Do not send explicit images or videos or forward such content. In immediate danger, contact emergency services without waiting for support.';
 
   @override
-  String get helpChildSafetyStandards => 'Child safety standards';
+  String get helpChildSafetyStandards => 'Read our child safety standards.';
 
   @override
   String get helpLinkFailed =>

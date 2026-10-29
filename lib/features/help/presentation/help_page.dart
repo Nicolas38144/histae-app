@@ -88,38 +88,65 @@ class _HelpPageState extends State<HelpPage> {
             ),
             const SizedBox(height: 20),
             for (final entry in [
-              (text.helpFeedQuestion, text.helpFeedAnswer),
-              (text.helpPhotoQuestion, text.helpPhotoAnswer),
-              (text.matchesInactivityInfo, text.matchesInactivityPolicy),
-              (text.helpCreditsQuestion, text.helpCreditsAnswer),
-              (text.helpPurchasesQuestion, text.helpPurchasesAnswer),
-              (text.helpRestoreQuestion, text.helpRestoreAnswer),
-              (text.helpDraftsQuestion, text.helpDraftsAnswer),
-              (text.helpSafetyQuestion, text.helpSafetyAnswer),
-              (text.helpChildSafetyQuestion, text.helpChildSafetyAnswer),
+              (text.helpFeedQuestion, text.helpFeedAnswer, false),
+              (text.helpPhotoQuestion, text.helpPhotoAnswer, false),
+              (text.matchesInactivityInfo, text.matchesInactivityPolicy, false),
+              (text.helpCreditsQuestion, text.helpCreditsAnswer, false),
+              (text.helpPurchasesQuestion, text.helpPurchasesAnswer, false),
+              (text.helpRestoreQuestion, text.helpRestoreAnswer, false),
+              (text.helpDraftsQuestion, text.helpDraftsAnswer, false),
+              (text.helpSafetyQuestion, text.helpSafetyAnswer, false),
+              (text.helpChildSafetyQuestion, text.helpChildSafetyAnswer, true),
             ])
               Card(
                 child: ExpansionTile(
+                  key: entry.$3 ? const Key('help-child-safety') : null,
                   title: Text(entry.$1),
                   childrenPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                   children: [
                     Align(
                       alignment: Alignment.centerLeft,
-                      child: Text(entry.$2),
+                      child: entry.$3 && standards != null
+                          ? Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(text: '${entry.$2} '),
+                                  WidgetSpan(
+                                    alignment: PlaceholderAlignment.baseline,
+                                    baseline: TextBaseline.alphabetic,
+                                    child: Semantics(
+                                      link: true,
+                                      child: InkWell(
+                                        key: const Key(
+                                          'help-child-safety-standards',
+                                        ),
+                                        onTap: _launching
+                                            ? null
+                                            : () => _openStandards(standards),
+                                        child: Text(
+                                          text.helpChildSafetyStandards,
+                                          style: DefaultTextStyle.of(context)
+                                              .style
+                                              .copyWith(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .primary,
+                                                decoration:
+                                                    TextDecoration.underline,
+                                              ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : Text(entry.$2),
                     ),
+                    if (entry.$3 && _linkFailed) Text(text.helpLinkFailed),
                   ],
                 ),
               ),
-            if (standards != null) ...[
-              const SizedBox(height: 20),
-              HistaeButton.outlinedIcon(
-                key: const Key('help-child-safety-standards'),
-                onPressed: _launching ? null : () => _openStandards(standards),
-                icon: const Icon(Icons.policy_outlined),
-                label: Text(text.helpChildSafetyStandards),
-              ),
-            ],
-            if (_linkFailed) Text(text.helpLinkFailed),
             const SizedBox(height: 24),
             Text(
               text.helpContactTitle,
