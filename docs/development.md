@@ -56,6 +56,8 @@ Do not hand-edit generated Dart messages. When changing native permission copy, 
 ## Visual previews
 
 `tool/preview_*_test.dart` renders real widgets with synthetic content under `build/previews/`.
+`tool/preview_help_test.dart` renders the actual child-safety answer and inline link using only
+the local public support configuration, with no provider calls. Set `FLUTTER_ROOT` for its fonts.
 For example:
 
 ```bash

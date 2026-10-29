@@ -6,6 +6,7 @@ import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import 'feed_guide.dart';
 import 'help_scope.dart';
+import 'linked_help_answer.dart';
 
 class HelpPage extends StatefulWidget {
   const HelpPage({super.key});
@@ -107,39 +108,13 @@ class _HelpPageState extends State<HelpPage> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: entry.$3 && standards != null
-                          ? Text.rich(
-                              TextSpan(
-                                children: [
-                                  TextSpan(text: '${entry.$2} '),
-                                  WidgetSpan(
-                                    alignment: PlaceholderAlignment.baseline,
-                                    baseline: TextBaseline.alphabetic,
-                                    child: Semantics(
-                                      link: true,
-                                      child: InkWell(
-                                        key: const Key(
-                                          'help-child-safety-standards',
-                                        ),
-                                        onTap: _launching
-                                            ? null
-                                            : () => _openStandards(standards),
-                                        child: Text(
-                                          text.helpChildSafetyStandards,
-                                          style: DefaultTextStyle.of(context)
-                                              .style
-                                              .copyWith(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary,
-                                                decoration:
-                                                    TextDecoration.underline,
-                                              ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                          ? LinkedHelpAnswer(
+                              key: const Key('help-child-safety-standards'),
+                              body: entry.$2,
+                              linkLabel: text.helpChildSafetyStandards,
+                              onOpenLink: _launching
+                                  ? null
+                                  : () => _openStandards(standards),
                             )
                           : Text(entry.$2),
                     ),

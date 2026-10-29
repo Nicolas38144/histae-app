@@ -259,9 +259,26 @@ void main() {
         scrollable: helpScroller,
       );
       expect(
-        find.text('Consultez nos normes de sécurité des enfants.'),
+        find.textContaining('Consultez nos normes de sécurité des enfants.'),
         findsOneWidget,
       );
+      final linkedAnswer = tester.widget<Text>(
+        find.descendant(
+          of: find.byKey(const Key('help-child-safety-standards')),
+          matching: find.byType(Text),
+        ),
+      );
+      final bodyStyle = histaeTheme(Brightness.dark).textTheme.bodyMedium!;
+      final answerSpan = linkedAnswer.textSpan! as TextSpan;
+      expect(linkedAnswer.style?.fontSize, bodyStyle.fontSize);
+      expect(answerSpan.children!.whereType<WidgetSpan>(), isEmpty);
+      final linkSpan = answerSpan.children!.last as TextSpan;
+      expect(linkSpan.style?.fontSize, isNull);
+      expect(
+        linkSpan.style?.decorationColor,
+        histaeTheme(Brightness.dark).colorScheme.primary,
+      );
+      expect(linkSpan.recognizer, isNotNull);
       await tester.scrollUntilVisible(
         find.text('support@example.test'),
         200,
