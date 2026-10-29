@@ -33,6 +33,27 @@ class _GuideStore implements FeedGuideStore {
 }
 
 void main() {
+  test('support standards only use an optional public HTTPS origin', () {
+    final support = SupportConfig.fromValues({
+      'SUPPORT_EMAIL': 'support@example.test',
+      'SUPPORT_WEBSITE_URL': 'https://example.test',
+    });
+    expect(support.websiteOrigin, Uri.parse('https://example.test'));
+    expect(SupportConfig.fromValues({}).websiteOrigin, isNull);
+    for (final invalid in [
+      'http://example.test',
+      'https://user@example.test',
+      'https://example.test/private',
+      'https://example.test?token=secret',
+      'https://example.test/#private',
+    ]) {
+      expect(
+        () => SupportConfig.fromValues({'SUPPORT_WEBSITE_URL': invalid}),
+        throwsFormatException,
+      );
+    }
+  });
+
   testWidgets(
     'Monday invalidates last week quota without a navigation request',
     (tester) async {
@@ -173,7 +194,10 @@ void main() {
       addTearDown(profile.dispose);
       final store = _GuideStore();
       final help = HelpController(
-        SupportConfig.fromValues({'SUPPORT_EMAIL': 'support@example.test'}),
+        SupportConfig.fromValues({
+          'SUPPORT_EMAIL': 'support@example.test',
+          'SUPPORT_WEBSITE_URL': 'https://example.test',
+        }),
         store: store,
       );
       addTearDown(help.dispose);
@@ -218,6 +242,12 @@ void main() {
             matching: find.byType(Scrollable),
           )
           .first;
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('help-child-safety-standards')),
+        200,
+        scrollable: helpScroller,
+      );
+      expect(find.text('Normes de sécurité des enfants'), findsOneWidget);
       await tester.scrollUntilVisible(
         find.text('support@example.test'),
         200,

@@ -86,6 +86,11 @@ class _ReportPageState extends State<ReportPage> {
                   ),
                   const SizedBox(height: 24),
                   if (!c.submitted) ...[
+                    Text(
+                      AppStrings.of(context).messages.reportChildSafetyHint,
+                      key: const Key('report-child-safety-hint'),
+                    ),
+                    const SizedBox(height: 20),
                     PrivacyChoice<ReportReason>(
                       value: _reason,
                       label: AppStrings.of(context).messages.reportPageReason,

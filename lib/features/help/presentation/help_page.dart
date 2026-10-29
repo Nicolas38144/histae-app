@@ -15,7 +15,27 @@ class HelpPage extends StatefulWidget {
 }
 
 class _HelpPageState extends State<HelpPage> {
-  bool _launching = false, _failed = false;
+  bool _launching = false, _failed = false, _linkFailed = false;
+
+  Future<void> _openStandards(Uri uri) async {
+    if (_launching) return;
+    setState(() {
+      _launching = true;
+      _linkFailed = false;
+    });
+    var opened = false;
+    try {
+      opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      /* Keep the in-app safety guidance available. */
+    }
+    if (mounted) {
+      setState(() {
+        _launching = false;
+        _linkFailed = !opened;
+      });
+    }
+  }
 
   Future<void> _contact(String email) async {
     if (_launching) return;
@@ -47,7 +67,11 @@ class _HelpPageState extends State<HelpPage> {
   @override
   Widget build(BuildContext context) {
     final text = AppStrings.of(context).messages;
-    final email = HelpScope.maybeOf(context)?.support.email;
+    final support = HelpScope.maybeOf(context)?.support;
+    final email = support?.email;
+    final standards = support?.websiteOrigin?.resolve(
+      '/${AppStrings.of(context).localeName}/child-safety/',
+    );
     return HistaeScaffold(
       appBar: AppBar(title: Text(text.helpTitle)),
       body: SafeArea(
@@ -72,6 +96,7 @@ class _HelpPageState extends State<HelpPage> {
               (text.helpRestoreQuestion, text.helpRestoreAnswer),
               (text.helpDraftsQuestion, text.helpDraftsAnswer),
               (text.helpSafetyQuestion, text.helpSafetyAnswer),
+              (text.helpChildSafetyQuestion, text.helpChildSafetyAnswer),
             ])
               Card(
                 child: ExpansionTile(
@@ -85,6 +110,16 @@ class _HelpPageState extends State<HelpPage> {
                   ],
                 ),
               ),
+            if (standards != null) ...[
+              const SizedBox(height: 20),
+              HistaeButton.outlinedIcon(
+                key: const Key('help-child-safety-standards'),
+                onPressed: _launching ? null : () => _openStandards(standards),
+                icon: const Icon(Icons.policy_outlined),
+                label: Text(text.helpChildSafetyStandards),
+              ),
+            ],
+            if (_linkFailed) Text(text.helpLinkFailed),
             const SizedBox(height: 24),
             Text(
               text.helpContactTitle,
@@ -95,6 +130,7 @@ class _HelpPageState extends State<HelpPage> {
               Text(text.helpEmailComingSoon)
             else ...[
               SelectableText(email),
+              const SizedBox(height: 12),
               HistaeButton.icon(
                 onPressed: _launching ? null : () => _contact(email),
                 icon: const Icon(Icons.mail_outline),

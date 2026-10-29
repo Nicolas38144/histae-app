@@ -31,6 +31,7 @@ class AppConfig {
         ...PushConfig.keys,
         ...BillingConfig.keys,
         'SUPPORT_EMAIL',
+        'SUPPORT_WEBSITE_URL',
       },
     );
     return AppConfig.fromValues(

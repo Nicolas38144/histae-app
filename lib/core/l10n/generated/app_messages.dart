@@ -5935,6 +5935,36 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Aucune conversation archivée pour le moment.'**
   String get matchesArchivesEmpty;
+
+  /// Child-safety reporting guidance and public standards link.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un mineur ou une situation d’exploitation sur Histae ?'**
+  String get helpChildSafetyQuestion;
+
+  /// Child-safety reporting guidance and public standards link.
+  ///
+  /// In fr, this message translates to:
+  /// **'Histae est réservé aux personnes de 18 ans et plus. Depuis le menu d’un profil ou d’une conversation, choisissez « Signaler cette personne », puis « Autre motif » et décrivez les faits. Vous pouvez aussi bloquer la personne ou contacter le support ci-dessous. N’envoyez pas d’image ou de vidéo explicite et ne retransmettez pas ces contenus. En cas de danger immédiat, contactez les secours sans attendre une réponse du support.'**
+  String get helpChildSafetyAnswer;
+
+  /// Child-safety reporting guidance and public standards link.
+  ///
+  /// In fr, this message translates to:
+  /// **'Normes de sécurité des enfants'**
+  String get helpChildSafetyStandards;
+
+  /// Child-safety reporting guidance and public standards link.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le lien n’a pas pu être ouvert. Réessayez depuis le site Histae.'**
+  String get helpLinkFailed;
+
+  /// Child-safety reporting guidance and public standards link.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mineur présumé ou risque d’exploitation ? Choisissez « Autre motif » et décrivez les faits ci-dessous. Ne recopiez pas de contenu sexuel explicite et ne cherchez pas à en collecter des copies.'**
+  String get reportChildSafetyHint;
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

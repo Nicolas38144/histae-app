@@ -3611,4 +3611,23 @@ class AppMessagesEs extends AppMessages {
   @override
   String get matchesArchivesEmpty =>
       'Todavía no hay conversaciones archivadas.';
+
+  @override
+  String get helpChildSafetyQuestion =>
+      '¿Un menor o una posible situación de explotación en Histae?';
+
+  @override
+  String get helpChildSafetyAnswer =>
+      'Histae es para personas de 18 años o más. En el menú de un perfil o una conversación, elija la opción para denunciar a la persona, después “Otro motivo” y describa los hechos. También puede bloquearla o contactar con el soporte más abajo. No envíe imágenes o vídeos explícitos ni reenvíe esos contenidos. En caso de peligro inmediato, contacte con emergencias sin esperar al soporte.';
+
+  @override
+  String get helpChildSafetyStandards => 'Normas de seguridad infantil';
+
+  @override
+  String get helpLinkFailed =>
+      'No se ha podido abrir el enlace. Inténtelo desde el sitio web de Histae.';
+
+  @override
+  String get reportChildSafetyHint =>
+      '¿Sospecha que es menor o existe riesgo de explotación? Elija “Otro motivo” y describa los hechos. No copie contenido sexual explícito ni intente recopilar copias.';
 }

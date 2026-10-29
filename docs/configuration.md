@@ -26,11 +26,16 @@ Invalid or missing configuration shows the unavailable-service flow rather than 
 
 ```dotenv
 SUPPORT_EMAIL=support.histae@gmail.com
+SUPPORT_WEBSITE_URL=https://www.histae.com
 ```
 
 This public address appears in Help and contact and enables a button that opens the person's
 email app; nothing is sent automatically. An empty field shows the localized “Email address
 coming soon” fallback. No support backend or API change is required. Rebuild after changing the asset.
+
+`SUPPORT_WEBSITE_URL` is an optional HTTPS origin. It enables the localized public child-safety
+standards link in Help and contact. Safety reporting instructions remain available in the app
+even without that origin. It is public configuration, not a credential.
 
 ## Optional provider fields
 
