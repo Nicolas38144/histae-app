@@ -207,10 +207,12 @@ class MessagePage {
 
 String trimMessage(String value) => trimOuterWhitespace(value);
 
+const messageCharacterLimit = 2000;
+
 ClientMessage? validateMessage(String value) {
   final content = trimMessage(value);
   if (content.isEmpty) return ClientMessage.messageEmpty;
-  if (content.runes.length > 2000) {
+  if (content.runes.length > messageCharacterLimit) {
     return ClientMessage.messageTooLong;
   }
   return null;

@@ -18,6 +18,8 @@ import '../features/notifications/data/push_gateway.dart';
 import '../features/notifications/data/push_vault.dart';
 import '../features/reading/application/reading_controller.dart';
 import '../features/reading/data/reading_preferences_store.dart';
+import '../features/updates/application/store_update_controller.dart';
+import '../features/updates/data/store_update_gateway.dart';
 import 'session_repositories.dart';
 
 /// The composition root. Feature widgets receive scoped dependencies instead
@@ -32,6 +34,7 @@ class AppDependencies {
     this.repositories,
     this.help,
     this.reading,
+    this.updates,
   });
 
   factory AppDependencies.fromConfig(
@@ -54,6 +57,7 @@ class AppDependencies {
       draftVault: const SecureDraftVault(),
     );
     return AppDependencies(
+      updates: StoreUpdateController(NativeStoreUpdateGateway()),
       reading: ReadingController(store: const SecureReadingPreferencesStore()),
       help: HelpController(config.support, store: const SecureFeedGuideStore()),
       repositories: repositories,
@@ -64,6 +68,7 @@ class AppDependencies {
         devices,
         FirebasePushGateway(config.push),
         SecurePushVault(),
+        autoEnable: true,
         language: locale == null ? null : () => locale.apiLanguage,
         languageChanges: locale,
       ),
@@ -83,4 +88,5 @@ class AppDependencies {
   final RewardedVideoGateway? videos;
   final HelpController? help;
   final ReadingController? reading;
+  final StoreUpdateController? updates;
 }

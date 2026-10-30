@@ -19,6 +19,8 @@ import '../features/notifications/application/push_controller.dart';
 import '../features/notifications/presentation/push_scope.dart';
 import '../features/reading/application/reading_controller.dart';
 import '../features/reading/presentation/reading_scope.dart';
+import '../features/updates/application/store_update_controller.dart';
+import '../features/updates/presentation/store_update_gate.dart';
 import 'account_language_binding.dart';
 import 'app_opening.dart';
 import 'notification_navigation.dart';
@@ -39,6 +41,7 @@ class HistaeApp extends StatefulWidget {
     this.repositories,
     this.helpController,
     this.readingController,
+    this.updateController,
   });
   // Ownership is transferred to the app; requests close when it is disposed.
   final CatalogRepository? catalogRepository;
@@ -50,6 +53,7 @@ class HistaeApp extends StatefulWidget {
   final SessionRepositories? repositories;
   final HelpController? helpController;
   final ReadingController? readingController;
+  final StoreUpdateController? updateController;
 
   @override
   State<HistaeApp> createState() => _HistaeAppState();
@@ -70,6 +74,7 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    unawaited(widget.updateController?.check());
     unawaited(widget.helpController?.load());
     unawaited(_reading.load());
     widget.sessionController?.addListener(_sessionChanged);
@@ -130,12 +135,14 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
     }
     final push = widget.pushController;
     if (state == AppLifecycleState.resumed) {
+      widget.updateController?.setActive(true);
       if (push != null) unawaited(push.resume());
     } else if ([
       AppLifecycleState.paused,
       AppLifecycleState.hidden,
       AppLifecycleState.detached,
     ].contains(state)) {
+      widget.updateController?.setActive(false);
       push?.suspend();
     }
   }
@@ -154,6 +161,7 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
     _locale.dispose();
     widget.helpController?.dispose();
     _reading.dispose();
+    widget.updateController?.dispose();
     super.dispose();
   }
 
@@ -187,7 +195,10 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
                       controller: widget.pushController,
                       child: HelpScope(
                         controller: widget.helpController,
-                        child: child!,
+                        child: StoreUpdateGate(
+                          controller: widget.updateController,
+                          child: child!,
+                        ),
                       ),
                     ),
                   ),

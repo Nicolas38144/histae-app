@@ -411,11 +411,8 @@
   "chatPageResumeReadConfirmation": "Riprendi la conferma di lettura",
   "chatPageClosingStillNeedsConfirmationNoNew": "La chiusura resta da confermare. Nessun nuovo messaggio verrà inviato.",
   "chatPageResumeTheSameRequest": "Riprendi la stessa richiesta",
-  "chatPageThisMessageIsAwaitingConfirmationResuming": "Non è ancora stato possibile confermare l’invio. Riprendendo, verrà inviato lo stesso messaggio.",
   "chatPageSending": "Invio in corso…",
-  "chatPageResumeTheSameMessage": "Riprendi lo stesso invio",
   "chatPageYourMessage": "Il tuo messaggio",
-  "chatPage2000Characters": "{arg0} / 2000 caratteri",
   "conversationHeaderChooseWhatComesNext": "Scegli il seguito",
   "conversationHeaderConversationStatus": "Stato della conversazione",
   "conversationHeaderYourChoices": "Le tue scelte",
@@ -1104,5 +1101,11 @@
   "helpChildSafetyAnswer": "Histae è riservata alle persone di almeno 18 anni. Nel menu di un profilo o di una conversazione, scegliete l’opzione per segnalare la persona, poi “Altro motivo” e descrivete i fatti. Potete anche bloccarla o contattare l’assistenza qui sotto. Non inviate immagini o video espliciti e non inoltrate questi contenuti. In caso di pericolo immediato, contattate i soccorsi senza attendere l’assistenza.",
   "helpChildSafetyStandards": "Consultate le nostre norme sulla sicurezza dei minori.",
   "helpLinkFailed": "Non è stato possibile aprire il link. Riprovate dal sito Histae.",
-  "reportChildSafetyHint": "Sospettate un minore o un rischio di sfruttamento? Scegliete “Altro motivo” e descrivete i fatti. Non ricopiate contenuti sessuali espliciti e non cercate di raccoglierne copie."
+  "reportChildSafetyHint": "Sospettate un minore o un rischio di sfruttamento? Scegliete “Altro motivo” e descrivete i fatti. Non ricopiate contenuti sessuali espliciti e non cercate di raccoglierne copie.",
+  "chatPageMessageLimitReached": "Hai raggiunto il limite di 2000 caratteri.",
+  "storeUpdateTitle": "È disponibile un aggiornamento.",
+  "storeUpdateBody": "È disponibile una nuova versione di Histae. Aggiorna l’app per continuare.",
+  "storeUpdateOpen": "Apri lo store",
+  "storeUpdateCheck": "Controlla di nuovo",
+  "storeUpdateOpenFailed": "Impossibile aprire lo store. Riprova tra poco."
 }

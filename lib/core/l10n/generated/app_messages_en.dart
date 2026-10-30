@@ -1564,22 +1564,10 @@ class AppMessagesEn extends AppMessages {
   String get chatPageResumeTheSameRequest => 'Resume the same request';
 
   @override
-  String get chatPageThisMessageIsAwaitingConfirmationResuming =>
-      'We haven’t been able to confirm sending yet. Resuming will resend this same message.';
-
-  @override
   String get chatPageSending => 'Sending…';
 
   @override
-  String get chatPageResumeTheSameMessage => 'Resume the same message';
-
-  @override
   String get chatPageYourMessage => 'Your message';
-
-  @override
-  String chatPage2000Characters(Object arg0) {
-    return '$arg0 / 2,000 characters';
-  }
 
   @override
   String get conversationHeaderChooseWhatComesNext => 'Choose what comes next';
@@ -3583,4 +3571,24 @@ class AppMessagesEn extends AppMessages {
   @override
   String get reportChildSafetyHint =>
       'Suspected minor or exploitation concern? Choose “Other reason” and describe what happened below. Do not copy explicit sexual content or try to collect copies of it.';
+
+  @override
+  String get chatPageMessageLimitReached => '2,000-character limit reached.';
+
+  @override
+  String get storeUpdateTitle => 'An update is ready.';
+
+  @override
+  String get storeUpdateBody =>
+      'A new version of Histae is available. Update the app to continue.';
+
+  @override
+  String get storeUpdateOpen => 'Open the store';
+
+  @override
+  String get storeUpdateCheck => 'Check again';
+
+  @override
+  String get storeUpdateOpenFailed =>
+      'The store could not be opened. Please try again in a moment.';
 }

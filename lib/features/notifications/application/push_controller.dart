@@ -20,6 +20,7 @@ class PushController extends ChangeNotifier {
     this.gateway,
     this.vault, {
     Future<String?> Function()? appVersion,
+    this.autoEnable = false,
     this._language,
     Listenable? languageChanges,
   }) : _languageChanges = languageChanges,
@@ -65,6 +66,7 @@ class PushController extends ChangeNotifier {
   final PushGateway gateway;
   final PushVault vault;
   final Future<String?> Function() _appVersion;
+  final bool autoEnable;
 
   AuthenticatedSession get session => repository.session;
   final _subscriptions = <StreamSubscription<dynamic>>[];
@@ -78,6 +80,7 @@ class PushController extends ChangeNotifier {
   String? _key, _restoredKey, _latestRegistration;
   int _epoch = 0;
   bool _disposed = false, _started = false, _foreground = true;
+  bool _defaultPermissionPending = false;
   bool enabled = false, busy = false, coversMainFlow = false;
   PushPermission permission = PushPermission.unavailable;
   String? deviceId, notice;
@@ -94,7 +97,8 @@ class PushController extends ChangeNotifier {
 
   bool get configured => gateway.configured;
 
-  bool get stopping => _saved?.optedIn == false;
+  bool get stopping =>
+      _saved?.optedIn == false && (deviceId != null || failure != null);
 
   bool get accessible =>
       !_disposed &&
@@ -213,6 +217,7 @@ class PushController extends ChangeNotifier {
           session.phase == SessionPhase.unavailable &&
           (_key == newKey || _key == null);
       _epoch++;
+      _defaultPermissionPending = false;
       _scope.cancel();
       _scope = RequestCancellation();
       busy = false;
@@ -264,6 +269,7 @@ class PushController extends ChangeNotifier {
     _saved = saved;
     if (saved == null) {
       pendingOpen = null;
+      await _enableDefault(epoch);
       return;
     }
     if (saved.origin != _origin || saved.owner != session.identity!.userId) {
@@ -271,6 +277,7 @@ class PushController extends ChangeNotifier {
       if (configured) await gateway.disable();
       _saved = null;
       pendingOpen = null;
+      await _enableDefault(epoch);
       return;
     }
     if (!configured || !saved.optedIn) {
@@ -279,6 +286,10 @@ class PushController extends ChangeNotifier {
       return;
     }
     if (saved.deviceId == null) {
+      if (autoEnable) {
+        await _enable(epoch);
+        return;
+      }
       await gateway.disable();
       await vault.write(null);
       _saved = null;
@@ -295,9 +306,12 @@ class PushController extends ChangeNotifier {
     final devices = await repository.list(_scope);
     if (!_alive(epoch)) return;
     if (!devices.any((d) => d.id == saved.deviceId)) {
-      await vault.write(null);
+      final choice = autoEnable
+          ? PushRecord(_origin, session.identity!.userId, optedIn: false)
+          : null;
+      await vault.write(choice);
       await gateway.disable();
-      _saved = null;
+      _saved = choice;
       pendingOpen = null;
       notice = 'removed_elsewhere';
       _notify();
@@ -334,42 +348,61 @@ class PushController extends ChangeNotifier {
     final epoch = _epoch;
     busy = true;
     _notify();
-    await _enqueue(() async {
+    await _enqueue(() => _enable(epoch));
+  }
+
+  Future<void> _enableDefault(int epoch) async {
+    if (!autoEnable || !configured || !_alive(epoch)) return;
+    // Record the first attempt before presenting a system dialog. A refusal
+    // or interrupted prompt must not become a new prompt at every startup.
+    final choice = PushRecord(
+      _origin,
+      session.identity!.userId,
+      optedIn: false,
+    );
+    await vault.write(choice);
+    if (!_alive(epoch)) return;
+    _saved = choice;
+    _defaultPermissionPending = true;
+    await _enable(epoch);
+    if (_alive(epoch)) _defaultPermissionPending = false;
+  }
+
+  Future<void> _enable(int epoch, {bool request = true}) async {
+    if (!_alive(epoch)) return;
+    busy = true;
+    failure = null;
+    notice = null;
+    _notify();
+    try {
+      await _prepareGateway();
       if (!_alive(epoch)) return;
-      busy = true;
-      failure = null;
-      notice = null;
-      _notify();
-      try {
-        await _prepareGateway();
-        if (!_alive(epoch)) return;
-        permission = await gateway.permission(request: true);
-        if (!_alive(epoch)) return;
-        if (![
-          PushPermission.authorized,
-          PushPermission.provisional,
-        ].contains(permission)) {
-          if (enabled || pending != null) await _disable(epoch);
-          notice = 'permission_denied';
-          return;
-        }
-        await _persist(epoch);
-        if (!_alive(epoch)) return;
-        enabled = true;
-        if (pending != null) {
-          await _send(epoch);
-        } else {
-          await _newRegistration(epoch);
-        }
-      } catch (e) {
-        if (_alive(epoch)) _error(e);
-      } finally {
-        if (_alive(epoch)) {
-          busy = false;
-          _notify();
-        }
+      permission = await gateway.permission(request: request);
+      if (!_alive(epoch)) return;
+      if (![
+        PushPermission.authorized,
+        PushPermission.provisional,
+      ].contains(permission)) {
+        if (enabled || pending != null) await _disable(epoch);
+        notice = 'permission_denied';
+        return;
       }
-    });
+      await _persist(epoch);
+      if (!_alive(epoch)) return;
+      enabled = true;
+      if (pending != null) {
+        await _send(epoch);
+      } else {
+        await _newRegistration(epoch);
+      }
+    } catch (e) {
+      if (_alive(epoch)) _error(e);
+    } finally {
+      if (_alive(epoch)) {
+        busy = false;
+        _notify();
+      }
+    }
   }
 
   Future<void> _newRegistration(int epoch) async {
@@ -501,6 +534,7 @@ class PushController extends ChangeNotifier {
   }
 
   Future<void> _disable(int epoch) async {
+    _defaultPermissionPending = false;
     final id = deviceId;
     enabled = false;
     pending = null;
@@ -525,10 +559,14 @@ class PushController extends ChangeNotifier {
       }
     }
     if (_alive(epoch)) {
-      await vault.write(null);
+      final choice = autoEnable
+          ? PushRecord(_origin, session.identity!.userId, optedIn: false)
+          : null;
+      await vault.write(choice);
       if (!_alive(epoch)) return;
-      _saved = null;
+      _saved = choice;
       deviceId = null;
+      failure = null;
       notice = 'disabled';
       _notify();
     }
@@ -553,6 +591,19 @@ class PushController extends ChangeNotifier {
     if (!accessible || !configured) return;
     final epoch = _epoch;
     await _enqueue(() async {
+      // A system permission sheet may temporarily background the app. Resume
+      // that first activation using its actual result, without asking again.
+      if (_alive(epoch) && _defaultPermissionPending) {
+        _defaultPermissionPending = false;
+        permission = await gateway.permission();
+        if (_alive(epoch) &&
+            [
+              PushPermission.authorized,
+              PushPermission.provisional,
+            ].contains(permission)) {
+          await _enable(epoch, request: false);
+        }
+      }
       if (!_alive(epoch) || !enabled || pending != null) return;
       try {
         permission = await gateway.permission();

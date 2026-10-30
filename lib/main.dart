@@ -23,6 +23,7 @@ Future<void> main() async {
       repositories: dependencies.repositories,
       helpController: dependencies.help,
       readingController: dependencies.reading,
+      updateController: dependencies.updates,
     ),
   );
 }

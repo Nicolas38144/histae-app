@@ -79,8 +79,10 @@ Use the public Firebase options for each registered Android/iOS app. The Dart ga
 Firebase with explicit `FirebaseOptions`; Android additionally builds native Firebase resources
 from the same public fields for cold-start delivery.
 
-Set `PUSH_ENABLED=true` only with a complete configuration for the target platform. The user must
-still enable notifications, grant native permission and register the device with the API.
+Set `PUSH_ENABLED=true` only with a complete configuration for the target platform. The app's
+composition root enables first-use registration after a verified, complete sign-in and asks for
+native permission. A refusal, manual opt-out or remotely removed device is not automatically
+re-enabled on restart. Users can change their choice in device/notification settings.
 The device-management screen remains available when push is disabled.
 Push alerts are for background delivery only. No foreground banner, sound or automatic
 navigation is added while the app is open; messages and unread counters use the realtime channel.

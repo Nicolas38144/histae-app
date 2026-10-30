@@ -411,11 +411,8 @@
   "chatPageResumeReadConfirmation": "Retomar la confirmación de lectura",
   "chatPageClosingStillNeedsConfirmationNoNew": "El cierre está pendiente de confirmación. No se enviará ningún mensaje nuevo.",
   "chatPageResumeTheSameRequest": "Retomar la misma solicitud",
-  "chatPageThisMessageIsAwaitingConfirmationResuming": "Aún no hemos podido confirmar el envío. Al retomarlo se enviará ese mismo mensaje.",
   "chatPageSending": "Enviando…",
-  "chatPageResumeTheSameMessage": "Retomar el mismo envío",
   "chatPageYourMessage": "Tu mensaje",
-  "chatPage2000Characters": "{arg0} / 2000 caracteres",
   "conversationHeaderChooseWhatComesNext": "Elegir cómo seguir",
   "conversationHeaderConversationStatus": "Estado de la conversación",
   "conversationHeaderYourChoices": "Tus decisiones",
@@ -1104,5 +1101,11 @@
   "helpChildSafetyAnswer": "Histae es para personas de 18 años o más. En el menú de un perfil o una conversación, elija la opción para denunciar a la persona, después “Otro motivo” y describa los hechos. También puede bloquearla o contactar con el soporte más abajo. No envíe imágenes o vídeos explícitos ni reenvíe esos contenidos. En caso de peligro inmediato, contacte con emergencias sin esperar al soporte.",
   "helpChildSafetyStandards": "Consulte nuestras normas de seguridad infantil.",
   "helpLinkFailed": "No se ha podido abrir el enlace. Inténtelo desde el sitio web de Histae.",
-  "reportChildSafetyHint": "¿Sospecha que es menor o existe riesgo de explotación? Elija “Otro motivo” y describa los hechos. No copie contenido sexual explícito ni intente recopilar copias."
+  "reportChildSafetyHint": "¿Sospecha que es menor o existe riesgo de explotación? Elija “Otro motivo” y describa los hechos. No copie contenido sexual explícito ni intente recopilar copias.",
+  "chatPageMessageLimitReached": "Has alcanzado el límite de 2000 caracteres.",
+  "storeUpdateTitle": "Hay una actualización disponible.",
+  "storeUpdateBody": "Hay una nueva versión de Histae. Actualiza la aplicación para continuar.",
+  "storeUpdateOpen": "Abrir la tienda",
+  "storeUpdateCheck": "Volver a comprobar",
+  "storeUpdateOpenFailed": "No se ha podido abrir la tienda. Inténtalo de nuevo en un momento."
 }

@@ -187,11 +187,17 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
 
   MessageIntent? get pendingMessage => _outbox.pendingFor(selectedId);
 
+  int get pendingMessageCount => _outbox.pendingCount(selectedId);
+
+  List<MessageIntent> get pendingMessages =>
+      _outbox.pendingMessages(selectedId);
+
+  ApiFailure? get sendFailure => _outbox.failureFor(selectedId);
+
   bool get canSend =>
       active &&
       _verified &&
       selected?.lifecycle.allowsSendAt(serverNow) == true &&
-      !sending &&
       !ending &&
       pendingEnd != selectedId &&
       pendingBlock != selectedId &&
@@ -215,8 +221,9 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   }
 
   void setDraft(String id, String text) {
-    if (accessible && !_outbox.hasPending(id) && !_removed.contains(id)) {
+    if (accessible && !_removed.contains(id)) {
       _outbox.setDraft(id, text);
+      validation = null;
     }
   }
 
@@ -279,6 +286,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   }
 
   void suspend({bool notify = true}) {
+    if (sending) _outbox.interrupt(selectedId);
     _active = false;
     _epoch++;
     _chatEpoch++;
@@ -298,11 +306,13 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     if (notify) _notify();
   }
 
-  void _error(ApiFailure error, {bool chat = false}) {
-    if (chat) {
-      chatFailure = error;
-    } else {
-      failure = error;
+  void _error(ApiFailure error, {bool chat = false, bool send = false}) {
+    if (!send) {
+      if (chat) {
+        chatFailure = error;
+      } else {
+        failure = error;
+      }
     }
     if (error.retryAt != null &&
         (_retryAt == null || error.retryAt!.isAfter(_retryAt!))) {
@@ -526,6 +536,9 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
         listLoading = false;
         _backgroundRead = false;
         _notify();
+        if (canSend && sendFailure == null && pendingMessage != null) {
+          unawaited(resumeSend());
+        }
       }
     }
   }
@@ -651,6 +664,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   }
 
   Future<void> openChat(String id) async {
+    if (sending) _outbox.interrupt(selectedId);
     if (drafts case final drafts?) {
       final owner = session.resourceKey;
       await drafts.ready;
@@ -679,6 +693,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
 
   void closeChat(String id, {bool notify = true}) {
     if (selectedId != id) return;
+    if (sending) _outbox.interrupt(id);
     _chatEpoch++;
     _chatScope.cancel();
     _chatScope = RequestCancellation();
@@ -745,54 +760,55 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
 
   Future<void> send(String raw) async {
     final match = selected;
-    if (match == null || !canSend || _outbox.hasPending(match.id)) return;
+    if (match == null || !canSend) return;
     validation = validateMessage(raw);
     if (validation != null) {
       _notify();
       return;
     }
     _outbox.prepare(match.id, raw);
-    await resumeSend();
+    _notify();
+    if (sendFailure == null) await resumeSend();
   }
 
   Future<void> resumeSend() async {
     final match = selected, intent = pendingMessage;
-    if (!canSend || match == null || intent == null) return;
+    if (!canSend || sending || match == null || intent == null) return;
     final epoch = _epoch, chatEpoch = _chatEpoch;
     sending = true;
-    chatFailure = null;
+    _outbox.clearFailure(match.id);
     validation = null;
     _notify();
     try {
-      if (drafts != null && !await drafts!.flush()) {
-        throw const ApiFailure(ApiFailureKind.secureStorage);
+      while (_chatAlive(epoch, chatEpoch, match.id) && canSend) {
+        final next = _outbox.pendingFor(match.id);
+        if (next == null) break;
+        try {
+          if (drafts != null && !await drafts!.flush()) {
+            throw const ApiFailure(ApiFailureKind.secureStorage);
+          }
+          if (!_chatAlive(epoch, chatEpoch, match.id)) return;
+          final message = await repository.send(match, next, _chatScope);
+          if (!_chatAlive(epoch, chatEpoch, match.id)) return;
+          if (!_messages.any((m) => m.id == message.id)) {
+            _messages.insert(0, message);
+          }
+          _outbox.acknowledge(match.id, next);
+          _notify();
+        } on ApiFailure catch (e) {
+          if (!_chatAlive(epoch, chatEpoch, match.id)) return;
+          _outbox.fail(match.id, next, e);
+          _error(e, send: true);
+          if (_denied(e)) {
+            _purge(match.id, remove: true);
+            notice = 'ended';
+            _notify();
+            _schedule();
+          }
+          break;
+        }
       }
-      if (!_chatAlive(epoch, chatEpoch, match.id)) return;
-      final message = await repository.send(match, intent, _chatScope);
-      if (!_chatAlive(epoch, chatEpoch, match.id)) return;
-      if (!_messages.any((m) => m.id == message.id)) {
-        _messages.insert(0, message);
-      }
-      _outbox.forget(match.id);
       _schedule();
-    } on ApiFailure catch (e) {
-      if (_chatAlive(epoch, chatEpoch, match.id)) {
-        _error(e, chat: true);
-        if (e.code == 'invalid_message_request' ||
-            e.code == 'invalid_message_payload') {
-          _outbox.forgetPending(match.id);
-        }
-        if (e.code == 'match_expired' ||
-            e.code == 'match_not_found' ||
-            e.code == 'match_blocked') {
-          _purge(match.id);
-          notice = 'ended';
-        }
-        if (_denied(e)) {
-          _verified = false;
-          _schedule();
-        }
-      }
     } finally {
       if (_chatAlive(epoch, chatEpoch, match.id)) {
         sending = false;

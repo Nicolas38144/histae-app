@@ -411,11 +411,8 @@
   "chatPageResumeReadConfirmation": "Resume read confirmation",
   "chatPageClosingStillNeedsConfirmationNoNew": "Closing still needs confirmation. No new message will be sent.",
   "chatPageResumeTheSameRequest": "Resume the same request",
-  "chatPageThisMessageIsAwaitingConfirmationResuming": "We haven’t been able to confirm sending yet. Resuming will resend this same message.",
   "chatPageSending": "Sending…",
-  "chatPageResumeTheSameMessage": "Resume the same message",
   "chatPageYourMessage": "Your message",
-  "chatPage2000Characters": "{arg0} / 2,000 characters",
   "conversationHeaderChooseWhatComesNext": "Choose what comes next",
   "conversationHeaderConversationStatus": "Conversation status",
   "conversationHeaderYourChoices": "Your choices",
@@ -1104,5 +1101,11 @@
   "helpChildSafetyAnswer": "Histae is for people aged 18 and over. In a profile or conversation menu, choose “Report this person”, then “Other reason” and describe what happened. You can also block the person or contact support below. Do not send explicit images or videos or forward such content. In immediate danger, contact emergency services without waiting for support.",
   "helpChildSafetyStandards": "Read our child safety standards.",
   "helpLinkFailed": "The link could not be opened. Try again from the Histae website.",
-  "reportChildSafetyHint": "Suspected minor or exploitation concern? Choose “Other reason” and describe what happened below. Do not copy explicit sexual content or try to collect copies of it."
+  "reportChildSafetyHint": "Suspected minor or exploitation concern? Choose “Other reason” and describe what happened below. Do not copy explicit sexual content or try to collect copies of it.",
+  "chatPageMessageLimitReached": "2,000-character limit reached.",
+  "storeUpdateTitle": "An update is ready.",
+  "storeUpdateBody": "A new version of Histae is available. Update the app to continue.",
+  "storeUpdateOpen": "Open the store",
+  "storeUpdateCheck": "Check again",
+  "storeUpdateOpenFailed": "The store could not be opened. Please try again in a moment."
 }

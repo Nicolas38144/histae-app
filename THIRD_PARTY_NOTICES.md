@@ -33,6 +33,11 @@ References: [OFL FAQ](https://openfontlicense.org/ofl-faq/),
 
 ## Recorded package metadata
 
+Native update integration added on 2026-10-30: `com.google.android.play:app-update:2.1.0`.
+Its Maven POM declares the [Play Core SDK Terms of Service](https://developer.android.com/guide/playcore/license).
+This SDK and its native dependencies retain their upstream terms; Histae's proprietary source
+restrictions do not replace them. This addition does not change the dated Dart inventory below.
+
 135 package-version entries are recorded in [THIRD_PARTY_LICENSES.json](THIRD_PARTY_LICENSES.json). These counts include build/test and optional packages and may repeat a package across nested tools. They do not describe the contents of a production artifact.
 
 | Declared license expression | Entries |

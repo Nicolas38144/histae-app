@@ -2574,32 +2574,14 @@ abstract class AppMessages {
   /// Interface: lib/features/matches/presentation/chat_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Nous n’avons pas encore pu confirmer l’envoi. Reprendre renverra ce même message.'**
-  String get chatPageThisMessageIsAwaitingConfirmationResuming;
-
-  /// Interface: lib/features/matches/presentation/chat_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Envoi en cours…'**
   String get chatPageSending;
 
   /// Interface: lib/features/matches/presentation/chat_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Reprendre le même envoi'**
-  String get chatPageResumeTheSameMessage;
-
-  /// Interface: lib/features/matches/presentation/chat_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Votre message'**
   String get chatPageYourMessage;
-
-  /// Interface: lib/features/matches/presentation/chat_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'{arg0} / 2 000 caractères'**
-  String chatPage2000Characters(Object arg0);
 
   /// Interface: lib/features/matches/presentation/conversation_header.dart
   ///
@@ -5947,6 +5929,42 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Mineur présumé ou risque d’exploitation ? Choisissez « Autre motif » et décrivez les faits ci-dessous. Ne recopiez pas de contenu sexuel explicite et ne cherchez pas à en collecter des copies.'**
   String get reportChildSafetyHint;
+
+  /// No description provided for @chatPageMessageLimitReached.
+  ///
+  /// In fr, this message translates to:
+  /// **'Limite de 2 000 caractères atteinte.'**
+  String get chatPageMessageLimitReached;
+
+  /// No description provided for @storeUpdateTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une mise à jour vous attend.'**
+  String get storeUpdateTitle;
+
+  /// No description provided for @storeUpdateBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une nouvelle version de Histae est disponible. Mettez l’application à jour pour continuer.'**
+  String get storeUpdateBody;
+
+  /// No description provided for @storeUpdateOpen.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ouvrir le store'**
+  String get storeUpdateOpen;
+
+  /// No description provided for @storeUpdateCheck.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifier à nouveau'**
+  String get storeUpdateCheck;
+
+  /// No description provided for @storeUpdateOpenFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le store n’a pas pu être ouvert. Réessayez dans un instant.'**
+  String get storeUpdateOpenFailed;
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

@@ -56,6 +56,7 @@ class FakePushGateway implements PushGateway {
   int initializations = 0, requests = 0, registrationsCount = 0, disables = 0;
   String registrationId = syntheticRegistration;
   PushPermission authorization = PushPermission.authorized;
+  Future<PushPermission>? permissionReply;
   PushIntent? first;
   final tokens = StreamController<String>.broadcast(sync: true);
   final foreground = StreamController<PushIntent>.broadcast(sync: true);
@@ -72,6 +73,7 @@ class FakePushGateway implements PushGateway {
   @override
   Future<PushPermission> permission({bool request = false}) async {
     if (request) requests++;
+    if (request && permissionReply != null) return permissionReply!;
     return authorization;
   }
 

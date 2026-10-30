@@ -11,12 +11,14 @@ import '../../catalog/data/catalog_repository.dart';
 import '../../continuation/presentation/continuation_page.dart';
 import '../../privacy/presentation/report_page.dart';
 import '../application/matches_controller.dart';
+import '../data/match_models.dart';
 import 'conversation_header.dart';
 import 'match_photo_avatar.dart';
 import 'matches_strings.dart';
 import 'message_bubble.dart';
 import 'message_metadata.dart';
 import 'partner_page.dart';
+import 'pending_message_tile.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({
@@ -64,7 +66,8 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
         selection: TextSelection.collapsed(offset: draft.length),
       );
     }
-    final head = c.messages.isEmpty ? null : c.messages.first.id;
+    final head =
+        c.pendingMessages.lastOrNull?.key ?? c.messages.firstOrNull?.id;
     final preserve =
         _head != null &&
         _head != head &&
@@ -213,6 +216,9 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
       return const HistaeScaffold(body: SizedBox.shrink());
     }
     final messages = c.messages;
+    final pending = c.pendingMessages.reversed.toList();
+    final messageLength = trimMessage(_text.text).runes.length;
+    final limitReached = messageLength >= messageCharacterLimit;
     final sent = messages.where((message) => message.senderId == c.ownerId);
     final lastSent = sent.firstOrNull?.id;
     final lastRead = sent
@@ -384,10 +390,29 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                             reverse: true,
                             padding: const EdgeInsets.all(16),
                             itemCount:
+                                pending.length +
                                 messages.length +
                                 (c.messageCursor == null ? 0 : 1),
                             itemBuilder: (context, index) {
-                              if (index == messages.length) {
+                              if (index < pending.length) {
+                                final intent = pending[index];
+                                final first =
+                                    intent.key == c.pendingMessage?.key;
+                                return PendingMessageTile(
+                                  key: ValueKey(
+                                    'pending-message-${intent.key}',
+                                  ),
+                                  intent: intent,
+                                  maxWidth: layout.maxWidth * .86,
+                                  active: c.sending,
+                                  failure: first ? c.sendFailure : null,
+                                  onRetry: first && c.canSend && !c.sending
+                                      ? () => unawaited(c.resumeSend())
+                                      : null,
+                                );
+                              }
+                              final messageIndex = index - pending.length;
+                              if (messageIndex == messages.length) {
                                 return HistaeButton.text(
                                   onPressed: c.historyLoading || c.listLoading
                                       ? null
@@ -399,7 +424,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                                   ),
                                 );
                               }
-                              final m = messages[index];
+                              final m = messages[messageIndex];
                               final own = m.senderId == c.ownerId;
                               return Padding(
                                 key: own
@@ -514,23 +539,6 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                                       .chatPageResumeTheSameRequest,
                                 ),
                               ),
-                            ] else if (c.pendingMessage != null &&
-                                !c.sending) ...[
-                              Text(
-                                AppStrings.of(context)
-                                    .messages
-                                    .chatPageThisMessageIsAwaitingConfirmationResuming,
-                              ),
-                              const SizedBox(height: 10),
-                              HistaeButton(
-                                onPressed: c.canSend ? c.resumeSend : null,
-                                child: Text(
-                                  AppStrings.of(context)
-                                      .messages
-                                      .chatPageResumeTheSameMessage,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
                             ],
                             if (match.sendAllowed)
                               TextField(
@@ -540,39 +548,41 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                                 maxLines: 4,
                                 textCapitalization:
                                     TextCapitalization.sentences,
-                                readOnly:
-                                    !c.canSend || c.pendingMessage != null,
+                                readOnly: !c.canSend,
                                 decoration: InputDecoration(
                                   labelText: AppStrings.of(context)
                                       .messages
                                       .chatPageYourMessage,
-                                  helperText: AppStrings.of(context).messages
-                                      .chatPage2000Characters(
-                                        _text.text.runes.length,
-                                      ),
+                                  helperText: limitReached
+                                      ? AppStrings.of(context)
+                                            .messages
+                                            .chatPageMessageLimitReached
+                                      : null,
                                 ),
                                 onChanged: (text) {
                                   c.setDraft(widget.matchId, text);
                                   setState(() {});
                                 },
                               ),
-                            if (match.sendAllowed &&
-                                (c.pendingMessage == null || c.sending))
+                            if (match.sendAllowed)
                               Padding(
                                 padding: const EdgeInsets.only(top: 10),
                                 child: HistaeButton.icon(
-                                  onPressed: c.canSend
-                                      ? () => c.send(_text.text)
+                                  onPressed:
+                                      c.canSend &&
+                                          messageLength <= messageCharacterLimit
+                                      ? () {
+                                          if (trimMessage(_text.text)
+                                              .isNotEmpty) {
+                                            unawaited(c.send(_text.text));
+                                          }
+                                        }
                                       : null,
                                   icon: const Icon(Icons.send_outlined),
                                   label: Text(
-                                    c.sending
-                                        ? AppStrings.of(context)
-                                              .messages
-                                              .chatPageSending
-                                        : AppStrings.of(context)
-                                              .messages
-                                              .chatPageSend,
+                                    AppStrings.of(context)
+                                        .messages
+                                        .chatPageSend,
                                   ),
                                 ),
                               ),

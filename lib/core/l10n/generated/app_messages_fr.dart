@@ -1578,22 +1578,10 @@ class AppMessagesFr extends AppMessages {
   String get chatPageResumeTheSameRequest => 'Reprendre la même demande';
 
   @override
-  String get chatPageThisMessageIsAwaitingConfirmationResuming =>
-      'Nous n’avons pas encore pu confirmer l’envoi. Reprendre renverra ce même message.';
-
-  @override
   String get chatPageSending => 'Envoi en cours…';
 
   @override
-  String get chatPageResumeTheSameMessage => 'Reprendre le même envoi';
-
-  @override
   String get chatPageYourMessage => 'Votre message';
-
-  @override
-  String chatPage2000Characters(Object arg0) {
-    return '$arg0 / 2 000 caractères';
-  }
 
   @override
   String get conversationHeaderChooseWhatComesNext => 'Choisir la suite';
@@ -3629,4 +3617,25 @@ class AppMessagesFr extends AppMessages {
   @override
   String get reportChildSafetyHint =>
       'Mineur présumé ou risque d’exploitation ? Choisissez « Autre motif » et décrivez les faits ci-dessous. Ne recopiez pas de contenu sexuel explicite et ne cherchez pas à en collecter des copies.';
+
+  @override
+  String get chatPageMessageLimitReached =>
+      'Limite de 2 000 caractères atteinte.';
+
+  @override
+  String get storeUpdateTitle => 'Une mise à jour vous attend.';
+
+  @override
+  String get storeUpdateBody =>
+      'Une nouvelle version de Histae est disponible. Mettez l’application à jour pour continuer.';
+
+  @override
+  String get storeUpdateOpen => 'Ouvrir le store';
+
+  @override
+  String get storeUpdateCheck => 'Vérifier à nouveau';
+
+  @override
+  String get storeUpdateOpenFailed =>
+      'Le store n’a pas pu être ouvert. Réessayez dans un instant.';
 }

@@ -28,7 +28,13 @@ void main() {
         writes.add((r.headers['Idempotency-Key'], jsonDecode(r.body)));
         if (lost) throw TimeoutException('Synthetic lost response');
         return jsonResponse(
-          messageJson(id: outgoingId, sender: testUser, content: 'Bonjour 🌿'),
+          messageJson(
+            id: (jsonDecode(r.body) as Map)['content'] == 'Bonjour 🌿'
+                ? outgoingId
+                : '99999999-9999-4999-8999-999999999999',
+            sender: testUser,
+            content: (jsonDecode(r.body) as Map)['content'] as String,
+          ),
           201,
         );
       }
@@ -48,7 +54,8 @@ void main() {
     expect(trimMessage('\u0085'), '\u0085');
     await c.send(' \uFEFFBonjour 🌿\n');
     final key = c.pendingMessage!.key;
-    expect(c.draftFor(testMatch), 'Bonjour 🌿');
+    expect(c.draftFor(testMatch), isEmpty);
+    expect(c.sendFailure, isNotNull);
     await c.send('A different message');
     expect(writes, hasLength(1));
     c.closeChat(testMatch);
@@ -56,6 +63,7 @@ void main() {
     expect(c.pendingMessage?.key, key);
     lost = false;
     await c.resumeSend();
+    expect(writes, hasLength(3));
     expect(writes[0].$1, writes[1].$1);
     expect(writes[0].$2, writes[1].$2);
     expect(c.pendingMessage, isNull);

@@ -8,10 +8,20 @@ import 'matches_strings.dart';
 
 /// A selectable message with a temporary date that does not shift the history.
 class MessageBubble extends StatefulWidget {
-  const MessageBubble({super.key, required this.message, required this.own});
+  const MessageBubble({
+    super.key,
+    required ChatMessage this.message,
+    required this.own,
+  }) : _pendingContent = null;
 
-  final ChatMessage message;
+  const MessageBubble.pending({super.key, required String content})
+    : message = null,
+      own = true,
+      _pendingContent = content;
+
+  final ChatMessage? message;
   final bool own;
+  final String? _pendingContent;
 
   @override
   State<MessageBubble> createState() => _MessageBubbleState();
@@ -53,7 +63,7 @@ class _MessageBubbleState extends State<MessageBubble>
   @override
   void didUpdateWidget(MessageBubble oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.message.id != widget.message.id) _hideAfterBuild();
+    if (oldWidget.message?.id != widget.message?.id) _hideAfterBuild();
   }
 
   void _hideAfterBuild() {
@@ -66,7 +76,7 @@ class _MessageBubbleState extends State<MessageBubble>
   }
 
   void _showDate() {
-    if (!_routeVisible || !_foreground) return;
+    if (widget.message == null || !_routeVisible || !_foreground) return;
     _dismissal?.cancel();
     _date.show();
     _dismissal = Timer(const Duration(seconds: 3), _hideDate);
@@ -125,7 +135,7 @@ class _MessageBubbleState extends State<MessageBubble>
                     ),
                     child: Text(
                       MatchesStrings(AppStrings.of(context))
-                          .date(widget.message.createdAt),
+                          .date(widget.message!.createdAt),
                       style: theme.textTheme.bodySmall?.copyWith(
                         fontSize: 11,
                         color: colors.onSurfaceVariant,
@@ -143,7 +153,9 @@ class _MessageBubbleState extends State<MessageBubble>
         child: TapRegion(
           onTapOutside: (_) => _hideDate(),
           child: Semantics(
-            onTapHint: AppStrings.of(context).messages.messageShowDate,
+            onTapHint: widget.message == null
+                ? null
+                : AppStrings.of(context).messages.messageShowDate,
             child: GestureDetector(
               onTap: _showDate,
               behavior: HitTestBehavior.opaque,
@@ -165,7 +177,7 @@ class _MessageBubbleState extends State<MessageBubble>
                   ),
                 ),
                 child: SelectableText(
-                  widget.message.content,
+                  widget.message?.content ?? widget._pendingContent!,
                   onTap: _showDate,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: widget.own

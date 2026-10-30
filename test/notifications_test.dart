@@ -19,6 +19,131 @@ import 'support/matches_fixture.dart';
 import 'support/notifications_fixture.dart';
 
 void main() {
+  test('default activation waits for a verified session and preserves an explicit opt-out', () async {
+    var posts = 0;
+    final session = testSession((r) async {
+      if (r.method == 'POST' && r.url.path.endsWith('/devices')) posts++;
+      return defaultNotificationsResponse(r);
+    });
+    final gateway = FakePushGateway();
+    final vault = MemoryPushVault();
+    final c = PushController(
+      DeviceRepository(session),
+      gateway,
+      vault,
+      autoEnable: true,
+      appVersion: () async => '1.0',
+    );
+    await c.start();
+    await pumpEventQueue();
+    expect(gateway.requests, 0);
+    await session.establish(testTokens);
+    await pumpEventQueue();
+    expect(c.enabled, isTrue);
+    expect(posts, 1);
+    expect(gateway.requests, 1);
+    await c.disable();
+    expect(vault.record!.optedIn, isFalse);
+    expect(c.stopping, isFalse);
+    c.dispose();
+    final restored = PushController(
+      DeviceRepository(session),
+      gateway,
+      vault,
+      autoEnable: true,
+    );
+    await restored.start();
+    await pumpEventQueue();
+    expect(restored.enabled, isFalse);
+    expect(gateway.requests, 1);
+    expect(posts, 1);
+    restored.dispose();
+    session.dispose();
+    await gateway.close();
+  });
+
+  test('default permission denial is stored and a revoked remote device never re-registers', () async {
+    final session = testSession((r) async {
+      if (r.method == 'GET' && r.url.path.endsWith('/devices')) {
+        return jsonResponse({'devices': <Object?>[]});
+      }
+      return defaultNotificationsResponse(r);
+    });
+    await session.establish(testTokens);
+    final gateway = FakePushGateway()..authorization = PushPermission.denied;
+    final vault = MemoryPushVault();
+    final c = PushController(
+      DeviceRepository(session),
+      gateway,
+      vault,
+      autoEnable: true,
+    );
+    await c.start();
+    await pumpEventQueue();
+    expect(vault.record!.optedIn, isFalse);
+    expect(gateway.requests, 1);
+    expect(gateway.registrationsCount, 0);
+    c.dispose();
+    gateway.authorization = PushPermission.authorized;
+    final denied = PushController(
+      DeviceRepository(session),
+      gateway,
+      vault,
+      autoEnable: true,
+    );
+    await denied.start();
+    await pumpEventQueue();
+    expect(denied.enabled, isFalse);
+    expect(gateway.requests, 1);
+    denied.dispose();
+    vault.record = const PushRecord(
+      'https://api.example',
+      testUser,
+      deviceId: deviceOne,
+    );
+    final revoked = PushController(
+      DeviceRepository(session),
+      gateway,
+      vault,
+      autoEnable: true,
+    );
+    await revoked.start();
+    await pumpEventQueue();
+    expect(revoked.enabled, isFalse);
+    expect(vault.record!.optedIn, isFalse);
+    expect(gateway.registrationsCount, 0);
+    revoked.dispose();
+    session.dispose();
+    await gateway.close();
+  });
+
+  test('first permission grant survives a system-dialog background cycle without a second prompt', () async {
+    final session = testSession((r) async => defaultNotificationsResponse(r));
+    await session.establish(testTokens);
+    final grant = Completer<PushPermission>();
+    final gateway = FakePushGateway()..permissionReply = grant.future;
+    final c = PushController(
+      DeviceRepository(session),
+      gateway,
+      MemoryPushVault(),
+      autoEnable: true,
+      appVersion: () async => '1.0',
+    );
+    await c.start();
+    await pumpEventQueue();
+    expect(gateway.requests, 1);
+    c.suspend();
+    final resumed = c.resume();
+    grant.complete(PushPermission.authorized);
+    await resumed;
+    expect(c.enabled, isTrue);
+    expect(gateway.registrationsCount, 1);
+    expect(gateway.requests, 1);
+    c.dispose();
+    session.dispose();
+    await gateway.close();
+  });
+
   test(
     'ignores retired trial alerts and still accepts payment failure alerts',
     () {

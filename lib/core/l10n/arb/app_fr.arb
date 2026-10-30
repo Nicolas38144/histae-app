@@ -1794,30 +1794,13 @@
   "@chatPageResumeTheSameRequest": {
     "description": "Interface: lib/features/matches/presentation/chat_page.dart"
   },
-  "chatPageThisMessageIsAwaitingConfirmationResuming": "Nous n’avons pas encore pu confirmer l’envoi. Reprendre renverra ce même message.",
-  "@chatPageThisMessageIsAwaitingConfirmationResuming": {
-    "description": "Interface: lib/features/matches/presentation/chat_page.dart"
-  },
   "chatPageSending": "Envoi en cours…",
   "@chatPageSending": {
-    "description": "Interface: lib/features/matches/presentation/chat_page.dart"
-  },
-  "chatPageResumeTheSameMessage": "Reprendre le même envoi",
-  "@chatPageResumeTheSameMessage": {
     "description": "Interface: lib/features/matches/presentation/chat_page.dart"
   },
   "chatPageYourMessage": "Votre message",
   "@chatPageYourMessage": {
     "description": "Interface: lib/features/matches/presentation/chat_page.dart"
-  },
-  "chatPage2000Characters": "{arg0} / 2 000 caractères",
-  "@chatPage2000Characters": {
-    "description": "Interface: lib/features/matches/presentation/chat_page.dart",
-    "placeholders": {
-      "arg0": {
-        "type": "Object"
-      }
-    }
   },
   "conversationHeaderChooseWhatComesNext": "Choisir la suite",
   "@conversationHeaderChooseWhatComesNext": {
@@ -4101,5 +4084,11 @@
   "reportChildSafetyHint": "Mineur présumé ou risque d’exploitation ? Choisissez « Autre motif » et décrivez les faits ci-dessous. Ne recopiez pas de contenu sexuel explicite et ne cherchez pas à en collecter des copies.",
   "@reportChildSafetyHint": {
     "description": "Child-safety reporting guidance and public standards link."
-  }
+  },
+  "chatPageMessageLimitReached": "Limite de 2 000 caractères atteinte.",
+  "storeUpdateTitle": "Une mise à jour vous attend.",
+  "storeUpdateBody": "Une nouvelle version de Histae est disponible. Mettez l’application à jour pour continuer.",
+  "storeUpdateOpen": "Ouvrir le store",
+  "storeUpdateCheck": "Vérifier à nouveau",
+  "storeUpdateOpenFailed": "Le store n’a pas pu être ouvert. Réessayez dans un instant."
 }

@@ -1,3 +1,4 @@
+import '../../../core/network/api_failure.dart';
 import '../data/match_models.dart';
 
 /// Drafts can be restored from the device vault; send intentions stay in memory.
@@ -6,48 +7,63 @@ class MessageOutbox {
   MessageOutbox({this.onChanged});
   final void Function(String id, String? text)? onChanged;
   final _drafts = <String, String>{};
-  final _pending = <String, MessageIntent>{};
+  final _pending = <String, List<MessageIntent>>{};
+  final _failures = <String, ApiFailure>{};
 
   Iterable<String> get matchIds => {..._drafts.keys, ..._pending.keys};
 
-  bool hasPending(String id) => _pending.containsKey(id);
+  MessageIntent? pendingFor(String? id) => _pending[id]?.firstOrNull;
 
-  MessageIntent? pendingFor(String? id) => _pending[id];
+  List<MessageIntent> pendingMessages(String? id) =>
+      List.unmodifiable(_pending[id] ?? const <MessageIntent>[]);
 
-  String draftFor(String id) => _pending[id]?.content ?? _drafts[id] ?? '';
+  int pendingCount(String? id) => _pending[id]?.length ?? 0;
+
+  ApiFailure? failureFor(String? id) => _failures[id];
+
+  String draftFor(String id) => _drafts[id] ?? '';
 
   void setDraft(String id, String text) {
-    if (!hasPending(id)) {
-      _drafts[id] = text;
-      onChanged?.call(id, text);
-    }
+    _drafts[id] = text;
+    onChanged?.call(id, text);
   }
 
   void restore(Map<String, String> values) {
-    _drafts.removeWhere((id, _) => !hasPending(id) && !values.containsKey(id));
+    _drafts.removeWhere((id, _) => !values.containsKey(id));
     for (final entry in values.entries) {
-      if (!hasPending(entry.key)) {
-        _drafts[entry.key] = entry.value;
-      }
+      _drafts[entry.key] = entry.value;
     }
   }
 
   void prepare(String id, String text) {
-    if (hasPending(id)) return;
     final intent = MessageIntent(id, text);
-    _pending[id] = intent;
-    _drafts[id] = intent.content;
+    (_pending[id] ??= []).add(intent);
+    _drafts.remove(id);
     // Once submitted, a message must never return as a new sendable draft.
     onChanged?.call(id, null);
   }
 
-  void forgetPending(String id) {
-    _pending.remove(id);
-    onChanged?.call(id, _drafts[id]);
+  void acknowledge(String id, MessageIntent intent) {
+    if (!identical(pendingFor(id), intent)) return;
+    _pending[id]!.removeAt(0);
+    if (_pending[id]!.isEmpty) _pending.remove(id);
+    _failures.remove(id);
+  }
+
+  void fail(String id, MessageIntent intent, ApiFailure error) {
+    if (identical(pendingFor(id), intent)) _failures[id] = error;
+  }
+
+  void clearFailure(String id) => _failures.remove(id);
+
+  void interrupt(String? id) {
+    if (id == null || pendingFor(id) == null) return;
+    _failures.putIfAbsent(id, () => const ApiFailure(ApiFailureKind.cancelled));
   }
 
   void forget(String id) {
     _pending.remove(id);
+    _failures.remove(id);
     _drafts.remove(id);
     onChanged?.call(id, null);
   }
@@ -55,5 +71,6 @@ class MessageOutbox {
   void clear() {
     _drafts.clear();
     _pending.clear();
+    _failures.clear();
   }
 }

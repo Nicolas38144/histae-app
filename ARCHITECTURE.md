@@ -57,8 +57,11 @@ debounced while typing and flushed when leaving a form or backgrounding. Sign-ou
 and queues deletion after outstanding writes. Account changes never restore a previous owner's
 snapshot. Biography, photos and credentials are excluded.
 
-`MessageOutbox` removes persisted text before an HTTP send begins. An uncertain send keeps its
-original key in memory and is not restored as a fresh, sendable draft after process death.
+`MessageOutbox` separates the editable draft from a per-conversation FIFO of immutable send
+intentions. Submitting clears the composer immediately; its next draft remains editable while
+acknowledgements arrive. Each intention removes its persisted draft before HTTP starts and keeps
+the same key after an uncertain result. Confirming one intention never clears a newer draft.
+Submitted intentions stay in memory and are not restored as fresh sends after process death.
 `AnswersEditor` restores local inputs without publishing them; saving still uses the explicit
 replacement confirmation. `DraftSnapshot` owns decoding and `DraftVault` owns native storage.
 
@@ -134,6 +137,12 @@ network retry for mutations. Retried intentions retain their idempotency key, co
 
 Native store SDKs own their purchase lifecycle. The app does not persist a browser Checkout attempt.
 
+The composition root opts into first-use push activation after verified sign-in. `PushController`
+serializes system permission and device registration, records the initial attempt before opening
+the permission sheet, and keeps owner-bound opt-out tombstones. A temporary background cycle can
+finish that initial grant without opening a second prompt. Explicit refusals and remote device
+removal do not become fresh automatic registrations.
+
 ## Real time, messages and private photos
 
 `MatchLifecycle` owns the app's projection of server deadlines: an inactive confirmed conversation
@@ -161,8 +170,12 @@ proof: opening one verifies the session, collection and history. `MessageOutbox`
 and immutable send intentions. Read receipts require a received message visible in the foreground.
 The view renders receipts outside bubbles, only below the latest own message and latest own
 read message in the loaded history; the two markers coalesce when these are the same message.
-Normal sending shows progress, while the resume warning is reserved for an idle, unconfirmed
-send intention. Retrying retains its original content and idempotency key.
+Pending intentions appear as local bubbles with an animated three-dot footer in the same position
+as receipts. Only server acknowledgements add confirmed messages and checks. A real failure stops
+the FIFO and shows an inline retry on that message; there is no global pending-send warning.
+Retrying retains its original content and idempotency key. Motion stops when hidden/backgrounded
+or when the system requests reduced animation. The composer shows no counter; its localized
+limit hint appears only at the API's 2,000-Unicode-scalar boundary.
 Message and receipt events refresh existing data silently, preserving verified access, editor
 focus and IME composition. Access-changing events still invalidate private access immediately.
 Successful sends completing during a history read are merged into its snapshot. Explicit refresh

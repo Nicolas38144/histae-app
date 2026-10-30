@@ -13,6 +13,7 @@ import 'package:histae_app/features/matches/presentation/match_preview_card.dart
 import 'package:histae_app/features/matches/presentation/matches_page.dart';
 import 'package:histae_app/features/matches/presentation/message_bubble.dart';
 import 'package:histae_app/features/matches/presentation/message_metadata.dart';
+import 'package:histae_app/features/matches/presentation/message_sending_indicator.dart';
 import 'package:http/http.dart' as http;
 
 import 'support/auth_fixture.dart';
@@ -121,7 +122,7 @@ void main() {
   );
 
   testWidgets(
-    'normal sends show progress; only failed sends offer the original retry',
+    'queued sends stay editable, show animated dots and retry only after a real failure',
     (tester) async {
       var response = Completer<http.Response>();
       final writes = <http.Request>[];
@@ -150,52 +151,111 @@ void main() {
           tester.widget<TextField>(composer).textCapitalization,
           TextCapitalization.sentences,
         );
+        expect(
+          tester.widget<TextField>(composer).decoration!.helperText,
+          isNull,
+        );
         await tester.enterText(composer, 'Bonjour');
         await tester.tap(find.text(text.chatPageSend));
         await tester.pump();
         expect(c.sending, isTrue);
-        expect(find.text(text.chatPageSending), findsOneWidget);
+        expect(find.text('Bonjour'), findsOneWidget);
+        expect(find.byType(MessageSendingIndicator), findsOneWidget);
+        expect(tester.widget<TextField>(composer).controller!.text, isEmpty);
+        expect(tester.widget<TextField>(composer).readOnly, isFalse);
+        expect(tester.testTextInput.isVisible, isTrue);
         expect(
-          find.text(text.chatPageThisMessageIsAwaitingConfirmationResuming),
-          findsNothing,
+          tester
+              .widget<FilledButton>(
+                find.widgetWithText(FilledButton, text.chatPageSend),
+              )
+              .onPressed,
+          isNotNull,
         );
-        expect(find.text(text.chatPageResumeTheSameMessage), findsNothing);
+        final transform = find
+            .descendant(
+              of: find.byType(MessageSendingIndicator),
+              matching: find.byType(Transform),
+            )
+            .first;
+        final initialTransform = tester
+            .widget<Transform>(transform)
+            .transform
+            .clone();
+        await tester.pump(const Duration(milliseconds: 160));
+        expect(
+          tester.widget<Transform>(transform).transform,
+          isNot(initialTransform),
+        );
+        await tester.enterText(composer, 'La suite');
+        await tester.tap(find.text(text.chatPageSend));
+        await tester.pump();
+        expect(c.pendingMessageCount, 2);
+        expect(writes, hasLength(1));
+        expect(find.text('La suite'), findsOneWidget);
+        await tester.enterText(composer, 'Mon prochain brouillon');
         response.completeError(http.ClientException('Synthetic response loss'));
         await tester.pumpAndSettle();
+        expect(c.sendFailure, isNotNull);
+        expect(find.text(text.appStringsTryAgain), findsOneWidget);
         expect(
-          find.text(text.chatPageThisMessageIsAwaitingConfirmationResuming),
-          findsOneWidget,
+          tester.widget<TextField>(composer).controller!.text,
+          'Mon prochain brouillon',
         );
-        expect(find.text(text.chatPageResumeTheSameMessage), findsOneWidget);
         final key = c.pendingMessage!.key;
         response = Completer<http.Response>();
-        await tester.tap(find.text(text.chatPageResumeTheSameMessage));
+        await tester.tap(find.text(text.appStringsTryAgain));
         await tester.pump();
         expect(c.pendingMessage!.key, key);
         expect(writes, hasLength(2));
         expect(writes.first.headers['idempotency-key'], key);
-        expect(
-          writes[1].headers['idempotency-key'],
-          writes[0].headers['idempotency-key'],
-        );
+        expect(writes[1].headers['idempotency-key'], key);
         expect(writes[1].body, writes[0].body);
-        expect(
-          find.text(text.chatPageThisMessageIsAwaitingConfirmationResuming),
-          findsNothing,
-        );
+        final second = Completer<http.Response>();
         response.complete(
           jsonResponse(
             messageJson(id: outgoingId, sender: testUser, content: 'Bonjour'),
             201,
           ),
         );
+        response = second;
         await tester.pump();
-        expect(c.pendingMessage, isNull);
+        expect(writes, hasLength(3));
+        expect(c.pendingMessageCount, 1);
+        expect(c.messages.where((m) => m.id == outgoingId), hasLength(1));
         expect(
-          find.text(text.chatPageThisMessageIsAwaitingConfirmationResuming),
-          findsNothing,
+          tester.widget<TextField>(composer).controller!.text,
+          'Mon prochain brouillon',
         );
-        expect(tester.widget<TextField>(composer).controller!.text, isEmpty);
+        second.complete(
+          jsonResponse(
+            messageJson(
+              id: '99999999-9999-4999-8999-999999999999',
+              sender: testUser,
+              content: 'La suite',
+            ),
+            201,
+          ),
+        );
+        await tester.pump();
+        expect(c.pendingMessageCount, 0);
+        expect(find.byType(MessageSendingIndicator), findsNothing);
+        expect(
+          tester.widget<TextField>(composer).controller!.text,
+          'Mon prochain brouillon',
+        );
+        await tester.enterText(composer, List.filled(2000, '🌿').join());
+        await tester.pump();
+        expect(
+          tester.widget<TextField>(composer).decoration!.helperText,
+          text.chatPageMessageLimitReached,
+        );
+        await tester.enterText(composer, 'Un texte court');
+        await tester.pump();
+        expect(
+          tester.widget<TextField>(composer).decoration!.helperText,
+          isNull,
+        );
         c.suspend();
         await tester.pumpWidget(const SizedBox.shrink());
       } finally {

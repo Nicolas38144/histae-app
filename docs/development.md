@@ -34,6 +34,7 @@ payments. Run the relevant existing suite rather than testing every visual or do
 | Camera/gallery selection, staged upload and photo errors | `flutter test test/profile_widget_test.dart test/profile_test.dart` |
 | Conversation profile, cached navigation and full-size photo privacy | `flutter test test/match_profile_test.dart test/cached_conversation_test.dart` |
 | Live conversation editing, private URL renewal and unread indicators | `flutter test test/conversation_updates_test.dart test/private_photo_test.dart` |
+| Store availability and mandatory update gate | `flutter test test/store_updates_test.dart` |
 | Feed reading delay and transitions | `flutter test test/feed_reading_delay_test.dart` |
 | Match inactivity, archives, cache expiry and manual refresh | `flutter test test/matches_inactivity_test.dart test/matches_test.dart` |
 | Native billing | `flutter test test/billing_test.dart` |
@@ -59,6 +60,8 @@ Do not hand-edit generated Dart messages. When changing native permission copy, 
 `tool/preview_*_test.dart` renders real widgets with synthetic content under `build/previews/`.
 `tool/preview_help_test.dart` renders the actual child-safety answer and inline link using only
 the local public support configuration, with no provider calls. Set `FLUTTER_ROOT` for its fonts.
+`tool/preview_message_queue_test.dart` captures pending three-dot footers, confirmed receipts,
+the composer limit hint and the store update gate with simulated message/store responses.
 For example:
 
 ```bash
