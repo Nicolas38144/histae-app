@@ -124,6 +124,17 @@ void main() {
             'messages': [
               {
                 ...messageJson(
+                  id: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+                  match: id,
+                  sender: testUser,
+                  content: 'Et toi, tu lis quoi en ce moment ?',
+                ),
+                'created_at': clock
+                    .subtract(const Duration(days: 23, hours: 23, minutes: 59))
+                    .toIso8601String(),
+              },
+              {
+                ...messageJson(
                   match: id,
                   sender: candidateTwo,
                   content: 'Et si on passait à cette librairie samedi ?',

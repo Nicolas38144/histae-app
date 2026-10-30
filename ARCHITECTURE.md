@@ -159,6 +159,10 @@ loss or owner disposal stops the stream.
 Events trigger the authorized reads required by each flow. Notifications are not authorization
 proof: opening one verifies the session, collection and history. `MessageOutbox` retains drafts
 and immutable send intentions. Read receipts require a received message visible in the foreground.
+The view renders receipts outside bubbles, only below the latest own message and latest own
+read message in the loaded history; the two markers coalesce when these are the same message.
+Normal sending shows progress, while the resume warning is reserved for an idle, unconfirmed
+send intention. Retrying retains its original content and idempotency key.
 Message and receipt events refresh existing data silently, preserving verified access, editor
 focus and IME composition. Access-changing events still invalidate private access immediately.
 Successful sends completing during a history read are merged into its snapshot. Explicit refresh

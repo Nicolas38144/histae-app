@@ -5,6 +5,7 @@ import 'package:histae_app/core/l10n/app_strings.dart';
 import 'package:histae_app/core/l10n/generated/app_messages.dart';
 import 'package:histae_app/features/matches/data/match_models.dart';
 import 'package:histae_app/features/matches/presentation/message_bubble.dart';
+import 'package:histae_app/features/matches/presentation/message_metadata.dart';
 
 void main() {
   final message = ChatMessage(
@@ -37,6 +38,58 @@ void main() {
         ],
       ),
     ),
+  );
+
+  testWidgets(
+    'short outgoing and incoming bubbles have the same height without a receipt footer',
+    (tester) async {
+      final short = ChatMessage(
+        'short',
+        'match',
+        'owner',
+        'Merci',
+        message.createdAt,
+        null,
+      );
+      for (final language in ['fr', 'en', 'es', 'it']) {
+        for (final scale in [1.0, 2.0]) {
+          Widget bubble(bool own) => MaterialApp(
+            theme: histaeTheme(Brightness.dark),
+            locale: Locale(language),
+            localizationsDelegates: AppMessages.localizationsDelegates,
+            supportedLocales: AppMessages.supportedLocales,
+            home: MediaQuery(
+              data: MediaQueryData(textScaler: TextScaler.linear(scale)),
+              child: Scaffold(
+                body: ListView(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 275),
+                        child: MessageBubble(message: short, own: own),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+          await tester.pumpWidget(bubble(true));
+          await tester.pumpAndSettle();
+          final own = tester.getSize(find.byType(MessageBubble));
+          expect(find.byType(MessageMetadata), findsNothing);
+          await tester.pumpWidget(bubble(false));
+          await tester.pumpAndSettle();
+          expect(
+            own.height,
+            closeTo(tester.getSize(find.byType(MessageBubble)).height, .1),
+          );
+          expect(tester.takeException(), isNull);
+        }
+      }
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
   );
 
   testWidgets(

@@ -11,6 +11,8 @@ import 'package:histae_app/features/matches/data/realtime_client.dart';
 import 'package:histae_app/features/matches/presentation/chat_page.dart';
 import 'package:histae_app/features/matches/presentation/match_preview_card.dart';
 import 'package:histae_app/features/matches/presentation/matches_page.dart';
+import 'package:histae_app/features/matches/presentation/message_bubble.dart';
+import 'package:histae_app/features/matches/presentation/message_metadata.dart';
 import 'package:http/http.dart' as http;
 
 import 'support/auth_fixture.dart';
@@ -26,6 +28,183 @@ Widget localized(Widget home) => MaterialApp(
 );
 
 void main() {
+  testWidgets(
+    'receipts sit outside only the latest sent and latest read bubbles and coalesce after reading',
+    (tester) async {
+      const unreadOlder = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+      const readLatest = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+      const readOlder = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+      var allRead = false;
+      final session = testSession((r) async {
+        if (r.method == 'GET' && r.url.path.endsWith('/messages')) {
+          return jsonResponse({
+            'messages': [
+              messageJson(readAt: DateTime.now().toUtc().toIso8601String()),
+              for (final entry in [
+                (outgoingId, 'Le plus récent', false),
+                (unreadOlder, 'Un autre envoi', false),
+                (readLatest, 'Le dernier lu', true),
+                (readOlder, 'Un échange plus ancien', true),
+              ])
+                messageJson(
+                  id: entry.$1,
+                  sender: testUser,
+                  content: entry.$2,
+                  readAt: allRead || entry.$3
+                      ? DateTime.now().toUtc().toIso8601String()
+                      : null,
+                ),
+            ],
+            'next_cursor': null,
+          });
+        }
+        return defaultMatchesResponse(r);
+      });
+      await session.establish(testTokens);
+      final c = MatchesController(
+        MatchesRepository(session),
+        realtime: QuietRealtime(session),
+      );
+      try {
+        await c.activate();
+        await c.openChat(testMatch);
+        await tester.pumpWidget(
+          localized(ChatPage(controller: c, matchId: testMatch)),
+        );
+        await tester.pumpAndSettle();
+        final latest = find.byKey(
+          const ValueKey('message-receipt-$outgoingId'),
+        );
+        expect(find.byType(MessageMetadata), findsNWidgets(2));
+        expect(latest, findsOneWidget);
+        expect(
+          find.byKey(const ValueKey('message-receipt-$readLatest')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const ValueKey('message-receipt-$unreadOlder')),
+          findsNothing,
+        );
+        expect(
+          find.byKey(const ValueKey('message-receipt-$readOlder')),
+          findsNothing,
+        );
+        final bubble = find.ancestor(
+          of: find.text('Le plus récent'),
+          matching: find.byType(MessageBubble),
+        );
+        expect(
+          tester.getRect(latest).top,
+          greaterThan(tester.getRect(bubble).bottom),
+        );
+        expect(
+          find.descendant(
+            of: find.byType(MessageBubble),
+            matching: find.byType(MessageMetadata),
+          ),
+          findsNothing,
+        );
+        allRead = true;
+        await c.refresh();
+        await tester.pumpAndSettle();
+        expect(find.byType(MessageMetadata), findsOneWidget);
+        expect(latest, findsOneWidget);
+        expect(find.text('Lu'), findsOneWidget);
+        expect(find.text('Envoyé'), findsNothing);
+        c.suspend();
+        await tester.pumpWidget(const SizedBox.shrink());
+      } finally {
+        c.dispose();
+        session.dispose();
+      }
+    },
+  );
+
+  testWidgets(
+    'normal sends show progress; only failed sends offer the original retry',
+    (tester) async {
+      var response = Completer<http.Response>();
+      final writes = <http.Request>[];
+      final session = testSession((r) async {
+        if (r.method == 'POST' && r.url.path.endsWith('/messages')) {
+          writes.add(r);
+          return response.future;
+        }
+        return defaultMatchesResponse(r);
+      });
+      await session.establish(testTokens);
+      final c = MatchesController(
+        MatchesRepository(session),
+        realtime: QuietRealtime(session),
+      );
+      try {
+        await c.activate();
+        await c.openChat(testMatch);
+        await tester.pumpWidget(
+          localized(ChatPage(controller: c, matchId: testMatch)),
+        );
+        await tester.pumpAndSettle();
+        final text = AppMessages.of(tester.element(find.byType(ChatPage)));
+        final composer = find.byKey(const Key('chat-composer'));
+        expect(
+          tester.widget<TextField>(composer).textCapitalization,
+          TextCapitalization.sentences,
+        );
+        await tester.enterText(composer, 'Bonjour');
+        await tester.tap(find.text(text.chatPageSend));
+        await tester.pump();
+        expect(c.sending, isTrue);
+        expect(find.text(text.chatPageSending), findsOneWidget);
+        expect(
+          find.text(text.chatPageThisMessageIsAwaitingConfirmationResuming),
+          findsNothing,
+        );
+        expect(find.text(text.chatPageResumeTheSameMessage), findsNothing);
+        response.completeError(http.ClientException('Synthetic response loss'));
+        await tester.pumpAndSettle();
+        expect(
+          find.text(text.chatPageThisMessageIsAwaitingConfirmationResuming),
+          findsOneWidget,
+        );
+        expect(find.text(text.chatPageResumeTheSameMessage), findsOneWidget);
+        final key = c.pendingMessage!.key;
+        response = Completer<http.Response>();
+        await tester.tap(find.text(text.chatPageResumeTheSameMessage));
+        await tester.pump();
+        expect(c.pendingMessage!.key, key);
+        expect(writes, hasLength(2));
+        expect(writes.first.headers['idempotency-key'], key);
+        expect(
+          writes[1].headers['idempotency-key'],
+          writes[0].headers['idempotency-key'],
+        );
+        expect(writes[1].body, writes[0].body);
+        expect(
+          find.text(text.chatPageThisMessageIsAwaitingConfirmationResuming),
+          findsNothing,
+        );
+        response.complete(
+          jsonResponse(
+            messageJson(id: outgoingId, sender: testUser, content: 'Bonjour'),
+            201,
+          ),
+        );
+        await tester.pump();
+        expect(c.pendingMessage, isNull);
+        expect(
+          find.text(text.chatPageThisMessageIsAwaitingConfirmationResuming),
+          findsNothing,
+        );
+        expect(tester.widget<TextField>(composer).controller!.text, isEmpty);
+        c.suspend();
+        await tester.pumpWidget(const SizedBox.shrink());
+      } finally {
+        c.dispose();
+        session.dispose();
+      }
+    },
+  );
+
   testWidgets('a send finishing during a history read is retained', (
     tester,
   ) async {

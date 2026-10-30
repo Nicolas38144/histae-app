@@ -21,8 +21,10 @@ class MessageMetadata extends StatelessWidget {
     final status = read
         ? strings.messages.chatPageRead
         : strings.messages.chatPageSent;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
+    return Wrap(
+      alignment: WrapAlignment.end,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 4,
       children: [
         ExcludeSemantics(
           child: Icon(
@@ -33,8 +35,7 @@ class MessageMetadata extends StatelessWidget {
                 : theme.colorScheme.onSurfaceVariant,
           ),
         ),
-        const SizedBox(width: 4),
-        Flexible(child: Text(status, style: style)),
+        Text(status, style: style),
       ],
     );
   }

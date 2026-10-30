@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../../../core/l10n/app_strings.dart';
 import '../data/match_models.dart';
 import 'matches_strings.dart';
-import 'message_metadata.dart';
 
 /// A selectable message with a temporary date that does not shift the history.
 class MessageBubble extends StatefulWidget {
@@ -165,27 +164,14 @@ class _MessageBubbleState extends State<MessageBubble>
                     bottomRight: Radius.circular(widget.own ? 6 : 20),
                   ),
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SelectableText(
-                      widget.message.content,
-                      onTap: _showDate,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: widget.own
-                            ? colors.onPrimaryContainer
-                            : colors.onSurface,
-                      ),
-                    ),
-                    if (widget.own) ...[
-                      const SizedBox(height: 2),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: MessageMetadata(message: widget.message),
-                      ),
-                    ],
-                  ],
+                child: SelectableText(
+                  widget.message.content,
+                  onTap: _showDate,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: widget.own
+                        ? colors.onPrimaryContainer
+                        : colors.onSurface,
+                  ),
                 ),
               ),
             ),
