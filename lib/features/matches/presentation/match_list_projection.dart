@@ -9,7 +9,7 @@ class MatchListProjection {
     required String search,
   }) {
     final visible = matches
-        .where((match) => !match.isInactivityExpiredAt(now))
+        .where((match) => match.lifecycle.allowsHistoryAt(now))
         .toList();
     hasMatches = visible.isNotEmpty;
     query = hasMatches ? normalizeSearchText(search) : '';

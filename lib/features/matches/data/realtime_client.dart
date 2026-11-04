@@ -86,7 +86,9 @@ class MobileEventDecoder {
           event,
           id: id.isEmpty ? null : id,
           matchId: matchId,
-          ended: event == 'match.updated' && j['status'] == 'ended',
+          ended:
+              event == 'match.updated' &&
+              {'ended', 'expired'}.contains(j['status']),
         );
       } on FormatException {
         throw const ApiFailure(ApiFailureKind.invalidResponse);

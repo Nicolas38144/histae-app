@@ -38,6 +38,7 @@ payments. Run the relevant existing suite rather than testing every visual or do
 | Store availability and mandatory update gate | `flutter test test/store_updates_test.dart` |
 | Feed reading delay and transitions | `flutter test test/feed_reading_delay_test.dart` |
 | Match inactivity, archives, cache expiry and manual refresh | `flutter test test/matches_inactivity_test.dart test/matches_test.dart` |
+| Terminal match visibility, continuation expiry and pagination | `flutter test test/matches_visibility_test.dart` |
 | Native billing | `flutter test test/billing_test.dart` |
 | Interface/request language | `flutter test test/localization_test.dart test/api_language_test.dart` |
 | Screen privacy and OTP recovery | `flutter test test/app_privacy_shield_test.dart test/otp_test.dart test/auth_widget_test.dart` |

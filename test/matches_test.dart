@@ -167,6 +167,7 @@ void main() {
     expect(c.canSend, isFalse);
     status = 'expired';
     await c.refresh();
+    expect(c.items, isEmpty);
     expect(c.messages, isEmpty);
     expect(c.selected?.lastMessage, isNull);
     c.suspend();

@@ -164,6 +164,12 @@ a server-side closure. `MatchDeadlineScheduler` owns one cancellable timer and r
 alone only updates the view. An expired cached snapshot is verified once, and a still-expired
 fresh response cannot reopen private content or cause a read loop.
 
+Ended and expired matches are excluded from the controller's initial and paginated snapshots,
+search and archive grouping. The continuation deadline also hides an unresolved match locally
+and evicts its private data before server verification; a failed read cannot leave that row visible.
+Fresh confirmed state can still restore a match after an outdated local deadline. Terminal live
+updates remove it immediately and prevent stale reads from reintroducing it.
+
 `MatchListProjection` performs local search and archive grouping. The view expands archived search
 results. A toolbar action appears when matches exist and opens `ArchivedMatchesPage` using the
 same controller snapshots and card builder. The archive route owns only its search field; it

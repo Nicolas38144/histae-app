@@ -49,7 +49,9 @@ class MatchLifecycle {
       (archiveAt == null ? archived : !archiveAt!.isAfter(now));
 
   bool allowsHistoryAt(DateTime now) =>
-      historyAllowed && !isInactivityExpiredAt(now);
+      historyAllowed &&
+      !isInactivityExpiredAt(now) &&
+      (status != MatchStatus.awaitingContinuation || expiresAt.isAfter(now));
 
   bool allowsDecisionAt(DateTime now) =>
       allowsHistoryAt(now) &&

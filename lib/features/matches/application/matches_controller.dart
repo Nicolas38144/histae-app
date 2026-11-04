@@ -416,9 +416,9 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   void _deadlineReached(List<UserMatch> expired) {
     if (!active) return;
     for (final match in expired) {
-      if (match.status == MatchStatus.confirmed) {
+      if (!match.lifecycle.allowsHistoryAt(serverNow)) {
         // A local deadline hides private data without treating it as a
-        // permanent server removal: another person's message may renew it.
+        // permanent server removal: fresh server state may confirm or renew it.
         _purge(match.id);
         _items.removeWhere((item) => item.id == match.id);
         notice = 'ended';
@@ -485,12 +485,14 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
         }
         for (final item in page.items) {
           if (_removed.contains(item.id) || !seen.add(item.id)) continue;
-          if (!item.lifecycle.allowsHistoryAt(serverNow)) {
+          final visible = item.lifecycle.allowsHistoryAt(serverNow);
+          if (!visible) {
             unavailable.add(item.id);
           }
-          final expired = item.isInactivityExpiredAt(serverNow);
-          if (expired && policy == ReadPolicy.cached) _dirty = true;
-          if (item.status != MatchStatus.ended && !expired) {
+          if (!visible && item.historyAllowed && policy == ReadPolicy.cached) {
+            _dirty = true;
+          }
+          if (visible) {
             items.add(item);
           }
         }
@@ -637,10 +639,12 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       }
       final ids = _items.map((m) => m.id).toSet();
       for (final item in page.items) {
-        if (!_removed.contains(item.id) &&
-            item.status != MatchStatus.ended &&
-            !item.isInactivityExpiredAt(serverNow) &&
-            ids.add(item.id)) {
+        if (!item.lifecycle.allowsHistoryAt(serverNow)) {
+          _purge(item.id);
+          _items.removeWhere((match) => match.id == item.id);
+          continue;
+        }
+        if (!_removed.contains(item.id) && ids.add(item.id)) {
           _items.add(item);
         }
       }
