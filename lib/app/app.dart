@@ -136,6 +136,12 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
     final push = widget.pushController;
     if (state == AppLifecycleState.resumed) {
       widget.updateController?.setActive(true);
+      final session = widget.sessionController;
+      if (session != null &&
+          session.hasPendingRefresh &&
+          session.retrySeconds == 0) {
+        unawaited(session.synchronize());
+      }
       if (push != null) unawaited(push.resume());
     } else if ([
       AppLifecycleState.paused,

@@ -49,9 +49,14 @@ void main() {
     final session = testSession((request) async {
       if (request.url.path == '/api/auth/refresh') {
         refreshes++;
-        expect(SessionRecord.decode(vault.value)!.phase, 'rotating');
-        expect(vault.value, isNot(contains('test-refresh-old')));
-        expect(jsonDecode(request.body), {'refresh_token': 'test-refresh-old'});
+        final saved = SessionRecord.decode(vault.value)!;
+        expect(saved.phase, 'refreshing');
+        expect(saved.refreshToken, 'test-refresh-old');
+        expect(request.headers['Idempotency-Key'], saved.attemptId);
+        expect(jsonDecode(request.body), {
+          'refresh_token': 'test-refresh-old',
+          'recovery_id': saved.attemptId,
+        });
         expect(request.headers['Authorization'], isNull);
       }
       return defaultAuthResponse(request, complete: true);
@@ -65,6 +70,17 @@ void main() {
 
   for (final record in [
     const SessionRecord('https://api.example', 'rotating'),
+    const SessionRecord(
+      'https://api.example',
+      'refreshing',
+      'test-refresh-old',
+    ),
+    const SessionRecord(
+      'https://different.example',
+      'refreshing',
+      'test-refresh-old',
+      '11111111-1111-4111-8111-111111111111',
+    ),
     const SessionRecord(
       'https://different.example',
       'ready',
@@ -162,7 +178,7 @@ void main() {
   );
 
   test(
-    'a lost refresh response is never replayed, including after restart',
+    'a lost refresh response resumes the exact sealed attempt after restart',
     () async {
       final vault = MemorySessionVault()
         ..value = const SessionRecord(
@@ -170,23 +186,38 @@ void main() {
           'ready',
           'test-refresh-old',
         ).encode();
-      var calls = 0;
+      final keys = <String?>[];
       final session = testSession((request) async {
-        calls++;
+        keys.add(request.headers['Idempotency-Key']);
         throw http.ClientException('Synthetic lost response');
       }, vault: vault);
       addTearDown(session.dispose);
       await session.start();
-      expect(session.phase, SessionPhase.signedOut);
-      await session.synchronize();
-      final restarted = testSession(
-        (_) async => fail('Must not replay'),
-        vault: vault,
-      );
+      expect(session.phase, SessionPhase.unavailable);
+      expect(session.hasSession, isTrue);
+      expect(session.identity, isNull);
+      final saved = SessionRecord.decode(vault.value)!;
+      expect(saved.phase, 'refreshing');
+      expect(saved.attemptId, keys.single);
+      final restarted = testSession((request) async {
+        if (request.url.path == '/api/auth/refresh') {
+          keys.add(request.headers['Idempotency-Key']);
+          expect(jsonDecode(request.body), {
+            'refresh_token': testTokens.refreshToken,
+            'recovery_id': saved.attemptId,
+          });
+        }
+        return defaultAuthResponse(request, complete: true);
+      }, vault: vault);
       addTearDown(restarted.dispose);
       await restarted.start();
-      expect(restarted.phase, SessionPhase.signedOut);
-      expect(calls, 1);
+      expect(restarted.phase, SessionPhase.ready);
+      expect(keys, [saved.attemptId, saved.attemptId]);
+      expect(SessionRecord.decode(vault.value)!.attemptId, isNull);
+      expect(
+        SessionRecord.decode(vault.value)!.refreshToken,
+        rotatedTokens.refreshToken,
+      );
     },
   );
 
@@ -210,10 +241,114 @@ void main() {
     expect(refreshes, 0);
   });
 
+  test('temporary and unsupported-server failures keep the same attempt until explicit retry', () async {
+    for (final response in [
+      apiError(503, 'service_unavailable'),
+      apiError(429, 'refresh_rate_limit_exceeded', retryAfter: '60'),
+      apiError(400, 'invalid_request_body'),
+    ]) {
+      final vault = MemorySessionVault()
+        ..value = const SessionRecord(
+          'https://api.example',
+          'ready',
+          'test-refresh-old',
+        ).encode();
+      var recovering = false;
+      var refreshes = 0;
+      final keys = <String?>[];
+      final session = testSession((r) async {
+        if (r.url.path == '/api/auth/refresh') {
+          refreshes++;
+          keys.add(r.headers['Idempotency-Key']);
+          if (!recovering) return response;
+        }
+        return defaultAuthResponse(r, complete: true);
+      }, vault: vault);
+      await session.start();
+      expect(session.phase, SessionPhase.unavailable);
+      expect(session.hasSession, isTrue);
+      expect(session.identity, isNull);
+      final saved = vault.value;
+      if (response.statusCode == 429) {
+        await session.synchronize();
+        expect(refreshes, 1);
+        expect(vault.value, saved);
+        // A restart does not create a different attempt key.
+        session.dispose();
+        final resumed = testSession((r) async {
+          if (r.url.path == '/api/auth/refresh') {
+            keys.add(r.headers['Idempotency-Key']);
+          }
+          return defaultAuthResponse(r, complete: true);
+        }, vault: vault);
+        await resumed.start();
+        expect(resumed.phase, SessionPhase.ready);
+        resumed.dispose();
+      } else {
+        recovering = true;
+        await session.synchronize();
+        expect(session.phase, SessionPhase.ready);
+        session.dispose();
+      }
+      expect(keys.length, 2);
+      expect(keys.last, keys.first);
+    }
+  });
+
+  test('a definitive rejection clears the recovery credential and never retries it', () async {
+    final vault = MemorySessionVault()
+      ..value = const SessionRecord(
+        'https://api.example',
+        'refreshing',
+        'test-refresh-old',
+        '11111111-1111-4111-8111-111111111111',
+      ).encode();
+    var calls = 0;
+    final session = testSession((r) async {
+      calls++;
+      return apiError(401, 'invalid_or_expired_refresh_token');
+    }, vault: vault);
+    await session.start();
+    expect(session.phase, SessionPhase.signedOut);
+    expect(session.hasSession, isFalse);
+    expect(vault.value, isNot(contains('test-refresh-old')));
+    await session.synchronize();
+    expect(calls, 1);
+    session.dispose();
+  });
+
+  test('logout discards an unresolved attempt and a late refresh cannot resurrect it', () async {
+    final vault = MemorySessionVault()
+      ..value = const SessionRecord(
+        'https://api.example',
+        'ready',
+        'test-refresh-old',
+      ).encode();
+    final reply = Completer<http.Response>();
+    final started = Completer<void>();
+    final session = testSession((r) async {
+      if (r.url.path == '/api/auth/refresh') {
+        started.complete();
+        return reply.future;
+      }
+      return defaultAuthResponse(r, complete: true);
+    }, vault: vault);
+    final restoring = session.start();
+    await started.future;
+    final closing = session.logout();
+    reply.complete(jsonResponse(tokenJson(rotatedTokens)));
+    await Future.wait([restoring, closing]);
+    expect(session.phase, SessionPhase.signedOut);
+    expect(session.hasPendingRefresh, isFalse);
+    expect(SessionRecord.decode(vault.value)!.phase, 'signed_out');
+    session.dispose();
+  });
+
   test(
     'a replacement storage failure never publishes the new access token',
     () async {
       var expired = false;
+      var failedStorage = false;
       var newTokenReads = 0;
       final vault = MemorySessionVault();
       final session = testSession((request) async {
@@ -221,7 +356,10 @@ void main() {
           newTokenReads++;
         }
         if (request.url.path == '/api/auth/refresh') {
-          vault.failNextReady = true;
+          if (!failedStorage) {
+            vault.failNextReady = true;
+            failedStorage = true;
+          }
           return jsonResponse(tokenJson(rotatedTokens));
         }
         return expired
@@ -232,9 +370,13 @@ void main() {
       await session.establish(testTokens);
       expired = true;
       await session.synchronize();
-      expect(session.hasSession, isFalse);
+      expect(session.hasSession, isTrue);
       expect(newTokenReads, 0);
-      expect(SessionRecord.decode(vault.value)!.phase, 'signed_out');
+      expect(SessionRecord.decode(vault.value)!.phase, 'refreshing');
+      expired = false;
+      await session.synchronize();
+      expect(session.phase, SessionPhase.ready);
+      expect(SessionRecord.decode(vault.value)!.phase, 'ready');
     },
   );
 

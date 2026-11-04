@@ -111,10 +111,15 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
   @override
   void initState() {
     super.initState();
-    unawaited(c.activate());
-    if (widget.visibility case final visibility?) {
-      unawaited(visibility.ensureLoaded());
-    }
+    // Visibility is shared with Profile; do not notify an already mounted
+    // sibling while PageView is constructing this page during layout.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      unawaited(c.activate());
+      if (widget.visibility case final visibility?) {
+        unawaited(visibility.ensureLoaded());
+      }
+    });
   }
 
   @override

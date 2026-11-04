@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../../../core/async/serial_executor.dart';
 import '../../../core/l10n/api_language.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
@@ -89,6 +90,8 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
   ApiFailure? failure;
   String? notice;
   TokenPair? _tokens;
+  SessionRecord? _pendingRefresh;
+  final _storageWrites = SerialExecutor();
   RequestCancellation _scope = RequestCancellation();
   Future<void>? _start;
   Future<void>? _sync;
@@ -141,19 +144,32 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
   }) => repository.api.getJson(path, cancellation: cancellation);
 
   @override
-  bool get hasSession => _tokens != null && !_loggingOut;
+  bool get hasSession =>
+      (_tokens != null || _pendingRefresh != null) && !_loggingOut;
+
+  bool get hasPendingRefresh => _pendingRefresh != null;
 
   void _notify() {
     if (!_disposed) notifyListeners();
   }
 
-  Future<void> _write(String phase, [String? refresh]) async {
+  Future<void> _write(
+    String phase, [
+    String? refresh,
+    String? attemptId,
+    int? generation,
+  ]) => _storageWrites.run(() async {
+    if (generation != null && (_disposed || generation != _generation)) {
+      throw const ApiFailure(ApiFailureKind.cancelled);
+    }
     try {
-      await _vault.write(SessionRecord(_origin, phase, refresh).encode());
+      await _vault.write(
+        SessionRecord(_origin, phase, refresh, attemptId).encode(),
+      );
     } catch (_) {
       throw const ApiFailure(ApiFailureKind.secureStorage);
     }
-  }
+  });
 
   Future<void> start() => _start ??= _restore();
 
@@ -166,14 +182,21 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
       } else if (record.origin == _origin && record.phase == 'closing') {
         await _invalidate(const ApiFailure(ApiFailureKind.sessionUncertain));
         notice = 'closure_unconfirmed';
-      } else if (record.origin != _origin || record.phase != 'ready') {
+      } else if (record.origin != _origin ||
+          !['ready', 'refreshing'].contains(record.phase)) {
         await _invalidate(const ApiFailure(ApiFailureKind.sessionUncertain));
       } else {
+        if (record.phase == 'refreshing') _pendingRefresh = record;
         await _rotate(record.refreshToken!);
         if (hasSession) await synchronize();
       }
     } on ApiFailure catch (error) {
-      if (error.kind == ApiFailureKind.secureStorage) {
+      if (_pendingRefresh != null) {
+        phase = error.kind == ApiFailureKind.secureStorage
+            ? SessionPhase.storageFailure
+            : SessionPhase.unavailable;
+        _setFailure(error);
+      } else if (error.kind == ApiFailureKind.secureStorage) {
         phase = SessionPhase.storageFailure;
         failure = error;
       } else if (phase != SessionPhase.signedOut &&
@@ -223,18 +246,48 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
   }
 
   Future<void> _performRotation(String refresh) async {
+    final generation = _generation;
     try {
-      // Must finish BEFORE sending. If this write fails, do not call refresh.
-      await _write('rotating');
-      final next = await repository.refresh(refresh);
-      await _write('ready', next.refreshToken);
+      // Persist before sending, including on restart. Never generate another
+      // attempt key for a credential whose first result could have been lost.
+      final attempt =
+          _pendingRefresh ??
+          SessionRecord(_origin, 'refreshing', refresh, newUuidV4());
+      await _write(
+        'refreshing',
+        attempt.refreshToken,
+        attempt.attemptId,
+        generation,
+      );
+      if (_disposed || generation != _generation) {
+        throw const ApiFailure(ApiFailureKind.cancelled);
+      }
+      _pendingRefresh = attempt;
+      final next = await repository.refresh(
+        attempt.refreshToken!,
+        attemptId: attempt.attemptId!,
+      );
+      await _write('ready', next.refreshToken, null, generation);
+      if (_disposed || generation != _generation) {
+        throw const ApiFailure(ApiFailureKind.cancelled);
+      }
+      _pendingRefresh = null;
       _tokens = next; // Publish access only after the replacement is durable.
     } on ApiFailure catch (error) {
-      await _invalidate(
-        error.kind == ApiFailureKind.secureStorage
-            ? error
-            : const ApiFailure(ApiFailureKind.sessionUncertain),
-      );
+      if (_disposed || generation != _generation) rethrow;
+      final rejected =
+          error.statusCode == 401 || error.code == 'account_unavailable';
+      if (_pendingRefresh != null && !rejected) {
+        // No authenticated screen is shown while recovery is unresolved. Keep
+        // the sealed attempt for an explicit retry or the next foreground/start.
+        phase = error.kind == ApiFailureKind.secureStorage
+            ? SessionPhase.storageFailure
+            : SessionPhase.unavailable;
+        _setFailure(error);
+        _notify();
+      } else {
+        await _invalidate(error);
+      }
       rethrow;
     }
   }
@@ -259,6 +312,10 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
     final generation = _generation;
     final requestLanguage = language ?? this.language;
     if (_rotation case final pending?) await pending;
+    if (_pendingRefresh case final pending?) {
+      if (retrySeconds > 0) throw failure!;
+      await _rotate(pending.refreshToken!);
+    }
     final used = _tokens;
     if (used == null || _loggingOut || _disposed || generation != _generation) {
       throw const ApiFailure(ApiFailureKind.unauthenticated);
@@ -559,6 +616,9 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
     failure = null;
     _notify();
     try {
+      if (_pendingRefresh case final pending?) {
+        await _rotate(pending.refreshToken!);
+      }
       final me = MobileIdentity.fromJson(
         await _authorized('GET', '/api/auth/me', language: requestLanguage),
       );
@@ -582,7 +642,9 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
       if (generation != _generation || _loggingOut || _disposed) return;
       if (revision != localizationRevision) return;
       if (hasSession) {
-        phase = SessionPhase.unavailable;
+        phase = error.kind == ApiFailureKind.secureStorage
+            ? SessionPhase.storageFailure
+            : SessionPhase.unavailable;
         _setFailure(error);
       }
     } finally {
@@ -688,6 +750,7 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
     _scope.cancel();
     _scope = RequestCancellation();
     _tokens = null;
+    _pendingRefresh = null;
     identity = null;
     consents = null;
     _consentFingerprint = null;

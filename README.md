@@ -33,6 +33,7 @@ flutter run
 | [Development](docs/development.md) | Checks, previews, build preparation and working conventions |
 | [Android release](docs/android-release.md) | Private upload key, recovery and signed Play bundles |
 | [Store updates](docs/store-updates.md) | Mandatory update gate based on actual store availability |
+| [Session recovery](docs/session-recovery.md) | Durable refresh attempts, temporary outages and coordinated API rollout |
 | [Architecture](ARCHITECTURE.md) | Ownership, layers, cache, sessions and native adapters |
 | [Design system](DESIGN_SYSTEM.md) | Voice, branding, typography and UI behavior |
 | [Product flows](resume.md) | Account, profile, feed, matches, credits and privacy |

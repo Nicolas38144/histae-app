@@ -28,6 +28,7 @@ payments. Run the relevant existing suite rather than testing every visual or do
 | Change | Example focused command |
 | --- | --- |
 | Session/cache behavior | `flutter test test/read_snapshots_test.dart test/cache_lifecycle_regressions_test.dart` |
+| Refresh recovery, restart, revocation and durable credential writes | `flutter test test/session_test.dart test/auth_widget_test.dart` |
 | Feed expiry, location or pause | `flutter test test/discovery_test.dart test/discovery_pause_test.dart` |
 | Native location activation, refusal and cancellation | `flutter test test/device_location_test.dart test/discovery_test.dart` |
 | Photo readiness, withdrawal and private thumbnails | `flutter test test/photo_sharing_test.dart test/continuation_test.dart` |

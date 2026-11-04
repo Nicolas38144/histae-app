@@ -24,7 +24,7 @@ abstract interface class AuthRepository {
     RequestCancellation cancellation,
   );
 
-  Future<TokenPair> refresh(String refreshToken);
+  Future<TokenPair> refresh(String refreshToken, {required String attemptId});
 
   Future<void> logout(TokenPair tokens);
 }
@@ -70,11 +70,17 @@ final class ApiAuthRepository implements AuthRepository {
   );
 
   @override
-  Future<TokenPair> refresh(String refreshToken) async => TokenPair.fromJson(
+  Future<TokenPair> refresh(
+    String refreshToken, {
+    required String attemptId,
+  }) async => TokenPair.fromJson(
     await api.requestJson(
       'POST',
       '/api/auth/refresh',
-      body: {'refresh_token': refreshToken},
+      // Older APIs reject this field before rotating, instead of ignoring the
+      // recovery key and consuming a credential that the app might retry.
+      body: {'refresh_token': refreshToken, 'recovery_id': attemptId},
+      idempotencyKey: attemptId,
       expectedStatus: 200,
     ),
   );

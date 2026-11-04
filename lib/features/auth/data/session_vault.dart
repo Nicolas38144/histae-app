@@ -44,14 +44,21 @@ class SecureSessionVault implements SessionVault {
     }
   }
 }
-// A single secure entry is replaced before/after refresh. A rotating entry has
-// no reusable token: a crash or lost response must never replay its predecessor.
+// A refresh attempt is persisted atomically with its original credential and
+// recovery key. Only that exact attempt can be resumed after a lost response.
+// Legacy 'rotating' entries have no recovery material and still fail closed.
 
 class SessionRecord {
-  const SessionRecord(this.origin, this.phase, [this.refreshToken]);
+  const SessionRecord(
+    this.origin,
+    this.phase, [
+    this.refreshToken,
+    this.attemptId,
+  ]);
   final String origin;
   final String phase;
   final String? refreshToken;
+  final String? attemptId;
 
   static SessionRecord? decode(String? raw) {
     if (raw == null) return null;
@@ -60,13 +67,20 @@ class SessionRecord {
       if (value is! Map<String, dynamic> ||
           value['origin'] is! String ||
           value['phase'] is! String ||
-          (value['phase'] == 'ready' && value['refresh_token'] is! String)) {
+          (value['phase'] == 'ready' && value['refresh_token'] is! String) ||
+          (value['phase'] == 'refreshing' &&
+              (value['refresh_token'] is! String ||
+                  value['attempt_id'] is! String ||
+                  !RegExp(
+                    r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
+                  ).hasMatch(value['attempt_id'] as String)))) {
         throw const FormatException();
       }
       return SessionRecord(
         value['origin'] as String,
         value['phase'] as String,
         value['refresh_token'] as String?,
+        value['attempt_id'] as String?,
       );
     } catch (_) {
       throw const ApiFailure(ApiFailureKind.sessionUncertain);
@@ -77,5 +91,6 @@ class SessionRecord {
     'origin': origin,
     'phase': phase,
     if (refreshToken != null) 'refresh_token': refreshToken,
+    if (attemptId != null) 'attempt_id': attemptId,
   });
 }

@@ -7,6 +7,7 @@ import 'package:histae_app/core/l10n/app_strings.dart';
 import 'package:histae_app/core/l10n/generated/app_messages.dart';
 import 'package:histae_app/core/widgets/histae_button.dart';
 import 'package:histae_app/features/auth/application/session_controller.dart';
+import 'package:histae_app/features/auth/data/session_vault.dart';
 import 'package:histae_app/features/consents/domain/consent_state.dart';
 import 'package:histae_app/features/consents/presentation/consents_page.dart';
 import 'package:http/http.dart' as http;
@@ -14,6 +15,40 @@ import 'package:http/http.dart' as http;
 import 'support/auth_fixture.dart';
 
 void main() {
+  testWidgets(
+    'an offline restored session offers Retry without opening OTP or deleting credentials',
+    (tester) async {
+      final vault = MemorySessionVault()
+        ..value = const SessionRecord(
+          'https://api.example',
+          'ready',
+          'test-refresh-old',
+        ).encode();
+      var available = false;
+      final keys = <String?>[];
+      final session = testSession((r) async {
+        if (r.url.path == '/api/auth/refresh') {
+          keys.add(r.headers['Idempotency-Key']);
+          if (!available) throw http.ClientException('Synthetic offline');
+        }
+        return defaultAuthResponse(r);
+      }, vault: vault);
+      await tester.pumpWidget(HistaeApp(sessionController: session));
+      await tester.pumpAndSettle();
+      expect(session.phase, SessionPhase.unavailable);
+      expect(find.text(const AppStrings().retry), findsOneWidget);
+      expect(find.text('Créer mon compte'), findsNothing);
+      expect(find.byKey(const Key('otp')), findsNothing);
+      available = true;
+      await tester.tap(find.text(const AppStrings().retry));
+      await tester.pumpAndSettle();
+      expect(session.phase, SessionPhase.needsConsents);
+      expect(keys.length, 2);
+      expect(keys.last, keys.first);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets(
     'an older sensitive grant can still be withdrawn without accepting the new version',
     (tester) async {

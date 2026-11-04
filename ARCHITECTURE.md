@@ -117,8 +117,19 @@ action next to the location step. iOS retains the disabled-service settings fall
 
 ## Sessions, concurrency and persistence
 
-Refresh-token rotation is serialized. Secure storage is written and reread before a new session
-is published. An uncertain rotation closes access rather than reusing an old refresh token.
+Refresh-token rotation is serialized. Before sending, secure storage records the original refresh
+credential and a UUIDv4 attempt ID as a single `refreshing` entry. Both are reused for that exact
+attempt after a network failure, foreground return or process restart. The API atomically seals
+the replacement refresh token for up to seven days and only recovers it while that child and its
+family remain active. Recovery never extends the receipt deadline or the family's sliding expiry.
+The `recovery_id` body field prevents an older API from silently processing an unrecoverable
+rotation; `Idempotency-Key` must match it. Deploy the API migration and API before the app.
+
+Temporary failures hide authenticated screens but keep the sealed attempt for Retry. A confirmed
+401 or unavailable account clears it. New credentials are written and reread before publication;
+local writes are serialized so an invalidation cannot be undone by a late refresh. Legacy
+`rotating` entries without recovery material still fail closed. No mutation receives a general
+network retry. See [Session recovery](docs/session-recovery.md) for rollout and verification.
 Logout and account deletion also use durable barriers.
 
 A permitted request may retry once after a `401` confirming access-token expiry. There is no universal
