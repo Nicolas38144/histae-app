@@ -501,7 +501,7 @@ void main() {
   );
 
   testWidgets(
-    'consent documents remain refreshable at 200 percent text on a small screen',
+    'consent documents remain usable without manual reload at 200 percent text',
     (tester) async {
       tester.view.physicalSize = const Size(320, 568);
       tester.view.devicePixelRatio = 1;
@@ -533,8 +533,10 @@ void main() {
       );
       await tester.pumpAndSettle();
       final previousReads = documentReads;
-      await revealAndTap(tester, find.text(const AppStrings().refreshChoices));
-      expect(documentReads, greaterThan(previousReads));
+      await tester.drag(find.byType(Scrollable).last, const Offset(0, -1500));
+      await tester.pumpAndSettle();
+      expect(find.byType(RefreshIndicator), findsNothing);
+      expect(documentReads, previousReads);
       expect(session.phase, SessionPhase.needsConsents);
       expect(find.text('Se déconnecter'), findsNothing);
       expect(tester.takeException(), isNull);

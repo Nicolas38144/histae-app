@@ -149,8 +149,6 @@ class AppStrings {
 
   String get saveChoices => messages.appStringsSaveMyChoices;
 
-  String get refreshChoices => messages.appStringsRefreshMyConsents;
-
   String get withdraw => messages.appStringsWithdrawMyConsent;
 
   String get confirmWithdrawal => messages.appStringsConfirmWithdrawal;

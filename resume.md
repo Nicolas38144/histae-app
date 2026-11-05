@@ -50,6 +50,9 @@ remain immediately available. Only a server-confirmed reciprocal decision create
 Ended/inaccessible matches leave the list. Search and archives use loaded rows, with explicit
 pagination. Unread counts appear on match rows; receipts depend on visible received messages.
 The composer stays editable during queued sends; uncertain retries preserve the original message.
+While awaiting continuation, its send action becomes the shared credit/Premium confirmation. An empty
+balance opens Credits; an accepted choice waits for the partner. Server events reopen composition
+and remove the continuation section from match details once both have agreed.
 
 Confirmed chats archive after 10 days without a new message, receive a warning at day 23 and are
 deleted with their messages at day 30. A new message unarchives/resets the deadline without another

@@ -371,12 +371,15 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                         ),
                       ),
                     ),
-                  HistaeButton.outlined(
-                    onPressed: enabled ? c.load : null,
-                    child: Text(
-                      AppStrings.of(context).messages.devicesPageRefreshDevices,
+                  if (c.failure != null || c.pendingRemoval != null)
+                    HistaeButton.outlined(
+                      onPressed: enabled ? c.load : null,
+                      child: Text(
+                        AppStrings.of(context)
+                            .messages
+                            .devicesPageRefreshDevices,
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),

@@ -20,6 +20,15 @@ import 'support/continuation_fixture.dart';
 import 'support/matches_fixture.dart';
 import 'support/scrolling.dart';
 
+Future<void> subscriptionUpdated(WidgetTester tester) {
+  final c = tester
+      .widget<MatchesPage>(find.byType(MatchesPage, skipOffstage: false))
+      .controller
+      .continuation;
+  c.invalidateQuota();
+  return c.loadQuota();
+}
+
 Future<void> mountBenefits(
   WidgetTester tester, {
   required bool Function() premium,
@@ -78,7 +87,7 @@ Future<void> revealSubscription(WidgetTester tester) async {
 
 void main() {
   testWidgets(
-    'Profile keeps its confirmed subscription label while refreshing and applies new results',
+    'Profile keeps its confirmed plan label during automatic revalidation',
     (tester) async {
       Completer<http.Response>? pending;
       await mountBenefits(
@@ -99,9 +108,7 @@ void main() {
         required String after,
       }) async {
         pending = Completer<http.Response>();
-        final refresh = tester
-            .widget<RefreshIndicator>(find.byType(RefreshIndicator))
-            .onRefresh();
+        final refresh = subscriptionUpdated(tester);
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 200));
         expect(find.text(during), findsOneWidget);
@@ -227,14 +234,14 @@ void main() {
       ads = 2;
       await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();
-      // Returning alone keeps the balance; only a manual refresh reads it.
+      // Navigation keeps the snapshot; a server subscription event invalidates quota.
       expect(
         tester
             .widget<Text>(find.byKey(const Key('free-credits-remaining')))
             .data,
         '2',
       );
-      await tester.tap(find.byTooltip('Actualiser les rencontres'));
+      await subscriptionUpdated(tester);
       await tester.pumpAndSettle();
       expect(
         tester
@@ -281,9 +288,7 @@ void main() {
       await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();
       expect(find.text('Mon abonnement'), findsOneWidget);
-      await tester
-          .widget<RefreshIndicator>(find.byType(RefreshIndicator))
-          .onRefresh();
+      await subscriptionUpdated(tester);
       await tester.pumpAndSettle();
       expect(find.text('Premium'), findsOneWidget);
       premium = true;
@@ -299,7 +304,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(toggle);
       await tester.pumpAndSettle();
-      await tester.tap(find.byTooltip('Actualiser les rencontres'));
+      await subscriptionUpdated(tester);
       await tester.pumpAndSettle();
       expect(
         find.text('Vos continuations ne n\u00e9cessitent aucun cr\u00e9dit.'),
@@ -314,7 +319,7 @@ void main() {
       await tester.pumpAndSettle();
       premium = false;
       unavailable = true;
-      await tester.tap(find.byTooltip('Actualiser les rencontres'));
+      await subscriptionUpdated(tester);
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('free-credits-remaining')), findsNothing);
       expect(find.byKey(const Key('open-videos')), findsNothing);
@@ -338,9 +343,7 @@ void main() {
       await tester.tap(find.byKey(const Key('main-tab-profile')));
       await tester.pumpAndSettle();
       await revealSubscription(tester);
-      await tester
-          .widget<RefreshIndicator>(find.byType(RefreshIndicator))
-          .onRefresh();
+      await subscriptionUpdated(tester);
       await tester.pumpAndSettle();
       expect(find.text('Mon abonnement'), findsOneWidget);
       expect(find.text('Premium'), findsNothing);

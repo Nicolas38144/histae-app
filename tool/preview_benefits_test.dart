@@ -9,6 +9,7 @@ import 'package:histae_app/core/network/api_client.dart';
 import 'package:histae_app/features/billing/application/billing_controller.dart';
 import 'package:histae_app/features/billing/data/billing_repository.dart';
 import 'package:histae_app/features/catalog/data/catalog_repository.dart';
+import 'package:histae_app/features/matches/presentation/matches_page.dart';
 import 'package:http/testing.dart';
 
 import '../test/support/auth_fixture.dart';
@@ -149,7 +150,11 @@ void main() {
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
     premium = true;
-    await tester.tap(find.byTooltip('Actualiser les rencontres'));
+    await tester
+        .widget<MatchesPage>(find.byType(MatchesPage))
+        .controller
+        .continuation
+        .loadQuota();
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('main-tab-profile')));
     await tester.pumpAndSettle();
@@ -158,7 +163,11 @@ void main() {
     await tester.pumpAndSettle();
     await capture('matches-premium');
     premium = false;
-    await tester.tap(find.byTooltip('Actualiser les rencontres'));
+    await tester
+        .widget<MatchesPage>(find.byType(MatchesPage))
+        .controller
+        .continuation
+        .loadQuota();
     await tester.pumpAndSettle();
     tester.view.physicalSize = const Size(320, 568);
     tester.platformDispatcher.textScaleFactorTestValue = 2;

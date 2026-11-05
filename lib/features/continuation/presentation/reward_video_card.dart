@@ -161,13 +161,16 @@ class RewardVideoCard extends StatelessWidget {
             ],
             if (pending) ...[
               const SizedBox(height: 8),
-              HistaeButton.textIcon(
-                onPressed: r.busy || r.waiting || video.busy ? null : r.refresh,
-                icon: const Icon(Icons.refresh),
-                label: Text(
-                  AppStrings.of(context).messages.rewardVideoCardCheckReward,
+              if (r.needsVerificationRetry)
+                HistaeButton.textIcon(
+                  onPressed: r.busy || r.waiting || video.busy
+                      ? null
+                      : r.refresh,
+                  icon: const Icon(Icons.refresh),
+                  label: Text(
+                    AppStrings.of(context).messages.rewardVideoCardCheckReward,
+                  ),
                 ),
-              ),
               HistaeButton.text(
                 onPressed: r.busy || r.waiting || video.busy ? null : onCancel,
                 child: Text(

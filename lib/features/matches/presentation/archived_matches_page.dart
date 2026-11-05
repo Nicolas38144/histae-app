@@ -50,16 +50,7 @@ class _ArchivedMatchesPageState extends State<ArchivedMatchesPage> {
         search: _search.text,
       );
       return HistaeScaffold(
-        appBar: AppBar(
-          title: Text(text.matchesArchivedTitle),
-          actions: [
-            IconButton(
-              tooltip: text.discoveryPageRefreshEncounters,
-              onPressed: c.listLoading || c.retrySeconds > 0 ? null : c.refresh,
-              icon: const Icon(Icons.refresh_rounded),
-            ),
-          ],
-        ),
+        appBar: AppBar(title: Text(text.matchesArchivedTitle)),
         body: SafeArea(
           child: Column(
             children: [
@@ -89,50 +80,52 @@ class _ArchivedMatchesPageState extends State<ArchivedMatchesPage> {
                 child: c.listLoading ? const LinearProgressIndicator() : null,
               ),
               Expanded(
-                child: RefreshIndicator(
-                  onRefresh: c.refresh,
-                  child: ListView(
-                    key: const Key('archived-matches-list'),
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(24),
-                    children: [
-                      if (c.failure case final error?)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: Semantics(
-                            liveRegion: true,
-                            child: Text(
-                              MatchesStrings(AppStrings.of(context))
-                                  .failure(error),
-                            ),
+                child: ListView(
+                  key: const Key('archived-matches-list'),
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(24),
+                  children: [
+                    if (c.failure case final error?)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: Semantics(
+                          liveRegion: true,
+                          child: Text(
+                            MatchesStrings(AppStrings.of(context))
+                                .failure(error),
                           ),
                         ),
-                      if (!list.hasMatches &&
-                          !c.listLoading &&
-                          c.failure == null)
-                        HistaeEmptyState(title: text.matchesArchivesEmpty),
-                      if (list.query.isNotEmpty &&
-                          !list.hasResults &&
-                          !c.listLoading)
-                        Text(text.matchesSearchEmpty),
-                      if (list.query.isNotEmpty && c.listCursor != null)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: Text(text.matchesSearchLoadedOnly),
-                        ),
-                      for (final match in list.archived)
-                        widget.cardBuilder(match),
-                      if (c.retrySeconds > 0)
-                        Text(text.appStringsTryAgainInS(c.retrySeconds)),
-                      if (c.listCursor != null)
-                        HistaeButton.outlined(
-                          onPressed: c.listLoading || c.retrySeconds > 0
-                              ? null
-                              : c.loadMore,
-                          child: Text(text.matchesPageViewMoreMatches),
-                        ),
-                    ],
-                  ),
+                      ),
+                    if (!list.hasMatches && !c.listLoading && c.failure == null)
+                      HistaeEmptyState(title: text.matchesArchivesEmpty),
+                    if (list.query.isNotEmpty &&
+                        !list.hasResults &&
+                        !c.listLoading)
+                      Text(text.matchesSearchEmpty),
+                    if (list.query.isNotEmpty && c.listCursor != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: Text(text.matchesSearchLoadedOnly),
+                      ),
+                    if (c.failure != null)
+                      HistaeButton.outlined(
+                        onPressed: c.listLoading || c.retrySeconds > 0
+                            ? null
+                            : c.refresh,
+                        child: Text(text.appStringsTryAgain),
+                      ),
+                    for (final match in list.archived)
+                      widget.cardBuilder(match),
+                    if (c.retrySeconds > 0)
+                      Text(text.appStringsTryAgainInS(c.retrySeconds)),
+                    if (c.listCursor != null)
+                      HistaeButton.outlined(
+                        onPressed: c.listLoading || c.retrySeconds > 0
+                            ? null
+                            : c.loadMore,
+                        child: Text(text.matchesPageViewMoreMatches),
+                      ),
+                  ],
                 ),
               ),
             ],

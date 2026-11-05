@@ -374,7 +374,7 @@ void main() {
   );
 
   testWidgets(
-    'the chat refresh button performs an explicit read and preserves its draft',
+    'server revalidation preserves the chat draft without a manual refresh control',
     (tester) async {
       var lists = 0, histories = 0;
       final session = testSession((request) async {
@@ -402,7 +402,8 @@ void main() {
         );
         await tester.pumpAndSettle();
         final beforeLists = lists, beforeHistories = histories;
-        await tester.tap(find.byKey(const Key('chat-refresh')));
+        expect(find.byKey(const Key('chat-refresh')), findsNothing);
+        await c.refresh();
         await tester.pumpAndSettle();
         expect(lists, beforeLists + 1);
         expect(histories, beforeHistories + 1);

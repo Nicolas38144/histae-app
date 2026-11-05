@@ -70,8 +70,16 @@ void main() {
       await tester.pumpAndSettle();
       expect(matches.active, isTrue);
       expect(find.text('Mon profil'), findsOneWidget);
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      for (final state in [
+        AppLifecycleState.inactive,
+        AppLifecycleState.hidden,
+        AppLifecycleState.paused,
+        AppLifecycleState.hidden,
+        AppLifecycleState.inactive,
+        AppLifecycleState.resumed,
+      ]) {
+        tester.binding.handleAppLifecycleStateChanged(state);
+      }
       await tester.pumpAndSettle();
       expect(matches.active, isTrue);
       expect(discovery.active, isTrue);
@@ -90,12 +98,12 @@ void main() {
         expect(size.height, greaterThanOrEqualTo(48));
       }
       expect(reads, initialReads);
-      // The same visible profile refresh control still performs a real read.
+      // Profile has no manual reload; navigation retains its cached snapshot.
       await tester.tap(find.byKey(const Key('main-tab-profile')));
       await tester.pumpAndSettle();
-      await tester.tap(find.byTooltip('Actualiser mon profil'));
-      await tester.pumpAndSettle();
-      expect(reads['/api/users/me'], initialReads['/api/users/me']! + 1);
+      expect(find.byTooltip('Actualiser mon profil'), findsNothing);
+      expect(find.byType(RefreshIndicator), findsNothing);
+      expect(reads['/api/users/me'], initialReads['/api/users/me']);
       expect(tester.takeException(), isNull);
       await session.logout();
       await tester.pumpAndSettle();
@@ -315,7 +323,7 @@ void main() {
       tester.widget<ChatPage>(find.byType(ChatPage)).controller.accessible,
       isTrue,
     );
-    expect(find.byTooltip('Actualiser la conversation'), findsOneWidget);
+    expect(find.byTooltip('Actualiser la conversation'), findsNothing);
     await tester.drag(find.byType(ChatPage), const Offset(260, 0));
     await tester.pumpAndSettle();
     expect(find.byType(ChatPage), findsOneWidget);

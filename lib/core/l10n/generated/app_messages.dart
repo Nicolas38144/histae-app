@@ -102,6 +102,18 @@ abstract class AppMessages {
     Locale('it'),
   ];
 
+  /// Continuation action in the conversation composer.
+  ///
+  /// In fr, this message translates to:
+  /// **'Continuer avec 1 crédit'**
+  String get chatContinuationSpendCredit;
+
+  /// Continuation action in the conversation composer.
+  ///
+  /// In fr, this message translates to:
+  /// **'En attente de sa réponse'**
+  String get chatContinuationWaiting;
+
   /// Title shown after an explicit rewarded-video attempt has no ad inventory.
   ///
   /// In fr, this message translates to:
@@ -281,12 +293,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Enregistrer mes choix'**
   String get appStringsSaveMyChoices;
-
-  /// Interface: lib/core/l10n/app_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Actualiser mes consentements'**
-  String get appStringsRefreshMyConsents;
 
   /// Interface: lib/core/l10n/app_strings.dart
   ///
@@ -831,14 +837,8 @@ abstract class AppMessages {
   /// Interface: lib/features/billing/presentation/subscription_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Dernière situation connue. Actualisez pour confirmer vos droits actuels.'**
+  /// **'La situation de votre abonnement est en cours de vérification.'**
   String get subscriptionPageLastKnownStatusRefreshToConfirm;
-
-  /// Interface: lib/features/billing/presentation/subscription_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Vérifier mon abonnement'**
-  String get subscriptionPageCheckMySubscription;
 
   /// Interface: lib/features/billing/presentation/subscription_page.dart
   ///
@@ -1383,12 +1383,6 @@ abstract class AppMessages {
   /// Interface: lib/features/continuation/presentation/continuation_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Votre conversation est ouverte. Les conditions de continuation sont réunies.'**
-  String get continuationPageYourConversationIsOpenContinuationConditions;
-
-  /// Interface: lib/features/continuation/presentation/continuation_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Décision possible jusqu’au {arg0}. Vous pouvez toujours relire vos échanges.'**
   String continuationPageYouCanDecideUntilYouCan(Object arg0);
 
@@ -1413,30 +1407,6 @@ abstract class AppMessages {
   /// Interface: lib/features/continuation/presentation/continuation_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Votre formule actuelle : aucun crédit nécessaire pour votre accord.'**
-  String get continuationPageYourCurrentPlanNoCreditNeeded;
-
-  /// Interface: lib/features/continuation/presentation/continuation_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'{count, plural, one {{count} nouvelle continuation disponible} other {{count} nouvelles continuations disponibles}}. Votre accord coûte au maximum 1 crédit.'**
-  String continuationsAndCost(num count);
-
-  /// Interface: lib/features/continuation/presentation/continuation_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Lire le coût et choisir de continuer'**
-  String get continuationPageReadTheCostAndChooseTo;
-
-  /// Interface: lib/features/continuation/presentation/continuation_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Votre quota ne permet pas de nouvelle continuation actuellement.'**
-  String get continuationPageYourAllowanceDoesNotPermitAnother;
-
-  /// Interface: lib/features/continuation/presentation/continuation_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Voir mes crédits'**
   String get continuationPageViewMyCredits;
 
@@ -1445,12 +1415,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Chaque personne choisit indépendamment. Le choix de l’autre personne reste privé. Vous pouvez terminer la rencontre depuis les options de la conversation.'**
   String get continuationPageEachPersonChoosesIndependentlyTheOther;
-
-  /// Interface: lib/features/continuation/presentation/continuation_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Actualiser la rencontre et mes crédits'**
-  String get continuationPageRefreshMatchAndMyCredits;
 
   /// Interface: lib/features/continuation/presentation/continuation_strings.dart
   ///
@@ -1910,12 +1874,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Ouvrir les réglages'**
   String get discoveryPageOpenSettings;
-
-  /// Interface: lib/features/matches/presentation/matches_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Actualiser les rencontres'**
-  String get discoveryPageRefreshEncounters;
 
   /// Interface: lib/features/discovery/presentation/discovery_page.dart
   ///
@@ -2424,12 +2382,6 @@ abstract class AppMessages {
   /// Interface: lib/features/matches/presentation/chat_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Actualiser la conversation'**
-  String get chatPageRefreshConversation;
-
-  /// Interface: lib/features/matches/presentation/chat_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Options de la rencontre'**
   String get chatPageMatchOptions;
 
@@ -2468,12 +2420,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'La conversation n’est plus disponible.'**
   String get chatPageTheConversationIsNoLongerAvailable;
-
-  /// Interface: lib/features/matches/presentation/chat_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Relire mes rencontres'**
-  String get chatPageRefreshMyMatches;
 
   /// Interface: lib/features/matches/presentation/chat_page.dart
   ///
@@ -4124,12 +4070,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Nous n’avons pas pu vérifier l’enregistrement. Actualisez votre profil avant de réessayer ; votre photo peut être renvoyée à l’identique.'**
   String get profilePageSavingIsUncertainRefreshTheData;
-
-  /// Interface: lib/features/profile/presentation/profile_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Actualiser mon profil'**
-  String get profilePageRefreshMyProfile;
 
   /// Interface: lib/features/profile/presentation/profile_page.dart
   ///

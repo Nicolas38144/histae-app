@@ -8,6 +8,7 @@ import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../catalog/data/catalog_repository.dart';
+import '../../continuation/presentation/continuation_action.dart';
 import '../../continuation/presentation/continuation_page.dart';
 import '../../privacy/presentation/report_page.dart';
 import '../application/matches_controller.dart';
@@ -56,6 +57,18 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
     c.addListener(_changed);
     _scroll.addListener(_scheduleRead);
     _scheduleRead();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _ensureContinuation());
+  }
+
+  void _ensureContinuation() {
+    if (mounted &&
+        _foreground &&
+        ModalRoute.of(context)?.isCurrent == true &&
+        c.selected?.id == widget.matchId &&
+        c.selected?.status == MatchStatus.awaitingContinuation &&
+        !c.continuation.active) {
+      unawaited(c.continuation.activate());
+    }
   }
 
   void _changed() {
@@ -91,6 +104,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
       });
     }
     _scheduleRead();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _ensureContinuation());
   }
 
   void _scheduleRead() {
@@ -102,7 +116,10 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     _readTimer?.cancel();
-    if (state == AppLifecycleState.resumed) _scheduleRead();
+    if (state == AppLifecycleState.resumed) {
+      _scheduleRead();
+      _ensureContinuation();
+    }
   }
 
   void _readVisible({bool explicitRetry = false}) {
@@ -294,16 +311,9 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
           ),
         ),
         actions: [
-          IconButton(
-            key: const Key('chat-refresh'),
-            tooltip: AppStrings.of(context)
-                .messages
-                .chatPageRefreshConversation,
-            onPressed: c.listLoading || c.retrySeconds > 0 ? null : c.refresh,
-            icon: const Icon(Icons.refresh),
-          ),
           if (match != null)
             PopupMenuButton<String>(
+              key: const Key('chat-options'),
               tooltip: AppStrings.of(context).messages.chatPageMatchOptions,
               onSelected: (value) {
                 if (value == 'decisions') unawaited(_decisions());
@@ -314,6 +324,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
               },
               itemBuilder: (_) => [
                 PopupMenuItem(
+                  key: const Key('chat-decisions'),
                   value: 'decisions',
                   child: Text(
                     AppStrings.of(context)
@@ -376,14 +387,15 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                   ),
                   if (c.failure case final error?)
                     Text(MatchesStrings(AppStrings.of(context)).failure(error)),
-                  HistaeButton.outlined(
-                    onPressed: c.listLoading || c.retrySeconds > 0
-                        ? null
-                        : c.refresh,
-                    child: Text(
-                      AppStrings.of(context).messages.chatPageRefreshMyMatches,
+                  if (c.failure != null)
+                    HistaeButton.outlined(
+                      onPressed: c.listLoading || c.retrySeconds > 0
+                          ? null
+                          : c.refresh,
+                      child: Text(
+                        AppStrings.of(context).messages.appStringsTryAgain,
+                      ),
                     ),
-                  ),
                 ],
               )
             : LayoutBuilder(
@@ -519,6 +531,17 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                                   ),
                                 ),
                               ),
+                            if (c.chatFailure != null)
+                              HistaeButton.outlined(
+                                onPressed: c.showLoading || c.retrySeconds > 0
+                                    ? null
+                                    : c.refresh,
+                                child: Text(
+                                  AppStrings.of(context)
+                                      .messages
+                                      .appStringsTryAgain,
+                                ),
+                              ),
                             if (c.readFailure != null)
                               HistaeButton.text(
                                 onPressed: c.reading
@@ -583,6 +606,13 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                                   c.setDraft(widget.matchId, text);
                                   setState(() {});
                                 },
+                              ),
+                            if (match.status ==
+                                MatchStatus.awaitingContinuation)
+                              ContinuationAction(
+                                controller: c.continuation,
+                                matchId: widget.matchId,
+                                catalog: widget.catalog,
                               ),
                             if (match.sendAllowed)
                               Padding(

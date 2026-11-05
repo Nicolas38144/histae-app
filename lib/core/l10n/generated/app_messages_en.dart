@@ -10,6 +10,12 @@ class AppMessagesEn extends AppMessages {
   AppMessagesEn([String locale = 'en']) : super(locale);
 
   @override
+  String get chatContinuationSpendCredit => 'Continue with 1 credit';
+
+  @override
+  String get chatContinuationWaiting => 'Waiting for their reply';
+
+  @override
   String get rewardVideoNoAdsTitle => 'No ads available';
 
   @override
@@ -105,9 +111,6 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get appStringsSaveMyChoices => 'Save my choices';
-
-  @override
-  String get appStringsRefreshMyConsents => 'Refresh my consents';
 
   @override
   String get appStringsWithdrawMyConsent => 'Withdraw my consent';
@@ -443,10 +446,7 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get subscriptionPageLastKnownStatusRefreshToConfirm =>
-      'Last known status. Refresh to confirm your current entitlements.';
-
-  @override
-  String get subscriptionPageCheckMySubscription => 'Check my subscription';
+      'Your subscription status is being checked.';
 
   @override
   String get subscriptionPageSignUpAndPaymentManagementAre =>
@@ -780,10 +780,6 @@ class AppMessagesEn extends AppMessages {
       'Continue this conversation';
 
   @override
-  String get continuationPageYourConversationIsOpenContinuationConditions =>
-      'Your conversation is open. Continuation conditions are met.';
-
-  @override
   String continuationPageYouCanDecideUntilYouCan(Object arg0) {
     return 'You can decide until $arg0. You can still reread your messages.';
   }
@@ -812,42 +808,11 @@ class AppMessagesEn extends AppMessages {
       'Resume the same agreement';
 
   @override
-  String get continuationPageYourCurrentPlanNoCreditNeeded =>
-      'Your current plan: no credit needed for your agreement.';
-
-  @override
-  String continuationsAndCost(num count) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$countString new continuations available',
-      one: '$countString new continuation available',
-    );
-    return '$_temp0. Your agreement costs at most 1 credit.';
-  }
-
-  @override
-  String get continuationPageReadTheCostAndChooseTo =>
-      'Read the cost and choose to continue';
-
-  @override
-  String get continuationPageYourAllowanceDoesNotPermitAnother =>
-      'Your allowance does not permit another continuation right now.';
-
-  @override
   String get continuationPageViewMyCredits => 'View my credits';
 
   @override
   String get continuationPageEachPersonChoosesIndependentlyTheOther =>
       'Each person chooses independently. The other person’s choice stays private. You can end the match from the conversation options.';
-
-  @override
-  String get continuationPageRefreshMatchAndMyCredits =>
-      'Refresh match and my credits';
 
   @override
   String get continuationStringsYourPlanHasChangedCheckYour =>
@@ -1173,9 +1138,6 @@ class AppMessagesEn extends AppMessages {
   String get discoveryPageOpenSettings => 'Open settings';
 
   @override
-  String get discoveryPageRefreshEncounters => 'Refresh encounters';
-
-  @override
   String get discoveryPageRefreshMyLocation => 'Refresh my location';
 
   @override
@@ -1479,9 +1441,6 @@ class AppMessagesEn extends AppMessages {
   String get chatPageEnd => 'End';
 
   @override
-  String get chatPageRefreshConversation => 'Refresh conversation';
-
-  @override
   String get chatPageMatchOptions => 'Match options';
 
   @override
@@ -1503,9 +1462,6 @@ class AppMessagesEn extends AppMessages {
   @override
   String get chatPageTheConversationIsNoLongerAvailable =>
       'The conversation is no longer available.';
-
-  @override
-  String get chatPageRefreshMyMatches => 'Refresh my matches';
 
   @override
   String get chatPageOlderMessages => 'Older messages';
@@ -2474,9 +2430,6 @@ class AppMessagesEn extends AppMessages {
   @override
   String get profilePageSavingIsUncertainRefreshTheData =>
       'We couldn’t check whether your changes were saved. Refresh your profile before trying again; you can resume sending the same photo.';
-
-  @override
-  String get profilePageRefreshMyProfile => 'Refresh my profile';
 
   @override
   String get profilePageTheDetailsThatMatter => 'The details that matter.';

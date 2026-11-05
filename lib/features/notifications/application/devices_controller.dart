@@ -82,9 +82,11 @@ class DevicesController extends ChangeNotifier {
 
   Future<void> resume() async {
     if (!accessible) return;
+    final wasInactive = !_active;
     _active = true;
     _scope = RequestCancellation();
     _notify();
+    if (wasInactive) await load();
   }
 
   Future<void> ensureLoaded() => load(policy: ReadPolicy.cached);

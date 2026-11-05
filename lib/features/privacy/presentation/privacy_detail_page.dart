@@ -208,12 +208,13 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
       ),
     if (!c.loading && c.sessions.isEmpty)
       Text(AppStrings.of(context).messages.privacyDetailPageNoSessionsLoaded),
-    HistaeButton.outlined(
-      onPressed: enabled ? c.load : null,
-      child: Text(
-        AppStrings.of(context).messages.privacyDetailPageRefreshSessions,
+    if (c.failure != null || c.pendingRevoke != null)
+      HistaeButton.outlined(
+        onPressed: enabled ? c.load : null,
+        child: Text(
+          AppStrings.of(context).messages.privacyDetailPageRefreshSessions,
+        ),
       ),
-    ),
     if (c.cursor != null)
       HistaeButton.outlined(
         onPressed: enabled ? () => c.load(more: true) : null,
@@ -319,12 +320,13 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
             .messages
             .privacyDetailPageNoBlockedPeopleInThisList,
       ),
-    HistaeButton.outlined(
-      onPressed: enabled ? c.load : null,
-      child: Text(
-        AppStrings.of(context).messages.privacyDetailPageRefreshBlocks,
+    if (c.failure != null || c.pendingUnblock != null)
+      HistaeButton.outlined(
+        onPressed: enabled ? c.load : null,
+        child: Text(
+          AppStrings.of(context).messages.privacyDetailPageRefreshBlocks,
+        ),
       ),
-    ),
   ];
 
   List<Widget> _rights() {
@@ -398,12 +400,13 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
         Text(
           AppStrings.of(context).messages.privacyDetailPageNoRequestsToTrack,
         ),
-      HistaeButton.outlined(
-        onPressed: enabled ? c.load : null,
-        child: Text(
-          AppStrings.of(context).messages.privacyDetailPageRefreshTracking,
+      if (c.failure != null || c.rights.any((request) => request.open))
+        HistaeButton.outlined(
+          onPressed: enabled ? c.load : null,
+          child: Text(
+            AppStrings.of(context).messages.privacyDetailPageRefreshTracking,
+          ),
         ),
-      ),
     ];
   }
 

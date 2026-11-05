@@ -186,7 +186,7 @@ class ContinuationController extends ChangeNotifier {
   void invalidateQuota() {
     _quotaInvalidated = true;
     quotaReadAt = null;
-    quota = null;
+    // Keep the last plan label while balances remain unusable without readAt.
     _offer = null;
     _quotaDeadline?.cancel();
     _notify();
@@ -327,10 +327,7 @@ class ContinuationController extends ChangeNotifier {
         _now().toUtc().isBefore(nextWeeklyRenewal(readAt))) {
       return;
     }
-    quotaReadAt = null;
-    _offer = null;
-    _quotaDeadline?.cancel();
-    _notify();
+    invalidateQuota();
   }
 
   Future<ContinuationOffer?> prepareContinuation() async {

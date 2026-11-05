@@ -24,6 +24,43 @@ import 'support/matches_fixture.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   testWidgets(
+    'Monday renewal revalidates credits automatically once while active',
+    (tester) async {
+      var clock = DateTime.utc(2026, 11, 8, 23, 59, 58), reads = 0;
+      final session = testSession((request) async {
+        if (request.url.path.endsWith('/continuation-quota')) {
+          reads++;
+          return jsonResponse(quotaJson(remaining: reads == 1 ? 0 : 2));
+        }
+        return defaultContinuationResponse(request);
+      });
+      await session.establish(testTokens);
+      final access = MatchesController(
+        MatchesRepository(session),
+        realtime: QuietRealtime(session),
+        now: () => clock,
+      );
+      final c = ContinuationController(access, now: () => clock);
+      try {
+        await access.activate();
+        await c.activate();
+        expect(reads, 1);
+        clock = clock.add(const Duration(seconds: 3));
+        await tester.pump(const Duration(seconds: 3));
+        await tester.pumpAndSettle();
+        expect(reads, 2);
+        expect(c.quotaReadAt, clock);
+        expect(c.quota!.remaining, 2);
+        await tester.pump(const Duration(seconds: 1));
+        expect(reads, 2);
+      } finally {
+        c.dispose();
+        access.dispose();
+        session.dispose();
+      }
+    },
+  );
+  testWidgets(
     'a subscription event during a quota read rejects the stale result and refreshes only quota',
     (tester) async {
       var quotas = 0, plans = 0, matches = 0;

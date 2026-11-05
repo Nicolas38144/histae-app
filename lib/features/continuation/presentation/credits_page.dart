@@ -182,160 +182,142 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
         child: HistaeScaffold(
           appBar: AppBar(
             title: Text(AppStrings.of(context).messages.creditsPageYourCredits),
-            actions: [
-              IconButton(
-                onPressed: c.loading || video.busy || c.retrySeconds > 0
-                    ? null
-                    : _refresh,
-                tooltip: AppStrings.of(context)
-                    .messages
-                    .creditsPageRefreshMyCredits,
-                icon: const Icon(Icons.refresh_rounded),
-              ),
-              const SizedBox(width: 12),
-            ],
           ),
           body: SafeArea(
-            child: RefreshIndicator(
-              onRefresh: video.busy ? () async {} : _refresh,
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
-                children: [
-                  Text(
-                    AppStrings.of(context).messages.creditsPageTimeToContinue,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.primary,
-                    ),
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+              children: [
+                Text(
+                  AppStrings.of(context).messages.creditsPageTimeToContinue,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.primary,
                   ),
-                  const SizedBox(height: 12),
-                  Text(
-                    AppStrings.of(context)
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  AppStrings.of(context)
+                      .messages
+                      .creditsPageTheNextChapterStartsHere,
+                  style: theme.textTheme.headlineLarge,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  AppStrings.of(context)
+                      .messages
+                      .creditsPageCreditsForTheConnectionsYouWant,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                if (c.loading) ...[
+                  LinearProgressIndicator(
+                    semanticsLabel: AppStrings.of(context)
                         .messages
-                        .creditsPageTheNextChapterStartsHere,
-                    style: theme.textTheme.headlineLarge,
+                        .creditsPageCheckingYourCredits,
                   ),
-                  const SizedBox(height: 12),
-                  Text(
-                    AppStrings.of(context)
-                        .messages
-                        .creditsPageCreditsForTheConnectionsYouWant,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  if (c.loading) ...[
-                    LinearProgressIndicator(
-                      semanticsLabel: AppStrings.of(context)
-                          .messages
-                          .creditsPageCheckingYourCredits,
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                  if (fresh) ...[
-                    if (q.weeklyLimitReached) ...[
-                      CreditRecoveryCard(
-                        quota: q,
-                        enabled: !c.loading && !video.busy,
-                        onWatchVideo: _watchVideo,
-                        onOpenSubscription: _openSubscription,
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-                    if (promotesVideo) ...[
-                      if (q.suggestsRewardedVideo) ...[
-                        Text(
-                          AppStrings.of(context)
-                              .messages
-                              .creditRecoveryFreeTitle,
-                          style: theme.textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: 12),
-                      ],
-                      RewardVideoCard(
-                        credits: c,
-                        video: video,
-                        onWatch: _watchVideo,
-                        onCancel: _cancelReward,
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-                    CreditsBalancePanel(quota: q),
-                    if (!q.premium) ...[
-                      const SizedBox(height: 16),
-                      CreditsWeekPanel(quota: q),
-                    ],
-                  ] else if (!c.loading)
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            const Icon(Icons.cloud_off_outlined, size: 32),
-                            const SizedBox(height: 16),
-                            Text(
-                              AppStrings.of(context)
-                                  .messages
-                                  .creditsPageYourBalanceStillNeedsChecking,
-                              style: theme.textTheme.titleLarge,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              c.failure == null
-                                  ? AppStrings.of(context)
-                                        .messages
-                                        .creditsPageRefreshYourCreditsToViewYour
-                                  : ContinuationStrings(AppStrings.of(context))
-                                        .failure(c.failure!),
-                            ),
-                            const SizedBox(height: 16),
-                            HistaeButton.outlinedIcon(
-                              onPressed: c.retrySeconds > 0 ? null : _refresh,
-                              icon: const Icon(Icons.refresh),
-                              label: Text(
-                                c.retrySeconds > 0
-                                    ? AppStrings.of(context).messages
-                                          .continuationBalanceCardTryAgainInS(
-                                            c.retrySeconds,
-                                          )
-                                    : AppStrings.of(context)
-                                          .messages
-                                          .creditsPageRefreshMyCredits,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  if (fresh && !q.premium) ...[
-                    if (!promotesVideo &&
-                        (!q.weeklyLimitReached ||
-                            c.rewards.intent != null)) ...[
-                      const SizedBox(height: 16),
-                      RewardVideoCard(
-                        credits: c,
-                        video: video,
-                        onWatch: _watchVideo,
-                        onCancel: _cancelReward,
-                      ),
-                    ],
-                    const SizedBox(height: 16),
-                    CreditsExplanation(quota: q),
-                  ],
-                  const SizedBox(height: 20),
-                  Text(
-                    AppStrings.of(context)
-                        .messages
-                        .creditsPageAMatchContinuesTogetherEachPerson,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
+                  const SizedBox(height: 16),
                 ],
-              ),
+                if (fresh) ...[
+                  if (q.weeklyLimitReached) ...[
+                    CreditRecoveryCard(
+                      quota: q,
+                      enabled: !c.loading && !video.busy,
+                      onWatchVideo: _watchVideo,
+                      onOpenSubscription: _openSubscription,
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  if (promotesVideo) ...[
+                    if (q.suggestsRewardedVideo) ...[
+                      Text(
+                        AppStrings.of(context).messages.creditRecoveryFreeTitle,
+                        style: theme.textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+                    RewardVideoCard(
+                      credits: c,
+                      video: video,
+                      onWatch: _watchVideo,
+                      onCancel: _cancelReward,
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  CreditsBalancePanel(quota: q),
+                  if (!q.premium) ...[
+                    const SizedBox(height: 16),
+                    CreditsWeekPanel(quota: q),
+                  ],
+                ] else if (!c.loading)
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Icon(Icons.cloud_off_outlined, size: 32),
+                          const SizedBox(height: 16),
+                          Text(
+                            AppStrings.of(context)
+                                .messages
+                                .creditsPageYourBalanceStillNeedsChecking,
+                            style: theme.textTheme.titleLarge,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            c.failure == null
+                                ? AppStrings.of(context)
+                                      .messages
+                                      .creditsPageRefreshYourCreditsToViewYour
+                                : ContinuationStrings(AppStrings.of(context))
+                                      .failure(c.failure!),
+                          ),
+                          const SizedBox(height: 16),
+                          HistaeButton.outlinedIcon(
+                            onPressed: c.retrySeconds > 0 ? null : _refresh,
+                            icon: const Icon(Icons.refresh),
+                            label: Text(
+                              c.retrySeconds > 0
+                                  ? AppStrings.of(context).messages
+                                        .continuationBalanceCardTryAgainInS(
+                                          c.retrySeconds,
+                                        )
+                                  : AppStrings.of(context)
+                                        .messages
+                                        .creditsPageRefreshMyCredits,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                if (fresh && !q.premium) ...[
+                  if (!promotesVideo &&
+                      (!q.weeklyLimitReached || c.rewards.intent != null)) ...[
+                    const SizedBox(height: 16),
+                    RewardVideoCard(
+                      credits: c,
+                      video: video,
+                      onWatch: _watchVideo,
+                      onCancel: _cancelReward,
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  CreditsExplanation(quota: q),
+                ],
+                const SizedBox(height: 20),
+                Text(
+                  AppStrings.of(context)
+                      .messages
+                      .creditsPageAMatchContinuesTogetherEachPerson,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
           ),
         ),

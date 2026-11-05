@@ -157,6 +157,7 @@ class PrivacyController extends ChangeNotifier {
 
   Future<void> resume() async {
     if (!accessible) return;
+    final wasInactive = !_active;
     _active = true;
     _scope = RequestCancellation();
     if (_sharePendingCleanup && !sharing) {
@@ -164,6 +165,12 @@ class PrivacyController extends ChangeNotifier {
       await _cleanExport();
     }
     _notify();
+    if (wasInactive &&
+        section != null &&
+        section != PrivacySection.export &&
+        section != PrivacySection.deletion) {
+      await load();
+    }
   }
 
   Future<void> enter(PrivacySection value) async {

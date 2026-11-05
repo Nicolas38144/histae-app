@@ -135,7 +135,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
     if (mounted && accepted == true) await c.checkout(period);
   }
 
-  Future<void> _refresh() async {
+  Future<void> _retry() async {
     await c.activate();
     await c.load();
     await _catalog?.load();
@@ -154,133 +154,124 @@ class _SubscriptionPageState extends State<SubscriptionPage>
           constraints: const BoxConstraints(maxWidth: 680),
           child: ListenableBuilder(
             listenable: c,
-            builder: (context, _) => RefreshIndicator(
-              onRefresh: _refresh,
-              child: ListView(
-                padding: const EdgeInsets.all(24),
-                children: [
+            builder: (context, _) => ListView(
+              padding: const EdgeInsets.all(24),
+              children: [
+                Text(
+                  AppStrings.of(context)
+                      .messages
+                      .subscriptionPageFindYourPlanAndWhatIt,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                if (!c.accessible) ...[
                   Text(
                     AppStrings.of(context)
                         .messages
-                        .subscriptionPageFindYourPlanAndWhatIt,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                        .subscriptionPageYourSessionMustBeVerifiedTo,
                   ),
-                  const SizedBox(height: 20),
-                  if (!c.accessible) ...[
+                  _plans(context),
+                ] else ...[
+                  if (c.loading)
+                    LinearProgressIndicator(
+                      semanticsLabel: AppStrings.of(context)
+                          .messages
+                          .subscriptionPageCheckingYourSubscription,
+                    ),
+                  if (c.subscription case final state?)
+                    SubscriptionSummary(state: state),
+                  if (!c.fresh && c.subscription != null)
                     Text(
                       AppStrings.of(context)
                           .messages
-                          .subscriptionPageYourSessionMustBeVerifiedTo,
+                          .subscriptionPageLastKnownStatusRefreshToConfirm,
                     ),
-                    _plans(context),
-                  ] else ...[
-                    if (c.loading)
-                      LinearProgressIndicator(
-                        semanticsLabel: AppStrings.of(context)
-                            .messages
-                            .subscriptionPageCheckingYourSubscription,
-                      ),
-                    if (c.subscription case final state?)
-                      SubscriptionSummary(state: state),
-                    if (!c.fresh && c.subscription != null)
-                      Text(
-                        AppStrings.of(context)
-                            .messages
-                            .subscriptionPageLastKnownStatusRefreshToConfirm,
-                      ),
-                    if (c.failure case final error?) ...[
-                      const SizedBox(height: 16),
-                      Semantics(
-                        liveRegion: true,
-                        child: Text(
-                          BillingStrings(AppStrings.of(context)).error(error),
-                        ),
-                      ),
-                      if (error.requestId != null)
-                        Text(
-                          AppStrings.of(context)
-                              .requestReference(error.requestId!),
-                        ),
-                    ],
-                    if (BillingStrings(AppStrings.of(context))
-                        .notice(c.notice)
-                        .isNotEmpty) ...[
-                      const SizedBox(height: 16),
-                      Semantics(
-                        liveRegion: true,
-                        child: Text(
-                          BillingStrings(AppStrings.of(context))
-                              .notice(c.notice),
-                        ),
-                      ),
-                    ],
-                    _plans(context),
-                    const SizedBox(height: 20),
-                    HistaeButton.outlinedIcon(
-                      onPressed: c.loading || c.busy || c.retrySeconds > 0
-                          ? null
-                          : _refresh,
-                      icon: const Icon(Icons.refresh_rounded, size: 20),
-                      label: Text(
-                        c.retrySeconds > 0
-                            ? AppStrings.of(context).retryIn(c.retrySeconds)
-                            : AppStrings.of(context)
-                                  .messages
-                                  .subscriptionPageCheckMySubscription,
+                  if (c.failure case final error?) ...[
+                    const SizedBox(height: 16),
+                    Semantics(
+                      liveRegion: true,
+                      child: Text(
+                        BillingStrings(AppStrings.of(context)).error(error),
                       ),
                     ),
-                    if (c.busy)
-                      LinearProgressIndicator(
-                        semanticsLabel: AppStrings.of(context)
-                            .messages
-                            .billingStoreVerifying,
-                      ),
-                    if (c.purchasePending)
-                      Text(AppStrings.of(context).messages.billingStorePending),
-                    if (c.config.available) ...[
-                      const SizedBox(height: 12),
-                      HistaeButton.outlinedIcon(
-                        onPressed: c.busy || c.loading
-                            ? null
-                            : c.restorePurchases,
-                        icon: const Icon(Icons.restore_rounded, size: 20),
-                        label: Text(
-                          AppStrings.of(context)
-                              .messages
-                              .billingRestorePurchases,
-                        ),
-                      ),
-                    ],
-                    if (c.subscription?.provider == 'stripe')
-                      Text(
-                        AppStrings.of(context).messages.billingStoreManagedWeb,
-                      ),
-                    if (!c.paymentsAvailable) ...[
-                      const EditorialDivider(),
+                    if (error.requestId != null)
                       Text(
                         AppStrings.of(context)
-                            .messages
-                            .subscriptionPageSignUpAndPaymentManagementAre,
-                      ),
-                    ],
-                    if ([
-                      'app_store',
-                      'google_play',
-                    ].contains(c.subscription?.provider))
-                      HistaeButton.outlinedIcon(
-                        onPressed: _canAct ? c.portal : null,
-                        icon: const Icon(Icons.open_in_new),
-                        label: Text(
-                          AppStrings.of(context)
-                              .messages
-                              .subscriptionPageManageMySubscription,
-                        ),
+                            .requestReference(error.requestId!),
                       ),
                   ],
+                  if (BillingStrings(AppStrings.of(context))
+                      .notice(c.notice)
+                      .isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    Semantics(
+                      liveRegion: true,
+                      child: Text(
+                        BillingStrings(AppStrings.of(context)).notice(c.notice),
+                      ),
+                    ),
+                  ],
+                  _plans(context),
+                  const SizedBox(height: 20),
+
+                  if (c.failure != null && !c.purchasePending)
+                    HistaeButton.outlined(
+                      onPressed: c.loading || c.busy || c.retrySeconds > 0
+                          ? null
+                          : _retry,
+                      child: Text(
+                        AppStrings.of(context).messages.appStringsTryAgain,
+                      ),
+                    ),
+                  if (c.busy)
+                    LinearProgressIndicator(
+                      semanticsLabel: AppStrings.of(context)
+                          .messages
+                          .billingStoreVerifying,
+                    ),
+                  if (c.purchasePending)
+                    Text(AppStrings.of(context).messages.billingStorePending),
+                  if (c.config.available) ...[
+                    const SizedBox(height: 12),
+                    HistaeButton.outlinedIcon(
+                      onPressed: c.busy || c.loading
+                          ? null
+                          : c.restorePurchases,
+                      icon: const Icon(Icons.restore_rounded, size: 20),
+                      label: Text(
+                        AppStrings.of(context).messages.billingRestorePurchases,
+                      ),
+                    ),
+                  ],
+                  if (c.subscription?.provider == 'stripe')
+                    Text(
+                      AppStrings.of(context).messages.billingStoreManagedWeb,
+                    ),
+                  if (!c.paymentsAvailable) ...[
+                    const EditorialDivider(),
+                    Text(
+                      AppStrings.of(context)
+                          .messages
+                          .subscriptionPageSignUpAndPaymentManagementAre,
+                    ),
+                  ],
+                  if ([
+                    'app_store',
+                    'google_play',
+                  ].contains(c.subscription?.provider))
+                    HistaeButton.outlinedIcon(
+                      onPressed: _canAct ? c.portal : null,
+                      icon: const Icon(Icons.open_in_new),
+                      label: Text(
+                        AppStrings.of(context)
+                            .messages
+                            .subscriptionPageManageMySubscription,
+                      ),
+                    ),
                 ],
-              ),
+              ],
             ),
           ),
         ),

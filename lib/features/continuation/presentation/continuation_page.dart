@@ -11,10 +11,8 @@ import '../../catalog/data/catalog_repository.dart';
 import '../../matches/data/match_models.dart';
 import '../../matches/presentation/matches_strings.dart';
 import '../application/continuation_controller.dart';
+import 'continuation_action.dart';
 import 'continuation_strings.dart';
-import 'continuation_subscription_navigation.dart';
-import 'credit_recovery_card.dart';
-import 'credits_page.dart';
 import 'photo_reveal_panel.dart';
 
 class ContinuationPage extends StatefulWidget {
@@ -68,57 +66,8 @@ class _ContinuationPageState extends State<ContinuationPage>
     super.dispose();
   }
 
-  Future<void> _continue() async {
-    final offer = await c.prepareContinuation();
-    if (!mounted) return;
-    if (offer == null) {
-      final quota = c.quota;
-      if (c.quotaReadAt != null && c.canContinue && c.pendingCost == null) {
-        if (quota?.weeklyLimitReached == true) {
-          await _openSubscription();
-        } else if (quota?.suggestsRewardedVideo == true && !quota!.canStart) {
-          await _openCredits(focusVideo: true);
-        }
-      }
-      return;
-    }
-    final accepted = await confirmAction(
-      context,
-      AppStrings.of(context).messages.continuationPageContinueThisMatch,
-      offer.cost == 0
-          ? AppStrings.of(context)
-                .messages
-                .continuationPageYourCurrentPlanRequiresNoCredit
-          : AppStrings.of(context)
-                .messages
-                .continuationPageYouAcceptAMaximumCostOf,
-      action: offer.cost == 0
-          ? AppStrings.of(context)
-                .messages
-                .continuationPageContinueWithoutCredits
-          : AppStrings.of(context).messages.continuationPageAcceptUpTo1Credit,
-    );
-    if (accepted && mounted) await c.accept(offer);
-  }
-
-  Future<void> _openCredits({bool focusVideo = false}) async {
-    final route = MaterialPageRoute<void>(
-      builder: (_) => CreditsPage(
-        controller: c,
-        catalog: widget.catalog,
-        focusVideo: focusVideo,
-      ),
-    );
-    await Navigator.of(context).push(route);
-    await route.completed;
-    if (mounted) await c.activate();
-  }
-
-  Future<void> _openSubscription() => openContinuationSubscription(
-    context,
-    credits: c,
-    catalog: widget.catalog,
-  );
+  Future<void> _openCredits() =>
+      openContinuationCredits(context, controller: c, catalog: widget.catalog);
 
   Future<void> _reveal() async {
     if (await confirmAction(
@@ -212,21 +161,15 @@ class _ContinuationPageState extends State<ContinuationPage>
                   onWithdraw: _withdrawReveal,
                   onOpenProfile: widget.onOpenProfile,
                 ),
-                const EditorialDivider(),
-                Text(
-                  AppStrings.of(context)
-                      .messages
-                      .continuationPageContinueThisConversation,
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 12),
-                if (m.status == MatchStatus.confirmed)
+                if (m.status == MatchStatus.awaitingContinuation) ...[
+                  const EditorialDivider(),
                   Text(
                     AppStrings.of(context)
                         .messages
-                        .continuationPageYourConversationIsOpenContinuationConditions,
+                        .continuationPageContinueThisConversation,
+                    style: Theme.of(context).textTheme.headlineSmall,
                   ),
-                if (m.status == MatchStatus.awaitingContinuation) ...[
+                  const SizedBox(height: 12),
                   Text(
                     AppStrings.of(context).messages
                         .continuationPageYouCanDecideUntilYouCan(
@@ -236,105 +179,48 @@ class _ContinuationPageState extends State<ContinuationPage>
                   ),
                   if (c.myContinued)
                     Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                       child: Text(
                         AppStrings.of(context)
                             .messages
                             .continuationPageYourChoiceToContinueHasBeen,
                       ),
                     )
-                  else if (c.pendingCost case final cost?) ...[
+                  else ...[
+                    if (c.pendingCost case final cost?)
+                      Text(
+                        AppStrings.of(context).messages
+                            .continuationPageThisRequestStillNeedsConfirmationWith(
+                              cost,
+                            ),
+                      ),
+                    ContinuationAction(
+                      controller: c,
+                      matchId: widget.matchId,
+                      catalog: widget.catalog,
+                      showFeedback: false,
+                    ),
+                  ],
+                  HistaeButton.text(
+                    onPressed: c.busy ? null : _openCredits,
+                    child: Text(
+                      AppStrings.of(context)
+                          .messages
+                          .continuationPageViewMyCredits,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    AppStrings.of(context)
+                        .messages
+                        .continuationPageEachPersonChoosesIndependentlyTheOther,
+                  ),
+                  if (c.retrySeconds > 0)
                     Text(
                       AppStrings.of(context).messages
-                          .continuationPageThisRequestStillNeedsConfirmationWith(
-                            cost,
-                          ),
+                          .appStringsTryAgainInS(c.retrySeconds),
                     ),
-                    HistaeButton(
-                      onPressed: c.canContinue ? c.resumeContinuation : null,
-                      child: Text(
-                        AppStrings.of(context)
-                            .messages
-                            .continuationPageResumeTheSameAgreement,
-                      ),
-                    ),
-                  ] else ...[
-                    if (c.quotaReadAt != null && c.quota != null)
-                      Text(
-                        c.quota!.premium
-                            ? AppStrings.of(context)
-                                  .messages
-                                  .continuationPageYourCurrentPlanNoCreditNeeded
-                            : AppStrings.of(context).messages
-                                  .continuationsAndCost(c.quota!.remaining!),
-                      ),
-                    HistaeButton(
-                      onPressed:
-                          c.canContinue &&
-                              c.quota?.canStart == true &&
-                              c.quotaReadAt != null
-                          ? _continue
-                          : null,
-                      child: Text(
-                        AppStrings.of(context)
-                            .messages
-                            .continuationPageReadTheCostAndChooseTo,
-                      ),
-                    ),
-                    if (c.quotaReadAt != null &&
-                        c.quota != null &&
-                        (c.quota!.weeklyLimitReached ||
-                            c.quota!.suggestsRewardedVideo)) ...[
-                      const SizedBox(height: 16),
-                      CreditRecoveryCard(
-                        quota: c.quota!,
-                        enabled: c.canContinue,
-                        onWatchVideo: () => _openCredits(focusVideo: true),
-                        onOpenSubscription: _openSubscription,
-                      ),
-                    ] else if (c.quotaReadAt != null &&
-                        c.quota?.canStart == false)
-                      Text(
-                        AppStrings.of(context)
-                            .messages
-                            .continuationPageYourAllowanceDoesNotPermitAnother,
-                      ),
-                  ],
                 ],
-                HistaeButton.text(
-                  onPressed: c.busy ? null : _openCredits,
-                  child: Text(
-                    AppStrings.of(context)
-                        .messages
-                        .continuationPageViewMyCredits,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  AppStrings.of(context)
-                      .messages
-                      .continuationPageEachPersonChoosesIndependentlyTheOther,
-                ),
-                if (c.retrySeconds > 0)
-                  Text(
-                    AppStrings.of(context).messages
-                        .appStringsTryAgainInS(c.retrySeconds),
-                  ),
-                HistaeButton.outlinedIcon(
-                  onPressed: c.busy || c.loading || c.retrySeconds > 0
-                      ? null
-                      : () async {
-                          await c.access.refresh();
-                          await c.activate();
-                          await c.loadQuota();
-                        },
-                  icon: const Icon(Icons.refresh),
-                  label: Text(
-                    AppStrings.of(context)
-                        .messages
-                        .continuationPageRefreshMatchAndMyCredits,
-                  ),
-                ),
               ],
             ],
           ),

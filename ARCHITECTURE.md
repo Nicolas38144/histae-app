@@ -27,8 +27,8 @@ Writes invalidate affected snapshots before and after the request, including unc
 Generation checks reject late responses. Errors, cancellations, exports and SSE streams are not
 cached. Account/access changes clear private state; language changes invalidate localized reads.
 
-Refresh only affected resources after writes, relevant server events, manual refresh or a known
-deadline. Expired feed presence immediately hides stale profiles and exposes the location step;
+Refresh only affected resources after writes, relevant server events or a known deadline. Manual
+refresh belongs to Feed; other screens expose recovery only after failure or an uncertain outcome. Expired feed presence immediately hides stale profiles and exposes the location step;
 readiness refreshes once, without automatic GPS or a repeated-expiry request loop.
 `DeviceLocation` obtains one fresh cancellable fix with a 25-second timeout. Android can request
 native location activation; iOS and unsupported devices offer settings.

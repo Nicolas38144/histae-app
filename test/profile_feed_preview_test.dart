@@ -92,9 +92,11 @@ void main() {
       expect(writes, isEmpty);
 
       unavailable = true;
+      expect(find.byType(RefreshIndicator), findsNothing);
       final refresh = tester
-          .widget<RefreshIndicator>(find.byType(RefreshIndicator))
-          .onRefresh();
+          .widget<ProfileFeedPreviewPage>(page)
+          .controller
+          .load();
       await refresh;
       await tester.pumpAndSettle();
       expect(find.byType(FeedProfileContent), findsNothing);

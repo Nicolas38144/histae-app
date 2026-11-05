@@ -17,11 +17,7 @@ void main() {
   testWidgets(
     'matches and quota share a fixed initial indicator; realtime revalidation stays silent',
     (tester) async {
-      final matches = [
-        Completer<http.Response>(),
-        Completer<http.Response>(),
-        Completer<http.Response>(),
-      ];
+      final matches = [Completer<http.Response>(), Completer<http.Response>()];
       final quotas = [Completer<http.Response>(), Completer<http.Response>()];
       var matchReads = 0, quotaReads = 0;
       final session = testSession((r) async {
@@ -63,10 +59,7 @@ void main() {
         findsNothing,
       );
       expect(find.text('Actualisation de vos crédits…'), findsOneWidget);
-      // Pulling again during the initial load must not cancel or restart it.
-      await tester
-          .widget<RefreshIndicator>(find.byType(RefreshIndicator))
-          .onRefresh();
+      expect(find.byType(RefreshIndicator), findsNothing);
       expect(matchReads, 1);
       matches[0].complete(
         jsonResponse({
@@ -95,19 +88,8 @@ void main() {
       await tester.pump();
       expect(quotaReads, 1);
       expect(find.byType(LinearProgressIndicator), findsNothing);
-      // Realtime updates messages/matches, not the independent credit balance.
-      unawaited(
-        tester
-            .widget<RefreshIndicator>(find.byType(RefreshIndicator))
-            .onRefresh(),
-      );
-      await tester.pump();
-      matches[2].complete(
-        jsonResponse({
-          'matches': [publicMatchJson()],
-          'next_cursor': null,
-        }),
-      );
+      // A subscription event refreshes only the independent credit balance.
+      realtime.emit(const MobileSignal('subscription.updated'));
       await tester.pump();
       await tester.pump();
       expect(quotaReads, 2);

@@ -41,6 +41,9 @@ class RewardTracker extends ChangeNotifier {
 
   bool get waiting => retryAt?.isAfter(DateTime.now()) == true;
 
+  bool get needsVerificationRetry =>
+      _active && canPoll && completedVideo && !busy && _poll?.isActive != true;
+
   bool _alive(int epoch) => _active && accessible && epoch == _epoch;
 
   void _notify() {

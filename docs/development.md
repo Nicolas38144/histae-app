@@ -12,6 +12,14 @@ Do not run Git commands or recreate environment example files. Delete files only
 cleanup scope, with evidence they are obsolete. Suggest commit messages in English. Do not execute
 new or modified `.sh` scripts during local verification.
 
+## Refresh controls
+
+Feed keeps manual refresh. Remove routine reload buttons and pull-to-refresh elsewhere; use writes,
+server events, known deadlines and foreground recovery. Preserve explicit purchase restoration,
+uncertain-write recovery and failed-read retries. Reward verification is available after automatic
+polling stops; open privacy requests retain tracking because dashboard replies have no realtime event.
+Session/block/device reloads and photo-preview renewal appear only when recovery is needed.
+
 ## Checks
 
 Format changed Dart files, then check formatting and analysis:
@@ -54,6 +62,7 @@ translations, 200% text, keyboard layouts and insets against the [design system]
 | `preview_billing_test.dart`, `preview_benefits_test.dart` | Offers, subscription/profile/credit states |
 | `preview_preferences_test.dart`, `preview_help_test.dart` | Forms and safety/help links |
 | `preview_message_queue_test.dart` | Pending dots, receipts, composer limit and update gate |
+| `preview_continuation_test.dart` | Credit/Premium continuation, automatic confirmation, empty balances and refresh controls |
 | `preview_feed_test.dart`, `preview_reading_test.dart` | Feed actions and Aa settings |
 | `preview_photo_reveal_test.dart` | Match, chat, photo consent and withdrawal |
 | `preview_refactor_test.dart` | Navigation, archives/search and profile states |

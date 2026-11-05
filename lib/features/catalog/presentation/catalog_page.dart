@@ -146,11 +146,6 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
           ),
           const SizedBox(height: 16),
           Text(strings.catalogReadOnly),
-          const SizedBox(height: 16),
-          HistaeButton.outlined(
-            onPressed: controller.load,
-            child: Text(strings.refresh),
-          ),
         ],
       ),
     };

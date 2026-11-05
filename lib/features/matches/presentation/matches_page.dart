@@ -226,13 +226,6 @@ class _MatchesPageState extends State<MatchesPage> {
               onPressed: _openCredits,
               icon: const Icon(Icons.account_balance_wallet_outlined),
             ),
-            IconButton(
-              tooltip: AppStrings.of(context)
-                  .messages
-                  .discoveryPageRefreshEncounters,
-              onPressed: _loading || c.retrySeconds > 0 ? null : _refresh,
-              icon: const Icon(Icons.refresh),
-            ),
           ],
         ),
         body: SafeArea(
@@ -275,105 +268,108 @@ class _MatchesPageState extends State<MatchesPage> {
                   ),
                 ),
               Expanded(
-                child: RefreshIndicator(
-                  onRefresh: _refresh,
-                  child: ListView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(24),
-                    children: [
-                      if (query.isEmpty &&
-                          !_loading &&
-                          !list.hasMatches &&
-                          c.failure == null)
-                        HistaeEmptyState(
-                          key: const Key('matches-empty'),
-                          title: AppStrings.of(context)
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(24),
+                  children: [
+                    if (query.isEmpty &&
+                        !_loading &&
+                        !list.hasMatches &&
+                        c.failure == null)
+                      HistaeEmptyState(
+                        key: const Key('matches-empty'),
+                        title: AppStrings.of(context)
+                            .messages
+                            .matchesEmptyTitle,
+                      ),
+                    if (query.isNotEmpty && c.listCursor != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: Text(
+                          AppStrings.of(context)
                               .messages
-                              .matchesEmptyTitle,
+                              .matchesSearchLoadedOnly,
                         ),
-                      if (query.isNotEmpty && c.listCursor != null)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
+                      ),
+                    if (query.isNotEmpty && !list.hasResults && !_loading)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        child: Text(
+                          AppStrings.of(context).messages.matchesSearchEmpty,
+                        ),
+                      ),
+                    if (c.notice == 'ended')
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        child: Text(
+                          AppStrings.of(context)
+                              .messages
+                              .matchesPageThisMatchHasEnded,
+                        ),
+                      ),
+                    if (c.failure case final error?)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Semantics(
+                          liveRegion: true,
                           child: Text(
-                            AppStrings.of(context)
-                                .messages
-                                .matchesSearchLoadedOnly,
+                            MatchesStrings(AppStrings.of(context))
+                                .failure(error),
                           ),
                         ),
-                      if (query.isNotEmpty && !list.hasResults && !_loading)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 24),
-                          child: Text(
-                            AppStrings.of(context).messages.matchesSearchEmpty,
-                          ),
+                      ),
+                    if (c.failure != null)
+                      HistaeButton.outlined(
+                        onPressed: _loading || c.retrySeconds > 0
+                            ? null
+                            : _refresh,
+                        child: Text(
+                          AppStrings.of(context).messages.appStringsTryAgain,
                         ),
-                      if (c.notice == 'ended')
-                        Padding(
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          child: Text(
-                            AppStrings.of(context)
-                                .messages
-                                .matchesPageThisMatchHasEnded,
-                          ),
+                      ),
+                    for (final match in list.current) _matchCard(match),
+                    if (list.archived.isNotEmpty)
+                      ExpansionTile(
+                        key: PageStorageKey((
+                          'matches-archives',
+                          _key,
+                          query.isNotEmpty,
+                        )),
+                        initiallyExpanded: query.isNotEmpty,
+                        title: Text(
+                          AppStrings.of(context).messages.matchesArchivedTitle,
                         ),
-                      if (c.failure case final error?)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          child: Semantics(
-                            liveRegion: true,
-                            child: Text(
-                              MatchesStrings(AppStrings.of(context))
-                                  .failure(error),
-                            ),
-                          ),
+                        children: [
+                          for (final match in list.archived) _matchCard(match),
+                        ],
+                      ),
+                    if (c.retrySeconds > 0)
+                      Text(
+                        AppStrings.of(context).messages
+                            .appStringsTryAgainInS(c.retrySeconds),
+                      ),
+                    if (c.listCursor != null)
+                      HistaeButton.outlined(
+                        onPressed: c.listLoading || c.retrySeconds > 0
+                            ? null
+                            : c.loadMore,
+                        child: Text(
+                          AppStrings.of(context)
+                              .messages
+                              .matchesPageViewMoreMatches,
                         ),
-                      for (final match in list.current) _matchCard(match),
-                      if (list.archived.isNotEmpty)
-                        ExpansionTile(
-                          key: PageStorageKey((
-                            'matches-archives',
-                            _key,
-                            query.isNotEmpty,
-                          )),
-                          initiallyExpanded: query.isNotEmpty,
-                          title: Text(
-                            AppStrings.of(context)
-                                .messages
-                                .matchesArchivedTitle,
-                          ),
-                          children: [
-                            for (final match in list.archived)
-                              _matchCard(match),
-                          ],
-                        ),
-                      if (c.retrySeconds > 0)
-                        Text(
-                          AppStrings.of(context).messages
-                              .appStringsTryAgainInS(c.retrySeconds),
-                        ),
-                      if (c.listCursor != null)
-                        HistaeButton.outlined(
-                          onPressed: c.listLoading || c.retrySeconds > 0
-                              ? null
-                              : c.loadMore,
-                          child: Text(
-                            AppStrings.of(context)
-                                .messages
-                                .matchesPageViewMoreMatches,
-                          ),
-                        ),
-                      if (query.isEmpty) ...[
-                        const SizedBox(height: 16),
-                        ContinuationBalanceCard(
-                          key: ValueKey(('matches-credits', _key)),
-                          onOpenSubscription: _openSubscription,
-                          controller: c.continuation,
-                          onOpenCredits: _openCredits,
-                          loading: _overviewLoads > 0,
-                        ),
-                      ],
+                      ),
+                    if (query.isEmpty) ...[
+                      const SizedBox(height: 16),
+                      ContinuationBalanceCard(
+                        key: ValueKey(('matches-credits', _key)),
+                        onOpenSubscription: _openSubscription,
+                        controller: c.continuation,
+                        onOpenCredits: _openCredits,
+                        loading: _overviewLoads > 0,
+                      ),
                     ],
-                  ),
+                  ],
                 ),
               ),
             ],

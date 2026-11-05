@@ -71,18 +71,6 @@ class _ProfilePageState extends State<ProfilePage> {
     ]);
   }
 
-  Future<void> _load() async {
-    await Future.wait([
-      controller.load(),
-      _loadBalance(),
-      if (widget.visibility case final visibility?) visibility.load(),
-    ]);
-  }
-
-  Future<void> _loadBalance() async {
-    await widget.continuation.refreshQuota();
-  }
-
   @override
   void dispose() {
     widget.continuation.suspend(notify: false);
@@ -124,194 +112,183 @@ class _ProfilePageState extends State<ProfilePage> {
       return HistaeScaffold(
         appBar: AppBar(
           title: Text(strings.accountTitle),
-          actions: [
-            IconButton(
-              tooltip: c.retrySeconds > 0
-                  ? strings.retryIn(c.retrySeconds)
-                  : strings.messages.profilePageRefreshMyProfile,
-              onPressed: c.loading || c.saving || c.retrySeconds > 0
-                  ? null
-                  : _load,
-              icon: const Icon(Icons.refresh_rounded),
-            ),
-            const LanguageButton(),
-          ],
+          actions: [const LanguageButton()],
         ),
         body: SafeArea(
-          child: RefreshIndicator(
-            onRefresh: _load,
-            child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(24),
-              children: [
-                EditorialCard(
-                  eyebrow: AppStrings.of(context)
-                      .messages
-                      .profilePageYourProfile,
-                  title: p == null
-                      ? AppStrings.of(context)
-                            .messages
-                            .profilePageAMeetingStartsWithYou
-                      : AppStrings.of(context).messages
-                            .profilePageTheWordsOf(p.firstname),
-                  body: AppStrings.of(context)
-                      .messages
-                      .profilePageAWayToTellYourStory,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(24),
+            children: [
+              EditorialCard(
+                eyebrow: AppStrings.of(context).messages.profilePageYourProfile,
+                title: p == null
+                    ? AppStrings.of(context)
+                          .messages
+                          .profilePageAMeetingStartsWithYou
+                    : AppStrings.of(context).messages
+                          .profilePageTheWordsOf(p.firstname),
+                body: AppStrings.of(context)
+                    .messages
+                    .profilePageAWayToTellYourStory,
+              ),
+              const SizedBox(height: 16),
+              HistaeButton.outlinedIcon(
+                key: const Key('profile-feed-preview'),
+                onPressed: editable && c.hasFeedPreview
+                    ? () => _open(ProfileFeedPreviewPage(controller: c))
+                    : null,
+                icon: const Icon(Icons.visibility_outlined),
+                label: Text(
+                  AppStrings.of(context).messages.profilePagePreviewMyProfile,
                 ),
-                const SizedBox(height: 16),
-                HistaeButton.outlinedIcon(
-                  key: const Key('profile-feed-preview'),
-                  onPressed: editable && c.hasFeedPreview
-                      ? () => _open(ProfileFeedPreviewPage(controller: c))
-                      : null,
-                  icon: const Icon(Icons.visibility_outlined),
-                  label: Text(
-                    AppStrings.of(context).messages.profilePagePreviewMyProfile,
-                  ),
+              ),
+              const SizedBox(height: 16),
+              if (c.loading)
+                LinearProgressIndicator(
+                  semanticsLabel: AppStrings.of(context)
+                      .messages
+                      .profilePageLoadingProfile,
                 ),
-                const SizedBox(height: 16),
-                if (c.loading)
-                  LinearProgressIndicator(
-                    semanticsLabel: AppStrings.of(context)
-                        .messages
-                        .profilePageLoadingProfile,
-                  ),
-                for (final entry in c.errors.entries)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Semantics(
-                      liveRegion: true,
-                      child: Text(
-                        ProfileStrings(AppStrings.of(context))
-                            .failure(entry.value),
-                      ),
+              for (final entry in c.errors.entries)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Semantics(
+                    liveRegion: true,
+                    child: Text(
+                      ProfileStrings(AppStrings.of(context))
+                          .failure(entry.value),
                     ),
                   ),
-                if (c.uncertain)
-                  Text(
-                    AppStrings.of(context)
-                        .messages
-                        .profilePageSavingIsUncertainRefreshTheData,
-                  ),
-                ProfileIntroductionCard(
-                  controller: c,
-                  onEdit: () => _open(IdentityEditor(controller: c)),
                 ),
-                const SizedBox(height: 12),
-                ProfileAnswersCard(
-                  controller: c,
-                  onEdit: () => _open(AnswersEditor(controller: c)),
-                ),
-                const SizedBox(height: 24),
+              if (c.uncertain)
                 Text(
                   AppStrings.of(context)
                       .messages
-                      .profilePageTheDetailsThatMatter,
-                  style: Theme.of(context).textTheme.headlineSmall,
+                      .profilePageSavingIsUncertainRefreshTheData,
                 ),
-                const SizedBox(height: 8),
-                ProfilePreferencesTile(
-                  controller: c,
-                  onEdit: () => _open(
-                    c.sensitiveAllowed
-                        ? PreferencesEditor(controller: c)
-                        : ConsentsPage(session: c.session),
-                  ),
-                ),
-                ProfileTraitsTile(
-                  controller: c,
-                  onEdit: () => _open(TraitsEditor(controller: c)),
-                ),
-                ProfilePhotoTile(
-                  controller: c,
-                  onEdit: () => _open(PhotoPage(controller: c)),
-                ),
-                if (widget.visibility case final visibility?) ...[
-                  const EditorialDivider(),
-                  Semantics(
-                    header: true,
-                    child: Text(
-                      strings.messages.profileAtYourPace,
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  DiscoveryPauseCard(controller: visibility),
-                ],
-                const EditorialDivider(),
-                Text(
-                  AppStrings.of(context).messages.profilePageYourAccount,
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 16),
-                if (c.session.identity case final identity?) ...[
-                  AccountIdentifier(userId: identity.userId),
-                  const SizedBox(height: 16),
-                ],
-                AccountBenefitsActions(
-                  isPremium: widget.continuation.quotaReadAt == null
+              if (c.uncertain || c.errors.isNotEmpty)
+                HistaeButton.outlined(
+                  onPressed: c.loading || c.saving || c.retrySeconds > 0
                       ? null
-                      : widget.continuation.quota?.premium,
-                  onSubscription: _openSubscription,
+                      : c.load,
+                  child: Text(strings.messages.appStringsTryAgain),
                 ),
-                const SizedBox(height: 16),
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: const Icon(Icons.bookmark_border_rounded),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  title: Text(
-                    strings.messages.profilePageMyContinuationCredits,
-                  ),
-                  onTap: () => _open(
-                    CreditsPage(
-                      controller: widget.continuation,
-                      catalog: widget.catalog,
-                    ),
-                  ),
+              ProfileIntroductionCard(
+                controller: c,
+                onEdit: () => _open(IdentityEditor(controller: c)),
+              ),
+              const SizedBox(height: 12),
+              ProfileAnswersCard(
+                controller: c,
+                onEdit: () => _open(AnswersEditor(controller: c)),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                AppStrings.of(context).messages.profilePageTheDetailsThatMatter,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 8),
+              ProfilePreferencesTile(
+                controller: c,
+                onEdit: () => _open(
+                  c.sensitiveAllowed
+                      ? PreferencesEditor(controller: c)
+                      : ConsentsPage(session: c.session),
                 ),
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: const Icon(Icons.shield_outlined),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  title: Text(strings.privacyTitle),
-                  onTap: () => _open(
-                    PrivacyHubPage(
-                      session: controller.session,
-                      repository: widget.privacyRepository,
-                      deviceRepository: widget.deviceRepository,
-                    ),
+              ),
+              ProfileTraitsTile(
+                controller: c,
+                onEdit: () => _open(TraitsEditor(controller: c)),
+              ),
+              ProfilePhotoTile(
+                controller: c,
+                onEdit: () => _open(PhotoPage(controller: c)),
+              ),
+              if (widget.visibility case final visibility?) ...[
+                const EditorialDivider(),
+                Semantics(
+                  header: true,
+                  child: Text(
+                    strings.messages.profileAtYourPace,
+                    style: Theme.of(context).textTheme.headlineSmall,
                   ),
-                ),
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: const Icon(Icons.notifications_none),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  title: Text(
-                    strings.messages.devicesPageDevicesAndNotifications,
-                  ),
-                  onTap: () => _open(
-                    DevicesPage(
-                      session: controller.session,
-                      repository: widget.deviceRepository,
-                      push: PushScope.maybeOf(context),
-                    ),
-                  ),
-                ),
-                ListTile(
-                  key: const Key('profile-help'),
-                  contentPadding: EdgeInsets.zero,
-                  leading: const Icon(Icons.help_outline_rounded),
-                  trailing: const Icon(Icons.chevron_right_rounded),
-                  title: Text(strings.messages.helpTitle),
-                  onTap: () => _open(const HelpPage()),
                 ),
                 const SizedBox(height: 12),
-                HistaeButton.text(
-                  onPressed: controller.session.logout,
-                  child: Text(strings.logout),
-                ),
+                DiscoveryPauseCard(controller: visibility),
               ],
-            ),
+              const EditorialDivider(),
+              Text(
+                AppStrings.of(context).messages.profilePageYourAccount,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 16),
+              if (c.session.identity case final identity?) ...[
+                AccountIdentifier(userId: identity.userId),
+                const SizedBox(height: 16),
+              ],
+              AccountBenefitsActions(
+                isPremium:
+                    widget.continuation.quotaReadAt == null &&
+                        !widget.continuation.loading
+                    ? null
+                    : widget.continuation.quota?.premium,
+                onSubscription: _openSubscription,
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.bookmark_border_rounded),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                title: Text(strings.messages.profilePageMyContinuationCredits),
+                onTap: () => _open(
+                  CreditsPage(
+                    controller: widget.continuation,
+                    catalog: widget.catalog,
+                  ),
+                ),
+              ),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.shield_outlined),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                title: Text(strings.privacyTitle),
+                onTap: () => _open(
+                  PrivacyHubPage(
+                    session: controller.session,
+                    repository: widget.privacyRepository,
+                    deviceRepository: widget.deviceRepository,
+                  ),
+                ),
+              ),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.notifications_none),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                title: Text(
+                  strings.messages.devicesPageDevicesAndNotifications,
+                ),
+                onTap: () => _open(
+                  DevicesPage(
+                    session: controller.session,
+                    repository: widget.deviceRepository,
+                    push: PushScope.maybeOf(context),
+                  ),
+                ),
+              ),
+              ListTile(
+                key: const Key('profile-help'),
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.help_outline_rounded),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                title: Text(strings.messages.helpTitle),
+                onTap: () => _open(const HelpPage()),
+              ),
+              const SizedBox(height: 12),
+              HistaeButton.text(
+                onPressed: controller.session.logout,
+                child: Text(strings.logout),
+              ),
+            ],
           ),
         ),
       );

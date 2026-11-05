@@ -40,6 +40,7 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
   SignedPhotoDownload? _download;
   Timer? _expiry;
   bool _choosing = false, _fetching = false, _active = true;
+  bool _needsPreviewRecovery = false;
   int _downloadGeneration = 0;
 
   @override
@@ -75,6 +76,7 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
     _url = null;
     _readAt = null;
     _fetching = false;
+    _needsPreviewRecovery = false;
     _expiry?.cancel();
   }
 
@@ -103,10 +105,15 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
       if (remaining > Duration.zero && url != null) {
         _expiry = Timer(remaining, () {
           if (mounted) {
-            setState(_purgeRemote);
+            setState(() {
+              _purgeRemote();
+              _needsPreviewRecovery = true;
+            });
           }
         });
         unawaited(_fetch(url));
+      } else if (url != null) {
+        _needsPreviewRecovery = true;
       }
     }
     setState(() {});
@@ -128,11 +135,13 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
           c.session.resourceKey == _ownerScope) {
         setState(() {
           _remote = bytes;
+          _needsPreviewRecovery = false;
         });
       }
     } catch (_) {
       if (mounted && generation == _downloadGeneration) {
         setState(() {
+          _needsPreviewRecovery = true;
           _message = (strings) =>
               strings.messages.photoPageTheTemporaryPreviewIsUnavailableRefresh;
         });
@@ -343,18 +352,19 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
                   ),
                 ),
               ],
-              HistaeButton.text(
-                onPressed: c.loading || c.saving || c.retrySeconds > 0
-                    ? null
-                    : () async {
-                        _purgeRemote();
-                        await c.load();
-                        if (mounted) _changed();
-                      },
-                child: Text(
-                  AppStrings.of(context).messages.photoPageRefreshPhoto,
+              if (c.uncertain || _needsPreviewRecovery)
+                HistaeButton.text(
+                  onPressed: c.loading || c.saving || c.retrySeconds > 0
+                      ? null
+                      : () async {
+                          _purgeRemote();
+                          await c.load();
+                          if (mounted) _changed();
+                        },
+                  child: Text(
+                    AppStrings.of(context).messages.photoPageRefreshPhoto,
+                  ),
                 ),
-              ),
               if (c.profile?.photo != null)
                 HistaeButton.text(
                   onPressed: !c.canWrite || _choosing

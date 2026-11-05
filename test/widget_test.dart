@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
 import 'package:histae_app/app/welcome_page.dart';
+import 'package:histae_app/core/l10n/app_strings.dart';
 import 'package:histae_app/core/network/api_client.dart';
 import 'package:histae_app/features/catalog/data/catalog_repository.dart';
 import 'package:histae_app/features/catalog/presentation/catalog_page.dart';
@@ -186,7 +187,7 @@ void main() {
       await openCatalog(tester);
       await tester.pumpAndSettle();
       await tester.scrollUntilVisible(
-        find.text('Actualiser'),
+        find.text(const AppStrings().catalogReadOnly),
         200,
         scrollable: find.byType(Scrollable).first,
       );

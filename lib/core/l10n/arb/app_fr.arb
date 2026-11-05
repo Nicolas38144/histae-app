@@ -1,5 +1,9 @@
 {
   "@locale": "fr",
+  "chatContinuationSpendCredit": "Continuer avec 1 crédit",
+  "@chatContinuationSpendCredit": {"description": "Continuation action in the conversation composer."},
+  "chatContinuationWaiting": "En attente de sa réponse",
+  "@chatContinuationWaiting": {"description": "Continuation action in the conversation composer."},
   "rewardVideoNoAdsTitle": "Aucune publicité disponible",
   "@rewardVideoNoAdsTitle": {
     "description": "Title shown after an explicit rewarded-video attempt has no ad inventory."
@@ -118,10 +122,6 @@
   },
   "appStringsSaveMyChoices": "Enregistrer mes choix",
   "@appStringsSaveMyChoices": {
-    "description": "Interface: lib/core/l10n/app_strings.dart"
-  },
-  "appStringsRefreshMyConsents": "Actualiser mes consentements",
-  "@appStringsRefreshMyConsents": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
   "appStringsWithdrawMyConsent": "Retirer mon consentement",
@@ -514,12 +514,8 @@
   "@subscriptionPageCheckingYourSubscription": {
     "description": "Interface: lib/features/billing/presentation/subscription_page.dart"
   },
-  "subscriptionPageLastKnownStatusRefreshToConfirm": "Dernière situation connue. Actualisez pour confirmer vos droits actuels.",
+  "subscriptionPageLastKnownStatusRefreshToConfirm": "La situation de votre abonnement est en cours de vérification.",
   "@subscriptionPageLastKnownStatusRefreshToConfirm": {
-    "description": "Interface: lib/features/billing/presentation/subscription_page.dart"
-  },
-  "subscriptionPageCheckMySubscription": "Vérifier mon abonnement",
-  "@subscriptionPageCheckMySubscription": {
     "description": "Interface: lib/features/billing/presentation/subscription_page.dart"
   },
   "subscriptionPageSignUpAndPaymentManagementAre": "La souscription et la gestion des paiements ne sont pas encore disponibles dans cette version. Votre formule et vos droits existants restent consultables.",
@@ -912,10 +908,6 @@
   "@continuationPageContinueThisConversation": {
     "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
   },
-  "continuationPageYourConversationIsOpenContinuationConditions": "Votre conversation est ouverte. Les conditions de continuation sont réunies.",
-  "@continuationPageYourConversationIsOpenContinuationConditions": {
-    "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
-  },
   "continuationPageYouCanDecideUntilYouCan": "Décision possible jusqu’au {arg0}. Vous pouvez toujours relire vos échanges.",
   "@continuationPageYouCanDecideUntilYouCan": {
     "description": "Interface: lib/features/continuation/presentation/continuation_page.dart",
@@ -943,38 +935,12 @@
   "@continuationPageResumeTheSameAgreement": {
     "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
   },
-  "continuationPageYourCurrentPlanNoCreditNeeded": "Votre formule actuelle : aucun crédit nécessaire pour votre accord.",
-  "@continuationPageYourCurrentPlanNoCreditNeeded": {
-    "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
-  },
-  "continuationsAndCost": "{count, plural, one {{count} nouvelle continuation disponible} other {{count} nouvelles continuations disponibles}}. Votre accord coûte au maximum 1 crédit.",
-  "@continuationsAndCost": {
-    "description": "Interface: lib/features/continuation/presentation/continuation_page.dart",
-    "placeholders": {
-      "count": {
-        "type": "num",
-        "format": "decimalPattern"
-      }
-    }
-  },
-  "continuationPageReadTheCostAndChooseTo": "Lire le coût et choisir de continuer",
-  "@continuationPageReadTheCostAndChooseTo": {
-    "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
-  },
-  "continuationPageYourAllowanceDoesNotPermitAnother": "Votre quota ne permet pas de nouvelle continuation actuellement.",
-  "@continuationPageYourAllowanceDoesNotPermitAnother": {
-    "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
-  },
   "continuationPageViewMyCredits": "Voir mes crédits",
   "@continuationPageViewMyCredits": {
     "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
   },
   "continuationPageEachPersonChoosesIndependentlyTheOther": "Chaque personne choisit indépendamment. Le choix de l’autre personne reste privé. Vous pouvez terminer la rencontre depuis les options de la conversation.",
   "@continuationPageEachPersonChoosesIndependentlyTheOther": {
-    "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
-  },
-  "continuationPageRefreshMatchAndMyCredits": "Actualiser la rencontre et mes crédits",
-  "@continuationPageRefreshMatchAndMyCredits": {
     "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
   },
   "continuationStringsYourPlanHasChangedCheckYour": "Votre formule a changé. Relisez vos crédits et confirmez à nouveau le coût présenté.",
@@ -1334,10 +1300,6 @@
   "@discoveryPageOpenSettings": {
     "description": "Interface: lib/features/discovery/presentation/discovery_page.dart"
   },
-  "discoveryPageRefreshEncounters": "Actualiser les rencontres",
-  "@discoveryPageRefreshEncounters": {
-    "description": "Interface: lib/features/matches/presentation/matches_page.dart"
-  },
   "discoveryPageRefreshMyLocation": "Actualiser ma position",
   "@discoveryPageRefreshMyLocation": {
     "description": "Interface: lib/features/discovery/presentation/discovery_page.dart"
@@ -1694,10 +1656,6 @@
   "@chatPageEnd": {
     "description": "Interface: lib/features/matches/presentation/chat_page.dart"
   },
-  "chatPageRefreshConversation": "Actualiser la conversation",
-  "@chatPageRefreshConversation": {
-    "description": "Interface: lib/features/matches/presentation/chat_page.dart"
-  },
   "chatPageMatchOptions": "Options de la rencontre",
   "@chatPageMatchOptions": {
     "description": "Interface: lib/features/matches/presentation/chat_page.dart"
@@ -1724,10 +1682,6 @@
   },
   "chatPageTheConversationIsNoLongerAvailable": "La conversation n’est plus disponible.",
   "@chatPageTheConversationIsNoLongerAvailable": {
-    "description": "Interface: lib/features/matches/presentation/chat_page.dart"
-  },
-  "chatPageRefreshMyMatches": "Relire mes rencontres",
-  "@chatPageRefreshMyMatches": {
     "description": "Interface: lib/features/matches/presentation/chat_page.dart"
   },
   "chatPageOlderMessages": "Messages plus anciens",
@@ -2908,10 +2862,6 @@
   },
   "profilePageSavingIsUncertainRefreshTheData": "Nous n’avons pas pu vérifier l’enregistrement. Actualisez votre profil avant de réessayer ; votre photo peut être renvoyée à l’identique.",
   "@profilePageSavingIsUncertainRefreshTheData": {
-    "description": "Interface: lib/features/profile/presentation/profile_page.dart"
-  },
-  "profilePageRefreshMyProfile": "Actualiser mon profil",
-  "@profilePageRefreshMyProfile": {
     "description": "Interface: lib/features/profile/presentation/profile_page.dart"
   },
   "profilePageTheDetailsThatMatter": "Les détails qui comptent.",

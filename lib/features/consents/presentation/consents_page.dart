@@ -252,10 +252,6 @@ class _ConsentsPageState extends State<ConsentsPage> {
                         semanticsLabel: strings.actionInProgress,
                       ),
                     const SizedBox(height: 12),
-                    HistaeButton.outlined(
-                      onPressed: blocked ? null : widget.session.synchronize,
-                      child: Text(strings.refreshChoices),
-                    ),
                   ],
                 );
               },

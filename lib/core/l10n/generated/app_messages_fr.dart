@@ -10,6 +10,12 @@ class AppMessagesFr extends AppMessages {
   AppMessagesFr([String locale = 'fr']) : super(locale);
 
   @override
+  String get chatContinuationSpendCredit => 'Continuer avec 1 crédit';
+
+  @override
+  String get chatContinuationWaiting => 'En attente de sa réponse';
+
+  @override
   String get rewardVideoNoAdsTitle => 'Aucune publicité disponible';
 
   @override
@@ -106,9 +112,6 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get appStringsSaveMyChoices => 'Enregistrer mes choix';
-
-  @override
-  String get appStringsRefreshMyConsents => 'Actualiser mes consentements';
 
   @override
   String get appStringsWithdrawMyConsent => 'Retirer mon consentement';
@@ -448,10 +451,7 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get subscriptionPageLastKnownStatusRefreshToConfirm =>
-      'Dernière situation connue. Actualisez pour confirmer vos droits actuels.';
-
-  @override
-  String get subscriptionPageCheckMySubscription => 'Vérifier mon abonnement';
+      'La situation de votre abonnement est en cours de vérification.';
 
   @override
   String get subscriptionPageSignUpAndPaymentManagementAre =>
@@ -787,10 +787,6 @@ class AppMessagesFr extends AppMessages {
       'Continuer cette conversation';
 
   @override
-  String get continuationPageYourConversationIsOpenContinuationConditions =>
-      'Votre conversation est ouverte. Les conditions de continuation sont réunies.';
-
-  @override
   String continuationPageYouCanDecideUntilYouCan(Object arg0) {
     return 'Décision possible jusqu’au $arg0. Vous pouvez toujours relire vos échanges.';
   }
@@ -819,42 +815,11 @@ class AppMessagesFr extends AppMessages {
       'Reprendre le même accord';
 
   @override
-  String get continuationPageYourCurrentPlanNoCreditNeeded =>
-      'Votre formule actuelle : aucun crédit nécessaire pour votre accord.';
-
-  @override
-  String continuationsAndCost(num count) {
-    final intl.NumberFormat countNumberFormat =
-        intl.NumberFormat.decimalPattern(localeName);
-    final String countString = countNumberFormat.format(count);
-
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$countString nouvelles continuations disponibles',
-      one: '$countString nouvelle continuation disponible',
-    );
-    return '$_temp0. Votre accord coûte au maximum 1 crédit.';
-  }
-
-  @override
-  String get continuationPageReadTheCostAndChooseTo =>
-      'Lire le coût et choisir de continuer';
-
-  @override
-  String get continuationPageYourAllowanceDoesNotPermitAnother =>
-      'Votre quota ne permet pas de nouvelle continuation actuellement.';
-
-  @override
   String get continuationPageViewMyCredits => 'Voir mes crédits';
 
   @override
   String get continuationPageEachPersonChoosesIndependentlyTheOther =>
       'Chaque personne choisit indépendamment. Le choix de l’autre personne reste privé. Vous pouvez terminer la rencontre depuis les options de la conversation.';
-
-  @override
-  String get continuationPageRefreshMatchAndMyCredits =>
-      'Actualiser la rencontre et mes crédits';
 
   @override
   String get continuationStringsYourPlanHasChangedCheckYour =>
@@ -1182,9 +1147,6 @@ class AppMessagesFr extends AppMessages {
   String get discoveryPageOpenSettings => 'Ouvrir les réglages';
 
   @override
-  String get discoveryPageRefreshEncounters => 'Actualiser les rencontres';
-
-  @override
   String get discoveryPageRefreshMyLocation => 'Actualiser ma position';
 
   @override
@@ -1492,9 +1454,6 @@ class AppMessagesFr extends AppMessages {
   String get chatPageEnd => 'Terminer';
 
   @override
-  String get chatPageRefreshConversation => 'Actualiser la conversation';
-
-  @override
   String get chatPageMatchOptions => 'Options de la rencontre';
 
   @override
@@ -1516,9 +1475,6 @@ class AppMessagesFr extends AppMessages {
   @override
   String get chatPageTheConversationIsNoLongerAvailable =>
       'La conversation n’est plus disponible.';
-
-  @override
-  String get chatPageRefreshMyMatches => 'Relire mes rencontres';
 
   @override
   String get chatPageOlderMessages => 'Messages plus anciens';
@@ -2508,9 +2464,6 @@ class AppMessagesFr extends AppMessages {
   @override
   String get profilePageSavingIsUncertainRefreshTheData =>
       'Nous n’avons pas pu vérifier l’enregistrement. Actualisez votre profil avant de réessayer ; votre photo peut être renvoyée à l’identique.';
-
-  @override
-  String get profilePageRefreshMyProfile => 'Actualiser mon profil';
 
   @override
   String get profilePageTheDetailsThatMatter => 'Les détails qui comptent.';
