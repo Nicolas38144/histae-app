@@ -772,31 +772,12 @@ class AppMessagesFr extends AppMessages {
       'Le coût doit être relu et présenté à nouveau avant votre accord.';
 
   @override
-  String get continuationPageSeeEachOtherTogether => 'Se voir, à deux.';
-
-  @override
-  String get continuationPageRevealingPhotosRequiresSeparateConsentFrom =>
-      'La révélation des photos demande un accord distinct de chaque personne. Votre formule ne remplace jamais ces accords.';
-
-  @override
-  String get continuationPageYourPhotoRevealConsentHasBeen =>
-      'Votre accord de révélation est enregistré.';
-
-  @override
-  String get continuationPageMutualPhotoRevealIsConfirmed =>
-      'La révélation mutuelle est confirmée.';
-
-  @override
   String get continuationPageYourPhotoRevealRequestStillNeeds =>
       'Votre demande de révélation reste à confirmer.';
 
   @override
   String get continuationPageResumeTheSamePhotoRevealConsent =>
       'Reprendre le même accord de révélation';
-
-  @override
-  String get continuationPageChooseToRevealPhotos =>
-      'Choisir de révéler les photos';
 
   @override
   String get continuationPageContinueThisConversation =>
@@ -1034,9 +1015,6 @@ class AppMessagesFr extends AppMessages {
   @override
   String get creditsPageAMatchContinuesTogetherEachPerson =>
       'Une rencontre se poursuit à deux. Chacun confirme son propre choix.';
-
-  @override
-  String get partnerPhotoPageAPhotoTogether => 'Une photo, à deux';
 
   @override
   String get partnerPhotoPageThisPhotoIsCurrentlyUnavailable =>
@@ -1569,9 +1547,6 @@ class AppMessagesFr extends AppMessages {
   String get conversationHeaderConversationStatus => 'État de la conversation';
 
   @override
-  String get conversationHeaderYourChoices => 'Vos choix';
-
-  @override
   String get conversationHeaderSyncingConversation =>
       'Synchronisation de la conversation';
 
@@ -1914,9 +1889,6 @@ class AppMessagesFr extends AppMessages {
   @override
   String get privacyDetailPageTheseRequestsAreSubmittedForProcessing =>
       'Pour une information que vous ne pouvez pas corriger depuis « Mon profil », décrivez la modification souhaitée. L’export des données et la suppression du compte restent accessibles dans leurs rubriques.';
-
-  @override
-  String get privacyDetailPageYourRequest => 'Votre démarche';
 
   @override
   String get privacyDetailPageTheResponseStillNeedsConfirmationRefresh =>
@@ -3552,10 +3524,6 @@ class AppMessagesFr extends AppMessages {
   String matchesInactivityDeadline(String date) {
     return 'Sans nouveau message, cette conversation sera supprimée le $date. Sa reprise ne consomme aucun crédit.';
   }
-
-  @override
-  String get matchesInactivityWarning =>
-      'Une conversation sera supprimée dans les 7 prochains jours sans nouveau message.';
 
   @override
   String get matchesInactivityInfo => 'Archivage et suppression';

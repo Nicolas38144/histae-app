@@ -14,7 +14,7 @@ import 'package:histae_app/features/auth/application/session_controller.dart';
 import 'package:histae_app/features/auth/data/auth_repository.dart';
 import 'package:histae_app/features/billing/application/billing_controller.dart';
 import 'package:histae_app/features/billing/data/billing_repository.dart';
-import 'package:histae_app/features/continuation/presentation/partner_photo_page.dart';
+import 'package:histae_app/features/continuation/presentation/partner_photo.dart';
 import 'package:histae_app/features/discovery/data/discovery_models.dart';
 import 'package:histae_app/features/matches/application/matches_controller.dart';
 import 'package:histae_app/features/matches/data/matches_repository.dart';
@@ -319,11 +319,15 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: histaeTheme(Brightness.dark),
-          home: PartnerPhotoPage(
-            access: c,
-            matchId: testMatch,
-            photoClient: () =>
-                MockClient((_) async => http.Response.bytes(png, 200)),
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: PartnerPhoto(
+                access: c,
+                matchId: testMatch,
+                photoClient: () =>
+                    MockClient((_) async => http.Response.bytes(png, 200)),
+              ),
+            ),
           ),
         ),
       );

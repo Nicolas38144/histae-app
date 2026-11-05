@@ -41,8 +41,6 @@ abstract interface class MatchesRepository {
     RequestCancellation scope,
   );
 
-  Future<void> readOne(String id, String messageId, RequestCancellation scope);
-
   Future<void> end(String id, RequestCancellation scope);
 
   Future<void> block(String partnerId, RequestCancellation scope);
@@ -235,16 +233,6 @@ final class ApiMatchesRepository implements MatchesRepository {
         jsonField<int>(j, 'updated_count') < 0) {
       invalidResponse();
     }
-  }
-
-  @override
-  Future<void> readOne(
-    String id,
-    String messageId,
-    RequestCancellation scope,
-  ) async {
-    serverId({'id': messageId}, 'id');
-    await _request('PATCH', '${_path(id)}/messages/$messageId/read', scope);
   }
 
   @override

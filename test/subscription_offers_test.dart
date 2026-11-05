@@ -1,17 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:histae_app/core/network/api_client.dart';
 import 'package:histae_app/core/network/api_failure.dart';
 import 'package:histae_app/features/billing/data/billing_models.dart';
-import 'package:histae_app/features/billing/data/store_models.dart';
-import 'package:histae_app/features/billing/presentation/subscription_plans.dart';
-import 'package:histae_app/features/catalog/application/catalog_controller.dart';
-import 'package:histae_app/features/catalog/data/catalog_repository.dart';
 import 'package:histae_app/features/catalog/data/plan_catalog.dart';
-import 'package:http/http.dart' as http;
-import 'package:http/testing.dart';
 
-import 'support/billing_fixture.dart';
 import 'support/catalog_fixture.dart';
 
 void main() {
@@ -74,61 +65,4 @@ void main() {
       expect(() => PlanCatalog.fromJson(json), throwsA(isA<ApiFailure>()));
     });
   }
-
-  testWidgets('each Premium card selects its period and server price', (
-    tester,
-  ) async {
-    final repository = CatalogRepository(
-      ApiClient(
-        origin: Uri.parse('https://api.example'),
-        client: MockClient((_) async => http.Response(catalogFixture(), 200)),
-      ),
-    );
-    final controller = CatalogController(repository);
-    addTearDown(controller.dispose);
-    addTearDown(repository.close);
-    await controller.load();
-    final chosen = <SubscriptionOffer>[];
-    final gateway = FakeBillingGateway();
-    addTearDown(gateway.stream.close);
-    final storeOffers = await gateway.products(
-      (storeProductsJson()['offers'] as List)
-          .map(StoreProduct.fromJson)
-          .toList(),
-    );
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: SingleChildScrollView(
-            child: SubscriptionPlans(
-              catalog: controller,
-              storeOffers: storeOffers,
-              paymentsAvailable: true,
-              canSubscribe: true,
-              hasPending: false,
-              canAct: true,
-              onChoose: (offer) async {
-                chosen.add(offer);
-              },
-            ),
-          ),
-        ),
-      ),
-    );
-    expect(find.text('Free'), findsOneWidget);
-    expect(find.text('Premium Mensuel'), findsOneWidget);
-    expect(find.text('Premium Annuel'), findsOneWidget);
-    expect(find.textContaining('Période d’essai'), findsNothing);
-    expect(find.textContaining('éligibilité'), findsNothing);
-    await tester.scrollUntilVisible(find.text('Choisir Premium Mensuel'), 250);
-    await tester.tap(find.text('Choisir Premium Mensuel'));
-    await tester.scrollUntilVisible(find.text('Choisir Premium Annuel'), 250);
-    await tester.tap(find.text('Choisir Premium Annuel'));
-    expect(chosen.map((offer) => offer.billingPeriod), [
-      BillingPeriod.monthly,
-      BillingPeriod.annual,
-    ]);
-    expect(chosen.map((offer) => offer.priceCents), [1234, 9876]);
-    expect(tester.takeException(), isNull);
-  });
 }

@@ -896,32 +896,12 @@
   "@continuationPageTheCostMustBeCheckedAnd": {
     "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
   },
-  "continuationPageSeeEachOtherTogether": "Se voir, à deux.",
-  "@continuationPageSeeEachOtherTogether": {
-    "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
-  },
-  "continuationPageRevealingPhotosRequiresSeparateConsentFrom": "La révélation des photos demande un accord distinct de chaque personne. Votre formule ne remplace jamais ces accords.",
-  "@continuationPageRevealingPhotosRequiresSeparateConsentFrom": {
-    "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
-  },
-  "continuationPageYourPhotoRevealConsentHasBeen": "Votre accord de révélation est enregistré.",
-  "@continuationPageYourPhotoRevealConsentHasBeen": {
-    "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
-  },
-  "continuationPageMutualPhotoRevealIsConfirmed": "La révélation mutuelle est confirmée.",
-  "@continuationPageMutualPhotoRevealIsConfirmed": {
-    "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
-  },
   "continuationPageYourPhotoRevealRequestStillNeeds": "Votre demande de révélation reste à confirmer.",
   "@continuationPageYourPhotoRevealRequestStillNeeds": {
     "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
   },
   "continuationPageResumeTheSamePhotoRevealConsent": "Reprendre le même accord de révélation",
   "@continuationPageResumeTheSamePhotoRevealConsent": {
-    "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
-  },
-  "continuationPageChooseToRevealPhotos": "Choisir de révéler les photos",
-  "@continuationPageChooseToRevealPhotos": {
     "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
   },
   "continuationPageContinueThisConversation": "Continuer cette conversation",
@@ -1178,21 +1158,17 @@
   "@creditsPageAMatchContinuesTogetherEachPerson": {
     "description": "Interface: lib/features/continuation/presentation/credits_page.dart"
   },
-  "partnerPhotoPageAPhotoTogether": "Une photo, à deux",
-  "@partnerPhotoPageAPhotoTogether": {
-    "description": "Interface: lib/features/continuation/presentation/partner_photo_page.dart"
-  },
   "partnerPhotoPageThisPhotoIsCurrentlyUnavailable": "Cette photo n’est pas disponible actuellement.",
   "@partnerPhotoPageThisPhotoIsCurrentlyUnavailable": {
-    "description": "Interface: lib/features/continuation/presentation/partner_photo_page.dart"
+    "description": "Interface: lib/features/continuation/presentation/partner_photo.dart"
   },
   "partnerPhotoPageLoadingPhoto": "Chargement de la photo",
   "@partnerPhotoPageLoadingPhoto": {
-    "description": "Interface: lib/features/continuation/presentation/partner_photo_page.dart"
+    "description": "Interface: lib/features/continuation/presentation/partner_photo.dart"
   },
   "partnerPhotoPageYourMatchSPhoto": "Photo de votre rencontre",
   "@partnerPhotoPageYourMatchSPhoto": {
-    "description": "Interface: lib/features/continuation/presentation/partner_photo_page.dart"
+    "description": "Interface: lib/features/continuation/presentation/partner_photo.dart"
   },
   "rewardVideoCardWatchAVideo": "Regarder une vidéo",
   "@rewardVideoCardWatchAVideo": {
@@ -1786,10 +1762,6 @@
   "@conversationHeaderConversationStatus": {
     "description": "Interface: lib/features/matches/presentation/conversation_header.dart"
   },
-  "conversationHeaderYourChoices": "Vos choix",
-  "@conversationHeaderYourChoices": {
-    "description": "Interface: lib/features/matches/presentation/conversation_header.dart"
-  },
   "conversationHeaderSyncingConversation": "Synchronisation de la conversation",
   "@conversationHeaderSyncingConversation": {
     "description": "Interface: lib/features/matches/presentation/conversation_header.dart"
@@ -2203,10 +2175,6 @@
   },
   "privacyDetailPageTheseRequestsAreSubmittedForProcessing": "Pour une information que vous ne pouvez pas corriger depuis « Mon profil », décrivez la modification souhaitée. L’export des données et la suppression du compte restent accessibles dans leurs rubriques.",
   "@privacyDetailPageTheseRequestsAreSubmittedForProcessing": {
-    "description": "Interface: lib/features/privacy/presentation/privacy_detail_page.dart"
-  },
-  "privacyDetailPageYourRequest": "Votre démarche",
-  "@privacyDetailPageYourRequest": {
     "description": "Interface: lib/features/privacy/presentation/privacy_detail_page.dart"
   },
   "privacyDetailPageTheResponseStillNeedsConfirmationRefresh": "La réponse reste à confirmer. Actualisez le suivi avant de reprendre cette même démarche.",
@@ -4130,7 +4098,6 @@
       }
     }
   },
-  "matchesInactivityWarning": "Une conversation sera supprimée dans les 7 prochains jours sans nouveau message.",
   "matchesInactivityInfo": "Archivage et suppression",
   "@matchesInactivityInfo": {
     "description": "Disclosure title for the existing conversation archiving and deletion policy."

@@ -209,13 +209,8 @@
   "continuationPageTheNextChapterIsWrittenTogether": "Il seguito\nsi scrive in due.",
   "continuationPageRefreshingMatch": "Aggiornamento dell’incontro",
   "continuationPageTheCostMustBeCheckedAnd": "Il costo deve essere verificato e presentato di nuovo prima del consenso.",
-  "continuationPageSeeEachOtherTogether": "Vedersi, in due.",
-  "continuationPageRevealingPhotosRequiresSeparateConsentFrom": "Svelare le foto richiede il consenso separato di ciascuno. Il piano non sostituisce mai questi consensi.",
-  "continuationPageYourPhotoRevealConsentHasBeen": "Il consenso a svelare le foto è stato registrato.",
-  "continuationPageMutualPhotoRevealIsConfirmed": "La rivelazione reciproca è confermata.",
   "continuationPageYourPhotoRevealRequestStillNeeds": "La richiesta di rivelazione resta da confermare.",
   "continuationPageResumeTheSamePhotoRevealConsent": "Riprendi lo stesso consenso di rivelazione",
-  "continuationPageChooseToRevealPhotos": "Scegli di svelare le foto",
   "continuationPageContinueThisConversation": "Prosegui questa conversazione",
   "continuationPageYourConversationIsOpenContinuationConditions": "La conversazione è aperta. Le condizioni per proseguire sono soddisfatte.",
   "continuationPageYouCanDecideUntilYouCan": "Puoi decidere fino al {arg0}. Puoi sempre rileggere i messaggi.",
@@ -265,7 +260,6 @@
   "creditsPageYourBalanceStillNeedsChecking": "Il saldo resta da verificare",
   "creditsPageRefreshYourCreditsToViewYour": "Aggiorna i crediti per vedere il saldo.",
   "creditsPageAMatchContinuesTogetherEachPerson": "Un incontro prosegue in due. Ognuno conferma la propria scelta.",
-  "partnerPhotoPageAPhotoTogether": "Una foto, in due",
   "partnerPhotoPageThisPhotoIsCurrentlyUnavailable": "Questa foto non è disponibile al momento.",
   "partnerPhotoPageLoadingPhoto": "Caricamento della foto",
   "partnerPhotoPageYourMatchSPhoto": "Foto del tuo incontro",
@@ -409,7 +403,6 @@
   "chatPageYourMessage": "Il tuo messaggio",
   "conversationHeaderChooseWhatComesNext": "Scegli il seguito",
   "conversationHeaderConversationStatus": "Stato della conversazione",
-  "conversationHeaderYourChoices": "Le tue scelte",
   "conversationHeaderSyncingConversation": "Sincronizzazione della conversazione",
   "matchesPageYourMatches": "I tuoi incontri",
   "matchesPageRefreshingMatchesAndCredits": "Aggiornamento di incontri e crediti",
@@ -505,7 +498,6 @@
   "privacyDetailPageNoBlockedPeopleInThisList": "Nessuna persona bloccata in questo elenco.",
   "privacyDetailPageRefreshBlocks": "Aggiorna i blocchi",
   "privacyDetailPageTheseRequestsAreSubmittedForProcessing": "Se non puoi correggere un dato in «Il mio profilo», descrivi la modifica richiesta. Esportazione dei dati ed eliminazione dell’account restano disponibili nelle sezioni dedicate.",
-  "privacyDetailPageYourRequest": "La tua richiesta",
   "privacyDetailPageTheResponseStillNeedsConfirmationRefresh": "La risposta resta da confermare. Aggiorna il monitoraggio prima di riprendere la stessa richiesta.",
   "privacyDetailPageSubmitThisRequest": "Trasmettere questa richiesta?",
   "privacyDetailPageThisRequestWillBeRecordedFor": "{arg0}: questa richiesta verrà registrata per l’elaborazione. Lo stato sarà visibile nel monitoraggio.",
@@ -1086,7 +1078,6 @@
       }
     }
   },
-  "matchesInactivityWarning": "Una conversazione verrà eliminata entro 7 giorni senza un nuovo messaggio.",
   "matchesInactivityInfo": "Archiviazione ed eliminazione",
   "@matchesInactivityInfo": {
     "description": "Disclosure title for the existing conversation archiving and deletion policy."

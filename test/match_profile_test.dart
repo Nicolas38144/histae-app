@@ -6,7 +6,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/core/l10n/generated/app_messages.dart';
 import 'package:histae_app/features/continuation/presentation/continuation_page.dart';
 import 'package:histae_app/features/continuation/presentation/partner_photo.dart';
-import 'package:histae_app/features/continuation/presentation/partner_photo_page.dart';
 import 'package:histae_app/features/matches/application/matches_controller.dart';
 import 'package:histae_app/features/matches/data/matches_repository.dart';
 import 'package:histae_app/features/matches/presentation/chat_page.dart';
@@ -289,10 +288,14 @@ void main() {
       final response = Completer<http.Response>();
       await tester.pumpWidget(
         localized(
-          PartnerPhotoPage(
-            access: c,
-            matchId: testMatch,
-            photoClient: () => MockClient((_) => response.future),
+          Scaffold(
+            body: SingleChildScrollView(
+              child: PartnerPhoto(
+                access: c,
+                matchId: testMatch,
+                photoClient: () => MockClient((_) => response.future),
+              ),
+            ),
           ),
           navigator: navigator,
         ),

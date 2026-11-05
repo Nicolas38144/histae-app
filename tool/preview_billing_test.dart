@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/theme.dart';
 import 'package:histae_app/core/config/billing_config.dart';
+import 'package:histae_app/core/l10n/generated/app_messages.dart';
 import 'package:histae_app/core/network/api_client.dart';
 import 'package:histae_app/features/billing/application/billing_controller.dart';
 import 'package:histae_app/features/billing/data/billing_repository.dart';
@@ -17,6 +18,7 @@ import '../test/support/auth_fixture.dart';
 import '../test/support/billing_fixture.dart';
 import '../test/support/catalog_fixture.dart';
 import '../test/support/matches_fixture.dart';
+import '../test/support/scrolling.dart';
 
 void main() {
   setUpAll(() async {
@@ -29,19 +31,6 @@ void main() {
       )..addFont(rootBundle.load('assets/fonts/${font.$2}'))).load();
     }
     final flutterRoot = Platform.environment['FLUTTER_ROOT'];
-    final sans = FontLoader('Roboto');
-    for (final weight in ['regular', 'medium', 'bold']) {
-      sans.addFont(
-        Future.value(
-          ByteData.sublistView(
-            await File(
-              '$flutterRoot/bin/cache/artifacts/material_fonts/roboto-$weight.ttf',
-            ).readAsBytes(),
-          ),
-        ),
-      );
-    }
-    await sans.load();
     await (FontLoader('MaterialIcons')..addFont(
           Future.value(
             ByteData.sublistView(
@@ -54,7 +43,7 @@ void main() {
         .load();
   });
   testWidgets(
-    'preview L9 subscription states, disabled sales, checkout terms and uncertain payment',
+    'preview subscription states, disabled sales and store purchase confirmation',
     (tester) async {
       tester.view.physicalSize = const Size(390, 844);
       tester.view.devicePixelRatio = 1;
@@ -98,6 +87,9 @@ void main() {
             child: MaterialApp(
               debugShowCheckedModeBanner: false,
               theme: histaeTheme(Brightness.dark),
+              locale: const Locale('fr'),
+              localizationsDelegates: AppMessages.localizationsDelegates,
+              supportedLocales: AppMessages.supportedLocales,
               home: SubscriptionPage(controller: c, catalog: catalog),
             ),
           ),
@@ -116,6 +108,7 @@ void main() {
       await tester.scrollUntilVisible(
         find.textContaining('La souscription et la gestion'),
         150,
+        scrollable: verticalScrollables.first,
       );
       await screenshot('subscription-disabled');
       state = subscriptionJson(
@@ -137,11 +130,22 @@ void main() {
         realtime: QuietRealtime(session),
       );
       await mount(c);
-      await tester.scrollUntilVisible(find.text('Choisir Premium Annuel'), 200);
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('plan-selector-premium_annual')),
+        200,
+        scrollable: verticalScrollables.first,
+      );
+      await tester.tap(find.byKey(const Key('plan-selector-premium_annual')));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('Choisir Premium Annuel'),
+        200,
+        scrollable: verticalScrollables.first,
+      );
       await tester.pumpAndSettle();
       await tester.tap(find.text('Choisir Premium Annuel'));
       await screenshot('subscription-confirmation');
-      await tester.tap(find.text('Plus tard'));
+      await tester.tap(find.text('Annuler'));
       await tester.pumpWidget(const SizedBox());
       c.dispose();
       catalog.close();

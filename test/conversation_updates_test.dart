@@ -190,7 +190,7 @@ void main() {
         await tester.enterText(composer, 'La suite');
         await tester.tap(find.text(text.chatPageSend));
         await tester.pump();
-        expect(c.pendingMessageCount, 2);
+        expect(c.pendingMessages, hasLength(2));
         expect(writes, hasLength(1));
         expect(find.text('La suite'), findsOneWidget);
         await tester.enterText(composer, 'Mon prochain brouillon');
@@ -221,7 +221,7 @@ void main() {
         response = second;
         await tester.pump();
         expect(writes, hasLength(3));
-        expect(c.pendingMessageCount, 1);
+        expect(c.pendingMessages, hasLength(1));
         expect(c.messages.where((m) => m.id == outgoingId), hasLength(1));
         expect(
           tester.widget<TextField>(composer).controller!.text,
@@ -238,7 +238,7 @@ void main() {
           ),
         );
         await tester.pump();
-        expect(c.pendingMessageCount, 0);
+        expect(c.pendingMessages, isEmpty);
         expect(find.byType(MessageSendingIndicator), findsNothing);
         expect(
           tester.widget<TextField>(composer).controller!.text,

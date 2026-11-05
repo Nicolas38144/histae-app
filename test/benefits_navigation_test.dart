@@ -136,7 +136,7 @@ void main() {
   );
 
   testWidgets(
-    'Free gets a full feed, a profile upgrade and exact available balances with videos in matches at large text',
+    'Free gets a full feed, a profile upgrade and exact available balances with credit access at large text',
     (tester) async {
       tester.view.physicalSize = const Size(320, 568);
       tester.view.devicePixelRatio = 1;

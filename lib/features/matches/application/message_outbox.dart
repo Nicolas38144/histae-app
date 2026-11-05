@@ -17,8 +17,6 @@ class MessageOutbox {
   List<MessageIntent> pendingMessages(String? id) =>
       List.unmodifiable(_pending[id] ?? const <MessageIntent>[]);
 
-  int pendingCount(String? id) => _pending[id]?.length ?? 0;
-
   ApiFailure? failureFor(String? id) => _failures[id];
 
   String draftFor(String id) => _drafts[id] ?? '';

@@ -17,6 +17,7 @@ import '../test/support/catalog_fixture.dart';
 import '../test/support/continuation_fixture.dart';
 import '../test/support/matches_fixture.dart';
 import '../test/support/rewarded_video_fixture.dart';
+import '../test/support/scrolling.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -52,6 +53,9 @@ void main() {
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
     var premium = false;
     final session = testSession((r) async {
+      if (r.url.path == '/api/billing/store-products') {
+        return jsonResponse(storeProductsJson());
+      }
       if (r.url.path == '/api/users/me/continuation-quota') {
         return jsonResponse(quotaJson(premium: premium));
       }
@@ -103,10 +107,19 @@ void main() {
     await tester.tap(find.byKey(const Key('main-tab-profile')));
     await tester.pumpAndSettle();
     await capture('profile');
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('profile-subscription')),
+      240,
+      scrollable: verticalScrollables.first,
+    );
     await tester.tap(find.byKey(const Key('profile-subscription')));
     await tester.pumpAndSettle();
     await capture('subscription');
-    await tester.scrollUntilVisible(find.text('Choisir Premium Mensuel'), 200);
+    await tester.scrollUntilVisible(
+      find.text('Choisir Premium Mensuel'),
+      200,
+      scrollable: verticalScrollables.first,
+    );
     await tester.pumpAndSettle();
     await capture('subscribe-button');
     await tester.tap(find.byType(BackButton));
@@ -122,6 +135,7 @@ void main() {
     await tester.scrollUntilVisible(
       find.byKey(const Key('watch-rewarded-video')),
       200,
+      scrollable: verticalScrollables.first,
     );
     await tester.pumpAndSettle();
     await capture('videos-action');
@@ -135,6 +149,8 @@ void main() {
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
     premium = true;
+    await tester.tap(find.byTooltip('Actualiser les rencontres'));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('main-tab-profile')));
     await tester.pumpAndSettle();
     await capture('profile-premium');

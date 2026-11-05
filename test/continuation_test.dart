@@ -9,7 +9,7 @@ import 'package:histae_app/features/continuation/application/continuation_contro
 import 'package:histae_app/features/continuation/application/reward_tracker.dart';
 import 'package:histae_app/features/continuation/data/continuation_models.dart';
 import 'package:histae_app/features/continuation/data/continuation_repository.dart';
-import 'package:histae_app/features/continuation/presentation/partner_photo_page.dart';
+import 'package:histae_app/features/continuation/presentation/partner_photo.dart';
 import 'package:histae_app/features/matches/application/matches_controller.dart';
 import 'package:histae_app/features/matches/data/match_models.dart';
 import 'package:histae_app/features/matches/data/matches_repository.dart';
@@ -359,16 +359,20 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: histaeTheme(Brightness.dark),
-          home: PartnerPhotoPage(
-            access: access,
-            matchId: testMatch,
-            photoClient: () => MockClient((r) async {
-              requests++;
-              expectSync(r.headers.containsKey('Authorization'), isFalse);
-              expectSync(r.followRedirects, isFalse);
-              if (requests == 1) return http.Response.bytes(png, 200);
-              return response.future;
-            }),
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: PartnerPhoto(
+                access: access,
+                matchId: testMatch,
+                photoClient: () => MockClient((r) async {
+                  requests++;
+                  expectSync(r.headers.containsKey('Authorization'), isFalse);
+                  expectSync(r.followRedirects, isFalse);
+                  if (requests == 1) return http.Response.bytes(png, 200);
+                  return response.future;
+                }),
+              ),
+            ),
           ),
         ),
       );

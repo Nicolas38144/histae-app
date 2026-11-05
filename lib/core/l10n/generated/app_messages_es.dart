@@ -770,30 +770,12 @@ class AppMessagesEs extends AppMessages {
       'Es necesario consultar y mostrar de nuevo el coste antes de tu acuerdo.';
 
   @override
-  String get continuationPageSeeEachOtherTogether => 'Verse, entre dos.';
-
-  @override
-  String get continuationPageRevealingPhotosRequiresSeparateConsentFrom =>
-      'Revelar las fotos requiere el acuerdo individual de cada persona. Tu plan nunca sustituye esos acuerdos.';
-
-  @override
-  String get continuationPageYourPhotoRevealConsentHasBeen =>
-      'Tu acuerdo para revelar las fotos se ha registrado.';
-
-  @override
-  String get continuationPageMutualPhotoRevealIsConfirmed =>
-      'La revelación mutua está confirmada.';
-
-  @override
   String get continuationPageYourPhotoRevealRequestStillNeeds =>
       'Tu solicitud para revelar las fotos está pendiente de confirmación.';
 
   @override
   String get continuationPageResumeTheSamePhotoRevealConsent =>
       'Retomar el mismo acuerdo de revelación';
-
-  @override
-  String get continuationPageChooseToRevealPhotos => 'Elegir revelar las fotos';
 
   @override
   String get continuationPageContinueThisConversation =>
@@ -1032,9 +1014,6 @@ class AppMessagesEs extends AppMessages {
   @override
   String get creditsPageAMatchContinuesTogetherEachPerson =>
       'Un match continúa entre dos. Cada persona confirma su propia decisión.';
-
-  @override
-  String get partnerPhotoPageAPhotoTogether => 'Una foto, entre dos';
 
   @override
   String get partnerPhotoPageThisPhotoIsCurrentlyUnavailable =>
@@ -1568,9 +1547,6 @@ class AppMessagesEs extends AppMessages {
       'Estado de la conversación';
 
   @override
-  String get conversationHeaderYourChoices => 'Tus decisiones';
-
-  @override
   String get conversationHeaderSyncingConversation =>
       'Sincronizando la conversación';
 
@@ -1912,9 +1888,6 @@ class AppMessagesEs extends AppMessages {
   @override
   String get privacyDetailPageTheseRequestsAreSubmittedForProcessing =>
       'Si no puedes corregir un dato en «Mi perfil», describe el cambio que solicitas. La exportación de datos y la eliminación de la cuenta siguen disponibles en sus apartados.';
-
-  @override
-  String get privacyDetailPageYourRequest => 'Tu trámite';
 
   @override
   String get privacyDetailPageTheResponseStillNeedsConfirmationRefresh =>
@@ -3544,10 +3517,6 @@ class AppMessagesEs extends AppMessages {
   String matchesInactivityDeadline(String date) {
     return 'Sin un nuevo mensaje, esta conversación se eliminará el $date. Retomarla no consume créditos.';
   }
-
-  @override
-  String get matchesInactivityWarning =>
-      'Una conversación se eliminará en los próximos 7 días si no se envía un nuevo mensaje.';
 
   @override
   String get matchesInactivityInfo => 'Archivo y eliminación';

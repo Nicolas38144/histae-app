@@ -1359,30 +1359,6 @@ abstract class AppMessages {
   /// Interface: lib/features/continuation/presentation/continuation_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Se voir, à deux.'**
-  String get continuationPageSeeEachOtherTogether;
-
-  /// Interface: lib/features/continuation/presentation/continuation_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'La révélation des photos demande un accord distinct de chaque personne. Votre formule ne remplace jamais ces accords.'**
-  String get continuationPageRevealingPhotosRequiresSeparateConsentFrom;
-
-  /// Interface: lib/features/continuation/presentation/continuation_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Votre accord de révélation est enregistré.'**
-  String get continuationPageYourPhotoRevealConsentHasBeen;
-
-  /// Interface: lib/features/continuation/presentation/continuation_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'La révélation mutuelle est confirmée.'**
-  String get continuationPageMutualPhotoRevealIsConfirmed;
-
-  /// Interface: lib/features/continuation/presentation/continuation_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Votre demande de révélation reste à confirmer.'**
   String get continuationPageYourPhotoRevealRequestStillNeeds;
 
@@ -1391,12 +1367,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Reprendre le même accord de révélation'**
   String get continuationPageResumeTheSamePhotoRevealConsent;
-
-  /// Interface: lib/features/continuation/presentation/continuation_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Choisir de révéler les photos'**
-  String get continuationPageChooseToRevealPhotos;
 
   /// Interface: lib/features/continuation/presentation/continuation_page.dart
   ///
@@ -1695,25 +1665,19 @@ abstract class AppMessages {
   /// **'Une rencontre se poursuit à deux. Chacun confirme son propre choix.'**
   String get creditsPageAMatchContinuesTogetherEachPerson;
 
-  /// Interface: lib/features/continuation/presentation/partner_photo_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Une photo, à deux'**
-  String get partnerPhotoPageAPhotoTogether;
-
-  /// Interface: lib/features/continuation/presentation/partner_photo_page.dart
+  /// Interface: lib/features/continuation/presentation/partner_photo.dart
   ///
   /// In fr, this message translates to:
   /// **'Cette photo n’est pas disponible actuellement.'**
   String get partnerPhotoPageThisPhotoIsCurrentlyUnavailable;
 
-  /// Interface: lib/features/continuation/presentation/partner_photo_page.dart
+  /// Interface: lib/features/continuation/presentation/partner_photo.dart
   ///
   /// In fr, this message translates to:
   /// **'Chargement de la photo'**
   String get partnerPhotoPageLoadingPhoto;
 
-  /// Interface: lib/features/continuation/presentation/partner_photo_page.dart
+  /// Interface: lib/features/continuation/presentation/partner_photo.dart
   ///
   /// In fr, this message translates to:
   /// **'Photo de votre rencontre'**
@@ -2562,12 +2526,6 @@ abstract class AppMessages {
   /// Interface: lib/features/matches/presentation/conversation_header.dart
   ///
   /// In fr, this message translates to:
-  /// **'Vos choix'**
-  String get conversationHeaderYourChoices;
-
-  /// Interface: lib/features/matches/presentation/conversation_header.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Synchronisation de la conversation'**
   String get conversationHeaderSyncingConversation;
 
@@ -3134,12 +3092,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Pour une information que vous ne pouvez pas corriger depuis « Mon profil », décrivez la modification souhaitée. L’export des données et la suppression du compte restent accessibles dans leurs rubriques.'**
   String get privacyDetailPageTheseRequestsAreSubmittedForProcessing;
-
-  /// Interface: lib/features/privacy/presentation/privacy_detail_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Votre démarche'**
-  String get privacyDetailPageYourRequest;
 
   /// Interface: lib/features/privacy/presentation/privacy_detail_page.dart
   ///
@@ -5827,12 +5779,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Sans nouveau message, cette conversation sera supprimée le {date}. Sa reprise ne consomme aucun crédit.'**
   String matchesInactivityDeadline(String date);
-
-  /// No description provided for @matchesInactivityWarning.
-  ///
-  /// In fr, this message translates to:
-  /// **'Une conversation sera supprimée dans les 7 prochains jours sans nouveau message.'**
-  String get matchesInactivityWarning;
 
   /// Disclosure title for the existing conversation archiving and deletion policy.
   ///

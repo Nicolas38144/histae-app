@@ -774,31 +774,12 @@ class AppMessagesIt extends AppMessages {
       'Il costo deve essere verificato e presentato di nuovo prima del consenso.';
 
   @override
-  String get continuationPageSeeEachOtherTogether => 'Vedersi, in due.';
-
-  @override
-  String get continuationPageRevealingPhotosRequiresSeparateConsentFrom =>
-      'Svelare le foto richiede il consenso separato di ciascuno. Il piano non sostituisce mai questi consensi.';
-
-  @override
-  String get continuationPageYourPhotoRevealConsentHasBeen =>
-      'Il consenso a svelare le foto è stato registrato.';
-
-  @override
-  String get continuationPageMutualPhotoRevealIsConfirmed =>
-      'La rivelazione reciproca è confermata.';
-
-  @override
   String get continuationPageYourPhotoRevealRequestStillNeeds =>
       'La richiesta di rivelazione resta da confermare.';
 
   @override
   String get continuationPageResumeTheSamePhotoRevealConsent =>
       'Riprendi lo stesso consenso di rivelazione';
-
-  @override
-  String get continuationPageChooseToRevealPhotos =>
-      'Scegli di svelare le foto';
 
   @override
   String get continuationPageContinueThisConversation =>
@@ -1036,9 +1017,6 @@ class AppMessagesIt extends AppMessages {
   @override
   String get creditsPageAMatchContinuesTogetherEachPerson =>
       'Un incontro prosegue in due. Ognuno conferma la propria scelta.';
-
-  @override
-  String get partnerPhotoPageAPhotoTogether => 'Una foto, in due';
 
   @override
   String get partnerPhotoPageThisPhotoIsCurrentlyUnavailable =>
@@ -1572,9 +1550,6 @@ class AppMessagesIt extends AppMessages {
       'Stato della conversazione';
 
   @override
-  String get conversationHeaderYourChoices => 'Le tue scelte';
-
-  @override
   String get conversationHeaderSyncingConversation =>
       'Sincronizzazione della conversazione';
 
@@ -1917,9 +1892,6 @@ class AppMessagesIt extends AppMessages {
   @override
   String get privacyDetailPageTheseRequestsAreSubmittedForProcessing =>
       'Se non puoi correggere un dato in «Il mio profilo», descrivi la modifica richiesta. Esportazione dei dati ed eliminazione dell’account restano disponibili nelle sezioni dedicate.';
-
-  @override
-  String get privacyDetailPageYourRequest => 'La tua richiesta';
 
   @override
   String get privacyDetailPageTheResponseStillNeedsConfirmationRefresh =>
@@ -3553,10 +3525,6 @@ class AppMessagesIt extends AppMessages {
   String matchesInactivityDeadline(String date) {
     return 'Senza un nuovo messaggio, questa conversazione verrà eliminata il $date. Riprenderla non consuma crediti.';
   }
-
-  @override
-  String get matchesInactivityWarning =>
-      'Una conversazione verrà eliminata entro 7 giorni senza un nuovo messaggio.';
 
   @override
   String get matchesInactivityInfo => 'Archiviazione ed eliminazione';

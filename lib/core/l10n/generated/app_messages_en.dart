@@ -765,31 +765,12 @@ class AppMessagesEn extends AppMessages {
       'The cost must be checked and shown again before you agree.';
 
   @override
-  String get continuationPageSeeEachOtherTogether =>
-      'See each other, together.';
-
-  @override
-  String get continuationPageRevealingPhotosRequiresSeparateConsentFrom =>
-      'Revealing photos requires separate consent from each person. Your plan never replaces that consent.';
-
-  @override
-  String get continuationPageYourPhotoRevealConsentHasBeen =>
-      'Your photo reveal consent has been recorded.';
-
-  @override
-  String get continuationPageMutualPhotoRevealIsConfirmed =>
-      'Mutual photo reveal is confirmed.';
-
-  @override
   String get continuationPageYourPhotoRevealRequestStillNeeds =>
       'Your photo reveal request still needs confirmation.';
 
   @override
   String get continuationPageResumeTheSamePhotoRevealConsent =>
       'Resume the same photo reveal consent';
-
-  @override
-  String get continuationPageChooseToRevealPhotos => 'Choose to reveal photos';
 
   @override
   String get continuationPageContinueThisConversation =>
@@ -1028,9 +1009,6 @@ class AppMessagesEn extends AppMessages {
   @override
   String get creditsPageAMatchContinuesTogetherEachPerson =>
       'A match continues together. Each person confirms their own choice.';
-
-  @override
-  String get partnerPhotoPageAPhotoTogether => 'A photo, together';
 
   @override
   String get partnerPhotoPageThisPhotoIsCurrentlyUnavailable =>
@@ -1555,9 +1533,6 @@ class AppMessagesEn extends AppMessages {
   String get conversationHeaderConversationStatus => 'Conversation status';
 
   @override
-  String get conversationHeaderYourChoices => 'Your choices';
-
-  @override
   String get conversationHeaderSyncingConversation => 'Syncing conversation';
 
   @override
@@ -1894,9 +1869,6 @@ class AppMessagesEn extends AppMessages {
   @override
   String get privacyDetailPageTheseRequestsAreSubmittedForProcessing =>
       'If you cannot correct some information in “My profile”, describe the change you need. Data export and account deletion remain available in their dedicated sections.';
-
-  @override
-  String get privacyDetailPageYourRequest => 'Your request';
 
   @override
   String get privacyDetailPageTheResponseStillNeedsConfirmationRefresh =>
@@ -3508,10 +3480,6 @@ class AppMessagesEn extends AppMessages {
   String matchesInactivityDeadline(String date) {
     return 'Without a new message, this conversation will be deleted on $date. Resuming it does not spend a credit.';
   }
-
-  @override
-  String get matchesInactivityWarning =>
-      'A conversation will be deleted within 7 days unless a new message is sent.';
 
   @override
   String get matchesInactivityInfo => 'Archiving and deletion';

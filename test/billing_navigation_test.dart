@@ -18,6 +18,7 @@ import 'support/billing_fixture.dart';
 import 'support/catalog_fixture.dart';
 import 'support/matches_fixture.dart';
 import 'support/notifications_fixture.dart';
+import 'support/scrolling.dart';
 
 void main() {
   testWidgets(
@@ -71,13 +72,24 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await tester.scrollUntilVisible(find.text(annualChoice), 250);
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('plan-selector-premium_annual')),
+        250,
+        scrollable: verticalScrollables.first,
+      );
+      await tester.tap(find.byKey(const Key('plan-selector-premium_annual')));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text(annualChoice),
+        250,
+        scrollable: verticalScrollables.first,
+      );
       await tester.pumpAndSettle();
       await tester.tap(find.text(annualChoice));
       await tester.pumpAndSettle();
       expect(find.textContaining(RegExp(r'48,00\sEUR')), findsWidgets);
       expect(posts, 0);
-      await tester.tap(find.text('Plus tard'));
+      await tester.tap(find.text('Annuler'));
       await tester.pumpAndSettle();
       expect(posts, 0);
       await tester.tap(find.text(annualChoice));

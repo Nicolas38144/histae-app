@@ -5,10 +5,6 @@ import '../../../core/network/json_fields.dart';
 
 export '../../../core/network/json_fields.dart' show optionalText, serverId;
 
-// Compatibility for existing callers; new code uses the transport-level name.
-
-Never invalidProfile() => invalidResponse();
-
 class Moderation {
   Moderation(this.status, List<String> reasons)
     : reasons = List.unmodifiable(reasons);
@@ -22,7 +18,7 @@ class Moderation {
     if (!['pending', 'approved', 'rejected'].contains(status) ||
         reasons is! List ||
         reasons.any((r) => r is! String)) {
-      invalidProfile();
+      invalidResponse();
     }
     return Moderation(status, List<String>.unmodifiable(reasons));
   }
@@ -39,21 +35,19 @@ class OwnerProfile {
     this.bio,
     this.photo,
     this.bioModeration,
-    this.photoModeration,
   );
 
   factory OwnerProfile.fromJson(Object? value) {
     final j = jsonObject(value);
     final m = jsonObject(j['moderation']);
     final birth = jsonString(j, 'birthdate');
-    if (parseBirthdate(birth) == null) invalidProfile();
+    if (parseBirthdate(birth) == null) invalidResponse();
     final sex = optionalText(j, 'sex');
     if (sex != null && !['male', 'female', 'other'].contains(sex)) {
-      invalidProfile();
+      invalidResponse();
     }
     final photo = optionalText(j, 'photo');
-    if (photo != null && !validPhotoUrl(photo)) invalidProfile();
-    jsonField<List<dynamic>>(j, 'profile_answers');
+    if (photo != null && !validPhotoUrl(photo)) invalidResponse();
     return OwnerProfile(
       serverId(j, 'user_id'),
       jsonString(j, 'firstname'),
@@ -62,12 +56,11 @@ class OwnerProfile {
       optionalText(j, 'bio'),
       photo,
       m['bio'] == null ? null : Moderation.fromJson(m['bio']),
-      m['photo'] == null ? null : Moderation.fromJson(m['photo']),
     );
   }
   final String userId, firstname, birthdate;
   final String? sex, bio, photo;
-  final Moderation? bioModeration, photoModeration;
+  final Moderation? bioModeration;
 }
 
 bool validPhotoUrl(String value) {
@@ -142,7 +135,7 @@ class Preferences {
       jsonField<int>(j, 'max_distance_km'),
       jsonString(j, 'looking_for'),
     );
-    if (p.validate() != null) invalidProfile();
+    if (p.validate() != null) invalidResponse();
     return p;
   }
   final int minAge, maxAge, distance;
@@ -180,13 +173,7 @@ class ProfileTrait {
 }
 
 class ProfileQuestion {
-  const ProfileQuestion(
-    this.id,
-    this.code,
-    this.prompt,
-    this.category,
-    this.order,
-  );
+  const ProfileQuestion(this.id, this.code, this.prompt, this.order);
 
   factory ProfileQuestion.fromJson(Object? value) {
     final j = jsonObject(value);
@@ -194,11 +181,10 @@ class ProfileQuestion {
       serverId(j, 'id'),
       jsonString(j, 'code'),
       jsonString(j, 'prompt'),
-      jsonString(j, 'category'),
       jsonField<int>(j, 'display_order'),
     );
   }
-  final String id, code, prompt, category;
+  final String id, code, prompt;
   final int order;
 }
 
@@ -213,7 +199,6 @@ class ProfileAnswer {
 
   factory ProfileAnswer.fromJson(Object? value) {
     final j = jsonObject(value);
-    jsonString(j, 'code');
     return ProfileAnswer(
       serverId(j, 'question_id'),
       jsonString(j, 'question'),

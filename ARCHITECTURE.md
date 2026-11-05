@@ -221,7 +221,7 @@ on closing, losing access or backgrounding. The 50-second window measured from t
 downloads, leaving a margin before the API's 60-second signed URL expiry. It does not expire
 already downloaded bytes while their visible route remains authorized.
 
-`PartnerPhoto` owns full-size photo rendering for both the match profile and `PartnerPhotoPage`.
+`PartnerPhoto` owns full-size photo rendering within the match profile.
 Its sliver keep-alive retains the photo while scrolling the same profile. The shared `PrivatePhoto`
 widget observes route visibility and app lifecycle; the feature supplies current match access. A
 covered route cancels its download and purges the decoded image; late bytes cannot restore it.
@@ -308,8 +308,8 @@ normalize to JPEG under 500,000 bytes, remove EXIF data and clean picker cache c
 Android interrupted selections are discarded rather than attached to a restored session.
 
 A valid API upload is immediately available without automated content/face analysis.
-The wire moderation fields remain supported for manual removal; approval is not presented
-as photo verification. Feed readiness still comes from the API and mutual sharing consent
+The client retains biography and answer moderation, without storing unused photo moderation metadata.
+Approval is not presented as photo verification. Feed readiness still comes from the API and mutual sharing consent
 remains required. Private photo views share `privatePhotoLifetime` (50 seconds from the
 resource read), with explicit refresh after expiry.
 

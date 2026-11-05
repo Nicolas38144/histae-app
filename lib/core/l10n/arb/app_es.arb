@@ -209,13 +209,8 @@
   "continuationPageTheNextChapterIsWrittenTogether": "El siguiente capítulo\nse escribe entre dos.",
   "continuationPageRefreshingMatch": "Actualizando el match",
   "continuationPageTheCostMustBeCheckedAnd": "Es necesario consultar y mostrar de nuevo el coste antes de tu acuerdo.",
-  "continuationPageSeeEachOtherTogether": "Verse, entre dos.",
-  "continuationPageRevealingPhotosRequiresSeparateConsentFrom": "Revelar las fotos requiere el acuerdo individual de cada persona. Tu plan nunca sustituye esos acuerdos.",
-  "continuationPageYourPhotoRevealConsentHasBeen": "Tu acuerdo para revelar las fotos se ha registrado.",
-  "continuationPageMutualPhotoRevealIsConfirmed": "La revelación mutua está confirmada.",
   "continuationPageYourPhotoRevealRequestStillNeeds": "Tu solicitud para revelar las fotos está pendiente de confirmación.",
   "continuationPageResumeTheSamePhotoRevealConsent": "Retomar el mismo acuerdo de revelación",
-  "continuationPageChooseToRevealPhotos": "Elegir revelar las fotos",
   "continuationPageContinueThisConversation": "Continuar esta conversación",
   "continuationPageYourConversationIsOpenContinuationConditions": "Tu conversación está abierta. Se cumplen las condiciones para continuar.",
   "continuationPageYouCanDecideUntilYouCan": "Puedes decidir hasta {arg0}. Puedes seguir leyendo vuestros mensajes.",
@@ -265,7 +260,6 @@
   "creditsPageYourBalanceStillNeedsChecking": "Tu saldo está pendiente de verificación",
   "creditsPageRefreshYourCreditsToViewYour": "Actualiza tus créditos para consultar el saldo.",
   "creditsPageAMatchContinuesTogetherEachPerson": "Un match continúa entre dos. Cada persona confirma su propia decisión.",
-  "partnerPhotoPageAPhotoTogether": "Una foto, entre dos",
   "partnerPhotoPageThisPhotoIsCurrentlyUnavailable": "Esta foto no está disponible por ahora.",
   "partnerPhotoPageLoadingPhoto": "Cargando la foto",
   "partnerPhotoPageYourMatchSPhoto": "Foto de tu match",
@@ -409,7 +403,6 @@
   "chatPageYourMessage": "Tu mensaje",
   "conversationHeaderChooseWhatComesNext": "Elegir cómo seguir",
   "conversationHeaderConversationStatus": "Estado de la conversación",
-  "conversationHeaderYourChoices": "Tus decisiones",
   "conversationHeaderSyncingConversation": "Sincronizando la conversación",
   "matchesPageYourMatches": "Tus matches",
   "matchesPageRefreshingMatchesAndCredits": "Actualizando matches y créditos",
@@ -505,7 +498,6 @@
   "privacyDetailPageNoBlockedPeopleInThisList": "No hay personas bloqueadas en esta lista.",
   "privacyDetailPageRefreshBlocks": "Actualizar bloqueos",
   "privacyDetailPageTheseRequestsAreSubmittedForProcessing": "Si no puedes corregir un dato en «Mi perfil», describe el cambio que solicitas. La exportación de datos y la eliminación de la cuenta siguen disponibles en sus apartados.",
-  "privacyDetailPageYourRequest": "Tu trámite",
   "privacyDetailPageTheResponseStillNeedsConfirmationRefresh": "La respuesta está pendiente de confirmación. Actualiza el seguimiento antes de retomar este mismo trámite.",
   "privacyDetailPageSubmitThisRequest": "¿Enviar esta solicitud?",
   "privacyDetailPageThisRequestWillBeRecordedFor": "{arg0}: se registrará este trámite para su gestión. Podrás consultar su estado en el seguimiento.",
@@ -1086,7 +1078,6 @@
       }
     }
   },
-  "matchesInactivityWarning": "Una conversación se eliminará en los próximos 7 días si no se envía un nuevo mensaje.",
   "matchesInactivityInfo": "Archivo y eliminación",
   "@matchesInactivityInfo": {
     "description": "Disclosure title for the existing conversation archiving and deletion policy."

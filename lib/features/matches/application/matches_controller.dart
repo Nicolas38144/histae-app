@@ -191,8 +191,6 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
 
   MessageIntent? get pendingMessage => _outbox.pendingFor(selectedId);
 
-  int get pendingMessageCount => _outbox.pendingCount(selectedId);
-
   List<MessageIntent> get pendingMessages =>
       _outbox.pendingMessages(selectedId);
 
