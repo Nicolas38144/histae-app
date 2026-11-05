@@ -419,26 +419,23 @@ void main() {
     },
   );
 
-  test(
-    'offline logout purges locally and reports unconfirmed remote revocation',
-    () async {
-      final vault = MemorySessionVault();
-      final session = testSession((request) async {
-        if (request.url.path == '/api/auth/logout') {
-          throw http.ClientException('offline');
-        }
-        return defaultAuthResponse(request, complete: true);
-      }, vault: vault);
-      addTearDown(session.dispose);
-      await session.establish(testTokens);
-      await session.logout();
-      expect(session.phase, SessionPhase.signedOut);
-      expect(session.notice, 'logout_unconfirmed');
-      expect(session.identity, isNull);
-      expect(session.consents, isNull);
-      expect(vault.value, isNot(contains('test-refresh')));
-    },
-  );
+  test('offline logout purges locally without a sign-out notice', () async {
+    final vault = MemorySessionVault();
+    final session = testSession((request) async {
+      if (request.url.path == '/api/auth/logout') {
+        throw http.ClientException('offline');
+      }
+      return defaultAuthResponse(request, complete: true);
+    }, vault: vault);
+    addTearDown(session.dispose);
+    await session.establish(testTokens);
+    await session.logout();
+    expect(session.phase, SessionPhase.signedOut);
+    expect(session.notice, isNull);
+    expect(session.identity, isNull);
+    expect(session.consents, isNull);
+    expect(vault.value, isNot(contains('test-refresh')));
+  });
 
   test(
     'late reads from a previous account cannot replace a newer session',

@@ -2197,23 +2197,11 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get privacyStringsNoDeletionResponseWasReceivedThe =>
-      'La risposta all’eliminazione non è stata ricevuta. La sessione locale è chiusa; l’accettazione resta da confermare.';
+      'La risposta all’eliminazione non è stata ricevuta. L’accettazione della richiesta resta da confermare.';
 
   @override
   String get privacyStringsAccountDeletionWasNotAcceptedThis =>
-      'L’eliminazione non è stata accettata. La sessione locale è chiusa. Accedi di nuovo se desideri riprovare.';
-
-  @override
-  String get privacyStringsSessionOrAccountClosureWasInterrupted =>
-      'La chiusura della sessione o dell’account è stata interrotta. La sessione locale è chiusa; il risultato sul server non è confermato.';
-
-  @override
-  String get privacyStringsAllYourSessionsWereRevoked =>
-      'Tutte le sessioni sono state revocate.';
-
-  @override
-  String get privacyStringsYouAreSignedOutOnThis =>
-      'Hai effettuato la disconnessione su questo dispositivo. Non è stato possibile confermare la revoca sul server.';
+      'L’eliminazione dell’account non è stata accettata. Accedi di nuovo se desideri riprovare.';
 
   @override
   String get reportPageReportAProfile => 'Segnala un profilo';

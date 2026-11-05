@@ -3594,32 +3594,14 @@ abstract class AppMessages {
   /// Interface: lib/features/privacy/presentation/privacy_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'La réponse à la suppression n’a pas été reçue. La session de cet appareil est fermée ; l’acceptation de la demande reste à confirmer.'**
+  /// **'La réponse à la suppression n’a pas été reçue. L’acceptation de la demande reste à confirmer.'**
   String get privacyStringsNoDeletionResponseWasReceivedThe;
 
   /// Interface: lib/features/privacy/presentation/privacy_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'La suppression du compte n’a pas été acceptée. La session de cet appareil est fermée. Reconnectez-vous si vous souhaitez recommencer.'**
+  /// **'La suppression du compte n’a pas été acceptée. Reconnectez-vous si vous souhaitez recommencer.'**
   String get privacyStringsAccountDeletionWasNotAcceptedThis;
-
-  /// Interface: lib/features/privacy/presentation/privacy_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Une fermeture de session ou de compte a été interrompue. La session locale est fermée ; le résultat sur le serveur n’est pas confirmé.'**
-  String get privacyStringsSessionOrAccountClosureWasInterrupted;
-
-  /// Interface: lib/features/privacy/presentation/privacy_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Toutes vos sessions ont été révoquées.'**
-  String get privacyStringsAllYourSessionsWereRevoked;
-
-  /// Interface: lib/features/privacy/presentation/privacy_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Vous êtes déconnecté sur cet appareil. La révocation sur le serveur n’a pas pu être confirmée.'**
-  String get privacyStringsYouAreSignedOutOnThis;
 
   /// Interface: lib/features/privacy/presentation/report_page.dart
   ///

@@ -581,11 +581,8 @@
   "privacyStringsTheOperationWasInterrupted": "L’operazione è stata interrotta.",
   "privacyStringsTheResponseCouldNotBeConfirmed": "Impossibile confermare la risposta. Aggiorna lo stato prima di riprendere la stessa richiesta.",
   "privacyStringsYourDeletionRequestWasAcceptedYour": "La richiesta di eliminazione è stata accettata. L’account è inaccessibile; la pulizia dei dati continua in background.",
-  "privacyStringsNoDeletionResponseWasReceivedThe": "La risposta all’eliminazione non è stata ricevuta. La sessione locale è chiusa; l’accettazione resta da confermare.",
-  "privacyStringsAccountDeletionWasNotAcceptedThis": "L’eliminazione non è stata accettata. La sessione locale è chiusa. Accedi di nuovo se desideri riprovare.",
-  "privacyStringsSessionOrAccountClosureWasInterrupted": "La chiusura della sessione o dell’account è stata interrotta. La sessione locale è chiusa; il risultato sul server non è confermato.",
-  "privacyStringsAllYourSessionsWereRevoked": "Tutte le sessioni sono state revocate.",
-  "privacyStringsYouAreSignedOutOnThis": "Hai effettuato la disconnessione su questo dispositivo. Non è stato possibile confermare la revoca sul server.",
+  "privacyStringsNoDeletionResponseWasReceivedThe": "La risposta all’eliminazione non è stata ricevuta. L’accettazione della richiesta resta da confermare.",
+  "privacyStringsAccountDeletionWasNotAcceptedThis": "L’eliminazione dell’account non è stata accettata. Accedi di nuovo se desideri riprovare.",
   "reportPageReportAProfile": "Segnala un profilo",
   "reportPageCaringForConversations": "PRENDERSI CURA DEGLI SCAMBI",
   "reportPageASpaceToFeelAtEase": "Uno spazio\ndove stare bene.",
@@ -1084,7 +1081,14 @@
   "matchesArchivedTitle": "Archiviate",
   "matchesInactivityPolicy": "Dopo 10 giorni senza nuovi messaggi, una conversazione confermata viene archiviata. Un avviso viene inviato dopo 23 giorni; il match e i messaggi vengono eliminati dopo 30 giorni. Un nuovo messaggio rinnova il termine senza spendere altri crediti.",
   "matchesInactivityDeadline": "Senza un nuovo messaggio, questa conversazione verrà eliminata il {date}. Riprenderla non consuma crediti.",
-  "@matchesInactivityDeadline": {"description": "Inactivity deadline for a confirmed conversation", "placeholders": {"date": {"type": "String"}}},
+  "@matchesInactivityDeadline": {
+    "description": "Inactivity deadline for a confirmed conversation",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "matchesInactivityWarning": "Una conversazione verrà eliminata entro 7 giorni senza un nuovo messaggio.",
   "matchesInactivityInfo": "Archiviazione ed eliminazione",
   "@matchesInactivityInfo": {

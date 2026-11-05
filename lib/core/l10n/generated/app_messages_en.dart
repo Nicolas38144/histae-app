@@ -2166,23 +2166,11 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get privacyStringsNoDeletionResponseWasReceivedThe =>
-      'No deletion response was received. The session on this device is closed; acceptance still needs confirmation.';
+      'No deletion response was received. Acceptance of the request still needs confirmation.';
 
   @override
   String get privacyStringsAccountDeletionWasNotAcceptedThis =>
-      'Account deletion was not accepted. This device’s session is closed. Sign in again if you wish to restart.';
-
-  @override
-  String get privacyStringsSessionOrAccountClosureWasInterrupted =>
-      'Session or account closure was interrupted. The local session is closed; the server result is unconfirmed.';
-
-  @override
-  String get privacyStringsAllYourSessionsWereRevoked =>
-      'All your sessions were revoked.';
-
-  @override
-  String get privacyStringsYouAreSignedOutOnThis =>
-      'You are signed out on this device. Server revocation could not be confirmed.';
+      'Account deletion was not accepted. Sign in again if you want to retry.';
 
   @override
   String get reportPageReportAProfile => 'Report a profile';

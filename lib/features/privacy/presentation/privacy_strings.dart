@@ -88,9 +88,5 @@ String sessionNotice(AppStrings strings, String? notice) => switch (notice) {
     strings.messages.privacyStringsNoDeletionResponseWasReceivedThe,
   'erasure_not_accepted' =>
     strings.messages.privacyStringsAccountDeletionWasNotAcceptedThis,
-  'closure_unconfirmed' =>
-    strings.messages.privacyStringsSessionOrAccountClosureWasInterrupted,
-  'logout_all_confirmed' =>
-    strings.messages.privacyStringsAllYourSessionsWereRevoked,
-  _ => strings.messages.privacyStringsYouAreSignedOutOnThis,
+  _ => '',
 };

@@ -2190,23 +2190,11 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get privacyStringsNoDeletionResponseWasReceivedThe =>
-      'No se ha recibido respuesta a la eliminación. La sesión de este dispositivo está cerrada; falta confirmar la aceptación.';
+      'No se ha recibido respuesta a la eliminación. Falta confirmar la aceptación de la solicitud.';
 
   @override
   String get privacyStringsAccountDeletionWasNotAcceptedThis =>
-      'La eliminación no se ha aceptado. La sesión local está cerrada. Inicia sesión de nuevo si quieres volver a intentarlo.';
-
-  @override
-  String get privacyStringsSessionOrAccountClosureWasInterrupted =>
-      'Se ha interrumpido el cierre de la sesión o cuenta. La sesión local está cerrada; falta confirmar el resultado en el servidor.';
-
-  @override
-  String get privacyStringsAllYourSessionsWereRevoked =>
-      'Todas tus sesiones se han revocado.';
-
-  @override
-  String get privacyStringsYouAreSignedOutOnThis =>
-      'Has cerrado sesión en este dispositivo. No se ha podido confirmar la revocación en el servidor.';
+      'La eliminación de la cuenta no se ha aceptado. Inicia sesión de nuevo si quieres volver a intentarlo.';
 
   @override
   String get reportPageReportAProfile => 'Denunciar un perfil';

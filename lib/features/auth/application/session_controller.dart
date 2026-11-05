@@ -181,7 +181,6 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
         phase = SessionPhase.signedOut;
       } else if (record.origin == _origin && record.phase == 'closing') {
         await _invalidate(const ApiFailure(ApiFailureKind.sessionUncertain));
-        notice = 'closure_unconfirmed';
       } else if (record.origin != _origin ||
           !['ready', 'refreshing'].contains(record.phase)) {
         await _invalidate(const ApiFailure(ApiFailureKind.sessionUncertain));
@@ -518,9 +517,7 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
     phase = SessionPhase.synchronizing;
     resourceRevision++;
     _notify();
-    String? resultNotice = action == 'erasure'
-        ? 'erasure_unconfirmed'
-        : 'logout_unconfirmed';
+    String? resultNotice = action == 'erasure' ? 'erasure_unconfirmed' : null;
     try {
       final result = await repository.api.requestJson(
         action == 'all' ? 'POST' : 'DELETE',
@@ -549,12 +546,9 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
           throw const ApiFailure(ApiFailureKind.invalidResponse);
         }
         resultNotice = 'erasure_accepted';
-      } else {
-        if (action == 'all' &&
-            jsonField<int>(jsonObject(result), 'revoked_sessions') < 0) {
-          throw const ApiFailure(ApiFailureKind.invalidResponse);
-        }
-        resultNotice = action == 'all' ? 'logout_all_confirmed' : null;
+      } else if (action == 'all' &&
+          jsonField<int>(jsonObject(result), 'revoked_sessions') < 0) {
+        throw const ApiFailure(ApiFailureKind.invalidResponse);
       }
     } on ApiFailure catch (e) {
       if (action == 'erasure' &&
@@ -774,6 +768,7 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
 
   Future<void> _performLogout() async {
     _loggingOut = true;
+    notice = null;
     _scope.cancel();
     phase = SessionPhase.synchronizing;
     _notify();
@@ -784,11 +779,9 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
       /* Invalidated by rotation. */
     }
     final tokens = _tokens;
-    var confirmed = false;
     if (tokens != null) {
       try {
         await repository.logout(tokens);
-        confirmed = true;
       } on ApiFailure {
         /* Local logout still proceeds. No blind mutation replay. */
       }
@@ -796,7 +789,6 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
     await _invalidate(const ApiFailure(ApiFailureKind.unauthenticated));
     if (phase == SessionPhase.signedOut) {
       failure = null;
-      notice = confirmed ? null : 'logout_unconfirmed';
     }
     _loggingOut = false;
     _notify();

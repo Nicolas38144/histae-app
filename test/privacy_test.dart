@@ -141,7 +141,7 @@ void main() {
     await restored.start();
     expect(calls, isEmpty);
     expect(restored.phase, SessionPhase.signedOut);
-    expect(restored.notice, 'closure_unconfirmed');
+    expect(restored.notice, isNull);
   });
   test('secure storage barrier failure prevents destructive request; logout-all and current revoke close locally', () async {
     for (final action in ['storage', 'all', 'current']) {
@@ -169,7 +169,7 @@ void main() {
       } else if (action == 'all') {
         await session.logoutEverywhere();
         expect(calls.single.url.path, '/api/auth/logout-all');
-        expect(session.notice, 'logout_all_confirmed');
+        expect(session.notice, isNull);
       } else {
         await session.revokeCurrentSession(privacyId);
         expect(calls.single.url.path, '/api/auth/sessions/$privacyId');
