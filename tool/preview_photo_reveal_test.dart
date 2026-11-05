@@ -11,8 +11,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
 import 'package:histae_app/core/l10n/locale_controller.dart';
 import 'package:histae_app/features/continuation/presentation/partner_photo.dart';
-import 'package:histae_app/features/continuation/presentation/partner_photo_page.dart';
 import 'package:histae_app/features/matches/presentation/matches_page.dart';
+import 'package:histae_app/features/matches/presentation/partner_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
@@ -364,12 +364,10 @@ void main() {
           await tester.drag(find.byType(Scrollable).last, const Offset(0, 850));
           await record(1);
         }
-        await tap(find.text('Voir sa photo'));
+        await tap(find.text('Voir son profil'));
         await hold(2.5);
-        expect(find.byType(PartnerPhotoPage), findsOneWidget);
+        expect(find.byType(PartnerPage), findsOneWidget);
         await capture('$_output/discovered.png', ratio: 2);
-        await tap(find.byTooltip('Retour'));
-        await hold(0.6);
         await tap(find.byTooltip('Retour'));
         await hold(1.2);
         await capture('$_output/conversation-after.png', ratio: 2);

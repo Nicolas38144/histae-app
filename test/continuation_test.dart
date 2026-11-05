@@ -23,6 +23,68 @@ import 'support/matches_fixture.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  testWidgets(
+    'a subscription event during a quota read rejects the stale result and refreshes only quota',
+    (tester) async {
+      var quotas = 0, plans = 0, matches = 0;
+      final firstResponse = Completer<http.Response>();
+      final session = testSession((request) async {
+        if (request.url.path.endsWith('/continuation-quota')) {
+          quotas++;
+          return quotas == 1
+              ? firstResponse.future
+              : jsonResponse(quotaJson(premium: true));
+        }
+        if (request.url.path == '/api/plans') plans++;
+        if (request.url.path == '/api/matches/me') matches++;
+        return defaultContinuationResponse(request);
+      });
+      await session.establish(testTokens);
+      final realtime = QuietRealtime(session);
+      final access = MatchesController(
+        MatchesRepository(session),
+        realtime: realtime,
+      );
+      await access.activate();
+      final c = access.continuation;
+      final initial = c.activate();
+      await tester.pump();
+      realtime.emit(const MobileSignal('subscription.updated'));
+      firstResponse.complete(jsonResponse(quotaJson()));
+      await initial;
+      await tester.pumpAndSettle();
+      expect(c.quota!.premium, isTrue);
+      expect((quotas, plans, matches), (2, 1, 1));
+      access.dispose();
+      session.dispose();
+    },
+  );
+  test('quota changes reuse catalogue until manual refresh; navigation reuses both', () async {
+    var quotas = 0, plans = 0;
+    final session = testSession((request) async {
+      if (request.url.path.endsWith('/continuation-quota')) quotas++;
+      if (request.url.path == '/api/plans') plans++;
+      return defaultContinuationResponse(request);
+    });
+    addTearDown(session.dispose);
+    await session.establish(testTokens);
+    final access = MatchesController(
+      MatchesRepository(session),
+      realtime: QuietRealtime(session),
+    );
+    addTearDown(access.dispose);
+    await access.activate();
+    final c = access.continuation;
+    await c.activate();
+    expect((quotas, plans), (1, 1));
+    c.suspend();
+    await c.activate();
+    expect((quotas, plans), (1, 1));
+    await c.loadQuota();
+    expect((quotas, plans), (2, 1));
+    await c.refreshQuota();
+    expect((quotas, plans), (3, 2));
+  });
   test('credit recovery distinguishes exhausted free credits, stock and weekly confirmations', () {
     ContinuationQuota quota(Map<String, Object?> values) =>
         ContinuationQuota.fromJson({...quotaJson(), ...values});

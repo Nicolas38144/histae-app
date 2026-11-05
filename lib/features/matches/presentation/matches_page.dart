@@ -184,6 +184,7 @@ class _MatchesPageState extends State<MatchesPage> {
     ownerId: c.ownerId,
     photoReadAt: c.readAt,
     refreshPhotoAccess: c.refreshPhotos,
+    photoCache: c.thumbnails,
     photosAllowed: c.active && c.listVerified && !c.photosBlocked(match.id),
     onTap: _opening ? null : () => _open(match.id),
   );

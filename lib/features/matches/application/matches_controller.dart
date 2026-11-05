@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../../../core/media/private_photo_cache.dart';
 import '../../../core/models/client_message.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
@@ -38,6 +39,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   }
   final MatchesRepository repository;
   final DraftController? drafts;
+  final thumbnails = PrivatePhotoCache();
 
   String get ownerId => repository.owner;
   ContinuationController? _continuation;
@@ -61,6 +63,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
 
   @override
   void blockPhotos(String id) {
+    thumbnails.invalidate(id);
     _photoBarriers.add(id);
     repository.invalidate(matchId: id);
     _notify();
@@ -68,6 +71,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
 
   void profilePhotoChanged() {
     if (!accessible) return;
+    thumbnails.clear();
     repository.invalidate();
     _verified = false;
     _listVerified = false;
@@ -245,6 +249,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     suspend();
     _items.clear();
     _photoBarriers.clear();
+    thumbnails.clear();
     _messages.clear();
     _outbox.clear();
     _removed.clear();
@@ -328,6 +333,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   }
 
   void _purge(String id, {bool remove = false}) {
+    thumbnails.invalidate(id);
     repository.invalidate(matchId: id);
     _continuation?.forgetMatch(id);
     _outbox.forget(id);
@@ -359,6 +365,15 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       _armDeadline();
     }
     if (signal.type == 'heartbeat') return;
+    if (signal.type == 'subscription.updated') {
+      _continuation?.invalidateQuota();
+      return;
+    }
+    if (signal.type == 'matches.invalidated') {
+      thumbnails.clear();
+    } else if (signal.type == 'match.updated' && signal.matchId != null) {
+      thumbnails.invalidate(signal.matchId!);
+    }
     repository.invalidate(matchId: signal.matchId);
     if (signal.ended && signal.matchId != null) {
       _purge(signal.matchId!, remove: true);
@@ -407,11 +422,26 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     _debounce?.cancel();
     _debounce = Timer(
       const Duration(milliseconds: 180),
-      () => unawaited(_read(ReadPolicy.refresh, background: true)),
+      () => unawaited(
+        _read(
+          ReadPolicy.refresh,
+          background: true,
+          historyPolicy: ReadPolicy.cached,
+        ),
+      ),
     );
   }
 
   void _armDeadline() => _deadlines.update(_items);
+
+  void _syncThumbnailGrants() => thumbnails.retainAuthorized({
+    for (final match in _items)
+      if (match.photosRevealed &&
+          !photosBlocked(match.id) &&
+          match.lifecycle.allowsHistoryAt(serverNow) &&
+          match.partner.photo != null)
+        match.id: match.partner.photo!,
+  });
 
   void _deadlineReached(List<UserMatch> expired) {
     if (!active) return;
@@ -434,16 +464,28 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   Future<void> refresh() => _read(ReadPolicy.refresh);
 
   @override
-  Future<void> refreshPhotos() => _read(ReadPolicy.refresh, background: true);
+  Future<void> refreshPhotos() => _read(
+    ReadPolicy.refresh,
+    background: true,
+    historyPolicy: ReadPolicy.cached,
+  );
 
-  Future<void> _read(ReadPolicy policy, {bool background = false}) {
+  Future<void> _read(
+    ReadPolicy policy, {
+    bool background = false,
+    ReadPolicy? historyPolicy,
+  }) {
     if (_sync case final pending?) return pending;
     if (!active || retrySeconds > 0) return Future.value();
     if (listLoading || historyLoading) {
       _dirty = true;
       return Future.value();
     }
-    final task = _refresh(policy, background: background);
+    final task = _refresh(
+      policy,
+      background: background,
+      historyPolicy: historyPolicy ?? policy,
+    );
     _sync = task;
     return task.whenComplete(() {
       if (identical(_sync, task)) _sync = null;
@@ -454,7 +496,11 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     });
   }
 
-  Future<void> _refresh(ReadPolicy policy, {required bool background}) async {
+  Future<void> _refresh(
+    ReadPolicy policy, {
+    required bool background,
+    required ReadPolicy historyPolicy,
+  }) async {
     final epoch = _epoch, chatEpoch = _chatEpoch;
     final languageRevision = session.localizationRevision;
     final target = selectedId;
@@ -516,6 +562,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       for (final item in items) {
         if (!item.myRevealed) _photoBarriers.remove(item.id);
       }
+      _syncThumbnailGrants();
       if (cursor == null) {
         for (final id in {..._outbox.matchIds, ..._closures.keys}) {
           if (!seen.contains(id)) _purge(id);
@@ -528,7 +575,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
           _purge(target);
           notice = 'ended';
         } else {
-          await _refreshHistory(match, epoch, chatEpoch, policy);
+          await _refreshHistory(match, epoch, chatEpoch, historyPolicy);
         }
       }
     } on ApiFailure catch (e) {
@@ -599,6 +646,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
         notice = 'ended';
       }
       if (e.code == 'invalid_cursor') {
+        repository.invalidate(matchId: match.id);
         _historyPages = 1;
         _dirty = true;
       }
@@ -649,6 +697,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
         }
       }
       listCursor = page.cursor;
+      _syncThumbnailGrants();
       _armDeadline();
     } on ApiFailure catch (e) {
       if (_alive(epoch)) {
@@ -746,6 +795,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
           _purge(match.id, remove: true);
           notice = 'ended';
         } else if (e.code == 'invalid_cursor') {
+          repository.invalidate(matchId: match.id);
           _historyPages = 1;
           _dirty = true;
         }
@@ -899,6 +949,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
 
   @override
   void dispose() {
+    thumbnails.dispose();
     _continuation?.dispose();
     _disposed = true;
     suspend();

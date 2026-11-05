@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/media/private_photo_cache.dart';
 import '../../../core/theme/histae_tokens.dart';
 import '../data/match_models.dart';
 import 'match_photo_avatar.dart';
@@ -15,6 +16,7 @@ class MatchPreviewCard extends StatelessWidget {
     this.photoReadAt,
     this.photosAllowed = false,
     this.refreshPhotoAccess,
+    this.photoCache,
   });
   final UserMatch match;
   final String ownerId;
@@ -22,6 +24,7 @@ class MatchPreviewCard extends StatelessWidget {
   final DateTime? photoReadAt;
   final bool photosAllowed;
   final Future<void> Function()? refreshPhotoAccess;
+  final PrivatePhotoCache? photoCache;
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +46,8 @@ class MatchPreviewCard extends StatelessWidget {
                     url: match.partner.photo,
                     readAt: photoReadAt,
                     refreshAccess: refreshPhotoAccess,
+                    memoryCache: photoCache,
+                    cacheKey: match.id,
                     allowed:
                         photosAllowed &&
                         match.historyAllowed &&

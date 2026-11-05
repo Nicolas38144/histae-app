@@ -912,14 +912,6 @@
   "@continuationPageMutualPhotoRevealIsConfirmed": {
     "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
   },
-  "continuationPageThePhotoIsCurrentlyUnavailable": "La photo n’est pas disponible actuellement.",
-  "@continuationPageThePhotoIsCurrentlyUnavailable": {
-    "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
-  },
-  "continuationPageViewTheirPhoto": "Voir sa photo",
-  "@continuationPageViewTheirPhoto": {
-    "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
-  },
   "continuationPageYourPhotoRevealRequestStillNeeds": "Votre demande de révélation reste à confirmer.",
   "@continuationPageYourPhotoRevealRequestStillNeeds": {
     "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"

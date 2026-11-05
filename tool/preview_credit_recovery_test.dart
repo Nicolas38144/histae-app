@@ -221,11 +221,11 @@ void main() {
     await tester.ensureVisible(find.byKey(const Key('matches-credits-toggle')));
     await tester.tap(find.byKey(const Key('matches-credits-toggle')));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.byKey(const Key('open-videos')));
+    await tester.ensureVisible(find.byKey(const Key('open-credits')));
     await tester.pumpAndSettle();
     await capture('$_output/free-exhausted.png');
     await record(1.5);
-    await tap(find.byKey(const Key('open-videos')));
+    await tap(find.byKey(const Key('open-credits')));
     expect(find.byType(CreditsPage), findsOneWidget);
     await record(1.3);
     await capture('$_output/watch-video.png');

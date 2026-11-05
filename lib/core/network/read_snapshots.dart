@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'api_failure.dart';
 import 'request_cancellation.dart';
 
@@ -26,11 +28,18 @@ final class _Snapshot<T> {
   final Set<Object> tags;
 }
 
+final class _PendingRead {
+  _PendingRead(this.cancellation, Set<Object> tags) : tags = {...tags};
+  final RequestCancellation? cancellation;
+  final Set<Object> tags;
+  final result = Completer<Object?>();
+}
+
 /// Repository-owned, typed snapshots. Only validated models enter this cache.
 /// Policy is explicit; refreshes and writes never depend on a widget's Zone.
 final class ReadSnapshots {
   final _values = <Object, _Snapshot<Object?>>{};
-  final _pending = <Object, (Object, Set<Object>)>{};
+  final _pending = <Object, _PendingRead>{};
   String? _scope;
 
   DateTime? readAt(Object key) => _values[key]?.readAt;
@@ -42,7 +51,7 @@ final class ReadSnapshots {
 
   void invalidate(Set<Object> tags) {
     _values.removeWhere((_, value) => value.tags.any(tags.contains));
-    _pending.removeWhere((_, value) => value.$2.any(tags.contains));
+    _pending.removeWhere((_, value) => value.tags.any(tags.contains));
   }
 
   Future<T> mutate<T>(Set<Object> tags, Future<T> Function() write) async {
@@ -74,26 +83,44 @@ final class ReadSnapshots {
     if (policy == ReadPolicy.cached && value != null) {
       return value.value as T;
     }
+    final current = _pending[key];
+    // Share only requests with the same cancellation owner. Closing one route
+    // must never abort a different route's independent read.
+    if (current != null && identical(current.cancellation, cancellation)) {
+      current.tags.addAll(tags);
+      return await current.result.future as T;
+    }
     // A failed refresh must not leave a previously successful view reusable.
     _values.remove(key);
-    final pending = Object();
-    _pending[key] = (pending, Set.unmodifiable(tags));
+    final pending = _PendingRead(cancellation, tags);
+    _pending[key] = pending;
+    unawaited(_fetch(key, pending, fetch));
+    return await pending.result.future as T;
+  }
+
+  Future<void> _fetch<T>(
+    Object key,
+    _PendingRead pending,
+    Future<T> Function() fetch,
+  ) async {
     try {
       final result = await fetch();
-      if (identical(_pending[key]?.$1, pending) &&
-          cancellation?.isCancelled != true) {
+      if (identical(_pending[key], pending) &&
+          pending.cancellation?.isCancelled != true) {
         _values[key] = _Snapshot(
           result,
           DateTime.now().toUtc(),
-          Set.unmodifiable(tags),
+          Set.unmodifiable(pending.tags),
         );
         while (_values.length > 128) {
           _values.remove(_values.keys.first);
         }
       }
-      return result;
+      pending.result.complete(result);
+    } catch (error, stack) {
+      pending.result.completeError(error, stack);
     } finally {
-      if (identical(_pending[key]?.$1, pending)) _pending.remove(key);
+      if (identical(_pending[key], pending)) _pending.remove(key);
     }
   }
 }

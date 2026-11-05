@@ -6,6 +6,72 @@ import 'package:histae_app/core/network/read_snapshots.dart';
 import 'package:histae_app/core/network/request_cancellation.dart';
 
 void main() {
+  test('concurrent reads share one request and invalidation starts a fresh generation', () async {
+    final cache = ReadSnapshots(), cancellation = RequestCancellation();
+    final old = Completer<int>(), fresh = Completer<int>();
+    var reads = 0;
+    Future<int> read() => cache.read(
+      scope: 'owner:fr',
+      key: DataResource.profile,
+      tags: {DataResource.profile},
+      cancellation: cancellation,
+      fetch: () => ++reads == 1 ? old.future : fresh.future,
+    );
+    final first = read(), joined = read();
+    expect(reads, 1);
+    cache.invalidate({DataResource.profile});
+    final replacement = read();
+    expect(reads, 2);
+    fresh.complete(2);
+    expect(await replacement, 2);
+    old.complete(1);
+    expect(await Future.wait([first, joined]), [1, 1]);
+    expect(
+      await cache.read<int>(
+        scope: 'owner:fr',
+        key: DataResource.profile,
+        policy: ReadPolicy.cached,
+        fetch: () async => fail('late response replaced the fresh snapshot'),
+      ),
+      2,
+    );
+  });
+
+  test(
+    'independent cancellation owners never share a cancellable request',
+    () async {
+      final cache = ReadSnapshots();
+      final cancelled = RequestCancellation(), retained = RequestCancellation();
+      final firstResponse = Completer<int>(), nextResponse = Completer<int>();
+      final first = cache.read(
+        scope: 'owner',
+        key: 'profile',
+        cancellation: cancelled,
+        fetch: () => firstResponse.future,
+      );
+      final next = cache.read(
+        scope: 'owner',
+        key: 'profile',
+        cancellation: retained,
+        fetch: () => nextResponse.future,
+      );
+      cancelled.cancel();
+      firstResponse.complete(1);
+      nextResponse.complete(2);
+      expect(await first, 1);
+      expect(await next, 2);
+      expect(
+        await cache.read<int>(
+          scope: 'owner',
+          key: 'profile',
+          policy: ReadPolicy.cached,
+          fetch: () async => fail('missing retained snapshot'),
+        ),
+        2,
+      );
+    },
+  );
+
   test('explicit cached reads retain immutable values and their original timestamp', () async {
     final cache = ReadSnapshots();
     var reads = 0;

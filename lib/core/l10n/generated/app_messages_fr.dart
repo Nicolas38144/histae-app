@@ -787,13 +787,6 @@ class AppMessagesFr extends AppMessages {
       'La révélation mutuelle est confirmée.';
 
   @override
-  String get continuationPageThePhotoIsCurrentlyUnavailable =>
-      'La photo n’est pas disponible actuellement.';
-
-  @override
-  String get continuationPageViewTheirPhoto => 'Voir sa photo';
-
-  @override
   String get continuationPageYourPhotoRevealRequestStillNeeds =>
       'Votre demande de révélation reste à confirmer.';
 

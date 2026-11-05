@@ -213,8 +213,6 @@
   "continuationPageRevealingPhotosRequiresSeparateConsentFrom": "Revealing photos requires separate consent from each person. Your plan never replaces that consent.",
   "continuationPageYourPhotoRevealConsentHasBeen": "Your photo reveal consent has been recorded.",
   "continuationPageMutualPhotoRevealIsConfirmed": "Mutual photo reveal is confirmed.",
-  "continuationPageThePhotoIsCurrentlyUnavailable": "The photo is currently unavailable.",
-  "continuationPageViewTheirPhoto": "View their photo",
   "continuationPageYourPhotoRevealRequestStillNeeds": "Your photo reveal request still needs confirmation.",
   "continuationPageResumeTheSamePhotoRevealConsent": "Resume the same photo reveal consent",
   "continuationPageChooseToRevealPhotos": "Choose to reveal photos",

@@ -292,7 +292,11 @@ void main() {
       await c.activate();
       await c.openChat(testMatch);
       history = Completer<http.Response>();
-      final refresh = c.refreshPhotos();
+      c.realtime.onSignal!(
+        const MobileSignal('message.created', matchId: testMatch),
+      );
+      await tester.pump(const Duration(milliseconds: 180));
+      final refresh = c.refreshPhotos(); // Joins the active background read.
       await tester.pump();
       await c.send('À bientôt');
       expect(c.messages.any((m) => m.id == outgoingId), isTrue);
@@ -339,7 +343,7 @@ void main() {
       await tester.tap(credits);
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('free-credits-remaining')), findsOneWidget);
-      expect(find.byKey(const Key('open-videos')), findsOneWidget);
+      expect(find.byKey(const Key('open-videos')), findsNothing);
       expect(requests, reads);
       await tester.pumpWidget(const SizedBox.shrink());
     },

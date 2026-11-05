@@ -95,6 +95,9 @@ Suspending activity and disposing resources are distinct operations.
 repositories composed by `SessionRepositories`; the public catalogue has a separate language-aware cache.
 `ReadSnapshots` holds at most 128 validated entries per instance in memory and retains their original
 read timestamp. `ReadPolicy.cached` reuses a snapshot; `ReadPolicy.refresh` requests a new one.
+Concurrent reads for the same key and cancellation owner share one request, including explicit
+refreshes. Independent route cancellation remains isolated. Invalidation starts a new generation;
+an older response cannot refill or replace its successor's snapshot.
 
 | Trigger | Behavior |
 | --- | --- |
@@ -209,10 +212,12 @@ The conversation name and its profile menu entry share one navigation action. `P
 renders the selected match's existing public data through `FeedProfileContent`, also used by
 discovery and the owner's preview. Opening it does not reread the API or discard the message
 draft. Distance is omitted because the match projection does not supply it.
+After mutual photo consent, the encounter details action opens this same profile by replacing
+the details route. Back returns directly to the preserved conversation.
 
 `SignedPhotoLoader` downloads to memory without Bearer credentials or redirects, with a 5,000,000-byte
-limit and a fifteen-second timeout. Access is checked before display. Closing, losing access or
-backgrounding evicts the image. The 50-second window measured from the resource read bounds new
+limit and a fifteen-second timeout. Access is checked before display. Full-size images are evicted
+on closing, losing access or backgrounding. The 50-second window measured from the resource read bounds new
 downloads, leaving a margin before the API's 60-second signed URL expiry. It does not expire
 already downloaded bytes while their visible route remains authorized.
 
@@ -223,10 +228,18 @@ covered route cancels its download and purges the decoded image; late bytes cann
 Stale or rejected signed links cause at most one coalesced authorized refresh per visible attempt,
 without a loading bar in the conversation or a retry loop. Manual refresh remains available.
 
-`MatchPhotoAvatar` uses `PrivatePhoto` for authorized thumbnails. Renewing only S3 signing parameters
-retains the existing pixels; a different object path or version reloads the image. It downloads
-through `SignedPhotoLoader`, never through a persistent network-image cache, and purges
-on hidden routes/tabs, backgrounding, withdrawal or replacement. `ContinuationController` keeps
+`MatchPhotoAvatar` uses `PrivatePhoto` and the controller-owned `PrivatePhotoCache` for authorized
+thumbnails. Its foreground-only LRU retains at most 48 entries and 8 MiB of encoded bytes, shares
+in-flight downloads and reuses the same image provider between the list and conversation header.
+Hidden views stop displaying the photo while its authorized thumbnail remains available for navigation.
+Renewing only S3 signing parameters retains the pixels, even when the original download link has
+expired; a different object path or version reloads the image. Backgrounding, session changes,
+withdrawal, match removal/deadlines and access-changing server events clear the affected entries
+and reject late downloads. Fresh match grants reconcile retained thumbnails. Nothing is written to disk.
+Renewing a photo link refreshes matches while reusing unchanged message history. Server events invalidate
+only the affected history, so another match's event does not reread the open conversation. Stream
+reconnection still invalidates both list and histories to recover missed events; manual refresh
+explicitly rereads them. `ContinuationController` keeps
 grant and withdrawal retry intentions distinct. `MatchAccess` owns an immediate local photo
 barrier until a fresh server snapshot confirms withdrawal, so a lost response cannot restore an
 old image. Consent and continuation remain independent operations.
@@ -242,6 +255,9 @@ Matches, continuation options and credits share those decisions. Presentation ro
 session billing controller and injected catalogue; only confirmed entitlement changes refresh
 quota on return. Rewarded-video eligibility checks the same weekly ceiling before starting and
 after asynchronous consent/loading steps.
+Quota updates reuse the language/session-bound plan catalogue; manual quota refresh also refreshes
+the catalogue. Subscription events invalidate quota without rereading match lists or messages.
+The matches credit disclosure links to the credits screen without a duplicate video shortcut.
 
 `RewardedVideoGateway` isolates UMP/AdMob; `RewardTracker` follows the server intent. Only server
 validation grants a reward. `BillingController` operates on immutable values and `BillingGateway`;

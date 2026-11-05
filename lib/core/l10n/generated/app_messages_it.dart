@@ -789,13 +789,6 @@ class AppMessagesIt extends AppMessages {
       'La rivelazione reciproca è confermata.';
 
   @override
-  String get continuationPageThePhotoIsCurrentlyUnavailable =>
-      'La foto non è disponibile al momento.';
-
-  @override
-  String get continuationPageViewTheirPhoto => 'Vedi la sua foto';
-
-  @override
   String get continuationPageYourPhotoRevealRequestStillNeeds =>
       'La richiesta di rivelazione resta da confermare.';
 

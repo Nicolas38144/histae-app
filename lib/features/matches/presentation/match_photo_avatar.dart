@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/media/private_photo_cache.dart';
 import '../../../core/network/signed_photo_loader.dart';
 import '../../../core/widgets/private_photo.dart';
 
-/// A private thumbnail using the same route-scoped loader as the full photo.
+/// Private thumbnail pixels can be shared between authorized foreground views.
 class MatchPhotoAvatar extends StatelessWidget {
   const MatchPhotoAvatar({
     super.key,
@@ -13,6 +14,8 @@ class MatchPhotoAvatar extends StatelessWidget {
     this.size = 44,
     this.photoClient,
     this.refreshAccess,
+    this.memoryCache,
+    this.cacheKey,
   });
 
   final String? url;
@@ -21,6 +24,8 @@ class MatchPhotoAvatar extends StatelessWidget {
   final double size;
   final PhotoClientFactory? photoClient;
   final Future<void> Function()? refreshAccess;
+  final PrivatePhotoCache? memoryCache;
+  final String? cacheKey;
 
   @override
   Widget build(BuildContext context) => PrivatePhoto(
@@ -30,6 +35,8 @@ class MatchPhotoAvatar extends StatelessWidget {
     decodeWidth: 144,
     photoClient: photoClient,
     refreshAccess: refreshAccess,
+    memoryCache: memoryCache,
+    cacheKey: cacheKey,
     builder: (context, image, loading, failed) => ExcludeSemantics(
       child: ClipOval(
         child: SizedBox.square(

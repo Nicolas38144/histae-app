@@ -1383,18 +1383,6 @@ abstract class AppMessages {
   /// Interface: lib/features/continuation/presentation/continuation_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'La photo n’est pas disponible actuellement.'**
-  String get continuationPageThePhotoIsCurrentlyUnavailable;
-
-  /// Interface: lib/features/continuation/presentation/continuation_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Voir sa photo'**
-  String get continuationPageViewTheirPhoto;
-
-  /// Interface: lib/features/continuation/presentation/continuation_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Votre demande de révélation reste à confirmer.'**
   String get continuationPageYourPhotoRevealRequestStillNeeds;
 

@@ -213,8 +213,6 @@
   "continuationPageRevealingPhotosRequiresSeparateConsentFrom": "Svelare le foto richiede il consenso separato di ciascuno. Il piano non sostituisce mai questi consensi.",
   "continuationPageYourPhotoRevealConsentHasBeen": "Il consenso a svelare le foto è stato registrato.",
   "continuationPageMutualPhotoRevealIsConfirmed": "La rivelazione reciproca è confermata.",
-  "continuationPageThePhotoIsCurrentlyUnavailable": "La foto non è disponibile al momento.",
-  "continuationPageViewTheirPhoto": "Vedi la sua foto",
   "continuationPageYourPhotoRevealRequestStillNeeds": "La richiesta di rivelazione resta da confermare.",
   "continuationPageResumeTheSamePhotoRevealConsent": "Riprendi lo stesso consenso di rivelazione",
   "continuationPageChooseToRevealPhotos": "Scegli di svelare le foto",

@@ -785,13 +785,6 @@ class AppMessagesEs extends AppMessages {
       'La revelación mutua está confirmada.';
 
   @override
-  String get continuationPageThePhotoIsCurrentlyUnavailable =>
-      'La foto no está disponible por ahora.';
-
-  @override
-  String get continuationPageViewTheirPhoto => 'Ver su foto';
-
-  @override
   String get continuationPageYourPhotoRevealRequestStillNeeds =>
       'Tu solicitud para revelar las fotos está pendiente de confirmación.';
 

@@ -781,13 +781,6 @@ class AppMessagesEn extends AppMessages {
       'Mutual photo reveal is confirmed.';
 
   @override
-  String get continuationPageThePhotoIsCurrentlyUnavailable =>
-      'The photo is currently unavailable.';
-
-  @override
-  String get continuationPageViewTheirPhoto => 'View their photo';
-
-  @override
   String get continuationPageYourPhotoRevealRequestStillNeeds =>
       'Your photo reveal request still needs confirmation.';
 

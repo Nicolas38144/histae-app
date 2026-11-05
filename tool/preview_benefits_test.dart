@@ -116,7 +116,7 @@ void main() {
     await capture('matches-free');
     await tester.tap(find.byKey(const Key('matches-credits-toggle')));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('open-videos')));
+    await tester.tap(find.byKey(const Key('open-credits')));
     await tester.pumpAndSettle();
     await capture('videos');
     await tester.scrollUntilVisible(

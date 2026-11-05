@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../media/private_photo_cache.dart';
 import '../network/signed_photo_loader.dart';
 
 typedef PrivatePhotoBuilder = Widget Function(
@@ -11,8 +12,9 @@ typedef PrivatePhotoBuilder = Widget Function(
   bool failed,
 );
 
-/// Route-owned bytes, never persisted. URL expiry limits new downloads, not
-/// display of an already downloaded image while access remains authorized.
+/// Private image display, never persisted. Full-size bytes are route-owned;
+/// thumbnails may use a session cache while authorization remains valid.
+/// URL expiry limits new downloads, not display of authorized downloaded pixels.
 class PrivatePhoto extends StatefulWidget {
   const PrivatePhoto({
     super.key,
@@ -23,7 +25,9 @@ class PrivatePhoto extends StatefulWidget {
     required this.builder,
     this.refreshAccess,
     this.photoClient,
-  });
+    this.memoryCache,
+    this.cacheKey,
+  }) : assert(memoryCache == null || cacheKey != null);
 
   final String? url;
   final DateTime? readAt;
@@ -32,6 +36,8 @@ class PrivatePhoto extends StatefulWidget {
   final PrivatePhotoBuilder builder;
   final Future<void> Function()? refreshAccess;
   final PhotoClientFactory? photoClient;
+  final PrivatePhotoCache? memoryCache;
+  final String? cacheKey;
 
   @override
   State<PrivatePhoto> createState() => _PrivatePhotoState();
@@ -74,6 +80,10 @@ class _PrivatePhotoState extends State<PrivatePhoto>
   @override
   void didUpdateWidget(PrivatePhoto oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.memoryCache != widget.memoryCache ||
+        oldWidget.cacheKey != widget.cacheKey) {
+      _purge();
+    }
     if (_failed &&
         (oldWidget.url != widget.url || oldWidget.readAt != widget.readAt)) {
       _purge();
@@ -90,7 +100,12 @@ class _PrivatePhotoState extends State<PrivatePhoto>
     _epoch++;
     _download?.cancel();
     _download = null;
-    if (_image case final image?) unawaited(image.evict());
+    if (_image case final image?) {
+      if (widget.cacheKey == null ||
+          widget.memoryCache?.owns(widget.cacheKey!, image) != true) {
+        unawaited(image.evict());
+      }
+    }
     _image = null;
     _resource = null;
     _loading = false;
@@ -106,6 +121,17 @@ class _PrivatePhotoState extends State<PrivatePhoto>
     if (_resource == resource) return;
     _purge();
     _resource = resource;
+    final cached = widget.cacheKey == null
+        ? null
+        : widget.memoryCache?.lookup(
+            widget.cacheKey!,
+            widget.url!,
+            widget.decodeWidth,
+          );
+    if (cached != null) {
+      _image = cached;
+      return;
+    }
     _loading = true;
     // A stale snapshot can be encountered on navigation. Refresh only while
     // visible, once per attempt; controller reads coalesce across avatars.
@@ -131,6 +157,17 @@ class _PrivatePhotoState extends State<PrivatePhoto>
       while (_alive(epoch)) {
         if (!_fresh) throw StateError('Expired photo URL');
         try {
+          if (widget.memoryCache case final cache?
+              when widget.cacheKey != null) {
+            final image = await cache.load(
+              key: widget.cacheKey!,
+              url: widget.url!,
+              width: widget.decodeWidth,
+              photoClient: widget.photoClient,
+            );
+            if (_alive(epoch)) setState(() => _image = image);
+            return;
+          }
           final request = SignedPhotoLoader(clientFactory: widget.photoClient)
               .load(widget.url!);
           _download = request;

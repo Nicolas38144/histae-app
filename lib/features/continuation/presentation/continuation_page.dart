@@ -15,7 +15,6 @@ import 'continuation_strings.dart';
 import 'continuation_subscription_navigation.dart';
 import 'credit_recovery_card.dart';
 import 'credits_page.dart';
-import 'partner_photo_page.dart';
 import 'photo_reveal_panel.dart';
 
 class ContinuationPage extends StatefulWidget {
@@ -23,10 +22,12 @@ class ContinuationPage extends StatefulWidget {
     super.key,
     required this.controller,
     required this.matchId,
+    required this.onOpenProfile,
     this.catalog,
   });
   final ContinuationController controller;
   final String matchId;
+  final VoidCallback onOpenProfile;
   final CatalogRepository? catalog;
 
   @override
@@ -209,12 +210,7 @@ class _ContinuationPageState extends State<ContinuationPage>
                   controller: c,
                   onReveal: _reveal,
                   onWithdraw: _withdrawReveal,
-                  onOpen: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) =>
-                          PartnerPhotoPage(access: c.access, matchId: m.id),
-                    ),
-                  ),
+                  onOpenProfile: widget.onOpenProfile,
                 ),
                 const EditorialDivider(),
                 Text(

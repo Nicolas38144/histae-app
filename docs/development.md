@@ -31,7 +31,7 @@ payments. Run the relevant existing suite rather than testing every visual or do
 | Refresh recovery, restart, revocation and durable credential writes | `flutter test test/session_test.dart test/auth_widget_test.dart` |
 | Feed expiry, location or pause | `flutter test test/discovery_test.dart test/discovery_pause_test.dart` |
 | Native location activation, refusal and cancellation | `flutter test test/device_location_test.dart test/discovery_test.dart` |
-| Photo readiness, withdrawal and private thumbnails | `flutter test test/photo_sharing_test.dart test/continuation_test.dart` |
+| Photo readiness, withdrawal and private thumbnails | `flutter test test/photo_sharing_test.dart test/continuation_test.dart test/private_photo_cache_test.dart` |
 | Camera/gallery selection, staged upload and photo errors | `flutter test test/profile_widget_test.dart test/profile_test.dart` |
 | Conversation profile, cached navigation and full-size photo privacy | `flutter test test/match_profile_test.dart test/cached_conversation_test.dart` |
 | Live conversation editing, private URL renewal and unread indicators | `flutter test test/conversation_updates_test.dart test/private_photo_test.dart` |
@@ -45,6 +45,13 @@ payments. Run the relevant existing suite rather than testing every visual or do
 
 Tests use simulated providers. State exactly which checks ran and distinguish them from actual
 device/provider validation. The current release backlog is in the [roadmap](../roadmap.md).
+
+For thumbnail/navigation changes, also run `test/match_profile_test.dart` and
+`test/cached_conversation_test.dart`. Verify that list → conversation → list keeps the same
+authorized thumbnail without another download, photo URL renewal does not reread message history,
+and an unrelated match event does not reload the open conversation. Withdrawal and backgrounding
+must still remove photos immediately. From shared-photo details, “View their profile” must return
+directly to the conversation on Back and preserve its draft.
 
 ## Translations
 

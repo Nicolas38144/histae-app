@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/network/read_snapshots.dart';
 import '../../../core/network/retry_after.dart';
 import '../../auth/domain/authenticated_session.dart';
 import '../../catalog/data/subscription_plan.dart';
@@ -52,6 +53,7 @@ class ContinuationController extends ChangeNotifier {
   Timer? _quotaDeadline;
   List<SubscriptionPlan> plans = const [];
   bool loading = false, busy = false;
+  bool _quotaInvalidated = false;
   ApiFailure? failure, catalogFailure;
   String? notice;
   ContinuationOffer? _offer;
@@ -178,7 +180,17 @@ class ContinuationController extends ChangeNotifier {
 
   Future<void> refreshQuota() async {
     await _activate(loadIfMissing: false);
-    await loadQuota();
+    await loadQuota(refreshPlans: true);
+  }
+
+  void invalidateQuota() {
+    _quotaInvalidated = true;
+    quotaReadAt = null;
+    quota = null;
+    _offer = null;
+    _quotaDeadline?.cancel();
+    _notify();
+    if (active) unawaited(loadQuota());
   }
 
   Future<void> _activate({required bool loadIfMissing}) async {
@@ -242,18 +254,22 @@ class ContinuationController extends ChangeNotifier {
     }
   }
 
-  Future<void> loadQuota() {
+  Future<void> loadQuota({bool refreshPlans = false}) {
     if (_load case final pending?) return pending;
     if (!active || retrySeconds > 0) return Future.value();
-    final task = _loadQuota();
+    final task = _loadQuota(refreshPlans: refreshPlans);
     _load = task;
     return task.whenComplete(() {
-      if (identical(_load, task)) _load = null;
+      if (identical(_load, task)) {
+        _load = null;
+        if (_quotaInvalidated && active) unawaited(loadQuota());
+      }
     });
   }
 
-  Future<void> _loadQuota() async {
+  Future<void> _loadQuota({required bool refreshPlans}) async {
     final epoch = _epoch;
+    _quotaInvalidated = false;
     loading = true;
     failure = null;
     catalogFailure = null;
@@ -261,12 +277,15 @@ class ContinuationController extends ChangeNotifier {
     _notify();
     try {
       final q = await repository.quota(_scope);
-      if (!_alive(epoch)) return;
+      if (!_alive(epoch) || _quotaInvalidated) return;
       quota = q;
       quotaReadAt = _now().toUtc();
       _armWeeklySnapshot();
       try {
-        final result = await repository.plans(_scope);
+        final result = await repository.plans(
+          _scope,
+          policy: refreshPlans ? ReadPolicy.refresh : ReadPolicy.cached,
+        );
         if (_alive(epoch)) plans = result;
       } on ApiFailure catch (e) {
         if (_alive(epoch)) {

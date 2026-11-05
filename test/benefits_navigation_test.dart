@@ -205,7 +205,7 @@ void main() {
         tester.widget<Text>(find.byKey(const Key('ad-credits-remaining'))).data,
         '1',
       );
-      expect(find.byKey(const Key('open-videos')), findsOneWidget);
+      expect(find.byKey(const Key('open-videos')), findsNothing);
       await tester.ensureVisible(find.text('Voir mes crédits'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Voir mes crédits'));
@@ -327,7 +327,7 @@ void main() {
       unavailable = false;
       await tester.tap(find.text('Actualiser les cr\u00e9dits'));
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('open-videos')), findsOneWidget);
+      expect(find.byKey(const Key('open-videos')), findsNothing);
       expect(
         tester
             .widget<Text>(find.byKey(const Key('free-credits-remaining')))

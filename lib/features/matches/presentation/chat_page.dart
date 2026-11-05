@@ -44,6 +44,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   final _incoming = <String, GlobalKey>{};
   Timer? _readTimer;
   String? _head;
+  bool _profileOpening = false;
   bool get _foreground =>
       WidgetsBinding.instance.lifecycleState == null ||
       WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
@@ -154,32 +155,49 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   }
 
   Future<void> _decisions() async {
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => ContinuationPage(
-          catalog: widget.catalog,
-          controller: c.continuation,
-          matchId: widget.matchId,
-        ),
+    final route = MaterialPageRoute<void>(
+      builder: (_) => ContinuationPage(
+        catalog: widget.catalog,
+        controller: c.continuation,
+        matchId: widget.matchId,
+        onOpenProfile: () => unawaited(_profile(replaceDetails: true)),
       ),
     );
-    if (mounted) await c.continuation.activate();
+    await Navigator.of(context).push(route);
+    await route.completed;
+    if (mounted && ModalRoute.of(context)?.isCurrent == true) {
+      await c.continuation.activate();
+    }
   }
 
-  Future<void> _profile() async {
-    if (!c.accessible ||
+  Future<void> _profile({bool replaceDetails = false}) async {
+    if (_profileOpening ||
+        !c.accessible ||
         c.selected?.id != widget.matchId ||
         c.selected?.lifecycle.allowsHistoryAt(c.serverNow) != true) {
       return;
     }
+    _profileOpening = true;
     _readTimer?.cancel();
     FocusScope.of(context).unfocus();
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => PartnerPage(controller: c, id: widget.matchId),
-      ),
+    final route = MaterialPageRoute<void>(
+      builder: (_) => PartnerPage(controller: c, id: widget.matchId),
     );
-    if (mounted) _scheduleRead();
+    try {
+      final navigator = Navigator.of(context);
+      if (replaceDetails) {
+        await navigator.pushReplacement<void, void>(route);
+        await route.completed;
+      } else {
+        await navigator.push(route);
+      }
+      if (mounted) {
+        if (replaceDetails) await c.continuation.activate();
+        _scheduleRead();
+      }
+    } finally {
+      _profileOpening = false;
+    }
   }
 
   Future<void> _report() async {
@@ -247,6 +265,8 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                         url: match.partner.photo,
                         readAt: c.readAt,
                         refreshAccess: c.refreshPhotos,
+                        memoryCache: c.thumbnails,
+                        cacheKey: match.id,
                         allowed:
                             c.active &&
                             c.verified &&

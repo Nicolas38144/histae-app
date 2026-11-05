@@ -12,11 +12,11 @@ class PhotoRevealPanel extends StatelessWidget {
     required this.controller,
     required this.onReveal,
     required this.onWithdraw,
-    required this.onOpen,
+    required this.onOpenProfile,
   });
 
   final ContinuationController controller;
-  final VoidCallback onReveal, onWithdraw, onOpen;
+  final VoidCallback onReveal, onWithdraw, onOpenProfile;
 
   @override
   Widget build(BuildContext context) {
@@ -75,14 +75,11 @@ class PhotoRevealPanel extends StatelessWidget {
                   ] else if (shared) ...[
                     Text(text.photoRevealShared),
                     const SizedBox(height: 16),
-                    if (c.match!.partner.photo != null)
-                      HistaeButton.icon(
-                        onPressed: c.access.verified ? onOpen : null,
-                        icon: const Icon(Icons.visibility_outlined),
-                        label: Text(text.continuationPageViewTheirPhoto),
-                      )
-                    else
-                      Text(text.continuationPageThePhotoIsCurrentlyUnavailable),
+                    HistaeButton.icon(
+                      onPressed: c.access.verified ? onOpenProfile : null,
+                      icon: const Icon(Icons.person_outline_rounded),
+                      label: Text(text.chatPageViewTheirProfile),
+                    ),
                   ] else if (c.myRevealed) ...[
                     Text(text.photoRevealWaiting),
                   ] else if (c.pendingReveal) ...[

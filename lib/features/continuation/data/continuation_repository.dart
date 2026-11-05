@@ -1,6 +1,7 @@
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/network/json_fields.dart';
+import '../../../core/network/read_snapshots.dart';
 import '../../auth/domain/authenticated_session.dart';
 import '../../catalog/data/subscription_plan.dart';
 import 'continuation_models.dart';
@@ -13,7 +14,10 @@ abstract interface class ContinuationRepository {
 
   Future<ContinuationQuota> quota(RequestCancellation scope);
 
-  Future<List<SubscriptionPlan>> plans(RequestCancellation scope);
+  Future<List<SubscriptionPlan>> plans(
+    RequestCancellation scope, {
+    ReadPolicy policy = ReadPolicy.cached,
+  });
 
   Future<bool> reveal(String id, RequestCancellation scope);
 
@@ -30,6 +34,7 @@ abstract interface class ContinuationRepository {
 
 final class ApiContinuationRepository implements ContinuationRepository {
   ApiContinuationRepository(this.session);
+  final _reads = ReadSnapshots();
   @override
   final AuthenticatedSession session;
 
@@ -55,7 +60,18 @@ final class ApiContinuationRepository implements ContinuationRepository {
       );
 
   @override
-  Future<List<SubscriptionPlan>> plans(RequestCancellation scope) async {
+  Future<List<SubscriptionPlan>> plans(
+    RequestCancellation scope, {
+    ReadPolicy policy = ReadPolicy.cached,
+  }) => _reads.read(
+    scope: '${session.resourceKey}:${session.language.code}',
+    key: DataResource.plans,
+    policy: policy,
+    cancellation: scope,
+    fetch: () => _fetchPlans(scope),
+  );
+
+  Future<List<SubscriptionPlan>> _fetchPlans(RequestCancellation scope) async {
     final j = jsonObject(
       await session.publicJson('/api/plans', cancellation: scope),
     );

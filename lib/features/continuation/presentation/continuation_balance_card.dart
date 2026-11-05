@@ -118,29 +118,12 @@ class ContinuationBalanceCard extends StatelessWidget {
                 icon: const Icon(Icons.arrow_forward_rounded, size: 18),
                 label: Text(text.continuationBalanceCardViewCredits),
               ),
-              if (ready && !q.premium)
+              if (ready && !q.premium && q.weeklyLimitReached)
                 HistaeButton.textIcon(
-                  key: Key(
-                    q.weeklyLimitReached
-                        ? 'open-credit-subscription'
-                        : 'open-videos',
-                  ),
-                  onPressed: q.weeklyLimitReached
-                      ? onOpenSubscription
-                      : onOpenCredits,
-                  icon: Icon(
-                    q.weeklyLimitReached
-                        ? Icons.auto_awesome_outlined
-                        : Icons.play_circle_outline,
-                    size: 18,
-                  ),
-                  label: Text(
-                    q.weeklyLimitReached
-                        ? text.creditRecoveryViewSubscriptions
-                        : q.suggestsRewardedVideo
-                        ? text.rewardVideoCardWatchAVideo
-                        : text.continuationBalanceCardVideos,
-                  ),
+                  key: const Key('open-credit-subscription'),
+                  onPressed: onOpenSubscription,
+                  icon: const Icon(Icons.auto_awesome_outlined, size: 18),
+                  label: Text(text.creditRecoveryViewSubscriptions),
                 ),
             ],
           ),
