@@ -171,9 +171,6 @@ class AppMessagesFr extends AppMessages {
       'Un détail qui fait sourire. Une réponse qui donne envie d’en savoir plus. Ici, les mots passent avant les photos, que vous choisissez de dévoiler à deux.';
 
   @override
-  String get appStringsExplorePlans => 'Découvrir les formules';
-
-  @override
   String get appStringsHistaePlans => 'Les formules Histae';
 
   @override

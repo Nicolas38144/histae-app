@@ -8,18 +8,10 @@ import '../core/widgets/histae_scaffold.dart';
 import '../core/widgets/histae_wordmark.dart';
 import '../features/auth/application/session_controller.dart';
 import '../features/auth/presentation/otp_page.dart';
-import '../features/catalog/data/catalog_repository.dart';
-import '../features/catalog/presentation/catalog_page.dart';
 import '../features/privacy/presentation/privacy_strings.dart';
 
 class WelcomePage extends StatelessWidget {
-  const WelcomePage({
-    super.key,
-    required this.repository,
-    this.session,
-    this.onRegister,
-  });
-  final CatalogRepository? repository;
+  const WelcomePage({super.key, this.session, this.onRegister});
   final SessionController? session;
   final VoidCallback? onRegister;
 
@@ -83,17 +75,7 @@ class WelcomePage extends StatelessWidget {
                     ),
                     child: Text(strings.existingAccount),
                   ),
-                  const SizedBox(height: 16),
                 ],
-                HistaeButton.outlined(
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      settings: const RouteSettings(name: '/catalog'),
-                      builder: (_) => CatalogPage(repository: repository),
-                    ),
-                  ),
-                  child: Text(strings.catalogAction),
-                ),
                 const SizedBox(height: 28),
                 const ConnectionArtwork(),
                 const SizedBox(height: 20),

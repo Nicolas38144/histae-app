@@ -170,9 +170,6 @@ class AppMessagesEs extends AppMessages {
       'Un detalle que le hace sonreír. Una respuesta que despierta curiosidad. Aquí, las palabras van antes que las fotos, que ambos deciden revelar.';
 
   @override
-  String get appStringsExplorePlans => 'Descubrir los planes';
-
-  @override
   String get appStringsHistaePlans => 'Los planes Histae';
 
   @override

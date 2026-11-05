@@ -213,7 +213,7 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
             ),
           ),
           home: widget.sessionController == null
-              ? WelcomePage(repository: widget.catalogRepository)
+              ? const WelcomePage()
               : ListenableBuilder(
                   listenable: widget.sessionController!,
                   builder: (context, _) => SessionGate(

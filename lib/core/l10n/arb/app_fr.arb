@@ -188,10 +188,6 @@
   "@appStringsDiscoverSomeoneThroughTheirWordsPhotos": {
     "description": "Interface: lib/core/l10n/app_strings.dart"
   },
-  "appStringsExplorePlans": "Découvrir les formules",
-  "@appStringsExplorePlans": {
-    "description": "Interface: lib/core/l10n/app_strings.dart"
-  },
   "appStringsHistaePlans": "Les formules Histae",
   "@appStringsHistaePlans": {
     "description": "Interface: lib/core/l10n/app_strings.dart"

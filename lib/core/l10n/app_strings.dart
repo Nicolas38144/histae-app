@@ -187,8 +187,6 @@ class AppStrings {
   String get welcomeBody =>
       messages.appStringsDiscoverSomeoneThroughTheirWordsPhotos;
 
-  String get catalogAction => messages.appStringsExplorePlans;
-
   String get catalogTitle => messages.appStringsHistaePlans;
 
   String get catalogIntro =>

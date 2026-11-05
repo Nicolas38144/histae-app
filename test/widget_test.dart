@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
+import 'package:histae_app/app/welcome_page.dart';
 import 'package:histae_app/core/network/api_client.dart';
 import 'package:histae_app/features/catalog/data/catalog_repository.dart';
+import 'package:histae_app/features/catalog/presentation/catalog_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
@@ -22,16 +24,25 @@ void main() {
 
   Future<void> openCatalog(WidgetTester tester) async {
     await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(find.text('Découvrir les formules'), 200);
-    await tester.ensureVisible(find.text('Découvrir les formules'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Découvrir les formules'));
+    // Exercise the catalogue route directly. Welcome no longer links to plans.
+    final app = tester.widget<HistaeApp>(find.byType(HistaeApp));
+    final navigator = tester.state<NavigatorState>(
+      find.byType(Navigator).first,
+    );
+    unawaited(
+      navigator.push<void>(
+        MaterialPageRoute<void>(
+          settings: const RouteSettings(name: '/catalog'),
+          builder: (_) => CatalogPage(repository: app.catalogRepository),
+        ),
+      ),
+    );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
   }
 
   testWidgets(
-    'French public navigation remains usable without API configuration',
+    'catalogue route and back navigation remain usable without API configuration',
     (tester) async {
       await tester.pumpWidget(const HistaeApp());
       await tester.pumpAndSettle();
@@ -40,7 +51,7 @@ void main() {
       expect(find.text('Service non configuré'), findsOneWidget);
       await tester.tap(find.byTooltip('Retour'));
       await tester.pumpAndSettle();
-      expect(find.text('Découvrir les formules'), findsOneWidget);
+      expect(find.byType(WelcomePage), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );
@@ -76,7 +87,7 @@ void main() {
       await tester.tap(find.byKey(const Key('plan-selector-free')));
       await tester.pumpAndSettle();
       expect(find.text('Offre 1 sur 3'), findsOneWidget);
-      expect(find.text('Crédits inclus par semaine : 3'), findsOneWidget);
+      expect(find.text('Crédits inclus par semaine : 2'), findsOneWidget);
       expect(find.text('Messagerie'), findsOneWidget);
       expect(find.text('Messaging'), findsNothing);
       expect(
@@ -137,7 +148,7 @@ void main() {
     expect(calls, 1);
     await tester.tap(find.byTooltip('Retour'));
     await tester.pumpAndSettle();
-    expect(find.text('Découvrir les formules'), findsOneWidget);
+    expect(find.byType(WelcomePage), findsOneWidget);
   });
 
   testWidgets('leaving while loading ignores a late response', (tester) async {
@@ -150,7 +161,7 @@ void main() {
     await tester.pumpAndSettle();
     response.complete(http.Response(catalogFixture(), 200));
     await tester.pumpAndSettle();
-    expect(find.text('Découvrir les formules'), findsOneWidget);
+    expect(find.byType(WelcomePage), findsOneWidget);
     expect(find.text('Premium'), findsNothing);
     expect(tester.takeException(), isNull);
   });
@@ -172,7 +183,6 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await tester.scrollUntilVisible(find.text('Découvrir les formules'), 200);
       await openCatalog(tester);
       await tester.pumpAndSettle();
       await tester.scrollUntilVisible(

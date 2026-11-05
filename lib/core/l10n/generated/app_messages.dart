@@ -387,12 +387,6 @@ abstract class AppMessages {
   /// Interface: lib/core/l10n/app_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Découvrir les formules'**
-  String get appStringsExplorePlans;
-
-  /// Interface: lib/core/l10n/app_strings.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Les formules Histae'**
   String get appStringsHistaePlans;
 

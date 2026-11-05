@@ -72,11 +72,7 @@ class _SessionGateState extends State<SessionGate> {
     }
     switch (session.phase) {
       case SessionPhase.signedOut:
-        return WelcomePage(
-          repository: catalog,
-          session: session,
-          onRegister: _register,
-        );
+        return WelcomePage(session: session, onRegister: _register);
       case SessionPhase.needsConsents:
         return ConsentsPage(session: session, onboarding: true);
       case SessionPhase.ready:
