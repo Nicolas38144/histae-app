@@ -1698,12 +1698,6 @@ abstract class AppMessages {
   /// Interface: lib/features/continuation/presentation/partner_photo_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'La photo temporaire n’est pas disponible. Actualisez pour obtenir un nouveau lien.'**
-  String get partnerPhotoPageTheTemporaryPhotoIsUnavailableRefresh;
-
-  /// Interface: lib/features/continuation/presentation/partner_photo_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Une photo, à deux'**
   String get partnerPhotoPageAPhotoTogether;
 
@@ -1724,18 +1718,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Photo de votre rencontre'**
   String get partnerPhotoPageYourMatchSPhoto;
-
-  /// Interface: lib/features/continuation/presentation/partner_photo_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'La photo ne peut pas être affichée. Actualisez le lien temporaire.'**
-  String get partnerPhotoPageThePhotoCannotBeShownRefresh;
-
-  /// Interface: lib/features/continuation/presentation/partner_photo_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Actualiser la photo'**
-  String get partnerPhotoPageRefreshPhoto;
 
   /// Interface: lib/features/continuation/presentation/reward_video_card.dart
   ///

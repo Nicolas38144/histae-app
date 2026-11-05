@@ -226,7 +226,8 @@ Its sliver keep-alive retains the photo while scrolling the same profile. The sh
 widget observes route visibility and app lifecycle; the feature supplies current match access. A
 covered route cancels its download and purges the decoded image; late bytes cannot restore it.
 Stale or rejected signed links cause at most one coalesced authorized refresh per visible attempt,
-without a loading bar in the conversation or a retry loop. Manual refresh remains available.
+without a loading bar in the conversation or a retry loop. Manual refresh remains available from
+the conversation; the viewed profile has no dedicated photo-refresh button.
 
 `MatchPhotoAvatar` uses `PrivatePhoto` and the controller-owned `PrivatePhotoCache` for authorized
 thumbnails. Its foreground-only LRU retains at most 48 entries and 8 MiB of encoded bytes, shares

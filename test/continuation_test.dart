@@ -326,6 +326,7 @@ void main() {
     'partner photo makes no hidden request; after mutual reveal it uses no Bearer or redirects and ignores bytes after access loss',
     (tester) async {
       var both = false, requests = 0;
+      var photo = 'https://photos.example/synthetic';
       final png = base64Decode(
         'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aL1sAAAAASUVORK5CYII=',
       );
@@ -339,7 +340,7 @@ void main() {
                 'photos_revealed': both,
                 'other_user': {
                   ...(publicMatchJson()['other_user'] as Map),
-                  'photo': 'https://photos.example/synthetic',
+                  'photo': photo,
                 },
               },
             ],
@@ -378,9 +379,8 @@ void main() {
       await tester.pumpAndSettle();
       expect(requests, 1);
       expect(find.byType(Image), findsOneWidget);
-      await tester.scrollUntilVisible(find.text('Actualiser la photo'), 200);
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Actualiser la photo'));
+      photo = 'https://photos.example/replacement';
+      await access.refreshPhotos();
       await tester.pump();
       expect(requests, 2);
       access.removeUnavailable(testMatch);

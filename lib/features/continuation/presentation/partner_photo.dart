@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/signed_photo_loader.dart';
-import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/private_photo.dart';
 import '../application/match_access.dart';
 
@@ -26,7 +25,6 @@ class PartnerPhoto extends StatefulWidget {
 class _PartnerPhotoState extends State<PartnerPhoto>
     with AutomaticKeepAliveClientMixin {
   late final _resourceKey = widget.access.session.resourceKey;
-  int _attempt = 0;
 
   @override
   bool get wantKeepAlive => true;
@@ -49,7 +47,7 @@ class _PartnerPhotoState extends State<PartnerPhoto>
             !access.photosBlocked(widget.matchId);
         final text = AppStrings.of(context).messages;
         return PrivatePhoto(
-          key: ValueKey((_resourceKey, widget.matchId, _attempt)),
+          key: ValueKey((_resourceKey, widget.matchId)),
           url: match?.partner.photo,
           readAt: access.readAt,
           allowed: allowed,
@@ -78,27 +76,15 @@ class _PartnerPhotoState extends State<PartnerPhoto>
                         errorBuilder: (_, _, _) => Padding(
                           padding: const EdgeInsets.all(24),
                           child: Text(
-                            text.partnerPhotoPageThePhotoCannotBeShownRefresh,
+                            text.partnerPhotoPageThisPhotoIsCurrentlyUnavailable,
                           ),
                         ),
                       ),
                     ),
                   ),
                 if (failed)
-                  Text(
-                    text.partnerPhotoPageTheTemporaryPhotoIsUnavailableRefresh,
-                  ),
+                  Text(text.partnerPhotoPageThisPhotoIsCurrentlyUnavailable),
               ],
-              HistaeButton.outlinedIcon(
-                onPressed: !access.active || loading
-                    ? null
-                    : () async {
-                        await access.refreshPhotos();
-                        if (mounted) setState(() => _attempt++);
-                      },
-                icon: const Icon(Icons.refresh),
-                label: Text(text.partnerPhotoPageRefreshPhoto),
-              ),
             ],
           ),
         );

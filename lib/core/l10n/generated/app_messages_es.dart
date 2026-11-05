@@ -1034,10 +1034,6 @@ class AppMessagesEs extends AppMessages {
       'Un match continúa entre dos. Cada persona confirma su propia decisión.';
 
   @override
-  String get partnerPhotoPageTheTemporaryPhotoIsUnavailableRefresh =>
-      'La foto temporal no está disponible. Actualiza para obtener otro enlace.';
-
-  @override
   String get partnerPhotoPageAPhotoTogether => 'Una foto, entre dos';
 
   @override
@@ -1049,13 +1045,6 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get partnerPhotoPageYourMatchSPhoto => 'Foto de tu match';
-
-  @override
-  String get partnerPhotoPageThePhotoCannotBeShownRefresh =>
-      'No se puede mostrar la foto. Actualiza el enlace temporal.';
-
-  @override
-  String get partnerPhotoPageRefreshPhoto => 'Actualizar la foto';
 
   @override
   String get rewardVideoCardWatchAVideo => 'Ver un vídeo';

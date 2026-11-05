@@ -1178,10 +1178,6 @@
   "@creditsPageAMatchContinuesTogetherEachPerson": {
     "description": "Interface: lib/features/continuation/presentation/credits_page.dart"
   },
-  "partnerPhotoPageTheTemporaryPhotoIsUnavailableRefresh": "La photo temporaire n’est pas disponible. Actualisez pour obtenir un nouveau lien.",
-  "@partnerPhotoPageTheTemporaryPhotoIsUnavailableRefresh": {
-    "description": "Interface: lib/features/continuation/presentation/partner_photo_page.dart"
-  },
   "partnerPhotoPageAPhotoTogether": "Une photo, à deux",
   "@partnerPhotoPageAPhotoTogether": {
     "description": "Interface: lib/features/continuation/presentation/partner_photo_page.dart"
@@ -1196,14 +1192,6 @@
   },
   "partnerPhotoPageYourMatchSPhoto": "Photo de votre rencontre",
   "@partnerPhotoPageYourMatchSPhoto": {
-    "description": "Interface: lib/features/continuation/presentation/partner_photo_page.dart"
-  },
-  "partnerPhotoPageThePhotoCannotBeShownRefresh": "La photo ne peut pas être affichée. Actualisez le lien temporaire.",
-  "@partnerPhotoPageThePhotoCannotBeShownRefresh": {
-    "description": "Interface: lib/features/continuation/presentation/partner_photo_page.dart"
-  },
-  "partnerPhotoPageRefreshPhoto": "Actualiser la photo",
-  "@partnerPhotoPageRefreshPhoto": {
     "description": "Interface: lib/features/continuation/presentation/partner_photo_page.dart"
   },
   "rewardVideoCardWatchAVideo": "Regarder une vidéo",
