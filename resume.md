@@ -1,187 +1,95 @@
-# Product flows and integration rules
+# Product flows
 
 [Documentation](README.md#documentation) · [Architecture](ARCHITECTURE.md) · [Roadmap](roadmap.md)
 
-The Rust API [HTTP contract](../histae-api-rust/docs/http-contract.md) owns DTOs, errors, limits and
-authorization. The mobile app contains neither administration UI nor `/api/admin/*` calls.
+The [Rust contract](../histae-api-rust/docs/http-contract.md) owns access rules, limits and DTOs.
+This guide describes user behavior; cache, retries and ownership belong in Architecture.
 
-## Account access and consent
+## Registration and consent
 
-Registration proceeds through profile (first name, birthdate, sex and biography), preferences,
-consent choices, then French phone/SMS OTP verification. The draft stays in flow memory between
-steps; no private field or consent is sent before verification. Closing the flow or process discards
-unsaved values. Returning sign-in opens phone verification directly. Both flows share the same OTP
-implementation; there is no separate password-based registration endpoint. An accepted SMS request
-does not prove delivery; a lost verification result requires a new code.
+Registration collects profile, preferences and explicit consent choices before phone/OTP.
+Drafts stay in memory until verification; closing the flow discards them. Returning users go
+directly to phone verification. Birthdate uses an adult-only calendar; sex defaults to male.
+Preference sliders start at ages 18–50 and 50 km. France (+33) is the supported phone selector.
 
-Sign-up uses a calendar-only adult birthdate picker and defaults sex to male. Preference sliders
-start at ages 18–50 and 50 km, with one-unit minus/plus buttons disabled at the API bounds or the
-opposite age limit. Phone entry uses the France (+33) selector and normalizes national typing or
-international autofill to E.164. Registration OTP requests include `registration: true`. Every accepted request opens the same
-code-entry screen: an already registered number at sign-up, or an unknown number at sign-in,
-receives no SMS. HTTP does not query account membership or wait for Sweego: the API atomically
-queues an encrypted request for its outbox worker. The generic acknowledgement proves neither
-delivery nor authentication. An explicit sign-in action remains available during registration.
+Both flows use generic OTP acknowledgement. An already registered sign-up number or unknown
+sign-in number opens code entry without sending SMS. Neither response reveals membership or
+proves delivery. Resend cooldown remains separate from code verification.
 
-The server enforces a shared resend cooldown (60 seconds by default); the mobile displays its
-remaining time without disabling code verification. Editing the phone cannot bypass it. A lost
-send response is resumed with the same UUID and parameters, never a new background SMS. Global
-provider attempt limits default to 100/hour and 500/day in addition to per-phone limits. Deploy
-the matching API, schema and outbox worker before relying on these protections.
+Public legal metadata comes from `GET /api/legal/documents`. After verification the app checks
+it again, saves choices and permitted profile/preferences, and preserves an existing account.
+Interrupted saves resume manually after checking server state. Terms acceptance and privacy-notice
+acknowledgement are required; sensitive-data and location agreements are separate and withdrawable.
+Sex/preferences are omitted without sensitive-data agreement. Native GPS permission is separate.
 
-`GET /api/legal/documents` supplies the current public document metadata, using the same versions,
-URLs and language fallbacks as the authenticated consent endpoint. Deploy this API route before the
-new registration flow. After verification, the app compares the documents again, saves the explicit
-consent choices, then the profile and permitted preferences. Sex and preferences are omitted without
-sensitive-data consent. An existing account is preserved rather than overwritten by a sign-up draft.
-An interrupted save can be resumed manually without another SMS; uncertain writes are checked by
-reading the current server state first. Photos, traits and question answers remain editable from
-the profile once the account is created.
+Withdrawal can remove affected fields or presence and make discovery unavailable. Privacy,
+logout, export and deletion remain accessible where authorized. Document acceptance is not yet
+atomic with publication; see the roadmap.
 
-Private access depends on the API's current required documents. Terms are accepted and the privacy
-notice is acknowledged. New choices are not preselected. Sensitive-data and location agreements
-are separate and withdrawable, with their consequences explained. Native GPS permission does not
-replace the Histae agreement.
+## Profile and discovery
 
-Sensitive-data withdrawal removes the affected fields, including sex/preferences; location
-withdrawal removes presence. Discovery may become unavailable while other account settings remain
-accessible. Logout, privacy requests, export and deletion remain available where the API permits.
+Profiles contain identity, biography, traits and up to three ordered answers. Saving answers
+replaces the whole list. Public projections show approved text; owners see text moderation state.
+A private photo is required for discovery, becomes available after upload, and stays hidden from
+the feed. Selecting/capturing stages it before upload; replacement affects authorized reveals.
+The owner preview reuses public components without inventing a distance or partner photo.
 
-Before saving, the client compares the document version, URL and language against what was shown.
-The current PUT does not send an expected version: this precheck cannot guarantee atomicity if a
-document changes during the write. A complete guarantee requires an API change.
+Readiness explains missing steps. Requesting location obtains one fresh position, with no
+background tracking. Expired presence hides old candidates and refreshes readiness once;
+GPS still requires a deliberate action. Pause hides new discovery/likes while retaining chats.
 
-## Profile and private photo
+Feed presents first name, age, server distance, biography, traits and answers. Three visible
+seconds unlock like/pass; a thin bar shows progress and pauses when hidden. Double tap likes;
+an upward gesture at the end passes. Buttons provide equivalent actions. Confirmed decisions
+animate briefly into the next profile; reduced motion uses static feedback. Reporting/blocking
+remain immediately available. Only a server-confirmed reciprocal decision creates a match.
 
-Profiles are adult-only. Identity/bio updates send the intended field state; preferences are saved
-together. Traits and questions come from API catalogues. The owner manages up to three ordered
-answers; saving confirms replacement of the entire list, including clearing it. Public projections
-show approved text, while the owner sees moderation state.
+## Conversations and photos
 
-An approved private photo is required to access discovery and to appear as a candidate. The feed
-shows a repair step linking to photo management while a photo is missing or awaiting approval.
-Photo writes invalidate feed readiness without introducing navigation-based API reloads.
-One private photo can be selected, replaced or removed. Preparation produces an oriented JPEG
-without EXIF, limited to 500,000 upload bytes. An uncertain retry keeps its exact bytes and key.
-Signed photos are temporary, without disk caching or speculative partner downloads.
+`active`/`confirmed` matches allow sending; `awaiting_continuation` keeps history readable.
+Ended/inaccessible matches leave the list. Search and archives use loaded rows, with explicit
+pagination. Unread counts appear on match rows; receipts depend on visible received messages.
+The composer stays editable during queued sends; uncertain retries preserve the original message.
 
-The owner's feed preview reuses public components and approved content, without inventing a
-distance/photo or allowing a swipe on the owner.
+Confirmed chats archive after 10 days without a new message, receive a warning at day 23 and are
+deleted with their messages at day 30. A new message unarchives/resets the deadline without another
+credit; reading, login and replay do not. Free and Premium follow the same rule.
 
-## Feed, location and pause
+Mutual photo agreement is confirmed by the API. Either participant can withdraw: both photos
+and thumbnails disappear while messages and the other agreement remain. Re-agreement can restore
+sharing. Replacing a photo updates mutually authorized matches. Thumbnails appear beside the name;
+tapping the name opens the profile. From shared-photo details, Back returns directly to chat.
+Ending a match and blocking are distinct; unblocking does not recreate it.
 
-The server readiness diagnostic identifies missing steps. GPS is requested on demand after the
-Histae agreement and native permission; there is no background location tracking or reuse of an
-old native reading.
+## Credits, ads and subscriptions
 
-When presence expires, stale candidates disappear and the recent-location step appears immediately.
-The app refreshes readiness automatically once, without triggering GPS. Repeated expired server
-timestamps do not start a request loop.
+Continuation confirmation rereads the match/quota and presents the applicable cost. A changed
+offer needs renewed confirmation. The API owns balances, reservations and entitlements.
 
-Feed shows first name, age, server distance, biography, traits and answers without a photo.
-A double tap likes; a separate upward gesture at the end passes. Buttons offer the same actions.
-Each profile requires three seconds of visible reading before either action becomes available.
-A thin gradient bar fills at the top of the profile and pauses while the feed is hidden or the app
-is inactive. Confirmed choices show a brief heart or upward-arrow animation, slide the current
-profile upward and bring in the next from below. Reduced motion uses a static feedback symbol
-and disables the sliding transition.
-Reporting and blocking remain immediately available.
-An uncertain choice can only resume with the same target and decision. A match requires a
-confirmed reciprocal result from the server.
+Matches shows a compact credit disclosure linking to Credits. Included/ad balances remain separate;
+the next renewal uses local date/time, while the API owns the Monday reset. Once included credits
+run out, eligible Free users can watch an optional video if stock has room. Reaching the weekly
+continuation cap takes priority and opens subscriptions; new reward videos are blocked. Existing
+proofs can settle. Reservations alone do not count as confirmed continuations.
 
-Pause mode is an account setting shared across devices. It hides new discovery and suspends new
-likes/matches while preserving existing conversations. Its API deployment is required.
+UMP handles ad preferences separately; only server reward validation grants credit.
+Google Play/StoreKit supply purchase UI and prices, with server verification before completion.
+Restoring purchases preserves the Histae owner. Monthly is the initial carousel selection.
+Existing Stripe subscriptions are website-managed; mobile offers no Stripe Checkout.
 
-## Matches, messages and reveal
+## Help, notifications and privacy
 
-Server-authorized `active` and `confirmed` matches permit sending. `awaiting_continuation` keeps
-history readable and disables composition. Local deadlines disable actions without inventing a
-new server state. Message ordering and cursors follow the API.
+A guide opens at the first usable feed and can reopen from Help and contact in Profile. Local
+encrypted drafts recover unsent messages and unpublished answers, excluding biographies, and clear
+on logout. Submitted messages are not restored as fresh drafts. Abrupt termination may interrupt
+a pending local write.
 
-Confirmed conversations are archived after 10 days without a new message, remain readable and
-writable, receive a server warning at day 23 and become unavailable at day 30. The API then purges
-the match and messages without another retention window. A new message resets inactivity without
-spending another credit; reading, signing in and replaying a send do not. The rule is identical for
-Free and Premium. Mobile projection uses `archived` and `inactivity_expires_at`, keeps archive search
-local and verifies an expired cached deadline before treating a renewed conversation as unavailable.
+Push needs platform configuration, permission and API registration. OS alerts are for background
+delivery; open-app messages/counters use realtime state. Removing a push device does not revoke
+its login session. Support opens the email app using `SUPPORT_EMAIL`.
 
-A lost send response retains text and UUID for an explicit retry. Read receipts apply only to
-received messages visible in the foreground. Shared real time refreshes affected resources;
-notification navigation verifies access before opening the conversation.
-
-Mutual photo reveal must be confirmed by the API. Losing access, closing the viewer or reaching its
-display deadline evicts the signed link and bytes. Reopening does not extend the deadline.
-The conversation header offers an explicit photo-sharing action. Each participant can withdraw
-their agreement for that match: both photos and thumbnails are hidden, while messages and the
-other participant's agreement are retained. A later agreement can restore mutual sharing.
-Unconfirmed withdrawal stays hidden locally and can only retry withdrawal, never an old grant.
-Replacements use the latest approved profile photo in all mutually authorized matches, with that
-behavior explained before agreement. Authorized thumbnails appear beside the name in the match
-list and conversation header; they use bounded memory downloads and are purged when hidden.
-Ending a match and blocking a person are distinct confirmed actions; unblocking does not recreate
-a match. Inaccessible data is purged and late responses are ignored.
-
-## Continuations, credits and rewards
-
-Before a continuation, the app rereads the match and quota, presents the person's cost and sends
-the accepted `credit_cost`. It never calculates a successful debit locally. A changed plan or stale
-offer requires renewed confirmation; an uncertain retry retains the accepted cost.
-
-Matches distinguishes available included credits, ad credits and the weekly cap. Reservations are
-not shown as available. Premium continuations use no credits; read failures are not zero balances.
-
-Matches and credits show the next renewal in the device's local date and time. The API still owns
-the actual Monday reset. Matches also offers an accent-insensitive first-name search over already
-loaded rows, with explicit load-more behavior and no search requests.
-
-Once included credits run out, the app suggests an optional video when the advertising stock has
-room. Reaching the weekly confirmed-continuation ceiling takes priority: the action opens store
-subscriptions, and new rewarded videos are blocked. Existing advertising proofs can still settle.
-Reservations alone do not count as a reached weekly ceiling.
-
-Videos are optional for eligible Free users. The API intent supplies ad-unit/custom data; UMP
-handles ad preferences separately from Histae consent. SDK completion starts tracking, while only
-server validation grants the credit.
-
-## Push and billing
-
-Push requires public Firebase options, user enablement, native permission and API registration.
-In-app banners remain generic and openings are deduplicated. Removing a push device does not revoke
-its login session.
-
-Google Play and StoreKit provide native purchase UI and localized prices. The API supplies store
-product identifiers and verifies receipts before purchase completion. Restoration preserves the
-purchase's Histae owner. Effective Free/Premium rights come from the API, never a success URL or
-SDK status alone. Stripe subscriptions are managed on the website; the app offers no Stripe checkout.
-
-## Local drafts and help
-
-Unpublished answers and unsent message text can be recovered on the same device after restarting.
-They use encrypted storage scoped to the account, are erased on sign-out and exclude biographies.
-Answer recovery never publishes content. A message already submitted for sending does not become
-a fresh sendable draft after restarting; uncertain sends retain their original in-memory retry.
-Abrupt OS termination can still interrupt an in-flight local write; validate real background and
-process-recreation behavior on both platforms.
-
-A short guide opens on the first usable feed and can be reopened from Help and contact, available
-at the bottom of Profile. It explains the reading bar, likes, passing and horizontal navigation.
-The help screen also explains photos, credits, purchases, restoration, drafts and safety. Support
-uses the public `SUPPORT_EMAIL` setting, currently `support.histae@gmail.com`, to open the user's
-email app. An empty setting retains the localized email-coming-soon fallback.
-
-## Privacy and deletion
-
-Privacy groups documents, editable choices, sessions, devices, blocks, rights requests, export and
-deletion. Submitting a rights request does not immediately execute it. Private JSON exports are
-downloaded temporarily and shared explicitly; cleanup is restricted to app-owned files and cannot
-remove copies saved elsewhere.
-
-Deletion requires confirmation and a dedicated token. A `202` closes access and reports cleanup
-in progress. A lost response closes local access with an uncertain remote result, without claiming
-erasure is finished.
-
-For shared caching and retry rules, use [Architecture](ARCHITECTURE.md). Interface and request
-language rules are in [Localization](lib/core/l10n/README.md) and [API languages](docs/api-languages.md).
-
-The public plan catalogue and subscription management share the same adaptive offer carousel,
-with Monthly selected initially, visible neighbouring cards and localized offer selectors.
+Privacy groups documents, choices, sessions, devices, blocks, correction requests, export and
+deletion. Requests require a precise description and do not immediately modify data. Exports use
+temporary files and explicit sharing; external copies cannot be recalled. Confirmed deletion
+acceptance closes access while cleanup proceeds; a lost response closes local access without
+claiming erasure finished.

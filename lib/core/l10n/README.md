@@ -2,51 +2,33 @@
 
 [Documentation](../../../README.md#documentation) · [API languages](../../../docs/api-languages.md)
 
-The four [ARB catalogues](arb/) contain French, English, Spanish and Italian interface text,
-validation, confirmations and accessibility labels. Developer documentation is written in English;
-this does not change the app's supported languages or French fallback.
+The [ARB catalogues](arb/) contain all interface, validation and accessibility copy in French,
+English, Spanish and Italian. Developer docs are English; unsupported app languages fall back to French.
 
-## Add or update a message
+## Editing messages
 
-1. Add a descriptive key to all four catalogues, with placeholder metadata in the French template.
-2. Use ICU plurals rather than concatenating sentence fragments or suffixes.
-3. Run generation from the app root:
+Add/update keys in all four catalogues, with placeholder metadata in the French template. Use ICU
+plurals rather than sentence fragments. Remove unused keys from every locale, then regenerate:
 
 ```bash
 flutter gen-l10n
 ```
 
-Use `AppStrings.of(context).messages` for copy and `AppStrings` for date, number, price and error
-formatting. Data/application layers return codes or `ClientMessage`; presentation translates them.
-Do not edit [generated Dart files](generated/) by hand. Remove genuinely unused keys from every
-locale and regenerate rather than keeping obsolete copy indefinitely.
-
-## Language preference and content
-
-`LocaleController` restores the device preference before the first render. Without an explicit
-local choice, `AccountLanguageBinding` can adopt the verified account's language. System mode
-resolves the device's primary language; unsupported languages use French.
-
-Changing language retains navigation and drafts. The API localizes catalogues and documents using
-`Accept-Language`, but personal text is not translated. Document presentation/acceptance language
-is separate from interface preference. Native and provider dialogs use their own settings.
+Widgets use `AppStrings.of(context).messages`; `AppStrings` formats dates, numbers, prices and
+errors. Other layers return codes/`ClientMessage`. Never hand-edit [generated Dart](generated/).
+Device preference restores before first render; account fallback applies only without a local
+choice. Language changes preserve navigation/drafts and never translate personal text.
 
 ## Native iOS resources
 
-After changing iOS permission or privacy-shield messages, also regenerate native localizations:
+After editing permission or privacy-shield copy, regenerate and review native resources:
 
 ```bash
 dart run tool/generate_native_localizations.dart
 ```
 
-Review the generated native resources; Dart localization alone does not update every system dialog.
+## Verification
 
-## Focused verification
-
-```bash
-flutter test test/localization_test.dart
-```
-
-The suite checks catalogue completeness, placeholders, plurals and hardcoded-label conventions.
-For visual review, use `tool/preview_localizations_test.dart`, including long translations, 200% text
-and keyboard layouts. See [Development](../../../docs/development.md) for shared checks and previews.
+`flutter test test/localization_test.dart` checks completeness, placeholders, plurals and label
+conventions. Use `tool/preview_localizations_test.dart` for long translations, keyboard layouts and
+200% text. See [Development](../../../docs/development.md#visual-previews) for preview commands.

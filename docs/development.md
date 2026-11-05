@@ -1,188 +1,107 @@
-# Development and verification
+# Development
 
-[Documentation](../README.md#documentation)
+[Documentation](../README.md#documentation) · [Architecture](../ARCHITECTURE.md)
 
 ## Working conventions
 
-Keep UI copy in the four ARB catalogues and business decisions in controllers/repositories.
-Preserve dependency ownership and cancellation when changing a flow; see [Architecture](../ARCHITECTURE.md).
-Use synthetic accounts and provider responses in tests and previews. Never log private data or
-call administrator routes from the mobile app.
+Keep interface copy in all four ARB catalogues, decisions in controllers/repositories, and
+ownership/cancellation explicit. Use fictional accounts and simulated providers in tests/previews.
+Never log private data or call admin routes from mobile.
 
-Do not run Git commands or recreate environment example files. Remove files only within an explicit
-cleanup request, with evidence they are obsolete. Provide proposed commit messages in English.
-Do not execute newly created or modified `.sh` scripts as part of local verification.
+Do not run Git commands or recreate environment example files. Delete files only within explicit
+cleanup scope, with evidence they are obsolete. Suggest commit messages in English. Do not execute
+new or modified `.sh` scripts during local verification.
 
 ## Checks
 
-Format the changed Dart files and analyze the project:
+Format changed Dart files, then check formatting and analysis:
 
 ```bash
 dart format --output=none --set-exit-if-changed lib test tool
 flutter analyze
 ```
 
-Use tests for meaningful risks such as session isolation, sensitive data, uncertain writes and
-payments. Run the relevant existing suite rather than testing every visual or documentation change.
+Run existing suites for affected risks; avoid tests that only mirror cosmetic changes.
+Documentation-only changes need no Flutter tests. Run Flutter checks/builds serially.
 
-| Change | Example focused command |
+| Area | Relevant suites in `test/` |
 | --- | --- |
-| Session/cache behavior | `flutter test test/read_snapshots_test.dart test/cache_lifecycle_regressions_test.dart` |
-| Refresh recovery, restart, revocation and durable credential writes | `flutter test test/session_test.dart test/auth_widget_test.dart` |
-| Feed expiry, location or pause | `flutter test test/discovery_test.dart test/discovery_pause_test.dart` |
-| Native location activation, refusal and cancellation | `flutter test test/device_location_test.dart test/discovery_test.dart` |
-| Photo readiness, withdrawal and private thumbnails | `flutter test test/photo_sharing_test.dart test/continuation_test.dart test/private_photo_cache_test.dart` |
-| Camera/gallery selection, staged upload and photo errors | `flutter test test/profile_widget_test.dart test/profile_test.dart` |
-| Conversation profile, cached navigation and full-size photo privacy | `flutter test test/match_profile_test.dart test/cached_conversation_test.dart` |
-| Live conversation editing, private URL renewal and unread indicators | `flutter test test/conversation_updates_test.dart test/private_photo_test.dart` |
-| Store availability and mandatory update gate | `flutter test test/store_updates_test.dart` |
-| Feed reading delay and transitions | `flutter test test/feed_reading_delay_test.dart` |
-| Match inactivity, archives, cache expiry and manual refresh | `flutter test test/matches_inactivity_test.dart test/matches_test.dart` |
-| Terminal match visibility, continuation expiry and pagination | `flutter test test/matches_visibility_test.dart` |
-| Native billing | `flutter test test/billing_test.dart` |
-| Interface/request language | `flutter test test/localization_test.dart test/api_language_test.dart` |
-| Screen privacy and OTP recovery | `flutter test test/app_privacy_shield_test.dart test/otp_test.dart test/auth_widget_test.dart` |
+| Sessions/OTP | `session_test.dart`, `auth_widget_test.dart`, `otp_test.dart` |
+| Cache/navigation | `read_snapshots_test.dart`, `cache_lifecycle_regressions_test.dart`, `cached_conversation_test.dart` |
+| Feed/location | `discovery_test.dart`, `discovery_pause_test.dart`, `device_location_test.dart`, `feed_reading_delay_test.dart` |
+| Photos/privacy | `photo_sharing_test.dart`, `continuation_test.dart`, `private_photo_cache_test.dart`, `private_photo_test.dart`, `match_profile_test.dart` |
+| Messaging/matches | `conversation_updates_test.dart`, `matches_inactivity_test.dart`, `matches_visibility_test.dart` |
+| Native boundaries | `billing_test.dart`, `store_updates_test.dart`, `app_privacy_shield_test.dart` |
+| Localization | `localization_test.dart`, `api_language_test.dart` |
 
-Tests use simulated providers. State exactly which checks ran and distinguish them from actual
-device/provider validation. The current release backlog is in the [roadmap](../roadmap.md).
+For example: `flutter test test/session_test.dart test/auth_widget_test.dart`.
+For cache/photo work, verify no redundant list/chat downloads, unrelated events or URL renewals
+reloading history, while withdrawal/backgrounding still purge images. Profile Back must preserve
+the chat draft. Report checks actually run; simulations do not validate native/provider behavior.
 
-For thumbnail/navigation changes, also run `test/match_profile_test.dart` and
-`test/cached_conversation_test.dart`. Verify that list → conversation → list keeps the same
-authorized thumbnail without another download, photo URL renewal does not reread message history,
-and an unrelated match event does not reload the open conversation. Withdrawal and backgrounding
-must still remove photos immediately. From shared-photo details, “View their profile” must return
-directly to the conversation on Back and preserve its draft.
-
-## Translations
-
-After editing the catalogues:
-
-```bash
-flutter gen-l10n
-```
-
-Do not hand-edit generated Dart messages. When changing native permission copy, also follow the
-[localization guide](../lib/core/l10n/README.md) to regenerate iOS resources.
+After ARB changes, run `flutter gen-l10n`; native permission copy also needs the
+[localization generator](../lib/core/l10n/README.md#native-ios-resources).
 
 ## Visual previews
 
-`tool/preview_*_test.dart` renders real widgets with synthetic content under `build/previews/`.
-Run the preview for the feature being reviewed.
-`tool/preview_billing_test.dart` reviews subscription states and the current offer carousel.
-`tool/preview_benefits_test.dart` reviews profile, credits and Premium transitions using an explicit
-refresh when its simulated server state changes, matching the app's cache policy.
-`tool/preview_help_test.dart` renders the actual child-safety answer and inline link using only
-the local public support configuration, with no provider calls. Set `FLUTTER_ROOT` for its fonts.
-`tool/preview_message_queue_test.dart` captures pending three-dot footers, confirmed receipts,
-the composer limit hint and the store update gate with simulated message/store responses.
-`tool/preview_preferences_test.dart` renders saved/edited preferences, registration and 200% text
-in all four languages under `build/previews/preferences-2026-11-05/`, with synthetic data only.
-For example:
+`tool/preview_*_test.dart` renders real widgets with fictional data into `build/previews/`.
+Set `FLUTTER_ROOT` to the SDK when fonts/icons require it. Review the images, including long
+translations, 200% text, keyboard layouts and insets against the [design system](../DESIGN_SYSTEM.md).
+
+| Preview | Purpose |
+| --- | --- |
+| `preview_brand_test.dart`, `preview_localizations_test.dart` | Shared visuals and translations |
+| `preview_billing_test.dart`, `preview_benefits_test.dart` | Offers, subscription/profile/credit states |
+| `preview_preferences_test.dart`, `preview_help_test.dart` | Forms and safety/help links |
+| `preview_message_queue_test.dart` | Pending dots, receipts, composer limit and update gate |
+| `preview_feed_test.dart`, `preview_reading_test.dart` | Feed actions and Aa settings |
+| `preview_photo_reveal_test.dart` | Match, chat, photo consent and withdrawal |
+| `preview_refactor_test.dart` | Navigation, archives/search and profile states |
+| `preview_website_test.dart` | Website captures, followed by the site's `scripts/export-app-screenshots.mjs` |
+
+Run a selected tool, for example:
 
 ```bash
 flutter test tool/preview_brand_test.dart --update-goldens
+flutter test tool/preview_feed_test.dart --dart-define=FEED_PREVIEW_ACTION=like
+flutter test tool/preview_photo_reveal_test.dart --dart-define=PHOTO_PREVIEW_LONG=true
 ```
 
-Some tools require `FLUTTER_ROOT` to point to the SDK to load platform fonts. Inspect the actual
-images, long biographies and translations, 200% text, keyboard layouts and system insets.
-Review the [design system](../DESIGN_SYSTEM.md) before changing shared components or brand assets.
+Feed accepts `like` or `pass` and exports 30 fps frames. Photo/reading previews use 15 fps and
+write `recording.json`. Photo options: `PHOTO_PREVIEW_PORTRAIT` (default
+`pictures/fixtures/fictional-portrait.png`), `PHOTO_PREVIEW_OUTPUT` (default
+`build/previews/photo-reveal/`), and `PHOTO_PREVIEW_RECEIPTS_ONLY=true` for stills only.
+Labels/touch markers belong to recordings; native screen protections remain enabled.
 
-`flutter test tool/preview_feed_test.dart` exports a populated feed and 30 fps PNG sequences for
-like/pass demonstrations under `build/previews/feed/`. Touch markers belong to the recording only.
-Use `--dart-define=FEED_PREVIEW_ACTION=like` or `pass` to render one sequence.
-
-`flutter test tool/preview_photo_reveal_test.dart` renders the real match, conversation, consent,
-photo and withdrawal screens and a 15 fps frame sequence in `build/previews/photo-reveal/`.
-Supply a fictional portrait with `--dart-define=PHOTO_PREVIEW_PORTRAIT=<local PNG path>` (the
-default is `pictures/fixtures/fictional-portrait.png`).
-The other participant's agreement is simulated; no provider or production API is contacted.
-Native screen protections stay enabled. The preview label and touch markers belong only to the
-recording. Add `--dart-define=PHOTO_PREVIEW_LONG=true` for a longer tour covering credits,
-conversation details, message composition, the match profile before/after photo consent and
-the actions at the bottom of the photo screen.
-Use `--dart-define=PHOTO_PREVIEW_OUTPUT=build/previews/<name>` for a separate export directory.
-The conversation and match-list preview share the same synthetic message history.
-Each export writes `recording.json` with its frame count, capture rate and duration.
-For receipt screenshots only, use `--dart-define=PHOTO_PREVIEW_RECEIPTS_ONLY=true`.
-This skips video frames and exports sent/read states, the tapped message date and its dismissal.
-Encode frames with FFmpeg, padding odd dimensions for H.264:
+Encode a 15 fps sequence with even H.264 dimensions:
 
 ```bash
 ffmpeg -framerate 15 -i build/previews/photo-reveal/frames/%04d.png -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2,fps=30" -c:v libx264 -crf 20 -pix_fmt yuv420p -movflags +faststart build/previews/photo-reveal/demo.mp4
 ```
 
-For website screenshots, run `flutter test tool/preview_website_test.dart`, then the site's
-`scripts/export-app-screenshots.mjs` converter. Keep profiles and conversations fictional and labelled.
-
-`flutter test tool/preview_refactor_test.dart` renders the current feed, reading settings,
-match archives/search, inactivity details, message timestamps and profile actions under
-`build/previews/refactor/`. It uses fictional profiles and simulated API responses. Delivered
-captures live in `pictures/previews/refactor-2026-10-28/`; older superseded UI exports are removed.
-
-`flutter test tool/preview_reading_test.dart` records the Aa settings and a fictional long profile
-under `build/previews/reading/`, with localized reviews at 100% and 200% system text size.
-Set `FLUTTER_ROOT` to load the SDK's Material icons. Encode `frames/%04d.png` at 15 fps with the
-FFmpeg recipe above; `recording.json` records the frame count and duration. Only the preview adds
-the fictional-profile label and touch markers. `test/reading_preferences_test.dart` covers local
-restore/write ordering, storage retry, unchanged API traffic and the paused feed reading delay.
-
-## Builds and release preparation
+## Builds and device checks
 
 ```bash
 flutter build apk --debug
-```
-
-This checks an Android development artifact, not store readiness. Android release builds use the
-private upload key configured in `android/key.properties`, with no fallback to debug signing.
-See [Android release signing](android-release.md) for recovery, bundle generation and verification.
-Keep signing credentials outside the public environment asset.
-
-Also verify the optimized Android build after changes to native dependencies or build settings:
-
-```bash
 flutter build apk --release
 ```
 
-Install it over an existing app signed with the same certificate without clearing data, launch
-it from a stopped process, and check that it stays open and resumes correctly. A development
-installation signed with the old debug key cannot be updated by an APK signed with the new key;
-use another test device or back up necessary data before uninstalling. A successful build or debug launch does not
-verify release startup. Flutter loads `android/app/proguard-rules.pro` automatically; its targeted
-Room constructor rule prevents WorkManager initialization from failing before Flutter starts
-when R8 removes the reflectively created database constructor.
+Use [Android signing](android-release.md) for upload-key recovery and Play bundles. After native
+or build changes, install the optimized release with the same certificate over existing data and
+test a stopped-process launch. Preserve the targeted Room constructor rule in
+`android/app/proguard-rules.pro`: removing it can break WorkManager before Flutter starts.
 
-iOS builds require macOS, Xcode and the intended signing/provisioning setup. Validate native
-permissions, Keychain, sharing, APNs, launch assets and store purchases on representative devices.
-Do not infer iOS success from Android or widget tests.
+On representative devices, check:
 
-The phone interface is locked to portrait-up at Flutter startup and in the Android manifest and
-both iOS property lists. Rebuild and restart after changing native settings, then rotate the device
-on the feed and a form: the interface and drafts must stay in place. iPad full-screen mode is
-required for its orientation restriction. Android 16+ may override orientation locks on displays
-at least 600 dp wide; see [Flutter's platform limits](https://api.flutter.dev/flutter/services/SystemChrome/setPreferredOrientations.html).
+- Portrait-up and drafts across rotation/interruption. iPad needs full-screen mode; Android large
+  displays can override orientation locks under [platform rules](https://api.flutter.dev/flutter/services/SystemChrome/setPreferredOrientations.html).
+- Android screenshot/recording rejection and Recents masking (API 24 and 33+). iOS app-switcher and
+  recording masks on iOS 15–17/18+; active still screenshots remain possible on iOS.
+- Disabled location activation, refusal, permission denial and cancellation. Refusal sends no
+  position; iOS/unsupported devices offer settings.
+- Camera/gallery permission and cancellation, staged preview without automatic upload, and discarded
+  interrupted Android capture. Regenerate localized iOS camera permission resources after copy edits.
 
-For screen privacy, test Recents/app-switcher previews from a conversation, photo and OTP form,
-including rotation, interruptions and returning from a system dialog. Drafts must remain intact.
-On Android, system screenshots should be rejected or blank and recordings must not show app
-content. Test at least API 24 and API 33+ after a full native rebuild. On iOS, verify app-switcher
-masking and active recording/mirroring on iOS 15–17 and iOS 18+. A still screenshot while the app
-is active remains possible on iOS; there is no supported global screenshot-blocking API. Avoid
-secure-text-field view-hierarchy workarounds. Native shields do not protect other applications,
-an external camera or a compromised OS.
-
-On Android, disable device location, request a position from the feed and accept the native
-activation prompt: the same request should then obtain one fresh fix. Declining must show
-feedback in the location card and send no position. Check permission denial, cancellation,
-and the settings fallback on devices where native activation is unavailable. On iOS, disabled
-services retain a settings action. Mocked provider tests do not verify the real system dialog.
-
-For photos, verify camera capture and gallery selection on a real device, including permission
-denial, cancellation, front-camera preference and returning to the preview without an automatic
-upload. Confirm that an interrupted Android capture is discarded after process recreation.
-iOS requires `NSCameraUsageDescription` in both plist configurations and all four localized
-permission resources; regenerate those resources after editing their ARB copy. Camera capture
-uses no video or microphone permission. Uploaded photos become available immediately; do not
-present the API's compatibility moderation status as an automated photo verification.
-
-Before beta, record the app/API versions, environment, tested flows and outstanding issues.
-Provider enablement and local compilation are separate from approval and availability in the stores.
+Native iOS checks require macOS/Xcode and signing. Keep provider delivery, Keychain, sharing,
+APNs, purchases and cold starts in the [release backlog](../roadmap.md); Android/widget success
+does not validate them.

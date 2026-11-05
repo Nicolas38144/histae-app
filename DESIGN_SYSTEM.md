@@ -2,134 +2,67 @@
 
 [Documentation](README.md#documentation)
 
-The mobile app shares the website's open-book identity, night-blue palette, lavender and apricot
-accents, and serif headings. Dark mode is the default.
+## Identity and shared components
 
-## Voice and content
+Use the website's open-book logo, night-blue surfaces, lavender/apricot accents and serif headings.
+Dark mode is the default. Colors and dimensions live in
+[HistaeTokens](lib/core/theme/histae_tokens.dart) and the [theme](lib/app/theme.dart); avoid copying
+values into individual screens. Screen backgrounds stay solid during tab transitions.
 
-Use simple, welcoming copy and concrete actions. French uses the formal form of address.
-Ordinary messages should describe what a person can do, without exposing transport internals.
-An uncertain save, purchase or reward stays uncertain until confirmed.
+Inter is used for body text and controls; Source Serif 4 for headings. Respect both font licenses:
+[Inter](assets/fonts/inter/OFL.txt), [Source Serif 4](assets/fonts/source_serif_4/OFL.txt).
+Panels generally have thin borders and 20 px corners. Primary actions use the coral-to-lavender
+gradient and dark text; secondary actions use a subtle surface and outline.
 
-Give long biographies and answers room to breathe. Do not rewrite or automatically translate
-personal content. Previews use clearly identified fictional profiles and conversations.
-Empty states provide a useful action without fabricating activity.
+Use `HistaeButton` for standard actions. It reserves 8 px above and below each button; row/wrap
+gaps remain explicit. Toolbars, steppers and offer selectors keep compact controls.
 
-## Colors and typography
+The [book SVG](assets/branding/histae-logo.svg) is the logo; the Histae wordmark is optional.
+`AppOpening` reveals the letters from **H.**, then the book, in 1,480 ms. Reduced motion skips it;
+suspension finishes it without resetting app state. Launcher icons require platform padding,
+including Android adaptive/monochrome layers. See the [iOS launch assets](ios/Runner/Assets.xcassets/LaunchImage.imageset/README.md).
 
-[HistaeTokens](lib/core/theme/histae_tokens.dart) and the [Flutter theme](lib/app/theme.dart)
-are the implementation references.
+`tool/generate_brand_assets.cjs` uses Node.js/Sharp and SVG sources in
+`pictures/logos/nouvelle-da/02-les-pages/`; `--site` also exports website assets.
 
-| Role | Value |
-| --- | --- |
-| Main background | `#0D1421` |
-| Secondary background | `#141D2D` |
-| Panel | `#1A2231` |
-| Main text | `#F9F7F2` |
-| Secondary text | `#C6C1D3` |
-| Lavender | `#B69CFF` |
-| Apricot | `#F09A82` |
-| Primary action | `#F2A48C` → `#D8B3F7` gradient with dark text |
+## Copy and screen hierarchy
 
-Screen backgrounds use the theme's solid surface color: night blue in dark mode.
+Use concrete, welcoming language; French addresses people formally. Explain actions rather than
+transport internals. Uncertain saves, rewards and purchases stay uncertain. Preserve personal
+text; previews use clearly identified fictional people.
 
-Inter is used for body text, forms and buttons; Source Serif 4 for headings. Respect screen width
-and system text size. Panels generally use thin borders and a 20 px radius; primary actions use
-a pill shape. Secondary buttons use a subtle lavender surface, light outline and 16 px corners.
-Space stacked actions so their hierarchy stays clear.
+- **Feed:** prioritize long profiles, without commercial buttons. Keep the reading bar visible;
+  reaching the end of a biography must not accidentally pass it.
+- **Matches:** show conversations before the compact credit disclosure and its explicit credits
+  link. Unknown balances are not zero. Place unread counts beneath the row arrow.
+- **Chat:** show receipts beneath the last sent/read messages, at bottom right. Pending dots use
+  that position. Tapping reveals the date briefly above the bubble; preserve text selection.
+- **Profile:** group introduction, answers, preview, pause and settings. Show Premium for Free,
+  subscription management for paid users, with a neutral loading state. The account UUID belongs
+  only here. Help follows the other settings entries.
+- **Photos:** place Take a photo before Choose a photo; both stage an image for explicit upload.
+  Do not show approval/pending-review badges. Mutual agreement controls partner access.
+- **Privacy:** keep optional switches separate from terms acceptance/privacy acknowledgement.
+  Correction requests need a precise message; explanations and request history use disclosures.
 
-Use `HistaeButton` for primary, outlined and text actions, including icon variants. The shared
-component reserves 8 px above and below each action (16 px between adjacent buttons). Keep
-horizontal gaps in rows/wraps explicit. Toolbar icons, steppers and plan selectors retain their
-compact controls; do not replace external spacing with larger label padding inside a button.
+## Forms and navigation
 
-Bundled font licenses: [Inter](assets/fonts/inter/OFL.txt) and
-[Source Serif 4](assets/fonts/source_serif_4/OFL.txt).
+Reuse `PreferenceField` and sliders for registration and saved preferences. Full-size headings
+and adjacent value badges replace floating captions. Disable steppers at bounds. Saved preferences
+keep Save visible but disabled until values change; initial onboarding stays enabled.
 
-## Logo and launch
+The transparent Profile / Feed / Matches bar has no panel, shadow or separator. Use 22 px icons,
+a 38 px selected circle and touch targets of at least 48 px. Feed is the initial center tab.
+Horizontal navigation requires a deliberate drag so small drift cannot interrupt vertical reading.
+Detail carousels keep their own gestures. Respect reduced motion and system insets.
 
-The logo is the open book, with the Histae name as an optional signature. The product source is
-[histae-logo.svg](assets/branding/histae-logo.svg); variants and PNGs live in
-[assets/branding](assets/branding/). Native launcher icons show the book with platform-appropriate
-padding. Android also has adaptive and monochrome layers.
+Subscription offers select Monthly initially when available. Space cards, reveal neighbors and use
+the action gradient for the selected selector. Provide previous/next controls and a localized
+position label; height adapts to the selected card and text size.
 
-`AppOpening` separates **H.** to reveal **istae**, then shows the book. The 1,480 ms animation runs
-on mount, skips reduced-motion mode and finishes on suspension without resetting application state.
-The [iOS launch guide](ios/Runner/Assets.xcassets/LaunchImage.imageset/README.md) covers native images.
+Aa reading settings apply only to profile prose: three sizes/spacings, preview and reset. They
+preserve system scaling, current profile and cache; the sheet pauses the reading delay.
 
-`tool/generate_brand_assets.cjs` uses Node.js, Sharp and local SVG sources under
-`pictures/logos/nouvelle-da/02-les-pages/`. It regenerates product/native sizes; `--site` also exports
-website assets. Review generated assets before using them in a release.
-
-## Main screens
-
-Feed gives priority to profiles, without commercial buttons. Reading to the end of a long profile
-must not accidentally pass it. Expired presence goes directly to the location step while readiness
-refreshes; the person still chooses when to request GPS.
-
-Matches shows a compact, scrollable credit card with an explicit view-credits action and arrow.
-Free users see available included/ad credits and Videos; Premium users get an appropriate message
-without a video button. A failed or unknown quota read must not appear as a zero balance.
-
-Conversation receipts stay at the bottom right of outgoing bubbles in 11 px metadata:
-a small neutral check for Sent, and a lavender double check for Read, with translated labels.
-Read state always comes from the API. Dates are hidden until a message is tapped, then appear
-above that bubble for three seconds without moving the history. Scrolling, another tap or
-leaving the conversation dismisses the date. Long-press text selection remains available.
-
-Profile groups the introduction, answers, feed preview, account details, pause mode and settings.
-Its subscription entry shows Premium for Free or the subscription-management label for Premium,
-with neutral loading state. The copyable account UUID appears only in the private profile.
-
-Photo management places Take a photo above Choose a photo. Both actions stage an image for
-explicit upload. Available photos are described as saved, without approval badges or a pending
-verification step. Mutual consent still controls when a match can see the photo.
-
-Answer editing separates the question, text, order and remove/move actions. Replacing the full answer
-list is explicit. Sensitive-data and location choices use switches, separate from required terms
-acceptance and privacy-notice acknowledgement.
-
-Privacy requests offer a single correction form for data that cannot be edited in the profile.
-Keep its explanation behind a disclosure and require a precise message before confirmation.
-The administrator's reply appears alongside the original message in expandable history entries.
-Profile editing, export, account deletion and optional privacy controls keep their own screens;
-restriction/objection requests are historical records only. Never present a status change as an
-automatic modification of account data.
-
-## Navigation and accessibility
-
-Preferences use subtle rounded panels with full-size headings. Numeric values appear beside the
-heading in a neutral badge; the slider and its decrement/increment actions sit below. The same
-`PreferenceField` shell contains the meeting selector, without a floating input caption. Headers
-and values wrap naturally at larger text sizes. Saved preferences keep Save visible in a fixed
-footer, disabled until their values differ from the saved version; first-time setup remains enabled.
-
-The Profile / Feed / Matches bar is transparent, with no panel, shadow or separator. Icons are
-22 px; the selected icon has a 38 px lavender circle, a label below and a full-tab touch target
-of at least 48 px. Compact spacing leaves more room for content without reducing label text size.
-Horizontal swipes slide between these three screens and synchronize the selected tab. Vertical
-feed gestures still navigate profiles; detail routes and their carousels retain their own gestures.
-Changing tabs requires a more deliberate horizontal drag, allowing vertical reading to win over
-small sideways drift. Every tab uses the same solid background during transitions.
-Reduced motion removes programmatic page and circle transitions. System bars remain transparent
-with appropriate bottom spacing for scrollable content.
-
-Shared widgets retain disabled states, focus, semantics and keyboard behavior. Keep scrolling and
-whole words on small screens, with a keyboard or at 200% text. Chat headers become compact while
-details and confirmations remain scrollable. Never globally shrink the person's chosen text scale.
-
-The feed's Aa toolbar action opens device-local reading preferences with three prose sizes and
-three line spacings, a live preview and a reset action. These choices apply to biographies and
-answers in the feed, owner preview and match profile. Headings and controls retain their usual
-styles, and the phone's text scaling still applies. Opening the sheet pauses the feed reading delay;
-changing preferences preserves the current profile and does not refresh the API.
-
-Use [visual previews](docs/development.md#visual-previews) for relevant states and translations.
-Native icon masks, fonts and cold starts still need Android/iOS device review.
-
-Subscription offers open on Monthly when available. The horizontal carousel spaces cards apart
-and reveals the neighboring cards; the shared coral-to-lavender action gradient identifies
-the selected offer, with dark text for contrast.
-Previous/next buttons and a localized position label also support navigation. Its height follows
-the selected card, including large text; offers appear before subscription maintenance actions.
-Feed remains the initial tab at the center.
+Keep disabled/focus states, semantics, scrolling and whole words usable on small screens,
+with a keyboard and at 200% text. Never globally shrink system text. Review relevant
+[visual previews](docs/development.md#visual-previews), then native masks/fonts on devices.

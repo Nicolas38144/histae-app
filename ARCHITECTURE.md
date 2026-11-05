@@ -1,330 +1,123 @@
-# Flutter architecture
+# Architecture
 
-[Documentation](README.md#documentation)
+[Documentation](README.md#documentation) · [Product flows](resume.md)
 
-The app is organized by feature, with `ChangeNotifier` controllers, constructor injection and
-Flutter navigation (`Navigator` and `MaterialPageRoute`). The usual flow is
-**view → controller → repository → HTTP client**.
+## Layers and ownership
 
-## Responsibilities and ownership
+Dependencies flow from `presentation` to `application`, `data` and `core/network`.
+Widgets render state and collect input; controllers coordinate flows; repositories handle API
+contracts and cache policy. `core` must not import features. Business authorization belongs to the
+[Rust API](../histae-api-rust/docs/http-contract.md); mobile never calls administrator routes.
 
-| Layer | Responsibility |
-| --- | --- |
-| `lib/app/` | Bootstrap, dependency composition, session scope, navigation and global lifecycle |
-| `lib/core/` | Configuration, transport, async primitives, localization and shared UI |
-| `features/*/presentation/` | Rendering, interactions, navigation and confirmations |
-| `features/*/application/` | Observable state, commands, action validation and cancellation |
-| `features/*/data/` | Repositories, DTO decoding, cache and native integrations |
-| `features/*/domain/` | Shared contracts independent of their concrete implementation |
+`AppDependencies` creates shared dependencies and `HistaeApp` disposes them. `SessionRepositories`
+owns account-scoped repositories, snapshots, drafts and the realtime hub. Routes dispose the
+controllers they create, never injected shared objects. Cancellation follows the same ownership.
 
-Core does not import features. Private repositories depend on `AuthenticatedSession`, not
-`SessionController`. Exposed collections are protected from external mutation.
+`MainShell` retains Profile, Feed and Matches, with Feed initially selected. Hidden pages use
+`Offstage`/`TickerMode`; tab changes preserve views and do not trigger systematic API reads.
+Localization revisions are separate from session/resource identity.
 
-`bootstrap` reads the public environment, registers font licenses and attempts to clean interrupted
-private exports. `AppDependencies` composes services; `HistaeApp` disposes the dependencies it owns.
-`SessionGate` selects the public, onboarding or private flow from confirmed session state.
+## Reads and invalidation
 
-During sign-up, `SessionGate` owns `RegistrationController` and keeps its flow visible while OTP
-establishes the session. `RegistrationDraft` holds only form values in memory; the profile and
-preference widgets own their local form state. `RegistrationLegalRepository` loads public document
-metadata, while the registration controller coordinates authenticated consent/profile writes and
-explicit recovery. `OtpForm` is shared with returning sign-in through an authentication callback.
-The normal private scope opens only after sign-up finishes or the user explicitly leaves it.
+`ReadSnapshots` holds at most 128 typed entries, preserving the original read time. Cached reads
+reuse them; explicit refresh requests new state. Identical requests coalesce only when their key
+and cancellation owner match. Independent consumers retain independent cancellation.
 
-`PreferenceField` and `PreferenceSlider` share the layout of registration and saved preferences.
-The editor compares its four current values with the saved preferences, including a return to the
-original values. `ProfileEditorState` supports a conditional save action and an overridden unsaved
-change check; registration and first-time preference creation keep their action enabled. The save
-action stays in the preferences footer while its fields scroll.
-`OtpController` separates resend deadlines from verification rate limits; `OtpForm` only renders
-those states. `AuthRepository` decodes the server's resend receipt. Neither UI nor controller
-infers account membership from accepted requests.
-The OTP summary exposes only the country prefix and final two digits. An uncertain send may be
-retried with its original intention; an incorrect code never offers a send replay, and an uncertain
-verification requires a deliberate new code.
+Writes invalidate affected snapshots before and after the request, including uncertain outcomes.
+Generation checks reject late responses. Errors, cancellations, exports and SSE streams are not
+cached. Account/access changes clear private state; language changes invalidate localized reads.
 
-`AppPrivacyShield` hides the entire navigator, overlays and opening animation while the app is
-inactive, without disposing drafts or controllers. Focus, touch and accessibility are excluded.
-Android sets `FLAG_SECURE` before the first Flutter frame and disables Recents snapshots on API 33+.
-iOS `SceneDelegate` owns a native `ScreenPrivacyShield` window for synchronous background masking
-and screen-capture detection (scene traits on iOS 18+, legacy screen notifications on iOS 15–17).
-It never becomes key. Still screenshots cannot be blocked through supported iOS APIs.
+Refresh only affected resources after writes, relevant server events, manual refresh or a known
+deadline. Expired feed presence immediately hides stale profiles and exposes the location step;
+readiness refreshes once, without automatic GPS or a repeated-expiry request loop.
+`DeviceLocation` obtains one fresh cancellable fix with a 25-second timeout. Android can request
+native location activation; iOS and unsupported devices offer settings.
 
-The catalogue owns `SubscriptionPlanCarousel`, reused by its public read-only page and billing's
-subscription plans. It owns selection and measured card heights only; catalogue loading and
-purchase actions remain in their respective controllers.
+## Authentication and writes
 
-`MainShell` owns Feed, Matches and Profile controllers and the shared page controller.
+Registration keeps profile, preferences and consent choices in memory until phone verification.
+Then it rechecks legal metadata and saves permitted fields, preserving an existing account.
+The consent precheck compares version, URL and language but cannot make document publication and
+acceptance atomic without an API version precondition.
 
-`SessionRepositories` also owns `DraftController`. Production injects `SecureDraftVault`, while
-tests explicitly use an in-memory vault. A typed snapshot holds only pending profile answers
-and unsent message text, scoped to the verified account and API origin. Writes are serialized,
-debounced while typing and flushed when leaving a form or backgrounding. Sign-out clears memory
-and queues deletion after outstanding writes. Account changes never restore a previous owner's
-snapshot. Biography, photos and credentials are excluded.
+OTP send intentions freeze phone, language and UUID. Resend cooldown and verification limits are
+separate. An uncertain send retries the same intention; an uncertain verification requires a new
+code. Generic acceptance proves neither account existence nor SMS delivery. Display only the
+phone prefix and last two digits.
 
-`MessageOutbox` separates the editable draft from a per-conversation FIFO of immutable send
-intentions. Submitting clears the composer immediately; its next draft remains editable while
-acknowledgements arrive. Each intention removes its persisted draft before HTTP starts and keeps
-the same key after an uncertain result. Confirming one intention never clears a newer draft.
-Submitted intentions stay in memory and are not restored as fresh sends after process death.
-`AnswersEditor` restores local inputs without publishing them; saving still uses the explicit
-replacement confirmation. `DraftSnapshot` owns decoding and `DraftVault` owns native storage.
+Refresh rotation persists its credential and recovery UUID before sending, and saves the new
+pair before publishing access. Temporary failures preserve the attempt; definitive rejection
+clears access. Logout/deletion barriers prevent stale responses restoring a session. See
+[Session recovery](docs/session-recovery.md) for the protocol and deployment order.
 
-`HelpController` owns the device's first-feed-guide flag. Its injected store performs only local
-operations. Discovery pauses its reading timer while the initial guide is shown; Help can reopen
-the same guide. Match-name search filters loaded snapshots locally and keeps pagination explicit.
-The next credit-renewal label converts Monday midnight UTC to the device's locale/time zone;
-displaying or updating this date never grants credits or refreshes the API.
-At the weekly boundary, a Free quota snapshot becomes unavailable locally and asks for a manual
-refresh. Its old ceiling must not keep offering a subscription as though the week had not reset.
-`MainTabPager` provides horizontal paging in Profile / Feed / Matches order, synchronized with
-the bottom navigation. Its viewport cache initializes and retains all three views at startup,
-including their scroll state, without reloading data on a tab change. Offscreen views exclude
-focus, touch, semantics and tickers; reading time pauses during page transitions. Pushed detail
-routes retain their own gestures. The session resource key rebuilds the private scope when access changes.
-The pager increases only its own horizontal touch threshold; each child receives the original
-device gesture settings so vertical scrolling and controls keep their usual sensitivity.
-`HistaeScaffold` uses the same solid theme surface for tab and detail backgrounds.
-A page disposes a controller it creates. A received controller remains owned by its parent.
-Suspending activity and disposing resources are distinct operations.
+Mutations keep immutable intentions and idempotency keys until resolved. Do not automatically
+repeat writes after a timeout or treat a local success state as server confirmation.
 
-## Cache and reads
+## Local state and messages
 
-`SessionController` owns authentication and request authorization. Domain snapshots belong to the
-repositories composed by `SessionRepositories`; the public catalogue has a separate language-aware cache.
-`ReadSnapshots` holds at most 128 validated entries per instance in memory and retains their original
-read timestamp. `ReadPolicy.cached` reuses a snapshot; `ReadPolicy.refresh` requests a new one.
-Concurrent reads for the same key and cancellation owner share one request, including explicit
-refreshes. Independent route cancellation remains isolated. Invalidation starts a new generation;
-an older response cannot refill or replace its successor's snapshot.
+Encrypted drafts are scoped to account and API origin. Debounced, serialized writes flush on
+lifecycle changes; logout clears them. Only unsent messages and unpublished answers persist,
+excluding biographies, photos and tokens. Submitted message intentions remain in memory and
+must not reappear as fresh sendable drafts after restart.
 
-| Trigger | Behavior |
-| --- | --- |
-| Main-flow startup or first detail opening | Initialize missing controller data |
-| Tab change or foreground return | Reuse loaded data without a systematic reread |
-| Manual refresh or requested pagination | Perform an explicit read |
-| Mutation, relevant server event or cost confirmation | Refresh the affected resources |
-| Feed presence expiry | Hide stale candidates, show the location step and refresh readiness once |
-| Other resource deadlines | Disable or evict expired state; refresh only as defined by that flow |
+Messages use a FIFO outbox while the composer remains editable. Acknowledgement requires the
+confirmed server message. Retries retain the original text, language and key. Realtime updates
+merge silently without rebuilding the composer, showing a loading bar or disturbing focus.
 
-Writes invalidate affected resources before and after the call, including lost responses.
-Targeted invalidation rejects late fills without clearing unrelated snapshots. A failed refresh
-must not resurrect an old success. Account, consent, language and access changes purge the relevant
-caches. Canceled responses, errors, exports and SSE streams are not reusable snapshots.
+`RealtimeHub` shares one SSE connection between matches, notifications and subscription state.
+Relevant events invalidate only affected resources; reconnection resynchronizes state. An unrelated
+match event must not reload the current history. Notification navigation rechecks authorized access.
+Read receipts apply only to received messages visible in the foreground.
 
-Feed expiry retains the last server diagnostic for a coherent location prompt. It never requests
-GPS automatically. The already-checked deadline prevents repeated reads when the server returns
-the same expired timestamp. An expired readiness response cannot load a stale candidate batch.
+Match deadlines disable actions locally and trigger one server confirmation when necessary.
+Ended/inaccessible rows disappear immediately. Archive/search views reuse loaded snapshots;
+explicit pagination loads further rows. Server fields remain authoritative for inactivity.
 
-On an explicit location request, Android's fused provider can show the native service-activation
-dialog. `DeviceLocation` must not reject disabled Android services before the provider starts;
-the platform resolves that setting after permission checks. Acquisition remains a cancellable,
-single-fix stream with no foreground service, a zero initial cache age on Android and the
-existing 25-second deadline. Refusal or unavailable resolution shows feedback and a settings
-action next to the location step. iOS retains the disabled-service settings fallback.
+## Private photos
 
-## Sessions, concurrency and persistence
+`PartnerPage` reuses the selected profile projection. Opening it from shared-photo details replaces
+that route so Back returns directly to the conversation and preserves its draft.
 
-Refresh-token rotation is serialized. Before sending, secure storage records the original refresh
-credential and a UUIDv4 attempt ID as a single `refreshing` entry. Both are reused for that exact
-attempt after a network failure, foreground return or process restart. The API atomically seals
-the replacement refresh token for up to seven days and only recovers it while that child and its
-family remain active. Recovery never extends the receipt deadline or the family's sliding expiry.
-The `recovery_id` body field prevents an older API from silently processing an unrecoverable
-rotation; `Idempotency-Key` must match it. Deploy the API migration and API before the app.
+`SignedPhotoLoader` accepts HTTPS, sends no Bearer token, rejects redirects, caps downloads at
+5 MB and times out after 15 seconds. Full-size photos are route-owned, remain alive while scrolling,
+and are evicted when covered, backgrounded, closed or no longer authorized. Signed-link expiry
+limits new downloads; it does not expire already authorized pixels by itself.
 
-Temporary failures hide authenticated screens but keep the sealed attempt for Retry. A confirmed
-401 or unavailable account clears it. New credentials are written and reread before publication;
-local writes are serialized so an invalidation cannot be undone by a late refresh. Legacy
-`rotating` entries without recovery material still fail closed. No mutation receives a general
-network retry. See [Session recovery](docs/session-recovery.md) for rollout and verification.
-Logout and account deletion also use durable barriers.
+`PrivatePhotoCache` shares foreground thumbnails between list and conversation: at most 48 entries
+and 8 MiB of encoded data, with shared providers/downloads and LRU eviction. Backgrounding, logout,
+withdrawal, replacement, access loss and deadlines purge affected photos. An unconfirmed withdrawal
+is an immediate local barrier: stale grant responses cannot restore images.
 
-A permitted request may retry once after a `401` confirming access-token expiry. There is no universal
-network retry for mutations. Retried intentions retain their idempotency key, content and language.
-`RequestCancellation`, revisions and generations prevent late responses from restoring private data.
-`SerialExecutor` orders local operations; `RetryTicker` updates countdowns while respecting `Retry-After`.
+Use the snapshot's original timestamp for the 50-second download window of a 60-second URL.
+A stale/rejected URL permits one authorized renewal, without rereading unchanged message history
+or entering a retry loop. Private photos never use disk caching or speculative partner downloads.
 
-| Data | Storage |
-| --- | --- |
-| Access token, profiles, messages, coordinates and signed URLs | Flow/session memory |
-| Unsent messages and pending profile answers | Owner-bound encrypted draft snapshot |
-| Refresh token and rotation/logout state | Secure storage bound to the API origin |
-| Push preference and registration metadata | Minimal owner-bound secure entries |
-| Explicit interface language | Device preference independent of the account |
-| Private export | Dedicated temporary file, cleaned after use |
+Camera/gallery selection stages an oriented, EXIF-free JPEG of at most 500,000 bytes. Upload is
+explicit; an uncertain retry preserves the bytes and key. Discard interrupted Android capture copies.
+Photo availability comes from the API; do not use its compatibility moderation status as a review
+step. Biography and answer moderation remain separate.
 
-Native store SDKs own their purchase lifecycle. The app does not persist a browser Checkout attempt.
+## Native adapters and privacy
 
-The composition root opts into first-use push activation after verified sign-in. `PushController`
-serializes system permission and device registration, records the initial attempt before opening
-the permission sheet, and keeps owner-bound opt-out tombstones. A temporary background cycle can
-finish that initial grant without opening a second prompt. Explicit refusals and remote device
-removal do not become fresh automatic registrations.
+`RewardGateway` handles UMP/AdMob; `RewardTracker` follows the server reward intent. SDK completion
+alone grants no credit. Continuation confirmation rereads match/quota and retains the accepted
+cost; only the server determines balances, eligibility and entitlements.
 
-## Real time, messages and private photos
+Billing controllers isolate store SDKs from screens. The API supplies product identifiers and
+verifies ownership before purchase completion. `SubscriptionPlanCarousel` owns selection/layout,
+not loading or payment decisions. Subscription events refresh quota without reloading chat history.
 
-`MatchLifecycle` owns the app's projection of server deadlines: an inactive confirmed conversation
-is archived at day 10 and unavailable at day 30. A new server deadline can restore it. Older API
-snapshots without inactivity metadata retain their compatible behavior; the client never invents
-a server-side closure. `MatchDeadlineScheduler` owns one cancellable timer and reports transitions;
-`MatchesController` coordinates private-data eviction and the relevant authorized read. Archiving
-alone only updates the view. An expired cached snapshot is verified once, and a still-expired
-fresh response cannot reopen private content or cause a read loop.
+Push registration requires complete public options, verified account setup and native permission.
+First-use prompting does not override a refusal, manual opt-out or remotely removed device.
+Foreground activity uses realtime state; OS alerts are for background delivery.
 
-Ended and expired matches are excluded from the controller's initial and paginated snapshots,
-search and archive grouping. The continuation deadline also hides an unresolved match locally
-and evicts its private data before server verification; a failed read cannot leave that row visible.
-Fresh confirmed state can still restore a match after an outdated local deadline. Terminal live
-updates remove it immediately and prevent stale reads from reintroducing it.
+Android uses `FLAG_SECURE` and Recents masking. iOS masks background/app-switcher and recording
+content; it cannot globally prevent still screenshots. Do not use secure-text-field workarounds.
 
-`MatchListProjection` performs local search and archive grouping. The view expands archived search
-results. A toolbar action appears when matches exist and opens `ArchivedMatchesPage` using the
-same controller snapshots and card builder. The archive route owns only its search field; it
-never activates, suspends or disposes the owner's controller. Pagination and refresh remain explicit.
-The translated archive policy is available in Help and contact. List validation is separate from selected-chat
-validation, so closing a chat does not disable otherwise authorized list thumbnails. Manual chat
-refresh performs an explicit read rather than reactivating an already active controller.
+Privacy requests submit corrections for data unavailable in self-service; historical limitation
+and objection requests remain readable only. Uncertain submissions retain their exact intention.
+Messages/replies are plain text, limited to 2,000 Unicode scalars. Closing a request does not itself
+modify arbitrary account fields. Export cleanup touches only app-owned temporary files.
 
-`RealtimeHub` shares SSE transport among matches, notifications and subscriptions. Covered routes
-suspend the relevant main-flow event handling without creating another transport. Private access
-loss or owner disposal stops the stream.
-
-Events trigger the authorized reads required by each flow. Notifications are not authorization
-proof: opening one verifies the session, collection and history. `MessageOutbox` retains drafts
-and immutable send intentions. Read receipts require a received message visible in the foreground.
-The view renders receipts outside bubbles, only below the latest own message and latest own
-read message in the loaded history; the two markers coalesce when these are the same message.
-Pending intentions appear as local bubbles with an animated three-dot footer in the same position
-as receipts. Only server acknowledgements add confirmed messages and checks. A real failure stops
-the FIFO and shows an inline retry on that message; there is no global pending-send warning.
-Retrying retains its original content and idempotency key. Motion stops when hidden/backgrounded
-or when the system requests reduced animation. The composer shows no counter; its localized
-limit hint appears only at the API's 2,000-Unicode-scalar boundary.
-Message and receipt events refresh existing data silently, preserving verified access, editor
-focus and IME composition. Access-changing events still invalidate private access immediately.
-Successful sends completing during a history read are merged into its snapshot. Explicit refresh
-and initial loading retain visible progress. Match cards show an accessible unread-number badge;
-the credit disclosure follows the matches and expands locally without an API read.
-
-The conversation name and its profile menu entry share one navigation action. `PartnerPage`
-renders the selected match's existing public data through `FeedProfileContent`, also used by
-discovery and the owner's preview. Opening it does not reread the API or discard the message
-draft. Distance is omitted because the match projection does not supply it.
-After mutual photo consent, the encounter details action opens this same profile by replacing
-the details route. Back returns directly to the preserved conversation.
-
-`SignedPhotoLoader` downloads to memory without Bearer credentials or redirects, with a 5,000,000-byte
-limit and a fifteen-second timeout. Access is checked before display. Full-size images are evicted
-on closing, losing access or backgrounding. The 50-second window measured from the resource read bounds new
-downloads, leaving a margin before the API's 60-second signed URL expiry. It does not expire
-already downloaded bytes while their visible route remains authorized.
-
-`PartnerPhoto` owns full-size photo rendering within the match profile.
-Its sliver keep-alive retains the photo while scrolling the same profile. The shared `PrivatePhoto`
-widget observes route visibility and app lifecycle; the feature supplies current match access. A
-covered route cancels its download and purges the decoded image; late bytes cannot restore it.
-Stale or rejected signed links cause at most one coalesced authorized refresh per visible attempt,
-without a loading bar in the conversation or a retry loop. Manual refresh remains available from
-the conversation; the viewed profile has no dedicated photo-refresh button.
-
-`MatchPhotoAvatar` uses `PrivatePhoto` and the controller-owned `PrivatePhotoCache` for authorized
-thumbnails. Its foreground-only LRU retains at most 48 entries and 8 MiB of encoded bytes, shares
-in-flight downloads and reuses the same image provider between the list and conversation header.
-Hidden views stop displaying the photo while its authorized thumbnail remains available for navigation.
-Renewing only S3 signing parameters retains the pixels, even when the original download link has
-expired; a different object path or version reloads the image. Backgrounding, session changes,
-withdrawal, match removal/deadlines and access-changing server events clear the affected entries
-and reject late downloads. Fresh match grants reconcile retained thumbnails. Nothing is written to disk.
-Renewing a photo link refreshes matches while reusing unchanged message history. Server events invalidate
-only the affected history, so another match's event does not reread the open conversation. Stream
-reconnection still invalidates both list and histories to recover missed events; manual refresh
-explicitly rereads them. `ContinuationController` keeps
-grant and withdrawal retry intentions distinct. `MatchAccess` owns an immediate local photo
-barrier until a fresh server snapshot confirms withdrawal, so a lost response cannot restore an
-old image. Consent and continuation remain independent operations.
-
-## Credits and provider adapters
-
-Profile and Matches share `ContinuationController`. It initializes quota once and refreshes after
-explicit requests, spending, rewards or confirmed subscription changes. The continuation cost is
-rechecked before acceptance; the client never invents a credit debit or grant.
-
-`ContinuationQuota` derives weekly-limit and video-recovery states from server counters.
-Matches, continuation options and credits share those decisions. Presentation routes reuse the
-session billing controller and injected catalogue; only confirmed entitlement changes refresh
-quota on return. Rewarded-video eligibility checks the same weekly ceiling before starting and
-after asynchronous consent/loading steps.
-Quota updates reuse the language/session-bound plan catalogue; manual quota refresh also refreshes
-the catalogue. Subscription events invalidate quota without rereading match lists or messages.
-The matches credit disclosure links to the credits screen without a duplicate video shortcut.
-
-`RewardedVideoGateway` isolates UMP/AdMob; `RewardTracker` follows the server intent. Only server
-validation grants a reward. `BillingController` operates on immutable values and `BillingGateway`;
-`NativeBillingGateway` alone handles Apple/Google SDK objects. Purchase verification precedes
-completion, and unverified purchases remain available for a safe retry or restoration.
-
-## Privacy requests
-
-New requests in the app offer only correction of otherwise uneditable data. Profile edits,
-export, account deletion and optional privacy controls keep their dedicated flows. The retired
-restriction/objection categories remain readable in history, but the API rejects their creation
-and status transitions and the dashboard exposes no processing actions for them.
-
-`PrivacyRequestForm` owns presentation and validation feedback. `PrivacyController` retains the
-session-scoped draft and an immutable `RightsRequestIntent` after an uncertain write. Request
-`details` and the administrator's public `response` are bounded to 2,000 Unicode scalars. The API
-stores them separately from internal notes, and both app and dashboard render them as plain text.
-A correction cannot be completed or rejected without a public reply. Closing it records manual
-handling; it does not automatically edit arbitrary account data. Existing records without a
-message remain readable. Opening a disclosure never submits a request; sending still requires
-confirmation. A definitive validation rejection unlocks the draft; a network failure keeps the
-original payload for an explicit retry. Session changes clear the draft and pending intention.
-
-API coverage checked from source on 2026-10-26: the historical six types remain readable; new
-restriction/objection requests and their status transitions are disabled. Export streams a JSON file, but creating an access or portability
-request does not start that export or complete the request. An administrator's completion of an
-erasure request schedules full account erasure through the worker. Rectification requests record the administrator’s response and status; closing one does not
-automatically edit the data. No additional processing-suspension controls were introduced. Editable profile data has separate self-service endpoints.
-This is a source review, not confirmation of production execution; no API tests were run.
-
-## Presentation and language
-
-The [design system](DESIGN_SYSTEM.md) defines the shared visual behavior. `AppOpening` owns only the
-opening presentation; session initialization and navigation continue independently.
-`LocaleController` owns device language and `AccountLanguageBinding` connects it to the verified
-account. A separate localization revision refreshes reads without discarding drafts or mutations.
-
-See [Localization](lib/core/l10n/README.md), [API languages](docs/api-languages.md) and
-[Development](docs/development.md) for the corresponding contracts and checks.
-
-## Photo capture and availability
-
-`PhotoPreparer` supports the camera and gallery through the same local preparation
-pipeline. Camera capture prefers the front camera. Both sources bound input size,
-normalize to JPEG under 500,000 bytes, remove EXIF data and clean picker cache copies.
-`PhotoPage` stages the result in memory; capture and selection never upload automatically.
-Android interrupted selections are discarded rather than attached to a restored session.
-
-A valid API upload is immediately available without automated content/face analysis.
-The client retains biography and answer moderation, without storing unused photo moderation metadata.
-Approval is not presented as photo verification. Feed readiness still comes from the API and mutual sharing consent
-remains required. Private photo views share `privatePhotoLifetime` (50 seconds from the
-resource read), with explicit refresh after expiry.
-
-Legal document dates come from the API's optional `document_date` metadata (`YYYY-MM-DD`).
-Both public registration documents and authenticated consent records carry the same date.
-`ConsentControl` displays it using the interface locale; it never substitutes `updated_at`,
-which records the user's consent event. Missing metadata remains explicit rather than inventing
-a publication date. A document date alone does not change an existing consent's version validity.
-
-## Reading preferences
-
-`ReadingController` owns device-local prose preferences, separate from account data and the API.
-`AppDependencies` injects `SecureReadingPreferencesStore`; startup restores it before the first
-frame, and `HistaeApp` owns disposal. `ReadingScope` shares it across routes. The settings sheet
-edits typed choices; `FeedProfileContent` renders them without altering the system text scaler.
-Local operations are serialized and a delayed restore cannot overwrite a newer choice. Storage
-failure leaves the choice usable in memory and allows an explicit retry. No profile text is stored
-with these settings.
+[Localization](lib/core/l10n/README.md), [API languages](docs/api-languages.md) and the
+[design system](DESIGN_SYSTEM.md) define the remaining shared conventions.

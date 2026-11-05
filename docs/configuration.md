@@ -2,10 +2,9 @@
 
 [Documentation](../README.md#documentation)
 
-The root `.env` is ignored by source tracking but bundled as a Flutter asset. Supply it before a
-local or CI build, then rebuild/restart after changes. It is public configuration, not secret
-storage. Stripe secrets, Firebase private keys and service-account credentials belong to the API.
-No `.env.example` file is maintained.
+The ignored root `.env` is bundled as a public asset. Supply it before local/CI builds and rebuild
+or restart after changes. Never put Stripe secrets, Firebase private keys or signing credentials
+here. No environment example file is maintained.
 
 ## API origin
 
@@ -14,13 +13,11 @@ APP_ENV=production
 API_BASE_URL=https://api.histae.com
 ```
 
-`APP_ENV` accepts `development`, `staging` or `production`. `API_BASE_URL` is an origin with no
-`/api` path, credentials, query or fragment. Repositories supply their full `/api/...` paths.
-
-For a local API on the standard Android emulator, use `APP_ENV=development` and
-`API_BASE_URL=http://10.0.2.2:8080`. A physical phone needs a reachable LAN address.
-HTTP is accepted only for a debug build in development; other configurations require HTTPS.
-Invalid or missing configuration shows the unavailable-service flow rather than a fallback host.
+`APP_ENV`: `development`, `staging` or `production`. The URL must be an origin without `/api`,
+credentials, query or fragment; repositories add paths. Local Android emulator:
+`APP_ENV=development`, `API_BASE_URL=http://10.0.2.2:8080`. A phone needs a reachable LAN address.
+HTTP is allowed only in debug/development; other builds require HTTPS. Invalid configuration
+shows an unavailable-service screen without a fallback host.
 
 ## Support contact
 
@@ -29,17 +26,13 @@ SUPPORT_EMAIL=support.histae@gmail.com
 SUPPORT_WEBSITE_URL=https://www.histae.com
 ```
 
-This public address appears in Help and contact and enables a button that opens the person's
-email app; nothing is sent automatically. An empty field shows the localized “Email address
-coming soon” fallback. No support backend or API change is required. Rebuild after changing the asset.
+Email opens the user's mail app without sending automatically; an empty value shows the localized
+coming-soon fallback. The optional HTTPS website origin enables the localized child-safety link.
+In-app safety instructions remain available without it.
 
-`SUPPORT_WEBSITE_URL` is an optional HTTPS origin. It enables the localized public child-safety
-standards link in Help and contact. Safety reporting instructions remain available in the app
-even without that origin. It is public configuration, not a credential.
+## Optional providers
 
-## Optional provider fields
-
-Leave optional services disabled until their platform and API configuration is ready:
+Keep services disabled until native and API setup is ready. Booleans are `true`/`false`.
 
 ```dotenv
 ADMOB_ANDROID_APP_ID=
@@ -59,48 +52,33 @@ FIREBASE_IOS_BUNDLE_ID=
 BILLING_ENABLED=false
 ```
 
-Use the boolean literals `true` and `false`. Populate identifiers from the appropriate provider
-project and platform app; do not substitute the project display name for a required identifier.
+### Rewarded videos
 
-## Rewarded videos
+AdMob app IDs contain `~`; rewarded-unit IDs contain `/`. Native build setup reads app IDs from
+this asset. Playback also requires eligibility, published UMP configuration and an API reward
+intent, which supplies the authoritative unit/custom data. SDK completion alone grants no credit;
+validate test-device delivery and the signed server reward callback.
 
-AdMob application IDs contain `~`; rewarded ad-unit IDs contain `/`. Native Android/iOS setup also
-needs the application ID. Android build configuration and the iOS AdMob build phase read it from
-the public environment.
+### Push notifications
 
-Playback requires an eligible account, working UMP configuration and the API's reward intent.
-The API intent selects the authoritative ad unit and custom data. The SDK completion callback
-does not grant a credit: the server must validate the reward. Verify the UMP message, test device,
-ad delivery and signed server callback in the intended provider environment before release.
+Copy public Firebase options from the registered Android/iOS apps, using actual identifiers rather
+than project display names. Dart uses explicit `FirebaseOptions`; Android also generates native
+resources for cold-start delivery. Set `PUSH_ENABLED=true` only with complete target-platform options.
 
-## Push notifications
+After verified account setup the app requests native permission/registers first use. Refusal,
+manual opt-out and remotely removed devices are not automatically reversed. Device settings remain
+accessible while push is disabled. OS alerts are background-only; open-app messages use realtime
+state. Notification taps open authorized destinations.
 
-Use the public Firebase options for each registered Android/iOS app. The Dart gateway initializes
-Firebase with explicit `FirebaseOptions`; Android additionally builds native Firebase resources
-from the same public fields for cold-start delivery.
+API/worker sending credentials are separate. iOS also requires APNs, capabilities and signing
+validation on macOS. Public configuration alone does not prove delivery.
 
-Set `PUSH_ENABLED=true` only with a complete configuration for the target platform. The app's
-composition root enables first-use registration after a verified, complete sign-in and asks for
-native permission. A refusal, manual opt-out or remotely removed device is not automatically
-re-enabled on restart. Users can change their choice in device/notification settings.
-The device-management screen remains available when push is disabled.
-Push alerts are for background delivery only. No foreground banner, sound or automatic
-navigation is added while the app is open; messages and unread counters use the realtime channel.
-Tapping an OS notification still opens its authorized destination.
+### Purchases
 
-Provider sending credentials are configured separately on the API and worker. iOS also needs its
-APNs, signing and native capabilities checked on macOS. Public options alone do not prove delivery.
+Google Play/StoreKit provide products/prices; identifiers come from the API catalogue. The API
+verifies ownership before completion, and restoration cannot transfer a purchase between accounts.
+Enable `BILLING_ENABLED=true` after product and Sandbox/Play test validation. The client presents
+no trial/introductory offer. Stripe subscriptions are website-managed; mobile Stripe Checkout and
+old distribution/return-URL settings are unsupported.
 
-## Purchases and subscription management
-
-Android uses Google Play Billing; iOS uses StoreKit. Product identifiers come from the API's store
-catalogue; display prices come from the platform SDK. The API verifies purchases before the app
-finishes them, and restoration never transfers a purchase to a different Histae account.
-
-Enable `BILLING_ENABLED=true` after configuring store products and validating Sandbox/Play test
-flows. No new trial or introductory offer is presented by the client. Existing Stripe subscriptions
-remain visible as website-managed subscriptions; Stripe Checkout is not offered inside the app.
-Old mobile Stripe distribution and return-URL fields are no longer supported configuration.
-
-For provider credentials, notifications, products and API activation, use the server's
-[store and website billing guide](../../histae-api-rust/docs/store-billing.md).
+Provider setup: [server billing guide](../../histae-api-rust/docs/store-billing.md).

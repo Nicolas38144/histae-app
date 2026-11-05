@@ -1,65 +1,37 @@
-# Mobile roadmap
+# Release validation
 
 [Documentation](README.md#documentation) · [Product flows](resume.md)
 
-Track implemented code, deployed API capability and device/provider validation separately.
-An implemented screen is not proof that a production service works.
+Core account, profile, discovery, messaging, reveal, credits, privacy, push and purchase flows are
+implemented. Track deployed API capability and real device/provider validation separately.
 
-## Implementation status
+## Remaining checks
 
-| Lot | Scope | Client status |
-| --- | --- | --- |
-| L0 | Contract and preparation | Rust contract remains the source for routes and DTOs |
-| L1 | Configuration, transport, navigation and theme | Implemented |
-| L2 | OTP, sessions, documents and consent | Implemented |
-| L3 | Profile, preferences, answers and photo | Implemented |
-| L4 | Location, feed, choices, preview and pause | Implemented, including automatic readiness refresh on expiry |
-| L5 | Matches, chat, read receipts and real time | Implemented |
-| L6 | Photo reveal, continuations, credits and videos | Implemented, including AdMob/UMP and server reward tracking |
-| L7 | Reports, blocks, sessions, privacy rights and deletion | Implemented |
-| L8 | Devices and Firebase push | Client integrated; native delivery still needs validation |
-| L9 | Catalogue and subscriptions | Native Apple/Google purchases integrated; Stripe belongs to the website |
-| L10 | Real integrations and beta readiness | Remaining work below |
-
-Four languages, shared website branding, opening animation and session caching are integrated.
-Keep detailed behavior in the relevant guides rather than a dated implementation log or duplicate
-route inventory. Use the [Rust HTTP contract](../histae-api-rust/docs/http-contract.md) for exact routes.
-
-## Remaining beta validation
-
-| Area | Required verification |
+| Area | Verify before release |
 | --- | --- |
-| Android release | Upload the signed bundle to Play testing, confirm identity/versioning and verify store delivery |
-| iOS release | Build on macOS; verify signing, Keychain, sharing, permissions and cold start |
-| Account/session | OTP delivery, rotation, lost responses, process interruption and account switching |
-| Profile/discovery | Upload limits, moderation, pause deployment and one-time expiry recovery |
-| Conversations | Two-account messaging, receipts, continuation windows, blocking and reveal |
-| Push | Platform options, API/worker provider, APNs, permission, background/cold-start delivery |
-| Rewarded videos | Published UMP message, test devices, delivery, signed reward callback and quota refresh |
-| Purchases | Sandbox/Play products, verification, completion, restore, interruption and delayed events |
-| Accessibility | Long biographies, four locales, 200% text, keyboard, small screens and native icon masks |
-| Privacy/release | Reviewed documents, provider disclosures, support and beta distribution requirements |
+| Android | Signed Play delivery, versioning, optimized cold start, upgrades without clearing data |
+| iOS | macOS build/signing, Keychain, launch, permissions, sharing and portrait behavior |
+| Authentication | Real OTP, refresh recovery, process interruption and account switching |
+| Discovery/photos | Capture/upload, pause, expired presence, photo replacement and withdrawal |
+| Conversations | Two-account delivery/receipts, continuation deadlines, archives and deletion |
+| Push | API/worker credentials, APNs, permission, background and cold-start delivery |
+| Rewards | Published UMP message, test devices, ads, signed callback and quota refresh |
+| Purchases/updates | Test products, verification, completion, restore, delayed events and actual store availability |
+| Accessibility | Long text, four locales, 200% text, keyboard, small screens and native icon masks |
+| Privacy | Documents, provider disclosures, support and temporary-file cleanup |
 
-The mobile consent precheck is not atomic with document publication. Track an API-side version
-precondition before claiming a complete guarantee. Local flags and provider consoles are not
-evidence of deployed capability.
+Record environment, app/API versions, result and outstanding issues. Include loading, empty,
+failure, uncertain-result and access-loss cases according to risk. Mock tests and local builds
+cannot validate a provider or another platform.
 
-## API and delivery dependencies
+## Known dependencies
 
-Check the deployed contract, pause/language support, private storage, moderation, outbox and
-maintenance for the intended release. Provider webhooks are called by providers, never by Flutter.
-Backend health checks do not replace user-flow errors or prove provider success.
+The consent precheck cannot guarantee atomic acceptance during document publication: the API
+needs an expected-version precondition. Check deployed contract/schema, private storage, outbox,
+maintenance and enabled providers before relying on a client feature. Deploy refresh recovery in
+the order described in [Session recovery](docs/session-recovery.md).
 
-Store purchase setup and website billing are covered by the API's
-[billing guide](../histae-api-rust/docs/store-billing.md). Website Checkout/portal validation belongs
-to that release, not a mobile browser-payment integration.
-
-## Completion criteria
-
-For each enabled flow, record its environment, app/API version, check and result. Include loading,
-empty, failure, uncertainty and access-loss states according to risk. A simulated test, analyzer
-pass or Android build does not validate a real provider or iOS.
-
-Use [Development](docs/development.md) for commands and [Configuration](docs/configuration.md) for
-public settings. Update this backlog when scope or remaining validation changes; do not retain
-completed task histories in the README.
+Website Stripe validation belongs to the web release; mobile purchases use stores. See the
+[API billing guide](../histae-api-rust/docs/store-billing.md), [Configuration](docs/configuration.md)
+and [Development](docs/development.md) for setup and commands. Keep this backlog focused on
+remaining work rather than completed task history.
