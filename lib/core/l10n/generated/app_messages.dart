@@ -4074,8 +4074,8 @@ abstract class AppMessages {
   /// Interface: lib/features/profile/presentation/preferences_editor.dart
   ///
   /// In fr, this message translates to:
-  /// **'Choisissez vos quatre préférences. Elles seront enregistrées ensemble.'**
-  String get preferencesEditorChooseYourFourPreferencesTheyWill;
+  /// **'Choisir'**
+  String get preferencesChoose;
 
   /// Interface: lib/features/profile/presentation/preferences_editor.dart
   ///
@@ -4098,7 +4098,7 @@ abstract class AppMessages {
   /// Interface: lib/features/profile/presentation/preferences_editor.dart
   ///
   /// In fr, this message translates to:
-  /// **'Distance maximale (km)'**
+  /// **'Distance maximale'**
   String get preferencesEditorMaximumDistanceKm;
 
   /// Interface: lib/features/profile/presentation/profile_editor.dart

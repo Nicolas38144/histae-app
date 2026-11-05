@@ -2482,8 +2482,7 @@ class AppMessagesIt extends AppMessages {
   String get photoPageRemoveMyPhoto => 'Rimuovi la mia foto';
 
   @override
-  String get preferencesEditorChooseYourFourPreferencesTheyWill =>
-      'Scegli le quattro preferenze. Verranno salvate insieme.';
+  String get preferencesChoose => 'Scegli';
 
   @override
   String get preferencesEditorIWantToMeet => 'Vorrei incontrare';
@@ -2495,7 +2494,7 @@ class AppMessagesIt extends AppMessages {
   String get preferencesEditorMaximumAge => 'Età massima';
 
   @override
-  String get preferencesEditorMaximumDistanceKm => 'Distanza massima (km)';
+  String get preferencesEditorMaximumDistanceKm => 'Distanza massima';
 
   @override
   String get profileEditorLeaveWithoutSaving => 'Uscire senza salvare?';

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -6,6 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
 import 'package:histae_app/app/theme.dart';
 import 'package:histae_app/core/network/signed_photo_loader.dart';
+import 'package:histae_app/core/widgets/histae_button.dart';
+import 'package:histae_app/core/widgets/preference_slider.dart';
 import 'package:histae_app/features/consents/domain/consent_state.dart';
 import 'package:histae_app/features/profile/application/profile_controller.dart';
 import 'package:histae_app/features/profile/data/photo_preparer.dart';
@@ -68,6 +71,101 @@ Future<void> tapVisible(WidgetTester tester, Finder finder) async {
 }
 
 void main() {
+  testWidgets(
+    'preference sliders preserve stored values, save integers and lock during submission',
+    (tester) async {
+      final response = Completer<http.Response>();
+      Map<String, dynamic>? saved;
+      final session = testSession((r) async {
+        if (r.url.path == '/api/users/me/preferences') {
+          if (r.method == 'PATCH') {
+            saved = jsonDecode(r.body) as Map<String, dynamic>;
+            return response.future;
+          }
+          return jsonResponse({...preferencesJson(), ...?saved});
+        }
+        return defaultProfileResponse(r);
+      });
+      addTearDown(session.dispose);
+      await session.establish(testTokens);
+      final c = ProfileController(ProfileRepository(session));
+      addTearDown(c.dispose);
+      await c.load();
+      await tester.pumpWidget(MaterialApp(home: const SizedBox.shrink()));
+      unawaited(
+        tester
+            .state<NavigatorState>(find.byType(Navigator))
+            .push<void>(
+              MaterialPageRoute<void>(
+                builder: (_) => PreferencesEditor(controller: c),
+              ),
+            ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(PreferenceSlider), findsNWidgets(3));
+      expect(find.byType(TextField), findsNothing);
+      HistaeButton saveButton() => tester.widget<HistaeButton>(
+        find.widgetWithText(HistaeButton, 'Enregistrer'),
+      );
+      expect(saveButton().onPressed, isNull);
+      for (final entry in {
+        'preferences-min-age': 25,
+        'preferences-max-age': 38,
+        'preferences-distance': 40,
+      }.entries) {
+        expect(
+          tester.widget<PreferenceSlider>(find.byKey(Key(entry.key))).value,
+          entry.value,
+        );
+      }
+      Finder part(String name, String action) => find.descendant(
+        of: find.byKey(Key(name)),
+        matching: find.byKey(Key(action)),
+      );
+      await tapVisible(tester, part('preferences-min-age', 'increase'));
+      expect(saveButton().onPressed, isNotNull);
+      await tapVisible(tester, part('preferences-min-age', 'decrease'));
+      expect(
+        saveButton().onPressed,
+        isNull,
+        reason: 'Restoring the saved values must disable Save again.',
+      );
+      await tapVisible(tester, part('preferences-min-age', 'increase'));
+      await tapVisible(tester, part('preferences-max-age', 'decrease'));
+      await tapVisible(tester, part('preferences-distance', 'increase'));
+      expect(
+        saved,
+        isNull,
+        reason: 'Moving a slider must not send an API mutation.',
+      );
+      await tester.ensureVisible(find.text('Enregistrer'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Enregistrer'));
+      await tester.pump();
+      expect(saved, {
+        'min_age': 26,
+        'max_age': 37,
+        'max_distance_km': 41,
+        'looking_for': 'both',
+      });
+      for (final slider in tester.widgetList<PreferenceSlider>(
+        find.byType(PreferenceSlider),
+      )) {
+        expect(slider.onChanged, isNull);
+      }
+      for (final slider in tester.widgetList<Slider>(find.byType(Slider))) {
+        expect(slider.onChanged, isNull);
+      }
+      response.complete(jsonResponse({'message': 'preferences updated'}));
+      await tester.pumpAndSettle();
+      expect(find.byType(PreferencesEditor), findsNothing);
+      expect(c.preferences?.minAge, 26);
+      expect(c.preferences?.maxAge, 37);
+      expect(c.preferences?.distance, 41);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets(
     'camera and gallery use their native sources and cancellation does not upload',
     (tester) async {

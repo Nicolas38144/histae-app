@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/widgets/preference_field.dart';
+import '../../../core/widgets/preference_slider.dart';
 import '../application/profile_controller.dart';
 import '../data/profile_models.dart';
 import 'profile_editor.dart';
@@ -17,77 +19,109 @@ class PreferencesEditor extends StatefulWidget {
 class _PreferencesEditorState extends ProfileEditorState<PreferencesEditor> {
   @override
   ProfileController get controller => widget.controller;
-  late final min = TextEditingController(
-    text: controller.preferences?.minAge.toString(),
-  );
-  late final max = TextEditingController(
-    text: controller.preferences?.maxAge.toString(),
-  );
-  late final distance = TextEditingController(
-    text: controller.preferences?.distance.toString(),
-  );
+  late int min = controller.preferences?.minAge ?? 18;
+  late int max = controller.preferences?.maxAge ?? 50;
+  late int distance = controller.preferences?.distance ?? 50;
   late String? looking = controller.preferences?.lookingFor;
 
+  bool get editable => !busy && !controller.saving;
+
   @override
-  void dispose() {
-    min.dispose();
-    max.dispose();
-    distance.dispose();
-    super.dispose();
+  bool get hasUnsavedChanges {
+    final saved = controller.preferences;
+    if (saved == null) return dirty;
+    return min != saved.minAge ||
+        max != saved.maxAge ||
+        distance != saved.distance ||
+        looking != saved.lookingFor;
   }
 
   @override
   Widget build(BuildContext context) => page(
     AppStrings.of(context).messages.discoveryPageYourPreferences,
     [
-      Text(
-        AppStrings.of(context)
-            .messages
-            .preferencesEditorChooseYourFourPreferencesTheyWill,
-      ),
-      const SizedBox(height: 24),
-      DropdownButtonFormField<String>(
-        initialValue: looking,
-        isExpanded: true,
-        decoration: InputDecoration(
-          labelText: AppStrings.of(context)
-              .messages
-              .preferencesEditorIWantToMeet,
+      PreferenceField(
+        label: AppStrings.of(context).messages.preferencesEditorIWantToMeet,
+        child: Semantics(
+          label: AppStrings.of(context).messages.preferencesEditorIWantToMeet,
+          child: DropdownButtonFormField<String>(
+            initialValue: looking,
+            hint: Text(AppStrings.of(context).messages.preferencesChoose),
+            isExpanded: true,
+            isDense: false,
+            itemHeight: null,
+            decoration: const InputDecoration(
+              filled: false,
+              border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              disabledBorder: InputBorder.none,
+              contentPadding: EdgeInsets.zero,
+            ),
+            items: ProfileStrings(AppStrings.of(context)).lookingFor.entries
+                .map(
+                  (e) => DropdownMenuItem(value: e.key, child: Text(e.value)),
+                )
+                .toList(),
+            onChanged: !editable
+                ? null
+                : (v) => setState(() {
+                    looking = v;
+                    changed();
+                  }),
+          ),
         ),
-        items: ProfileStrings(AppStrings.of(context)).lookingFor.entries
-            .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
-            .toList(),
-        onChanged: busy
+      ),
+      PreferenceSlider(
+        key: const Key('preferences-min-age'),
+        label: AppStrings.of(context).messages.preferencesEditorMinimumAge,
+        valueLabel: AppStrings.of(context).messages.registrationAgeValue(min),
+        value: min,
+        minimum: 18,
+        maximum: max,
+        onChanged: !editable
             ? null
-            : (v) => setState(() {
-                looking = v;
+            : (value) => setState(() {
+                min = value;
                 changed();
               }),
       ),
-      const SizedBox(height: 24),
-      field(
-        min,
-        AppStrings.of(context).messages.preferencesEditorMinimumAge,
-        keyboard: TextInputType.number,
+      PreferenceSlider(
+        key: const Key('preferences-max-age'),
+        label: AppStrings.of(context).messages.preferencesEditorMaximumAge,
+        valueLabel: AppStrings.of(context).messages.registrationAgeValue(max),
+        value: max,
+        minimum: min,
+        maximum: 99,
+        onChanged: !editable
+            ? null
+            : (value) => setState(() {
+                max = value;
+                changed();
+              }),
       ),
-      field(
-        max,
-        AppStrings.of(context).messages.preferencesEditorMaximumAge,
-        keyboard: TextInputType.number,
-      ),
-      field(
-        distance,
-        AppStrings.of(context).messages.preferencesEditorMaximumDistanceKm,
-        keyboard: TextInputType.number,
+      PreferenceSlider(
+        key: const Key('preferences-distance'),
+        label: AppStrings.of(context)
+            .messages
+            .preferencesEditorMaximumDistanceKm,
+        valueLabel: AppStrings.of(context).messages
+            .registrationDistanceValue(distance),
+        value: distance,
+        minimum: 1,
+        maximum: 500,
+        onChanged: !editable
+            ? null
+            : (value) => setState(() {
+                distance = value;
+                changed();
+              }),
       ),
     ],
+    saveEnabled: controller.preferences == null || hasUnsavedChanges,
+    saveInFooter: true,
     save: () {
-      final p = Preferences(
-        int.tryParse(min.text) ?? -1,
-        int.tryParse(max.text) ?? -1,
-        int.tryParse(distance.text) ?? -1,
-        looking ?? '',
-      );
+      final p = Preferences(min, max, distance, looking ?? '');
       final error = p.validate();
       if (error != null) {
         setState(() {

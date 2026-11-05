@@ -64,6 +64,8 @@ Do not hand-edit generated Dart messages. When changing native permission copy, 
 the local public support configuration, with no provider calls. Set `FLUTTER_ROOT` for its fonts.
 `tool/preview_message_queue_test.dart` captures pending three-dot footers, confirmed receipts,
 the composer limit hint and the store update gate with simulated message/store responses.
+`tool/preview_preferences_test.dart` renders saved/edited preferences, registration and 200% text
+in all four languages under `build/previews/preferences-2026-11-05/`, with synthetic data only.
 For example:
 
 ```bash

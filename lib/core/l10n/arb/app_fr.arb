@@ -2869,8 +2869,8 @@
   "@photoPageRemoveMyPhoto": {
     "description": "Interface: lib/features/profile/presentation/photo_page.dart"
   },
-  "preferencesEditorChooseYourFourPreferencesTheyWill": "Choisissez vos quatre préférences. Elles seront enregistrées ensemble.",
-  "@preferencesEditorChooseYourFourPreferencesTheyWill": {
+  "preferencesChoose": "Choisir",
+  "@preferencesChoose": {
     "description": "Interface: lib/features/profile/presentation/preferences_editor.dart"
   },
   "preferencesEditorIWantToMeet": "Je souhaite rencontrer",
@@ -2885,7 +2885,7 @@
   "@preferencesEditorMaximumAge": {
     "description": "Interface: lib/features/profile/presentation/preferences_editor.dart"
   },
-  "preferencesEditorMaximumDistanceKm": "Distance maximale (km)",
+  "preferencesEditorMaximumDistanceKm": "Distance maximale",
   "@preferencesEditorMaximumDistanceKm": {
     "description": "Interface: lib/features/profile/presentation/preferences_editor.dart"
   },

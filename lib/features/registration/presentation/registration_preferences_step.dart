@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/histae_button.dart';
+import '../../../core/widgets/preference_field.dart';
+import '../../../core/widgets/preference_slider.dart';
 import '../../profile/data/profile_models.dart';
 import '../../profile/presentation/profile_strings.dart';
 import '../application/registration_draft.dart';
-import 'preference_slider.dart';
 
 class RegistrationPreferencesStep extends StatefulWidget {
   const RegistrationPreferencesStep({
@@ -49,27 +50,39 @@ class _RegistrationPreferencesStepState
       key: const PageStorageKey('registration-preferences'),
       padding: const EdgeInsets.all(24),
       children: [
-        Text(copy.preferencesEditorChooseYourFourPreferencesTheyWill),
-        const SizedBox(height: 24),
-        DropdownButtonFormField<String>(
-          key: const Key('registration-looking-for'),
-          initialValue: _looking,
-          isExpanded: true,
-          decoration: InputDecoration(
-            labelText: copy.preferencesEditorIWantToMeet,
+        PreferenceField(
+          label: copy.preferencesEditorIWantToMeet,
+          child: Semantics(
+            label: copy.preferencesEditorIWantToMeet,
+            child: DropdownButtonFormField<String>(
+              key: const Key('registration-looking-for'),
+              initialValue: _looking,
+              hint: Text(copy.preferencesChoose),
+              isExpanded: true,
+              isDense: false,
+              itemHeight: null,
+              decoration: const InputDecoration(
+                filled: false,
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                disabledBorder: InputBorder.none,
+                contentPadding: EdgeInsets.zero,
+              ),
+              items: ProfileStrings(strings).lookingFor.entries
+                  .map(
+                    (entry) => DropdownMenuItem(
+                      value: entry.key,
+                      child: Text(entry.value),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (value) {
+                _looking = value;
+                _changed();
+              },
+            ),
           ),
-          items: ProfileStrings(strings).lookingFor.entries
-              .map(
-                (entry) => DropdownMenuItem(
-                  value: entry.key,
-                  child: Text(entry.value),
-                ),
-              )
-              .toList(),
-          onChanged: (value) {
-            _looking = value;
-            _changed();
-          },
         ),
         PreferenceSlider(
           key: const Key('registration-min-age'),

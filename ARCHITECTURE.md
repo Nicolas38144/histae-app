@@ -26,10 +26,16 @@ private exports. `AppDependencies` composes services; `HistaeApp` disposes the d
 
 During sign-up, `SessionGate` owns `RegistrationController` and keeps its flow visible while OTP
 establishes the session. `RegistrationDraft` holds only form values in memory; the profile and
-preferences widgets own their text controllers. `RegistrationLegalRepository` loads public document
+preference widgets own their local form state. `RegistrationLegalRepository` loads public document
 metadata, while the registration controller coordinates authenticated consent/profile writes and
 explicit recovery. `OtpForm` is shared with returning sign-in through an authentication callback.
 The normal private scope opens only after sign-up finishes or the user explicitly leaves it.
+
+`PreferenceField` and `PreferenceSlider` share the layout of registration and saved preferences.
+The editor compares its four current values with the saved preferences, including a return to the
+original values. `ProfileEditorState` supports a conditional save action and an overridden unsaved
+change check; registration and first-time preference creation keep their action enabled. The save
+action stays in the preferences footer while its fields scroll.
 `OtpController` separates resend deadlines from verification rate limits; `OtpForm` only renders
 those states. `AuthRepository` decodes the server's resend receipt. Neither UI nor controller
 infers account membership from accepted requests.

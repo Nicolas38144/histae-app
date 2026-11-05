@@ -12,6 +12,7 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
   ProfileController get controller;
   bool dirty = false, busy = false, leaving = false;
   bool get retainsDraft => false;
+  bool get hasUnsavedChanges => dirty;
   ClientMessage? message;
   ApiFailure? messageFailure;
   late final String _resourceKey = controller.session.resourceKey;
@@ -73,6 +74,7 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
     VoidCallback? save,
     String? saveLabel,
     bool saveInFooter = false,
+    bool saveEnabled = true,
   }) => ListenableBuilder(
     listenable: controller,
     builder: (context, _) {
@@ -81,7 +83,7 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
         return const HistaeScaffold(body: SizedBox.shrink());
       }
       return PopScope(
-        canPop: leaving || (!dirty && !busy),
+        canPop: leaving || (!hasUnsavedChanges && !busy),
         onPopInvokedWithResult: (didPop, result) async {
           if (didPop || busy) return;
           if (await confirmAction(
@@ -122,6 +124,7 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
                         save,
                         saveLabel ??
                             AppStrings.of(context).messages.answersEditorSave,
+                        enabled: saveEnabled,
                       ),
                     ),
                   ),
@@ -179,6 +182,7 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
                     save,
                     saveLabel ??
                         AppStrings.of(context).messages.answersEditorSave,
+                    enabled: saveEnabled,
                   ),
               ],
             ),
@@ -188,8 +192,12 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
     },
   );
 
-  Widget _saveButton(VoidCallback save, String label) => HistaeButton(
-    onPressed: busy || !controller.canWrite ? null : save,
+  Widget _saveButton(
+    VoidCallback save,
+    String label, {
+    required bool enabled,
+  }) => HistaeButton(
+    onPressed: !enabled || busy || !controller.canWrite ? null : save,
     child: Text(
       controller.retrySeconds > 0
           ? AppStrings.of(context).messages

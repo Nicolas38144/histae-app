@@ -98,6 +98,12 @@ automatic modification of account data.
 
 ## Navigation and accessibility
 
+Preferences use subtle rounded panels with full-size headings. Numeric values appear beside the
+heading in a neutral badge; the slider and its decrement/increment actions sit below. The same
+`PreferenceField` shell contains the meeting selector, without a floating input caption. Headers
+and values wrap naturally at larger text sizes. Saved preferences keep Save visible in a fixed
+footer, disabled until their values differ from the saved version; first-time setup remains enabled.
+
 The Profile / Feed / Matches bar is transparent, with no panel, shadow or separator. Icons are
 22 px; the selected icon has a 38 px lavender circle, a label below and a full-tab touch target
 of at least 48 px. Compact spacing leaves more room for content without reducing label text size.
