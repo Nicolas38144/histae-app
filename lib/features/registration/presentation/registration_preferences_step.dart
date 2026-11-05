@@ -61,6 +61,11 @@ class _RegistrationPreferencesStepState
               isExpanded: true,
               isDense: false,
               itemHeight: null,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
               decoration: const InputDecoration(
                 filled: false,
                 border: InputBorder.none,

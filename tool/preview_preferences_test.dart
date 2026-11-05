@@ -20,7 +20,7 @@ import '../test/support/auth_fixture.dart';
 import '../test/support/profile_fixture.dart';
 
 const _boundary = Key('preferences-preview');
-const _output = 'build/previews/preferences-2026-11-05';
+const _output = 'build/previews/preferences-2026-11-06';
 
 Future<void> capture(WidgetTester tester, String name) async {
   await tester.pump();
@@ -68,9 +68,9 @@ void main() {
         if (r.url.path == '/api/users/me/preferences') {
           return jsonResponse({
             ...preferencesJson(),
-            'min_age': 18,
-            'max_age': 99,
-            'max_distance_km': 500,
+            'min_age': 23,
+            'max_age': 30,
+            'max_distance_km': 100,
           });
         }
         return defaultProfileResponse(r);

@@ -17,48 +17,47 @@ class PreferenceField extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: colors.onSurface.withValues(alpha: 0.035),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: colors.outlineVariant.withValues(alpha: 0.5),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: colors.outlineVariant.withValues(alpha: 0.6),
+            width: 0.5,
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Wrap(
-                alignment: WrapAlignment.spaceBetween,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                spacing: 12,
-                runSpacing: 8,
-                children: [
-                  Text(label, style: theme.textTheme.titleMedium),
-                  if (valueLabel case final value?)
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: colors.onSurface.withValues(alpha: 0.06),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        child: Text(value, style: theme.textTheme.titleLarge),
-                      ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 12,
+              runSpacing: 8,
+              children: [
+                Text(
+                  label,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colors.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                if (valueLabel case final value?)
+                  Text(
+                    value,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontSize: 16,
+                      height: 1.3,
+                      fontWeight: FontWeight.w500,
                     ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              child,
-            ],
-          ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            child,
+          ],
         ),
       ),
     );

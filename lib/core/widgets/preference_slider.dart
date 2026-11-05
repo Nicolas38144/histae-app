@@ -24,28 +24,71 @@ class PreferenceSlider extends StatelessWidget {
     final copy = AppStrings.of(context).messages;
     final colors = Theme.of(context).colorScheme;
     final change = onChanged;
-    final buttonStyle = IconButton.styleFrom(
-      disabledForegroundColor: colors.onSurface.withValues(alpha: 0.28),
-      disabledBackgroundColor: colors.onSurface.withValues(alpha: 0.06),
-    );
+    Widget stepButton({
+      required String key,
+      required String tooltip,
+      required IconData icon,
+      required VoidCallback? onPressed,
+    }) {
+      final foreground = onPressed == null
+          ? colors.onSurface.withValues(alpha: 0.22)
+          : colors.onSurfaceVariant;
+      return IconButton(
+        key: Key(key),
+        tooltip: tooltip,
+        onPressed: onPressed,
+        style: IconButton.styleFrom(
+          padding: const EdgeInsets.all(8),
+          minimumSize: const Size(48, 48),
+          tapTargetSize: MaterialTapTargetSize.padded,
+          foregroundColor: foreground,
+          disabledForegroundColor: foreground,
+        ),
+        icon: DecoratedBox(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: foreground.withValues(
+                alpha: onPressed == null ? 0.1 : 0.35,
+              ),
+              width: 0.7,
+            ),
+          ),
+          child: SizedBox.square(dimension: 30, child: Icon(icon, size: 18)),
+        ),
+      );
+    }
+
     return PreferenceField(
       label: label,
       valueLabel: valueLabel,
       child: Row(
         children: [
-          IconButton.filledTonal(
-            key: const Key('decrease'),
+          stepButton(
+            key: 'decrease',
             tooltip: copy.registrationDecrease(label),
-            style: buttonStyle,
             onPressed: change != null && value > minimum
                 ? () => change(value - 1)
                 : null,
-            icon: const Icon(Icons.remove),
+            icon: Icons.remove,
           ),
           Expanded(
             child: SliderTheme(
-              data: SliderTheme.of(context)
-                  .copyWith(tickMarkShape: SliderTickMarkShape.noTickMark),
+              data: SliderTheme.of(context).copyWith(
+                trackHeight: 2,
+                activeTrackColor: colors.primary,
+                inactiveTrackColor: colors.outlineVariant,
+                thumbShape: const RoundSliderThumbShape(
+                  enabledThumbRadius: 6,
+                  disabledThumbRadius: 5,
+                  elevation: 0,
+                  pressedElevation: 0,
+                ),
+                overlayShape: const RoundSliderOverlayShape(overlayRadius: 18),
+                trackShape: const RoundedRectSliderTrackShape(),
+                tickMarkShape: SliderTickMarkShape.noTickMark,
+                showValueIndicator: ShowValueIndicator.never,
+              ),
               child: Slider(
                 value: value.toDouble(),
                 min: minimum.toDouble(),
@@ -59,14 +102,13 @@ class PreferenceSlider extends StatelessWidget {
               ),
             ),
           ),
-          IconButton.filledTonal(
-            key: const Key('increase'),
+          stepButton(
+            key: 'increase',
             tooltip: copy.registrationIncrease(label),
-            style: buttonStyle,
             onPressed: change != null && value < maximum
                 ? () => change(value + 1)
                 : null,
-            icon: const Icon(Icons.add),
+            icon: Icons.add,
           ),
         ],
       ),
