@@ -1,5 +1,9 @@
 {
   "@locale": "fr",
+  "rewardVideoNoAdsTitle": "Aucune publicité disponible",
+  "@rewardVideoNoAdsTitle": {
+    "description": "Title shown after an explicit rewarded-video attempt has no ad inventory."
+  },
   "appOpeningHistae": "Histae",
   "@appOpeningHistae": {
     "description": "Interface: lib/app/app_opening.dart"

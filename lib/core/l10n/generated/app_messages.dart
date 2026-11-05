@@ -102,6 +102,12 @@ abstract class AppMessages {
     Locale('it'),
   ];
 
+  /// Title shown after an explicit rewarded-video attempt has no ad inventory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune publicité disponible'**
+  String get rewardVideoNoAdsTitle;
+
   /// Interface: lib/app/app_opening.dart
   ///
   /// In fr, this message translates to:

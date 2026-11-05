@@ -5,24 +5,48 @@
 Core account, profile, discovery, messaging, reveal, credits, privacy, push and purchase flows are
 implemented. Track deployed API capability and real device/provider validation separately.
 
+## Confirmed on Android
+
+The owner confirmed these areas on their phone on 2026-11-05. Validation applies to the tested
+Android build and environment; iOS remains pending.
+
+- [x] Android
+- [x] Authentication
+- [x] Discovery/photos
+- [x] Conversations
+- [x] Push
+- [x] Rewards
+- [x] Purchases/updates
+- [x] Accessibility
+
 ## Remaining checks
 
 | Area | Verify before release |
 | --- | --- |
-| Android | Signed Play delivery, versioning, optimized cold start, upgrades without clearing data |
-| iOS | macOS build/signing, Keychain, launch, permissions, sharing and portrait behavior |
-| Authentication | Real OTP, refresh recovery, process interruption and account switching |
-| Discovery/photos | Capture/upload, pause, expired presence, photo replacement and withdrawal |
-| Conversations | Two-account delivery/receipts, continuation deadlines, archives and deletion |
-| Push | API/worker credentials, APNs, permission, background and cold-start delivery |
-| Rewards | Published UMP message, test devices, ads, signed callback and quota refresh |
-| Purchases/updates | Test products, verification, completion, restore, delayed events and actual store availability |
-| Accessibility | Long text, four locales, 200% text, keyboard, small screens and native icon masks |
-| Privacy | Documents, provider disclosures, support and temporary-file cleanup |
+| iOS | macOS build/signing, Keychain, launch, permissions, sharing, portrait and enabled providers |
+| Privacy | Complete the checks below using test accounts |
 
 Record environment, app/API versions, result and outstanding issues. Include loading, empty,
 failure, uncertain-result and access-loss cases according to risk. Mock tests and local builds
 cannot validate a provider or another platform.
+
+### Privacy
+
+- [ ] Open current documents in all four languages; verify dates, contact, retention and provider
+  disclosures against actual behavior and the Play Data safety declaration.
+- [ ] Withdraw sensitive-data, location and advertising choices; verify the affected use stops
+  without resetting the choice after relaunch. OS permission alone is not consent.
+- [ ] Withdraw photo sharing from one account and check both participants, cached views and restart.
+- [ ] Revoke another session, disable notifications and block a test account; verify access and
+  delivery stop as expected. Check account switching leaves no previous private data/drafts.
+- [ ] Export test data and check its contents; verify app-owned temporary files are removed after
+  sharing/leaving. Copies deliberately saved elsewhere remain outside app cleanup.
+- [ ] Submit a correction request, process it in the dashboard and read the reply in the app.
+- [ ] Delete a test account; verify access closes immediately and server-side cleanup completes.
+  Check the public web deletion path and support contact without requiring the installed app.
+
+References: [CNIL permissions and consent](https://www.cnil.fr/fr/permissions-applications-mobiles-recommandations-de-la-cnil-pour-respecter-la-vie-privee),
+[Google Play account deletion](https://support.google.com/googleplay/android-developer/answer/13327111?hl=en).
 
 ## Known dependencies
 

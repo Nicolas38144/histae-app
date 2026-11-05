@@ -10,6 +10,9 @@ class AppMessagesIt extends AppMessages {
   AppMessagesIt([String locale = 'it']) : super(locale);
 
   @override
+  String get rewardVideoNoAdsTitle => 'Nessun annuncio disponibile';
+
+  @override
   String get appOpeningHistae => 'Histae';
 
   @override

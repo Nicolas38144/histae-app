@@ -4,10 +4,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
+import 'package:histae_app/app/theme.dart';
 import 'package:histae_app/core/l10n/app_strings.dart';
+import 'package:histae_app/core/l10n/generated/app_messages.dart';
 import 'package:histae_app/features/continuation/application/rewarded_video_controller.dart';
 import 'package:histae_app/features/continuation/data/continuation_models.dart';
 import 'package:histae_app/features/continuation/data/rewarded_video_gateway.dart';
+import 'package:histae_app/features/continuation/presentation/credits_page.dart';
+import 'package:histae_app/features/continuation/presentation/rewarded_video_scope.dart';
 import 'package:histae_app/features/matches/application/matches_controller.dart';
 import 'package:histae_app/features/matches/data/matches_repository.dart';
 import 'package:http/http.dart' as http;
@@ -252,6 +256,100 @@ void main() {
     expect(rewardReads, before);
     expect(gateway.video.disposals, 1);
   });
+
+  for (final failure in [VideoFailure.noFill, VideoFailure.network]) {
+    testWidgets(
+      'no-fill popup distinguishes unavailable ads from ${failure.name}',
+      (tester) async {
+        final session = testSession((request) async {
+          if (request.url.path.endsWith('/advertising-rewards')) {
+            return jsonResponse(rewardJson());
+          }
+          if (request.url.path.endsWith('/$rewardId')) {
+            return request.method == 'DELETE'
+                ? http.Response('', 204)
+                : jsonResponse(rewardJson());
+          }
+          return request.url.path == '/api/plans'
+              ? jsonResponse(rewardedCatalogJson())
+              : defaultContinuationResponse(request);
+        });
+        addTearDown(session.dispose);
+        await session.establish(testTokens);
+        final access = MatchesController(
+          MatchesRepository(session),
+          realtime: QuietRealtime(session),
+        );
+        addTearDown(access.dispose);
+        final gateway = FakeRewardedVideoGateway()
+          ..loadFailure = RewardedVideoException(failure);
+        await tester.pumpWidget(
+          RewardedVideoScope(
+            gateway: gateway,
+            child: MaterialApp(
+              theme: histaeTheme(Brightness.dark),
+              locale: const Locale('fr'),
+              localizationsDelegates: AppMessages.localizationsDelegates,
+              supportedLocales: AppMessages.supportedLocales,
+              home: CreditsPage(controller: access.continuation),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        final watch = find.byKey(const Key('watch-rewarded-video'));
+        final dialog = find.byKey(const Key('rewarded-video-no-fill-dialog'));
+        expect(dialog, findsNothing);
+        await tester.scrollUntilVisible(watch, 200);
+        await tester.ensureVisible(watch);
+        await tester.pumpAndSettle();
+        await tester.tap(watch);
+        await tester.pumpAndSettle();
+        expect(gateway.intents, hasLength(1));
+        expect(gateway.video.shows, 0);
+        expect(access.continuation.rewards.intent, isNull);
+        expect(access.continuation.quota!.advertisingBalance, 2);
+
+        if (failure == VideoFailure.noFill) {
+          expect(dialog, findsOneWidget);
+          expect(
+            find.descendant(
+              of: dialog,
+              matching: find.text(
+                const AppStrings().messages.rewardVideoNoAdsTitle,
+              ),
+            ),
+            findsOneWidget,
+          );
+          await tester.tap(
+            find.descendant(of: dialog, matching: find.text('Fermer')),
+          );
+          await tester.pumpAndSettle();
+          await access.continuation.refreshQuota();
+          await tester.pumpAndSettle();
+          expect(dialog, findsNothing);
+          expect(gateway.intents, hasLength(1));
+
+          gateway.loadFailure = null;
+          gateway.video.earned = false;
+          await tester.ensureVisible(watch);
+          await tester.pumpAndSettle();
+          await tester.tap(watch);
+          await tester.pumpAndSettle();
+          expect(gateway.video.shows, 1);
+          expect(dialog, findsNothing);
+        } else {
+          expect(dialog, findsNothing);
+          expect(
+            find.text(
+              const AppStrings().clientMessage(ClientMessage.videoNetwork),
+            ),
+            findsOneWidget,
+          );
+        }
+        await tester.pumpWidget(const SizedBox.shrink());
+      },
+    );
+  }
 
   for (final entry in ['matches', 'profile']) {
     testWidgets(

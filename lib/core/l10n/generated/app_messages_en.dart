@@ -10,6 +10,9 @@ class AppMessagesEn extends AppMessages {
   AppMessagesEn([String locale = 'en']) : super(locale);
 
   @override
+  String get rewardVideoNoAdsTitle => 'No ads available';
+
+  @override
   String get appOpeningHistae => 'Histae';
 
   @override

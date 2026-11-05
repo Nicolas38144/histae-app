@@ -101,6 +101,37 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
     if (mounted) await _start();
   }
 
+  Future<void> _watchVideo() async {
+    final video = _video!;
+    if (!video.canWatch) return;
+    await video.watch();
+    if (!mounted ||
+        !c.accessible ||
+        c.access.session.resourceKey != _key ||
+        !video.foreground ||
+        ModalRoute.of(context)?.isCurrent != true ||
+        video.message != ClientMessage.videoNoFill) {
+      return;
+    }
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        key: const Key('rewarded-video-no-fill-dialog'),
+        icon: const Icon(Icons.play_circle_outline_rounded),
+        title: Text(AppStrings.of(context).messages.rewardVideoNoAdsTitle),
+        content: Text(
+          AppStrings.of(context).clientMessage(ClientMessage.videoNoFill),
+        ),
+        actions: [
+          HistaeButton.text(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(MaterialLocalizations.of(context).closeButtonLabel),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _cancelReward() async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -207,7 +238,7 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
                       CreditRecoveryCard(
                         quota: q,
                         enabled: !c.loading && !video.busy,
-                        onWatchVideo: video.watch,
+                        onWatchVideo: _watchVideo,
                         onOpenSubscription: _openSubscription,
                       ),
                       const SizedBox(height: 16),
@@ -225,6 +256,7 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
                       RewardVideoCard(
                         credits: c,
                         video: video,
+                        onWatch: _watchVideo,
                         onCancel: _cancelReward,
                       ),
                       const SizedBox(height: 16),
@@ -285,6 +317,7 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
                       RewardVideoCard(
                         credits: c,
                         video: video,
+                        onWatch: _watchVideo,
                         onCancel: _cancelReward,
                       ),
                     ],

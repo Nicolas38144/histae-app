@@ -12,11 +12,12 @@ class RewardVideoCard extends StatelessWidget {
     super.key,
     required this.credits,
     required this.video,
+    required this.onWatch,
     required this.onCancel,
   });
   final ContinuationController credits;
   final RewardedVideoController video;
-  final VoidCallback onCancel;
+  final VoidCallback onWatch, onCancel;
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +93,7 @@ class RewardVideoCard extends StatelessWidget {
             const SizedBox(height: 20),
             HistaeButton.icon(
               key: const Key('watch-rewarded-video'),
-              onPressed: video.canWatch ? video.watch : null,
+              onPressed: video.canWatch ? onWatch : null,
               icon: video.busy
                   ? const SizedBox.square(
                       dimension: 18,
