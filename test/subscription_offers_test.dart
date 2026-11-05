@@ -1,26 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/core/network/api_failure.dart';
-import 'package:histae_app/features/billing/data/billing_models.dart';
 import 'package:histae_app/features/catalog/data/plan_catalog.dart';
 
 import 'support/catalog_fixture.dart';
 
 void main() {
-  test('catalogue links three offers to two entitlement plans', () {
-    final catalog = PlanCatalog.fromJson(catalogJson());
-    expect(catalog.plans.length, 2);
-    expect(catalog.offers.map((offer) => offer.displayName), [
-      'Free',
-      'Premium Mensuel',
-      'Premium Annuel',
-    ]);
-    expect(catalog.offers[1].billingPeriod, BillingPeriod.monthly);
-    expect(catalog.offers[2].billingPeriod, BillingPeriod.annual);
-    expect(catalog.offers[1].planCode, catalog.offers[2].planCode);
-    expect(catalog.offers[1].priceCents, 1234);
-    expect(catalog.offers[2].priceCents, 9876);
-  });
-
   test('rejects a plans-only response instead of reconstructing offers', () {
     final json = catalogJson()..remove('offers');
     expect(() => PlanCatalog.fromJson(json), throwsA(isA<ApiFailure>()));

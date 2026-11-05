@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/core/network/api_client.dart';
 import 'package:histae_app/core/network/api_failure.dart';
+import 'package:histae_app/features/billing/data/billing_models.dart';
 import 'package:histae_app/features/catalog/application/catalog_controller.dart';
 import 'package:histae_app/features/catalog/data/catalog_repository.dart';
 import 'package:histae_app/features/catalog/data/subscription_plan.dart';
@@ -29,7 +30,7 @@ void main() {
   }
 
   test(
-    'decodes Rust optional fields, nullable labels and arbitrary feature_value',
+    'decodes linked plans and offers, optional labels and feature values',
     () async {
       final repo = repository(
         (_) async => http.Response(catalogFixture(), 200),
@@ -41,12 +42,22 @@ void main() {
         'premium_monthly',
         'premium_annual',
       ]);
+      expect(catalog.offers.map((offer) => offer.displayName), [
+        'Free',
+        'Premium Mensuel',
+        'Premium Annuel',
+      ]);
+      expect(catalog.offers[1].billingPeriod, BillingPeriod.monthly);
+      expect(catalog.offers[2].billingPeriod, BillingPeriod.annual);
+      expect(catalog.offers[1].priceCents, 1234);
       expect(catalog.offers.last.priceCents, 9876);
       expect(plans.map((p) => p.code), ['free', 'premium']);
       expect(plans.first.weeklyIncludedCredits, 2);
       expect(plans.first.weeklyContinuationLimit, 5);
       expect(plans.first.features.single.value, {'enabled': true});
       final premium = plans.last;
+      expect(catalog.offers[1].planCode, premium.code);
+      expect(catalog.offers[2].planCode, premium.code);
       expect(premium.weeklyIncludedCredits, isNull);
       expect(premium.weeklyContinuationLimit, isNull);
       expect(premium.monthlyPriceCents, 1234);

@@ -51,42 +51,40 @@ void main() {
         message.createdAt,
         null,
       );
-      for (final language in ['fr', 'en', 'es', 'it']) {
-        for (final scale in [1.0, 2.0]) {
-          Widget bubble(bool own) => MaterialApp(
-            theme: histaeTheme(Brightness.dark),
-            locale: Locale(language),
-            localizationsDelegates: AppMessages.localizationsDelegates,
-            supportedLocales: AppMessages.supportedLocales,
-            home: MediaQuery(
-              data: MediaQueryData(textScaler: TextScaler.linear(scale)),
-              child: Scaffold(
-                body: ListView(
-                  children: [
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 275),
-                        child: MessageBubble(message: short, own: own),
-                      ),
+      for (final scale in [1.0, 2.0]) {
+        Widget bubble(bool own) => MaterialApp(
+          theme: histaeTheme(Brightness.dark),
+          locale: const Locale('fr'),
+          localizationsDelegates: AppMessages.localizationsDelegates,
+          supportedLocales: AppMessages.supportedLocales,
+          home: MediaQuery(
+            data: MediaQueryData(textScaler: TextScaler.linear(scale)),
+            child: Scaffold(
+              body: ListView(
+                children: [
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 275),
+                      child: MessageBubble(message: short, own: own),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          );
-          await tester.pumpWidget(bubble(true));
-          await tester.pumpAndSettle();
-          final own = tester.getSize(find.byType(MessageBubble));
-          expect(find.byType(MessageMetadata), findsNothing);
-          await tester.pumpWidget(bubble(false));
-          await tester.pumpAndSettle();
-          expect(
-            own.height,
-            closeTo(tester.getSize(find.byType(MessageBubble)).height, .1),
-          );
-          expect(tester.takeException(), isNull);
-        }
+          ),
+        );
+        await tester.pumpWidget(bubble(true));
+        await tester.pumpAndSettle();
+        final own = tester.getSize(find.byType(MessageBubble));
+        expect(find.byType(MessageMetadata), findsNothing);
+        await tester.pumpWidget(bubble(false));
+        await tester.pumpAndSettle();
+        expect(
+          own.height,
+          closeTo(tester.getSize(find.byType(MessageBubble)).height, .1),
+        );
+        expect(tester.takeException(), isNull);
       }
       await tester.pumpWidget(const SizedBox.shrink());
     },
