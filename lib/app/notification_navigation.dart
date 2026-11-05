@@ -11,6 +11,10 @@ import '../features/matches/application/matches_controller.dart';
 import '../features/matches/data/matches_repository.dart';
 import '../features/matches/presentation/matches_page.dart';
 import '../features/notifications/application/push_controller.dart';
+import '../features/notifications/data/notification_models.dart';
+import '../features/privacy/application/privacy_controller.dart';
+import '../features/privacy/data/private_export_store.dart';
+import '../features/privacy/presentation/privacy_notification_page.dart';
 import 'session_repositories.dart';
 
 /// Owns only the temporary notification route and its scoped chat state.
@@ -24,6 +28,7 @@ class NotificationNavigation {
     required this.billingController,
     required this.isMounted,
     this.repositories,
+    this.privacyExportStore,
   }) {
     pushController?.addListener(_pushChanged);
   }
@@ -34,6 +39,7 @@ class NotificationNavigation {
   final BillingController? billingController;
   final bool Function() isMounted;
   final SessionRepositories? repositories;
+  final PrivateExportStore? privacyExportStore;
   bool _disposed = false;
 
   bool get mounted => !_disposed && isMounted();
@@ -93,6 +99,20 @@ class NotificationNavigation {
             catalog: catalogRepository,
             initialMatchId: intent.matchId,
             notificationFlow: true,
+          ),
+        );
+      } else if (intent.kind.destination == PushDestination.requests ||
+          intent.kind.destination == PushDestination.sessions) {
+        _pushRoute = MaterialPageRoute<void>(
+          settings: const RouteSettings(name: '/notification/privacy'),
+          builder: (_) => PrivacyNotificationPage(
+            session: session,
+            repository: repositories?.privacy,
+            section: intent.kind.destination == PushDestination.requests
+                ? PrivacySection.rights
+                : PrivacySection.sessions,
+            requestId: intent.requestId,
+            exportStore: privacyExportStore,
           ),
         );
       } else {

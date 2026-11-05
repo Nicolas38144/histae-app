@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/network/read_snapshots.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
@@ -18,9 +19,13 @@ class PrivacyDetailPage extends StatefulWidget {
     super.key,
     required this.controller,
     required this.section,
+    this.notificationFlow = false,
+    this.initialRequestId,
   });
   final PrivacyController controller;
   final PrivacySection section;
+  final bool notificationFlow;
+  final String? initialRequestId;
 
   @override
   State<PrivacyDetailPage> createState() => _PrivacyDetailPageState();
@@ -35,7 +40,14 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        unawaited(c.enter(widget.section));
+        unawaited(
+          c.enter(
+            widget.section,
+            policy: widget.notificationFlow
+                ? ReadPolicy.refresh
+                : ReadPolicy.cached,
+          ),
+        );
       }
     });
   }
@@ -353,6 +365,8 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
                   ),
                 )
               : ExpansionTile(
+                  key: ValueKey(('privacy-request', request.id)),
+                  initiallyExpanded: request.id == widget.initialRequestId,
                   title: Text(rightLabel(AppStrings.of(context), request.type)),
                   subtitle: Text(
                     '${rightStatus(AppStrings.of(context), request.status)} · ${privacyDate(AppStrings.of(context), request.requestedAt)}',

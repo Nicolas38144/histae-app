@@ -17,6 +17,7 @@ import '../features/help/application/help_controller.dart';
 import '../features/help/presentation/help_scope.dart';
 import '../features/notifications/application/push_controller.dart';
 import '../features/notifications/presentation/push_scope.dart';
+import '../features/privacy/data/private_export_store.dart';
 import '../features/reading/application/reading_controller.dart';
 import '../features/reading/presentation/reading_scope.dart';
 import '../features/updates/application/store_update_controller.dart';
@@ -42,6 +43,7 @@ class HistaeApp extends StatefulWidget {
     this.helpController,
     this.readingController,
     this.updateController,
+    this.privacyExportStore,
   });
   // Ownership is transferred to the app; requests close when it is disposed.
   final CatalogRepository? catalogRepository;
@@ -54,6 +56,7 @@ class HistaeApp extends StatefulWidget {
   final HelpController? helpController;
   final ReadingController? readingController;
   final StoreUpdateController? updateController;
+  final PrivateExportStore? privacyExportStore;
 
   @override
   State<HistaeApp> createState() => _HistaeAppState();
@@ -87,6 +90,7 @@ class _HistaeAppState extends State<HistaeApp> with WidgetsBindingObserver {
           );
     }
     _notifications = NotificationNavigation(
+      privacyExportStore: widget.privacyExportStore,
       navigator: _navigator,
       repositories: _repositories,
       pushController: widget.pushController,

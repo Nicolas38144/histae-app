@@ -110,6 +110,9 @@ not loading or payment decisions. Subscription events refresh quota without relo
 Push registration requires complete public options, verified account setup and native permission.
 First-use prompting does not override a refusal, manual opt-out or remotely removed device.
 Foreground activity uses realtime state; OS alerts are for background delivery.
+Typed push destinations distinguish conversations, subscriptions, requests and sessions. Each open
+rechecks authentication and fresh resource access; private routes own their controller and cleanup.
+Partner names belong only to server-rendered display copy, never client routing.
 
 Android uses `FLAG_SECURE` and Recents masking. iOS masks background/app-switcher and recording
 content; it cannot globally prevent still screenshots. Do not use secure-text-field workarounds.

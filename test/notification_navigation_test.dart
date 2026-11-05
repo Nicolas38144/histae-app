@@ -7,12 +7,104 @@ import 'package:histae_app/features/notifications/application/push_controller.da
 import 'package:histae_app/features/notifications/data/device_repository.dart';
 import 'package:histae_app/features/notifications/data/notification_models.dart';
 import 'package:histae_app/features/notifications/data/push_vault.dart';
+import 'package:histae_app/features/privacy/application/privacy_controller.dart';
+import 'package:histae_app/features/privacy/presentation/privacy_detail_page.dart';
+import 'package:histae_app/features/privacy/presentation/privacy_notification_page.dart';
 
 import 'support/auth_fixture.dart';
 import 'support/matches_fixture.dart';
 import 'support/notifications_fixture.dart';
+import 'support/privacy_fixture.dart';
 
 void main() {
+  for (final kind in [PushKind.dataRequestReplied, PushKind.newSession]) {
+    testWidgets('${kind.name} opens a fresh owner-scoped privacy destination', (
+      tester,
+    ) async {
+      final requests = kind == PushKind.dataRequestReplied;
+      final endpoint = requests
+          ? '/api/users/me/data-subject-requests'
+          : '/api/auth/sessions';
+      var reads = 0;
+      final session = testSession((request) async {
+        if (request.url.path == endpoint) reads++;
+        if (requests && request.url.path == endpoint) {
+          return jsonResponse({
+            'requests': [
+              {
+                ...rightsJson(type: 'rectification', status: 'completed'),
+                'completed_at': '2026-11-05T12:00:00Z',
+                'details': 'Une correction de test.',
+                'response': reads == 1
+                    ? 'Première réponse de test.'
+                    : 'Réponse de test mise à jour.',
+              },
+            ],
+          });
+        }
+        return request.url.path == '/api/auth/sessions'
+            ? defaultPrivacyResponse(request)
+            : defaultNotificationsResponse(request);
+      });
+      await session.establish(testTokens);
+      final vault = MemoryPushVault()
+        ..record = const PushRecord(
+          'https://api.example',
+          testUser,
+          deviceId: deviceOne,
+        );
+      final gateway = FakePushGateway();
+      final push = PushController(
+        DeviceRepository(session),
+        gateway,
+        vault,
+        appVersion: () async => '1.0',
+      );
+      await tester.pumpWidget(
+        HistaeApp(
+          sessionController: session,
+          pushController: push,
+          privacyExportStore: PreviewExportStore(),
+        ),
+      );
+      await tester.pumpAndSettle();
+      for (final id in [notificationOne, notificationTwo]) {
+        gateway.taps.add(
+          PushIntent(id, kind, null, requestId: requests ? privacyId : null),
+        );
+        await tester.pumpAndSettle();
+        expect(find.byType(PrivacyNotificationPage), findsOneWidget);
+        final detail = tester.widget<PrivacyDetailPage>(
+          find.byType(PrivacyDetailPage),
+        );
+        expect(
+          detail.section,
+          requests ? PrivacySection.rights : PrivacySection.sessions,
+        );
+        expect(detail.controller.repository.owner, testUser);
+        if (requests) {
+          expect(
+            detail.controller.rights.single.response,
+            reads == 1
+                ? 'Première réponse de test.'
+                : 'Réponse de test mise à jour.',
+          );
+        }
+        await tester.tap(find.byType(BackButton));
+        await tester.pumpAndSettle();
+      }
+      expect(
+        reads,
+        2,
+        reason: 'notification opens bypass an earlier private snapshot',
+      );
+      await session.logout();
+      await tester.pumpAndSettle();
+      expect(find.byType(PrivacyNotificationPage), findsNothing);
+      await tester.pumpWidget(const SizedBox.shrink());
+      await gateway.close();
+    });
+  }
   testWidgets(
     'cold notification checks session and match membership; stale match stays closed, warm delivery deduplicates and logout forgets navigation',
     (tester) async {

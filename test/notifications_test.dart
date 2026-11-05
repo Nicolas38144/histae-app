@@ -19,6 +19,53 @@ import 'support/matches_fixture.dart';
 import 'support/notifications_fixture.dart';
 
 void main() {
+  test('new push types require scoped identifiers and ignore untrusted navigation fields', () {
+    for (final entry in {
+      'continuation_requested': PushKind.continuationRequested,
+      'conversation_continued': PushKind.conversationContinued,
+      'photos_revealed': PushKind.photosRevealed,
+      'first_period_ending': PushKind.firstPeriodEnding,
+    }.entries) {
+      final data = {'notification_id': notificationOne, 'type': entry.key};
+      expect(PushIntent.parse(data), isNull);
+      final intent = PushIntent.parse({
+        ...data,
+        'match_id': testMatch,
+        'url': 'https://untrusted.invalid',
+        'firstname': 'UNTRUSTED',
+      });
+      expect(intent?.kind, entry.value);
+      expect(intent?.matchId, testMatch);
+      expect(intent?.kind.destination, PushDestination.match);
+    }
+    final request = {
+      'notification_id': notificationOne,
+      'type': 'data_request_replied',
+    };
+    expect(PushIntent.parse(request), isNull);
+    final reply = PushIntent.parse({
+      ...request,
+      'request_id': notificationTwo,
+      'match_id': testMatch,
+    });
+    expect(reply?.kind.destination, PushDestination.requests);
+    expect(reply?.requestId, notificationTwo);
+    expect(reply?.matchId, isNull);
+    final login = PushIntent.parse({
+      'notification_id': notificationOne,
+      'type': 'new_session',
+      'match_id': testMatch,
+    });
+    expect(login?.kind.destination, PushDestination.sessions);
+    expect(login?.matchId, isNull);
+    expect(
+      PushIntent.parse({
+        'notification_id': notificationOne,
+        'type': 'advertising_credit_added',
+      }),
+      isNull,
+    );
+  });
   test('default activation waits for a verified session and preserves an explicit opt-out', () async {
     var posts = 0;
     final session = testSession((r) async {

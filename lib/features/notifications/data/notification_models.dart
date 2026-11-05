@@ -25,20 +25,38 @@ class PushDevice {
   final DateTime? lastUsedAt;
 }
 
+enum PushDestination { match, subscription, requests, sessions }
+
 enum PushKind {
   newMatch,
   newMessage,
   matchExpiring,
-  billingPaymentFailed;
+  billingPaymentFailed,
+  continuationRequested,
+  conversationContinued,
+  photosRevealed,
+  firstPeriodEnding,
+  dataRequestReplied,
+  newSession;
 
-  bool get opensMatch => switch (this) {
-    PushKind.newMatch || PushKind.newMessage || PushKind.matchExpiring => true,
-    PushKind.billingPaymentFailed => false,
+  PushDestination get destination => switch (this) {
+    PushKind.newMatch ||
+    PushKind.newMessage ||
+    PushKind.matchExpiring ||
+    PushKind.continuationRequested ||
+    PushKind.conversationContinued ||
+    PushKind.photosRevealed ||
+    PushKind.firstPeriodEnding => PushDestination.match,
+    PushKind.billingPaymentFailed => PushDestination.subscription,
+    PushKind.dataRequestReplied => PushDestination.requests,
+    PushKind.newSession => PushDestination.sessions,
   };
+
+  bool get opensMatch => destination == PushDestination.match;
 }
 
 class PushIntent {
-  const PushIntent(this.id, this.kind, this.matchId);
+  const PushIntent(this.id, this.kind, this.matchId, {this.requestId});
 
   static PushIntent? parse(Map<String, dynamic> data) {
     try {
@@ -48,12 +66,21 @@ class PushIntent {
         'new_message' => PushKind.newMessage,
         'match_expiring' => PushKind.matchExpiring,
         'billing_payment_failed' => PushKind.billingPaymentFailed,
+        'continuation_requested' => PushKind.continuationRequested,
+        'conversation_continued' => PushKind.conversationContinued,
+        'photos_revealed' => PushKind.photosRevealed,
+        'first_period_ending' => PushKind.firstPeriodEnding,
+        'data_request_replied' => PushKind.dataRequestReplied,
+        'new_session' => PushKind.newSession,
         _ => null,
       };
       if (kind == null) return null;
       final match = kind.opensMatch ? serverId(data, 'match_id') : null;
+      final request = kind == PushKind.dataRequestReplied
+          ? serverId(data, 'request_id')
+          : null;
       // Ignore all remote display text, links, senders and non-contract fields.
-      return PushIntent(id, kind, match);
+      return PushIntent(id, kind, match, requestId: request);
     } catch (_) {
       return null;
     }
@@ -62,6 +89,7 @@ class PushIntent {
   final String id;
   final PushKind kind;
   final String? matchId;
+  final String? requestId;
 
   @override
   String toString() => 'PushIntent(redacted)';

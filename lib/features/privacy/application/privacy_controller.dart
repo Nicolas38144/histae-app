@@ -173,7 +173,10 @@ class PrivacyController extends ChangeNotifier {
     }
   }
 
-  Future<void> enter(PrivacySection value) async {
+  Future<void> enter(
+    PrivacySection value, {
+    ReadPolicy policy = ReadPolicy.cached,
+  }) async {
     if (section != value && !busy && !sharing) {
       _epoch++;
       _scope.cancel();
@@ -188,7 +191,7 @@ class PrivacyController extends ChangeNotifier {
     }
     failure = null;
     notice = null;
-    await load(policy: ReadPolicy.cached);
+    await load(policy: policy);
   }
 
   Future<void> clearExport() async {
