@@ -10,6 +10,7 @@ import '../../../core/widgets/histae_scaffold.dart';
 import '../../catalog/data/catalog_repository.dart';
 import '../../continuation/presentation/continuation_action.dart';
 import '../../continuation/presentation/continuation_page.dart';
+import '../../notifications/presentation/conversation_notification_sheet.dart';
 import '../../privacy/presentation/report_page.dart';
 import '../application/matches_controller.dart';
 import '../data/match_models.dart';
@@ -321,6 +322,16 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                 if (value == 'end') unawaited(_end(block: false));
                 if (value == 'block') unawaited(_end(block: true));
                 if (value == 'report') unawaited(_report());
+                if (value == 'notifications') {
+                  unawaited(
+                    showConversationNotifications(
+                      context,
+                      repository: c.notificationPreferences,
+                      matchId: widget.matchId,
+                      now: () => c.serverNow,
+                    ),
+                  );
+                }
               },
               itemBuilder: (_) => [
                 PopupMenuItem(
@@ -336,6 +347,15 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                   value: 'profile',
                   child: Text(
                     AppStrings.of(context).messages.chatPageViewTheirProfile,
+                  ),
+                ),
+                PopupMenuItem(
+                  key: const Key('chat-notifications'),
+                  value: 'notifications',
+                  child: Text(
+                    AppStrings.of(context)
+                        .messages
+                        .notificationConversationTitle,
                   ),
                 ),
                 PopupMenuItem(

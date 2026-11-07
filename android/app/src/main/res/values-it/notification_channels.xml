@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated from the ARB catalog. Do not edit by hand. -->
+<resources>
+    <string name="notification_messages" formatted="false">Messaggi</string>
+    <string name="notification_matches" formatted="false">Nuovi match</string>
+    <string name="notification_continuations" formatted="false">Continuazioni</string>
+    <string name="notification_photos" formatted="false">Condivisione delle foto</string>
+    <string name="notification_reminders" formatted="false">Promemoria delle scadenze</string>
+    <string name="notification_account" formatted="false">Account e sicurezza</string>
+</resources>

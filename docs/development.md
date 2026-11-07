@@ -40,6 +40,7 @@ Documentation-only changes need no Flutter tests. Run Flutter checks/builds seri
 | Photos/privacy | `photo_sharing_test.dart`, `continuation_test.dart`, `private_photo_cache_test.dart`, `private_photo_test.dart`, `match_profile_test.dart` |
 | Messaging/matches | `conversation_updates_test.dart`, `matches_inactivity_test.dart`, `matches_visibility_test.dart` |
 | Native boundaries | `billing_test.dart`, `store_updates_test.dart`, `app_privacy_shield_test.dart` |
+| Notifications | `notification_preferences_test.dart`, `notifications_test.dart`, `notification_navigation_test.dart` |
 | Localization | `localization_test.dart`, `api_language_test.dart` |
 
 For example: `flutter test test/session_test.dart test/auth_widget_test.dart`.
@@ -48,7 +49,7 @@ reloading history, while withdrawal/backgrounding still purge images. Profile Ba
 the chat draft. Report checks actually run; simulations do not validate native/provider behavior.
 
 After ARB changes, run `flutter gen-l10n`; native permission copy also needs the
-[localization generator](../lib/core/l10n/README.md#native-ios-resources).
+[localization generator](../lib/core/l10n/README.md#native-resources).
 
 ## Visual previews
 

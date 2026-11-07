@@ -70,6 +70,12 @@ manual opt-out and remotely removed devices are not automatically reversed. Devi
 accessible while push is disabled. OS alerts are background-only; open-app messages use realtime
 state. Notification taps open authorized destinations.
 
+Six account-wide categories, discreet display and private conversation mutes use the API's
+notification-preference routes. They require the matching API migration/worker, with no new `.env`
+values. Existing device opt-outs remain unchanged. Opening a settings editor reads current choices;
+ordinary tab navigation does not. Android channel names come from the ARBs via
+`dart run tool/generate_native_localizations.dart` and preserve system sound/importance choices.
+
 API/worker sending credentials are separate. iOS also requires APNs, capabilities and signing
 validation on macOS. Public configuration alone does not prove delivery.
 

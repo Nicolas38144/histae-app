@@ -1,9 +1,13 @@
 {
   "@locale": "fr",
   "chatContinuationSpendCredit": "Continuer avec 1 crédit",
-  "@chatContinuationSpendCredit": {"description": "Continuation action in the conversation composer."},
+  "@chatContinuationSpendCredit": {
+    "description": "Continuation action in the conversation composer."
+  },
   "chatContinuationWaiting": "En attente de sa réponse",
-  "@chatContinuationWaiting": {"description": "Continuation action in the conversation composer."},
+  "@chatContinuationWaiting": {
+    "description": "Continuation action in the conversation composer."
+  },
   "rewardVideoNoAdsTitle": "Aucune publicité disponible",
   "@rewardVideoNoAdsTitle": {
     "description": "Title shown after an explicit rewarded-video attempt has no ad inventory."
@@ -4085,5 +4089,45 @@
   "storeUpdateBody": "Une nouvelle version de Histae est disponible. Mettez l’application à jour pour continuer.",
   "storeUpdateOpen": "Ouvrir le store",
   "storeUpdateCheck": "Vérifier à nouveau",
-  "storeUpdateOpenFailed": "Le store n’a pas pu être ouvert. Réessayez dans un instant."
+  "storeUpdateOpenFailed": "Le store n’a pas pu être ouvert. Réessayez dans un instant.",
+  "notificationPreferencesTitle": "Mes notifications",
+  "notificationPreferencesDescription": "Ces choix s’appliquent à votre compte sur tous vos appareils. Les messages et les compteurs dans l’app restent disponibles.",
+  "notificationMessages": "Messages",
+  "notificationMessagesDescription": "Un nouveau message vous attend.",
+  "notificationNewMatches": "Nouvelles rencontres",
+  "notificationNewMatchesDescription": "Vous avez envie de vous découvrir tous les deux.",
+  "notificationContinuations": "Continuations",
+  "notificationContinuationsDescription": "Une invitation à continuer ou la confirmation de vos deux choix.",
+  "notificationPhotos": "Partage des photos",
+  "notificationPhotosDescription": "Vous pouvez désormais voir vos photos.",
+  "notificationReminders": "Rappels d’échéance",
+  "notificationRemindersDescription": "La fin des premiers mots ou la suppression prochaine d’une conversation inactive.",
+  "notificationAccountSecurity": "Compte et sécurité",
+  "notificationAccountSecurityDescription": "Nouvelle connexion, réponse à une démarche ou problème de paiement.",
+  "notificationDiscreet": "Notifications discrètes",
+  "notificationDiscreetDescription": "Masquer les prénoms dans toutes les notifications, y compris sur l’écran verrouillé.",
+  "notificationSystemSettings": "Réglages du téléphone",
+  "notificationSystemSettingsDescription": "Les réglages du téléphone restent prioritaires. Sur Android, vous pouvez aussi choisir le son et les vibrations par catégorie.",
+  "notificationSystemSettingsFailed": "Ouvrez les paramètres du téléphone, puis les notifications de Histae.",
+  "notificationSettingsLoading": "Chargement des réglages de notification",
+  "notificationSettingsUnavailable": "Ces réglages ne sont pas encore disponibles. Vos choix actuels restent inchangés.",
+  "notificationSettingsUnconfirmed": "Nous n’avons pas pu confirmer la modification ou charger les réglages. Vérifiez le choix affiché avant de réessayer.",
+  "notificationSettingsRetry": "Réessayer",
+  "notificationSettingsClose": "Fermer",
+  "notificationConversationTitle": "Notifications de cette conversation",
+  "notificationConversationDescription": "Coupez les alertes de cette conversation sur tous vos appareils. Les messages et leur compteur restent disponibles. L’autre personne n’est pas prévenue.",
+  "notificationConversationActive": "Cette conversation n’est pas en sourdine. Vos choix par catégorie continuent de s’appliquer.",
+  "notificationMutedIndefinitely": "Notifications coupées jusqu’à réactivation.",
+  "notificationMutedUntil": "Notifications coupées jusqu’au {date}.",
+  "@notificationMutedUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationUnmute": "Réactiver les alertes",
+  "notificationMuteHour": "Couper pendant une heure",
+  "notificationMuteTomorrow": "Couper jusqu’à demain",
+  "notificationMuteIndefinitely": "Couper jusqu’à réactivation"
 }

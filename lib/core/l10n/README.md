@@ -19,9 +19,10 @@ errors. Other layers return codes/`ClientMessage`. Never hand-edit [generated Da
 Device preference restores before first render; account fallback applies only without a local
 choice. Language changes preserve navigation/drafts and never translate personal text.
 
-## Native iOS resources
+## Native resources
 
-After editing permission or privacy-shield copy, regenerate and review native resources:
+After editing permission, privacy-shield copy or notification category names, regenerate and review
+native iOS resources and Android notification-channel XML:
 
 ```bash
 dart run tool/generate_native_localizations.dart

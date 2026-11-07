@@ -3521,4 +3521,119 @@ class AppMessagesEs extends AppMessages {
   @override
   String get storeUpdateOpenFailed =>
       'No se ha podido abrir la tienda. Inténtalo de nuevo en un momento.';
+
+  @override
+  String get notificationPreferencesTitle => 'Mis notificaciones';
+
+  @override
+  String get notificationPreferencesDescription =>
+      'Estas opciones se aplican a tu cuenta en todos tus dispositivos. Los mensajes y los contadores de la app siguen disponibles.';
+
+  @override
+  String get notificationMessages => 'Mensajes';
+
+  @override
+  String get notificationMessagesDescription => 'Tienes un nuevo mensaje.';
+
+  @override
+  String get notificationNewMatches => 'Nuevos matches';
+
+  @override
+  String get notificationNewMatchesDescription => 'Ambos queréis conoceros.';
+
+  @override
+  String get notificationContinuations => 'Continuaciones';
+
+  @override
+  String get notificationContinuationsDescription =>
+      'Una invitación a continuar o la confirmación de que ambos habéis aceptado.';
+
+  @override
+  String get notificationPhotos => 'Fotos compartidas';
+
+  @override
+  String get notificationPhotosDescription => 'Ya podéis ver vuestras fotos.';
+
+  @override
+  String get notificationReminders => 'Recordatorios de plazos';
+
+  @override
+  String get notificationRemindersDescription =>
+      'El fin del primer periodo o la próxima eliminación de una conversación inactiva.';
+
+  @override
+  String get notificationAccountSecurity => 'Cuenta y seguridad';
+
+  @override
+  String get notificationAccountSecurityDescription =>
+      'Un nuevo acceso, una respuesta a una solicitud o un problema de pago.';
+
+  @override
+  String get notificationDiscreet => 'Notificaciones discretas';
+
+  @override
+  String get notificationDiscreetDescription =>
+      'Ocultar los nombres en todas las notificaciones, también en la pantalla de bloqueo.';
+
+  @override
+  String get notificationSystemSettings => 'Ajustes del teléfono';
+
+  @override
+  String get notificationSystemSettingsDescription =>
+      'Los ajustes del teléfono tienen prioridad. En Android también puedes elegir el sonido y la vibración por categoría.';
+
+  @override
+  String get notificationSystemSettingsFailed =>
+      'Abre los ajustes del teléfono y luego las notificaciones de Histae.';
+
+  @override
+  String get notificationSettingsLoading =>
+      'Cargando los ajustes de notificaciones';
+
+  @override
+  String get notificationSettingsUnavailable =>
+      'Estos ajustes aún no están disponibles. Tus opciones actuales no cambian.';
+
+  @override
+  String get notificationSettingsUnconfirmed =>
+      'No hemos podido confirmar el cambio o cargar los ajustes. Comprueba la opción que aparece antes de volver a intentarlo.';
+
+  @override
+  String get notificationSettingsRetry => 'Reintentar';
+
+  @override
+  String get notificationSettingsClose => 'Cerrar';
+
+  @override
+  String get notificationConversationTitle =>
+      'Notificaciones de esta conversación';
+
+  @override
+  String get notificationConversationDescription =>
+      'Silencia esta conversación en todos tus dispositivos. Los mensajes y su contador siguen disponibles. No se avisa a la otra persona.';
+
+  @override
+  String get notificationConversationActive =>
+      'Esta conversación no está silenciada. Tus preferencias por categoría siguen aplicándose.';
+
+  @override
+  String get notificationMutedIndefinitely =>
+      'Notificaciones silenciadas hasta que las reactives.';
+
+  @override
+  String notificationMutedUntil(String date) {
+    return 'Notificaciones silenciadas hasta el $date.';
+  }
+
+  @override
+  String get notificationUnmute => 'Reactivar las alertas';
+
+  @override
+  String get notificationMuteHour => 'Silenciar durante una hora';
+
+  @override
+  String get notificationMuteTomorrow => 'Silenciar hasta mañana';
+
+  @override
+  String get notificationMuteIndefinitely => 'Silenciar hasta que las reactive';
 }

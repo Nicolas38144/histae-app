@@ -13,7 +13,10 @@ import '../../privacy/presentation/privacy_strings.dart' show privacyDate;
 import '../application/devices_controller.dart';
 import '../application/push_controller.dart';
 import '../data/device_repository.dart';
+import '../data/notification_preferences_repository.dart';
 import '../data/push_gateway.dart';
+import 'notification_preferences_panel.dart';
+import 'notification_system_settings_button.dart';
 
 String notificationFailure(
   AppStrings strings,
@@ -49,6 +52,8 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
   );
 
   PushController? get p => widget.push;
+  late final _preferences =
+      p?.preferences ?? NotificationPreferencesRepository(widget.session);
 
   @override
   void initState() {
@@ -244,6 +249,10 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                         ),
                       ),
                   ],
+                  const SizedBox(height: 24),
+                  NotificationPreferencesPanel(repository: _preferences),
+                  const SizedBox(height: 12),
+                  const NotificationSystemSettingsButton(),
                   const SizedBox(height: 24),
                   Text(
                     AppStrings.of(context)

@@ -3481,4 +3481,120 @@ class AppMessagesEn extends AppMessages {
   @override
   String get storeUpdateOpenFailed =>
       'The store could not be opened. Please try again in a moment.';
+
+  @override
+  String get notificationPreferencesTitle => 'My notifications';
+
+  @override
+  String get notificationPreferencesDescription =>
+      'These choices apply to your account on all your devices. Messages and in-app counters remain available.';
+
+  @override
+  String get notificationMessages => 'Messages';
+
+  @override
+  String get notificationMessagesDescription =>
+      'A new message is waiting for you.';
+
+  @override
+  String get notificationNewMatches => 'New matches';
+
+  @override
+  String get notificationNewMatchesDescription =>
+      'You both want to get to know each other.';
+
+  @override
+  String get notificationContinuations => 'Continuations';
+
+  @override
+  String get notificationContinuationsDescription =>
+      'An invitation to continue or confirmation that you both agreed.';
+
+  @override
+  String get notificationPhotos => 'Photo sharing';
+
+  @override
+  String get notificationPhotosDescription =>
+      'You can now see each other’s photos.';
+
+  @override
+  String get notificationReminders => 'Deadline reminders';
+
+  @override
+  String get notificationRemindersDescription =>
+      'The end of the first period or the upcoming deletion of an inactive conversation.';
+
+  @override
+  String get notificationAccountSecurity => 'Account and security';
+
+  @override
+  String get notificationAccountSecurityDescription =>
+      'A new sign-in, a reply to a request or a payment issue.';
+
+  @override
+  String get notificationDiscreet => 'Discreet notifications';
+
+  @override
+  String get notificationDiscreetDescription =>
+      'Hide first names in every notification, including on the lock screen.';
+
+  @override
+  String get notificationSystemSettings => 'Phone settings';
+
+  @override
+  String get notificationSystemSettingsDescription =>
+      'Phone settings take precedence. On Android, you can also choose sounds and vibrations by category.';
+
+  @override
+  String get notificationSystemSettingsFailed =>
+      'Open your phone settings, then Histae notifications.';
+
+  @override
+  String get notificationSettingsLoading => 'Loading notification settings';
+
+  @override
+  String get notificationSettingsUnavailable =>
+      'These settings are not available yet. Your current choices remain unchanged.';
+
+  @override
+  String get notificationSettingsUnconfirmed =>
+      'We could not confirm the change or load the settings. Check the displayed choice before trying again.';
+
+  @override
+  String get notificationSettingsRetry => 'Try again';
+
+  @override
+  String get notificationSettingsClose => 'Close';
+
+  @override
+  String get notificationConversationTitle => 'Conversation notifications';
+
+  @override
+  String get notificationConversationDescription =>
+      'Mute this conversation on all your devices. Messages and their counter remain available. The other person is not notified.';
+
+  @override
+  String get notificationConversationActive =>
+      'This conversation is not muted. Your category preferences still apply.';
+
+  @override
+  String get notificationMutedIndefinitely =>
+      'Notifications muted until you turn them back on.';
+
+  @override
+  String notificationMutedUntil(String date) {
+    return 'Notifications muted until $date.';
+  }
+
+  @override
+  String get notificationUnmute => 'Unmute conversation';
+
+  @override
+  String get notificationMuteHour => 'Mute for one hour';
+
+  @override
+  String get notificationMuteTomorrow => 'Mute until tomorrow';
+
+  @override
+  String get notificationMuteIndefinitely => 'Mute until I turn alerts back on';
 }

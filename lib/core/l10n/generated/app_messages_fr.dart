@@ -3528,4 +3528,122 @@ class AppMessagesFr extends AppMessages {
   @override
   String get storeUpdateOpenFailed =>
       'Le store n’a pas pu être ouvert. Réessayez dans un instant.';
+
+  @override
+  String get notificationPreferencesTitle => 'Mes notifications';
+
+  @override
+  String get notificationPreferencesDescription =>
+      'Ces choix s’appliquent à votre compte sur tous vos appareils. Les messages et les compteurs dans l’app restent disponibles.';
+
+  @override
+  String get notificationMessages => 'Messages';
+
+  @override
+  String get notificationMessagesDescription =>
+      'Un nouveau message vous attend.';
+
+  @override
+  String get notificationNewMatches => 'Nouvelles rencontres';
+
+  @override
+  String get notificationNewMatchesDescription =>
+      'Vous avez envie de vous découvrir tous les deux.';
+
+  @override
+  String get notificationContinuations => 'Continuations';
+
+  @override
+  String get notificationContinuationsDescription =>
+      'Une invitation à continuer ou la confirmation de vos deux choix.';
+
+  @override
+  String get notificationPhotos => 'Partage des photos';
+
+  @override
+  String get notificationPhotosDescription =>
+      'Vous pouvez désormais voir vos photos.';
+
+  @override
+  String get notificationReminders => 'Rappels d’échéance';
+
+  @override
+  String get notificationRemindersDescription =>
+      'La fin des premiers mots ou la suppression prochaine d’une conversation inactive.';
+
+  @override
+  String get notificationAccountSecurity => 'Compte et sécurité';
+
+  @override
+  String get notificationAccountSecurityDescription =>
+      'Nouvelle connexion, réponse à une démarche ou problème de paiement.';
+
+  @override
+  String get notificationDiscreet => 'Notifications discrètes';
+
+  @override
+  String get notificationDiscreetDescription =>
+      'Masquer les prénoms dans toutes les notifications, y compris sur l’écran verrouillé.';
+
+  @override
+  String get notificationSystemSettings => 'Réglages du téléphone';
+
+  @override
+  String get notificationSystemSettingsDescription =>
+      'Les réglages du téléphone restent prioritaires. Sur Android, vous pouvez aussi choisir le son et les vibrations par catégorie.';
+
+  @override
+  String get notificationSystemSettingsFailed =>
+      'Ouvrez les paramètres du téléphone, puis les notifications de Histae.';
+
+  @override
+  String get notificationSettingsLoading =>
+      'Chargement des réglages de notification';
+
+  @override
+  String get notificationSettingsUnavailable =>
+      'Ces réglages ne sont pas encore disponibles. Vos choix actuels restent inchangés.';
+
+  @override
+  String get notificationSettingsUnconfirmed =>
+      'Nous n’avons pas pu confirmer la modification ou charger les réglages. Vérifiez le choix affiché avant de réessayer.';
+
+  @override
+  String get notificationSettingsRetry => 'Réessayer';
+
+  @override
+  String get notificationSettingsClose => 'Fermer';
+
+  @override
+  String get notificationConversationTitle =>
+      'Notifications de cette conversation';
+
+  @override
+  String get notificationConversationDescription =>
+      'Coupez les alertes de cette conversation sur tous vos appareils. Les messages et leur compteur restent disponibles. L’autre personne n’est pas prévenue.';
+
+  @override
+  String get notificationConversationActive =>
+      'Cette conversation n’est pas en sourdine. Vos choix par catégorie continuent de s’appliquer.';
+
+  @override
+  String get notificationMutedIndefinitely =>
+      'Notifications coupées jusqu’à réactivation.';
+
+  @override
+  String notificationMutedUntil(String date) {
+    return 'Notifications coupées jusqu’au $date.';
+  }
+
+  @override
+  String get notificationUnmute => 'Réactiver les alertes';
+
+  @override
+  String get notificationMuteHour => 'Couper pendant une heure';
+
+  @override
+  String get notificationMuteTomorrow => 'Couper jusqu’à demain';
+
+  @override
+  String get notificationMuteIndefinitely => 'Couper jusqu’à réactivation';
 }

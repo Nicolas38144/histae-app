@@ -8,15 +8,19 @@ import io.flutter.embedding.engine.FlutterEngine
 
 class MainActivity : FlutterActivity() {
     private var storeUpdates: StoreUpdateBridge? = null
+    private var notificationSettings: NotificationSettingsBridge? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         storeUpdates = StoreUpdateBridge(this, flutterEngine.dartExecutor.binaryMessenger)
+        notificationSettings = NotificationSettingsBridge(this, flutterEngine.dartExecutor.binaryMessenger)
     }
 
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
         storeUpdates?.dispose()
         storeUpdates = null
+        notificationSettings?.dispose()
+        notificationSettings = null
         super.cleanUpFlutterEngine(flutterEngine)
     }
 

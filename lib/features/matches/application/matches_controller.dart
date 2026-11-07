@@ -12,6 +12,7 @@ import '../../auth/domain/authenticated_session.dart';
 import '../../continuation/application/continuation_controller.dart';
 import '../../continuation/application/match_access.dart';
 import '../../drafts/application/draft_controller.dart';
+import '../../notifications/data/notification_preferences_repository.dart';
 import '../data/match_models.dart';
 import '../data/matches_repository.dart';
 import '../data/realtime_client.dart';
@@ -38,6 +39,9 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     };
   }
   final MatchesRepository repository;
+  late final notificationPreferences = NotificationPreferencesRepository(
+    session,
+  );
   final DraftController? drafts;
   final thumbnails = PrivatePhotoCache();
 
@@ -244,6 +248,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     _key = session.resourceKey;
     _localeRevision = session.localizationRevision;
     privacyEpoch++;
+    notificationPreferences.clear();
     suspend();
     _items.clear();
     _photoBarriers.clear();
@@ -947,6 +952,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
 
   @override
   void dispose() {
+    notificationPreferences.clear();
     thumbnails.dispose();
     _continuation?.dispose();
     _disposed = true;

@@ -11,6 +11,7 @@ import '../../../core/network/retry_after.dart';
 import '../../auth/domain/authenticated_session.dart';
 import '../data/device_repository.dart';
 import '../data/notification_models.dart';
+import '../data/notification_preferences_repository.dart';
 import '../data/push_gateway.dart';
 import '../data/push_vault.dart';
 
@@ -65,6 +66,7 @@ class PushController extends ChangeNotifier {
   final DeviceRepository repository;
   final PushGateway gateway;
   final PushVault vault;
+  late final preferences = NotificationPreferencesRepository(session);
   final Future<String?> Function() _appVersion;
   final bool autoEnable;
 
@@ -212,6 +214,7 @@ class PushController extends ChangeNotifier {
       return;
     }
     if (!accessible || (_key != null && _key != newKey)) {
+      preferences.clear();
       final temporary =
           session.hasSession &&
           session.phase == SessionPhase.unavailable &&
@@ -690,6 +693,7 @@ class PushController extends ChangeNotifier {
 
   @override
   void dispose() {
+    preferences.clear();
     _disposed = true;
     _epoch++;
     _scope.cancel();

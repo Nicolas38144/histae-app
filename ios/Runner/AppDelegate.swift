@@ -24,6 +24,12 @@ import firebase_messaging
         // Called only after notification activation and the system grant.
         UIApplication.shared.registerForRemoteNotifications()
         result(nil)
+      } else if call.method == "openNotificationSettings" {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else {
+          result(false)
+          return
+        }
+        UIApplication.shared.open(url, options: [:]) { opened in result(opened) }
       } else {
         result(FlutterMethodNotImplemented)
       }

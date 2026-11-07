@@ -5803,6 +5803,204 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Le store n’a pas pu être ouvert. Réessayez dans un instant.'**
   String get storeUpdateOpenFailed;
+
+  /// No description provided for @notificationPreferencesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mes notifications'**
+  String get notificationPreferencesTitle;
+
+  /// No description provided for @notificationPreferencesDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ces choix s’appliquent à votre compte sur tous vos appareils. Les messages et les compteurs dans l’app restent disponibles.'**
+  String get notificationPreferencesDescription;
+
+  /// No description provided for @notificationMessages.
+  ///
+  /// In fr, this message translates to:
+  /// **'Messages'**
+  String get notificationMessages;
+
+  /// No description provided for @notificationMessagesDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un nouveau message vous attend.'**
+  String get notificationMessagesDescription;
+
+  /// No description provided for @notificationNewMatches.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelles rencontres'**
+  String get notificationNewMatches;
+
+  /// No description provided for @notificationNewMatchesDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous avez envie de vous découvrir tous les deux.'**
+  String get notificationNewMatchesDescription;
+
+  /// No description provided for @notificationContinuations.
+  ///
+  /// In fr, this message translates to:
+  /// **'Continuations'**
+  String get notificationContinuations;
+
+  /// No description provided for @notificationContinuationsDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une invitation à continuer ou la confirmation de vos deux choix.'**
+  String get notificationContinuationsDescription;
+
+  /// No description provided for @notificationPhotos.
+  ///
+  /// In fr, this message translates to:
+  /// **'Partage des photos'**
+  String get notificationPhotos;
+
+  /// No description provided for @notificationPhotosDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous pouvez désormais voir vos photos.'**
+  String get notificationPhotosDescription;
+
+  /// No description provided for @notificationReminders.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rappels d’échéance'**
+  String get notificationReminders;
+
+  /// No description provided for @notificationRemindersDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'La fin des premiers mots ou la suppression prochaine d’une conversation inactive.'**
+  String get notificationRemindersDescription;
+
+  /// No description provided for @notificationAccountSecurity.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte et sécurité'**
+  String get notificationAccountSecurity;
+
+  /// No description provided for @notificationAccountSecurityDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle connexion, réponse à une démarche ou problème de paiement.'**
+  String get notificationAccountSecurityDescription;
+
+  /// No description provided for @notificationDiscreet.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notifications discrètes'**
+  String get notificationDiscreet;
+
+  /// No description provided for @notificationDiscreetDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Masquer les prénoms dans toutes les notifications, y compris sur l’écran verrouillé.'**
+  String get notificationDiscreetDescription;
+
+  /// No description provided for @notificationSystemSettings.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réglages du téléphone'**
+  String get notificationSystemSettings;
+
+  /// No description provided for @notificationSystemSettingsDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les réglages du téléphone restent prioritaires. Sur Android, vous pouvez aussi choisir le son et les vibrations par catégorie.'**
+  String get notificationSystemSettingsDescription;
+
+  /// No description provided for @notificationSystemSettingsFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ouvrez les paramètres du téléphone, puis les notifications de Histae.'**
+  String get notificationSystemSettingsFailed;
+
+  /// No description provided for @notificationSettingsLoading.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chargement des réglages de notification'**
+  String get notificationSettingsLoading;
+
+  /// No description provided for @notificationSettingsUnavailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ces réglages ne sont pas encore disponibles. Vos choix actuels restent inchangés.'**
+  String get notificationSettingsUnavailable;
+
+  /// No description provided for @notificationSettingsUnconfirmed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous n’avons pas pu confirmer la modification ou charger les réglages. Vérifiez le choix affiché avant de réessayer.'**
+  String get notificationSettingsUnconfirmed;
+
+  /// No description provided for @notificationSettingsRetry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer'**
+  String get notificationSettingsRetry;
+
+  /// No description provided for @notificationSettingsClose.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fermer'**
+  String get notificationSettingsClose;
+
+  /// No description provided for @notificationConversationTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notifications de cette conversation'**
+  String get notificationConversationTitle;
+
+  /// No description provided for @notificationConversationDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Coupez les alertes de cette conversation sur tous vos appareils. Les messages et leur compteur restent disponibles. L’autre personne n’est pas prévenue.'**
+  String get notificationConversationDescription;
+
+  /// No description provided for @notificationConversationActive.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette conversation n’est pas en sourdine. Vos choix par catégorie continuent de s’appliquer.'**
+  String get notificationConversationActive;
+
+  /// No description provided for @notificationMutedIndefinitely.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notifications coupées jusqu’à réactivation.'**
+  String get notificationMutedIndefinitely;
+
+  /// No description provided for @notificationMutedUntil.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notifications coupées jusqu’au {date}.'**
+  String notificationMutedUntil(String date);
+
+  /// No description provided for @notificationUnmute.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réactiver les alertes'**
+  String get notificationUnmute;
+
+  /// No description provided for @notificationMuteHour.
+  ///
+  /// In fr, this message translates to:
+  /// **'Couper pendant une heure'**
+  String get notificationMuteHour;
+
+  /// No description provided for @notificationMuteTomorrow.
+  ///
+  /// In fr, this message translates to:
+  /// **'Couper jusqu’à demain'**
+  String get notificationMuteTomorrow;
+
+  /// No description provided for @notificationMuteIndefinitely.
+  ///
+  /// In fr, this message translates to:
+  /// **'Couper jusqu’à réactivation'**
+  String get notificationMuteIndefinitely;
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

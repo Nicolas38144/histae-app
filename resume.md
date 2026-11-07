@@ -91,6 +91,13 @@ Push needs platform configuration, permission and API registration. OS alerts ar
 delivery; open-app messages/counters use realtime state. Removing a push device does not revoke
 its login session. Support opens the email app using `SUPPORT_EMAIL`.
 
+Account notification choices cover messages, matches, continuations, photo sharing, deadlines and
+account/security events. Discreet display hides first names. The chat menu can mute one conversation
+for an hour, until tomorrow's local midnight or indefinitely; unread counters remain available.
+These choices persist across devices in the API and never override device permission/opt-outs.
+Android exposes matching system channels for sound/vibration; iOS opens app settings. There are no
+scheduled quiet hours. The matching API migration and worker deployment are required.
+
 Privacy groups documents, choices, sessions, devices, blocks, correction requests, export and
 deletion. Requests require a precise description and do not immediately modify data. Exports use
 temporary files and explicit sharing; external copies cannot be recalled. Confirmed deletion

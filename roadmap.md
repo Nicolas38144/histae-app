@@ -26,6 +26,7 @@ Android build and environment; iOS remains pending.
 | iOS | macOS build/signing, Keychain, launch, permissions, sharing, portrait and enabled providers |
 | Privacy | Complete the checks below using test accounts |
 | New push events | API checks and real-device delivery of the six new events, names and private destinations |
+| Notification choices | Deploy the matching API migration/worker; verify six categories, private mutes/expiry, cross-device choices, discreet display and Android channel settings on devices |
 
 Record environment, app/API versions, result and outstanding issues. Include loading, empty,
 failure, uncertain-result and access-loss cases according to risk. Mock tests and local builds
