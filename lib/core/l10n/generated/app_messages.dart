@@ -2682,56 +2682,14 @@ abstract class AppMessages {
   /// Interface: lib/features/notifications/presentation/devices_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Recevoir des notifications ?'**
-  String get devicesPageReceiveNotifications;
-
-  /// Interface: lib/features/notifications/presentation/devices_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Autorisez Histae à vous prévenir sur cet appareil. Vous pourrez désactiver les notifications ici à tout moment.'**
-  String get devicesPageHistaeWillAskForSystemPermission;
-
-  /// Interface: lib/features/notifications/presentation/devices_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Continuer'**
-  String get devicesPageContinue;
-
-  /// Interface: lib/features/notifications/presentation/devices_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Reprendre cet enregistrement'**
   String get devicesPageResumeThisRegistration;
 
   /// Interface: lib/features/notifications/presentation/devices_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Activer les notifications'**
-  String get devicesPageEnableNotifications;
-
-  /// Interface: lib/features/notifications/presentation/devices_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Arrêter les notifications ici ?'**
-  String get devicesPageStopNotificationsHere;
-
-  /// Interface: lib/features/notifications/presentation/devices_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Cet appareil sera retiré du service de notification. Votre session de connexion reste ouverte.'**
-  String get devicesPageThisDeviceWillBeRemovedFrom;
-
-  /// Interface: lib/features/notifications/presentation/devices_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Arrêter'**
   String get devicesPageStop;
-
-  /// Interface: lib/features/notifications/presentation/devices_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Arrêter les notifications sur cet appareil'**
-  String get devicesPageStopNotificationsOnThisDevice;
 
   /// Interface: lib/features/notifications/presentation/devices_page.dart
   ///
@@ -5780,12 +5738,6 @@ abstract class AppMessages {
   /// **'Ouvrir le store'**
   String get storeUpdateOpen;
 
-  /// No description provided for @storeUpdateCheck.
-  ///
-  /// In fr, this message translates to:
-  /// **'Vérifier à nouveau'**
-  String get storeUpdateCheck;
-
   /// No description provided for @storeUpdateOpenFailed.
   ///
   /// In fr, this message translates to:
@@ -6085,6 +6037,12 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Reprendre l’envoi'**
   String get photoCropResumeUpload;
+
+  /// No description provided for @devicesPageReceiveAlerts.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recevoir les notifications'**
+  String get devicesPageReceiveAlerts;
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

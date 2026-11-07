@@ -24,10 +24,7 @@ void main() {
         }
         if (r.url.path == '/api/users/me') {
           return jsonResponse({
-            ...ownerJson(
-              bio: 'Ma bio encore en validation.',
-              photo: 'https://storage.example/private-photo',
-            ),
+            ...ownerJson(bio: 'Ma bio encore en validation.', photo: null),
             'moderation': {
               'bio': {'status': 'pending', 'reasons': <Object?>[]},
               'photo': {'status': 'approved', 'reasons': <Object?>[]},

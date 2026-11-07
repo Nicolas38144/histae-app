@@ -1633,36 +1633,11 @@ class AppMessagesFr extends AppMessages {
       'Cet appareil a été retiré de votre compte. Il ne sera pas réenregistré automatiquement.';
 
   @override
-  String get devicesPageReceiveNotifications => 'Recevoir des notifications ?';
-
-  @override
-  String get devicesPageHistaeWillAskForSystemPermission =>
-      'Autorisez Histae à vous prévenir sur cet appareil. Vous pourrez désactiver les notifications ici à tout moment.';
-
-  @override
-  String get devicesPageContinue => 'Continuer';
-
-  @override
   String get devicesPageResumeThisRegistration =>
       'Reprendre cet enregistrement';
 
   @override
-  String get devicesPageEnableNotifications => 'Activer les notifications';
-
-  @override
-  String get devicesPageStopNotificationsHere =>
-      'Arrêter les notifications ici ?';
-
-  @override
-  String get devicesPageThisDeviceWillBeRemovedFrom =>
-      'Cet appareil sera retiré du service de notification. Votre session de connexion reste ouverte.';
-
-  @override
   String get devicesPageStop => 'Arrêter';
-
-  @override
-  String get devicesPageStopNotificationsOnThisDevice =>
-      'Arrêter les notifications sur cet appareil';
 
   @override
   String get devicesPageYourRegisteredDevices => 'Vos appareils enregistrés';
@@ -3514,9 +3489,6 @@ class AppMessagesFr extends AppMessages {
   String get storeUpdateOpen => 'Ouvrir le store';
 
   @override
-  String get storeUpdateCheck => 'Vérifier à nouveau';
-
-  @override
   String get storeUpdateOpenFailed =>
       'Le store n’a pas pu être ouvert. Réessayez dans un instant.';
 
@@ -3689,4 +3661,7 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get photoCropResumeUpload => 'Reprendre l’envoi';
+
+  @override
+  String get devicesPageReceiveAlerts => 'Recevoir les notifications';
 }

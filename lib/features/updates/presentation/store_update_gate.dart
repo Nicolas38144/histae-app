@@ -77,11 +77,6 @@ class _UpdatePage extends StatelessWidget {
                     icon: const Icon(Icons.open_in_new_rounded),
                     label: Text(text.storeUpdateOpen),
                   ),
-                  const SizedBox(height: 12),
-                  HistaeButton.text(
-                    onPressed: controller.checking ? null : controller.check,
-                    child: Text(text.storeUpdateCheck),
-                  ),
                   if (controller.openFailed) ...[
                     const SizedBox(height: 12),
                     Text(

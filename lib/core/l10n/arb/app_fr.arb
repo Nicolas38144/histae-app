@@ -1865,40 +1865,12 @@
   "@devicesPageThisDeviceWasRemovedFromYour": {
     "description": "Interface: lib/features/notifications/presentation/devices_page.dart"
   },
-  "devicesPageReceiveNotifications": "Recevoir des notifications ?",
-  "@devicesPageReceiveNotifications": {
-    "description": "Interface: lib/features/notifications/presentation/devices_page.dart"
-  },
-  "devicesPageHistaeWillAskForSystemPermission": "Autorisez Histae à vous prévenir sur cet appareil. Vous pourrez désactiver les notifications ici à tout moment.",
-  "@devicesPageHistaeWillAskForSystemPermission": {
-    "description": "Interface: lib/features/notifications/presentation/devices_page.dart"
-  },
-  "devicesPageContinue": "Continuer",
-  "@devicesPageContinue": {
-    "description": "Interface: lib/features/notifications/presentation/devices_page.dart"
-  },
   "devicesPageResumeThisRegistration": "Reprendre cet enregistrement",
   "@devicesPageResumeThisRegistration": {
     "description": "Interface: lib/features/notifications/presentation/devices_page.dart"
   },
-  "devicesPageEnableNotifications": "Activer les notifications",
-  "@devicesPageEnableNotifications": {
-    "description": "Interface: lib/features/notifications/presentation/devices_page.dart"
-  },
-  "devicesPageStopNotificationsHere": "Arrêter les notifications ici ?",
-  "@devicesPageStopNotificationsHere": {
-    "description": "Interface: lib/features/notifications/presentation/devices_page.dart"
-  },
-  "devicesPageThisDeviceWillBeRemovedFrom": "Cet appareil sera retiré du service de notification. Votre session de connexion reste ouverte.",
-  "@devicesPageThisDeviceWillBeRemovedFrom": {
-    "description": "Interface: lib/features/notifications/presentation/devices_page.dart"
-  },
   "devicesPageStop": "Arrêter",
   "@devicesPageStop": {
-    "description": "Interface: lib/features/notifications/presentation/devices_page.dart"
-  },
-  "devicesPageStopNotificationsOnThisDevice": "Arrêter les notifications sur cet appareil",
-  "@devicesPageStopNotificationsOnThisDevice": {
     "description": "Interface: lib/features/notifications/presentation/devices_page.dart"
   },
   "devicesPageYourRegisteredDevices": "Vos appareils enregistrés",
@@ -4075,7 +4047,6 @@
   "storeUpdateTitle": "Une mise à jour vous attend.",
   "storeUpdateBody": "Une nouvelle version de Histae est disponible. Mettez l’application à jour pour continuer.",
   "storeUpdateOpen": "Ouvrir le store",
-  "storeUpdateCheck": "Vérifier à nouveau",
   "storeUpdateOpenFailed": "Le store n’a pas pu être ouvert. Réessayez dans un instant.",
   "notificationPreferencesTitle": "Mes notifications",
   "notificationPreferencesDescription": "Ces choix s’appliquent à votre compte sur tous vos appareils. Les messages et les compteurs dans l’app restent disponibles.",
@@ -4139,5 +4110,6 @@
   "photoCropBack": "Revenir au choix de la photo",
   "photoCropSelectionReady": "Votre nouvelle photo n’est pas encore enregistrée.",
   "photoCropSavePhoto": "Enregistrer ma photo",
-  "photoCropResumeUpload": "Reprendre l’envoi"
+  "photoCropResumeUpload": "Reprendre l’envoi",
+  "devicesPageReceiveAlerts": "Recevoir les notifications"
 }

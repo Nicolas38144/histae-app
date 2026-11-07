@@ -36,6 +36,8 @@ rotation/reset and a live circular avatar preview. Confirming stages the framed 
 Save uploads it. Processing strips metadata and bounds decoded dimensions and final JPEG size.
 Cancelling preserves an earlier staged choice; replacement affects authorized reveals.
 The owner preview reuses public components without inventing a distance or partner photo.
+It also shows the owner's private photo above the text, with a small reminder that the photo stays
+out of the actual feed. Expired owner-photo links renew only the profile resource.
 
 Readiness explains missing steps. Requesting location obtains one fresh position, with no
 background tracking. Expired presence hides old candidates and refreshes readiness once;

@@ -429,15 +429,8 @@
   "devicesPageTheSystemAllowsQuietNotifications": "Il sistema consente notifiche silenziose.",
   "devicesPageTheSystemDidNotAllowNotifications": "Il sistema non ha autorizzato le notifiche. Puoi modificare il permesso nelle impostazioni del dispositivo.",
   "devicesPageThisDeviceWasRemovedFromYour": "Il dispositivo è stato rimosso dall’account. Non verrà registrato di nuovo automaticamente.",
-  "devicesPageReceiveNotifications": "Ricevere notifiche?",
-  "devicesPageHistaeWillAskForSystemPermission": "Consentite a Histae di avvisarvi su questo dispositivo. Potete disattivare le notifiche qui in qualsiasi momento.",
-  "devicesPageContinue": "Continua",
   "devicesPageResumeThisRegistration": "Riprendi questa registrazione",
-  "devicesPageEnableNotifications": "Attiva le notifiche",
-  "devicesPageStopNotificationsHere": "Disattivare le notifiche qui?",
-  "devicesPageThisDeviceWillBeRemovedFrom": "Il dispositivo verrà rimosso dal servizio notifiche. La sessione di accesso resta aperta.",
   "devicesPageStop": "Disattiva",
-  "devicesPageStopNotificationsOnThisDevice": "Disattiva le notifiche su questo dispositivo",
   "devicesPageYourRegisteredDevices": "I tuoi dispositivi registrati",
   "devicesPageThisListIsForNotificationsRemoving": "Questo elenco riguarda le notifiche. Rimuovere un dispositivo non chiude la sessione di accesso; le sessioni si gestiscono separatamente.",
   "devicesPageRefreshingDevices": "Aggiornamento dei dispositivi",
@@ -1084,7 +1077,6 @@
   "storeUpdateTitle": "È disponibile un aggiornamento.",
   "storeUpdateBody": "È disponibile una nuova versione di Histae. Aggiorna l’app per continuare.",
   "storeUpdateOpen": "Apri lo store",
-  "storeUpdateCheck": "Controlla di nuovo",
   "storeUpdateOpenFailed": "Impossibile aprire lo store. Riprova tra poco.",
   "notificationPreferencesTitle": "Le mie notifiche",
   "notificationPreferencesDescription": "Queste scelte si applicano al tuo account su tutti i dispositivi. I messaggi e i contatori nell’app restano disponibili.",
@@ -1134,5 +1126,6 @@
   "photoCropBack": "Torna alla scelta della foto",
   "photoCropSelectionReady": "La nuova foto non è ancora stata salvata.",
   "photoCropSavePhoto": "Salva la mia foto",
-  "photoCropResumeUpload": "Riprendi l’invio"
+  "photoCropResumeUpload": "Riprendi l’invio",
+  "devicesPageReceiveAlerts": "Ricevi notifiche"
 }

@@ -52,6 +52,17 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
   );
 
   PushController? get p => widget.push;
+  Future<void> _setNotifications(bool value) async {
+    final push = p;
+    if (push == null) return;
+    if (value) {
+      await push.enable();
+    } else {
+      await push.disable();
+    }
+    if (mounted) await c.load();
+  }
+
   late final _preferences =
       p?.preferences ?? NotificationPreferencesRepository(widget.session);
 
@@ -179,73 +190,35 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                         AppStrings.of(context).messages
                             .appStringsTryAgainInS(p!.retrySeconds),
                       ),
-                    if ((!p!.enabled ||
-                            p!.pending != null ||
-                            p!.deviceId == null ||
-                            p!.failure != null) &&
-                        !p!.stopping)
-                      HistaeButton(
+                    SwitchListTile.adaptive(
+                      key: const Key('device-notifications-switch'),
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        AppStrings.of(context)
+                            .messages
+                            .devicesPageReceiveAlerts,
+                      ),
+                      value: p!.enabled,
+                      onChanged: enabled && p!.active && p!.retrySeconds == 0
+                          ? _setNotifications
+                          : null,
+                    ),
+                    if (p!.stopping ||
+                        p!.pending != null ||
+                        p!.failure != null ||
+                        (p!.enabled && p!.deviceId == null))
+                      HistaeButton.text(
                         onPressed: enabled && p!.retrySeconds == 0
-                            ? () async {
-                                if (!await confirmAction(
-                                      context,
-                                      AppStrings.of(context)
-                                          .messages
-                                          .devicesPageReceiveNotifications,
-                                      AppStrings.of(context)
-                                          .messages
-                                          .devicesPageHistaeWillAskForSystemPermission,
-                                      action: p!.pending == null
-                                          ? AppStrings.of(context)
-                                                .messages
-                                                .devicesPageContinue
-                                          : AppStrings.of(context)
-                                                .messages
-                                                .devicesPageResumeThisRegistration,
-                                    ) ||
-                                    !mounted) {
-                                  return;
-                                }
-                                await p!.enable();
-                                if (mounted) await c.load();
-                              }
+                            ? () => _setNotifications(!p!.stopping)
                             : null,
                         child: Text(
-                          p!.pending == null
+                          p!.stopping
                               ? AppStrings.of(context)
                                     .messages
-                                    .devicesPageEnableNotifications
+                                    .devicesPageResumeThisRemoval
                               : AppStrings.of(context)
                                     .messages
                                     .devicesPageResumeThisRegistration,
-                        ),
-                      ),
-                    if (p!.enabled || p!.deviceId != null || p!.stopping)
-                      HistaeButton.outlined(
-                        onPressed: enabled
-                            ? () async {
-                                if (await confirmAction(
-                                      context,
-                                      AppStrings.of(context)
-                                          .messages
-                                          .devicesPageStopNotificationsHere,
-                                      AppStrings.of(context)
-                                          .messages
-                                          .devicesPageThisDeviceWillBeRemovedFrom,
-                                      action: AppStrings.of(context)
-                                          .messages
-                                          .devicesPageStop,
-                                    ) &&
-                                    mounted) {
-                                  await p!.disable();
-                                  if (mounted) await c.load();
-                                }
-                              }
-                            : null,
-                        child: Text(
-                          AppStrings.of(context)
-                              .messages
-                              .devicesPageStopNotificationsOnThisDevice,
                         ),
                       ),
                   ],
@@ -304,6 +277,7 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                             .devicesPageNoDevicesRegisteredForNotifications,
                       ),
                     ),
+                  if (c.devices.isNotEmpty) const SizedBox(height: 16),
                   for (final device in c.devices)
                     Card(
                       child: Padding(

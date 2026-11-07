@@ -1617,34 +1617,10 @@ class AppMessagesEn extends AppMessages {
       'This device was removed from your account. It will not be registered again automatically.';
 
   @override
-  String get devicesPageReceiveNotifications => 'Receive notifications?';
-
-  @override
-  String get devicesPageHistaeWillAskForSystemPermission =>
-      'Allow Histae to notify you on this device. You can turn notifications off here at any time.';
-
-  @override
-  String get devicesPageContinue => 'Continue';
-
-  @override
   String get devicesPageResumeThisRegistration => 'Resume this registration';
 
   @override
-  String get devicesPageEnableNotifications => 'Enable notifications';
-
-  @override
-  String get devicesPageStopNotificationsHere => 'Stop notifications here?';
-
-  @override
-  String get devicesPageThisDeviceWillBeRemovedFrom =>
-      'This device will be removed from the notification service. Your sign-in session stays open.';
-
-  @override
   String get devicesPageStop => 'Stop';
-
-  @override
-  String get devicesPageStopNotificationsOnThisDevice =>
-      'Stop notifications on this device';
 
   @override
   String get devicesPageYourRegisteredDevices => 'Your registered devices';
@@ -3468,9 +3444,6 @@ class AppMessagesEn extends AppMessages {
   String get storeUpdateOpen => 'Open the store';
 
   @override
-  String get storeUpdateCheck => 'Check again';
-
-  @override
   String get storeUpdateOpenFailed =>
       'The store could not be opened. Please try again in a moment.';
 
@@ -3641,4 +3614,7 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get photoCropResumeUpload => 'Resume upload';
+
+  @override
+  String get devicesPageReceiveAlerts => 'Receive notifications';
 }

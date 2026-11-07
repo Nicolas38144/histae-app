@@ -1635,36 +1635,11 @@ class AppMessagesIt extends AppMessages {
       'Il dispositivo è stato rimosso dall’account. Non verrà registrato di nuovo automaticamente.';
 
   @override
-  String get devicesPageReceiveNotifications => 'Ricevere notifiche?';
-
-  @override
-  String get devicesPageHistaeWillAskForSystemPermission =>
-      'Consentite a Histae di avvisarvi su questo dispositivo. Potete disattivare le notifiche qui in qualsiasi momento.';
-
-  @override
-  String get devicesPageContinue => 'Continua';
-
-  @override
   String get devicesPageResumeThisRegistration =>
       'Riprendi questa registrazione';
 
   @override
-  String get devicesPageEnableNotifications => 'Attiva le notifiche';
-
-  @override
-  String get devicesPageStopNotificationsHere =>
-      'Disattivare le notifiche qui?';
-
-  @override
-  String get devicesPageThisDeviceWillBeRemovedFrom =>
-      'Il dispositivo verrà rimosso dal servizio notifiche. La sessione di accesso resta aperta.';
-
-  @override
   String get devicesPageStop => 'Disattiva';
-
-  @override
-  String get devicesPageStopNotificationsOnThisDevice =>
-      'Disattiva le notifiche su questo dispositivo';
 
   @override
   String get devicesPageYourRegisteredDevices =>
@@ -3515,9 +3490,6 @@ class AppMessagesIt extends AppMessages {
   String get storeUpdateOpen => 'Apri lo store';
 
   @override
-  String get storeUpdateCheck => 'Controlla di nuovo';
-
-  @override
   String get storeUpdateOpenFailed =>
       'Impossibile aprire lo store. Riprova tra poco.';
 
@@ -3689,4 +3661,7 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get photoCropResumeUpload => 'Riprendi l’invio';
+
+  @override
+  String get devicesPageReceiveAlerts => 'Ricevi notifiche';
 }

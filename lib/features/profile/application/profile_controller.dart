@@ -95,6 +95,7 @@ class ProfileController extends ChangeNotifier {
       if (_localeRevision != session.localizationRevision) {
         _localeRevision = session.localizationRevision;
         _readRevision++;
+        _photoRefresh = null;
         _scope.cancel();
         _scope = RequestCancellation();
         loading = false;
@@ -106,6 +107,7 @@ class ProfileController extends ChangeNotifier {
     _key = session.resourceKey;
     _localeRevision = session.localizationRevision;
     _generation++;
+    _photoRefresh = null;
     _scope.cancel();
     _scope = RequestCancellation();
     profile = null;
@@ -137,6 +139,51 @@ class ProfileController extends ChangeNotifier {
   }
 
   Future<void> ensureLoaded() => load(policy: ReadPolicy.cached);
+
+  Future<void>? _photoRefresh;
+
+  /// Renew an expired owner-photo URL without reloading answers or preferences.
+  Future<void> refreshPhotoPreview() {
+    if (_photoRefresh case final pending?) return pending;
+    if (!accessible || loading || saving || retrySeconds > 0) {
+      return Future.value();
+    }
+    final generation = _generation,
+        revision = _readRevision,
+        photo = photoRevision;
+    final scope = _scope;
+    final task = () async {
+      try {
+        final value = await repository.profile(
+          scope,
+          policy: ReadPolicy.refresh,
+        );
+        if (!accessible ||
+            generation != _generation ||
+            revision != _readRevision ||
+            photo != photoRevision ||
+            saving ||
+            scope.isCancelled) {
+          return;
+        }
+        profile = value;
+        photoReadAt = repository.profileReadAt;
+        _notify();
+      } on ApiFailure catch (error) {
+        if (accessible && generation == _generation && !scope.isCancelled) {
+          _cooldown(error);
+          if (error.kind == ApiFailureKind.consentRequired) {
+            unawaited(session.synchronize());
+          }
+        }
+        rethrow;
+      }
+    }();
+    _photoRefresh = task;
+    return task.whenComplete(() {
+      if (identical(_photoRefresh, task)) _photoRefresh = null;
+    });
+  }
 
   Future<void> load({ReadPolicy policy = ReadPolicy.refresh}) async {
     if (_disposed || !accessible || loading || saving || retrySeconds > 0) {

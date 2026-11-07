@@ -26,7 +26,7 @@ Android build and environment; iOS remains pending.
 | iOS | macOS build/signing, Keychain, launch, permissions, sharing, portrait and enabled providers |
 | Privacy | Complete the checks below using test accounts |
 | New push events | API checks and real-device delivery of the six new events, names and private destinations |
-| Notification choices | Deploy the matching API migration/worker; verify six categories, private mutes/expiry, cross-device choices, discreet display and Android channel settings on devices |
+| Notification choices | Owner confirmed notifications work after API deployment on 2026-11-07; verify private mutes/expiry, cross-device choices, discreet display and Android channel settings on devices |
 | Message recovery | Simulations cover lost responses, process restart, reconnect and stable composer; verify real Wi-Fi/mobile switching, airplane mode and OS termination during send on devices |
 
 Record environment, app/API versions, result and outstanding issues. Include loading, empty,

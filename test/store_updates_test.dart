@@ -57,6 +57,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(c.blocked, isTrue);
       expect(find.byKey(const Key('store-update-open')), findsOneWidget);
+      expect(find.text('Vérifier à nouveau'), findsNothing);
       expect(find.byType(TextField), findsOneWidget);
       expect(draft.text, 'Un brouillon à garder');
       await tester.tapAt(tester.getCenter(find.text('Underlying action')));

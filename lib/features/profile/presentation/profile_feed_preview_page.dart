@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/network/signed_photo_loader.dart';
 import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../discovery/presentation/feed_profile_content.dart';
 import '../application/profile_controller.dart';
+import 'profile_owner_photo.dart';
 
 class ProfileFeedPreviewPage extends StatefulWidget {
-  const ProfileFeedPreviewPage({super.key, required this.controller});
+  const ProfileFeedPreviewPage({
+    super.key,
+    required this.controller,
+    this.photoClient,
+  });
   final ProfileController controller;
+  final PhotoClientFactory? photoClient;
 
   @override
   State<ProfileFeedPreviewPage> createState() => _ProfileFeedPreviewPageState();
@@ -48,10 +55,16 @@ class _ProfileFeedPreviewPageState extends State<ProfileFeedPreviewPage> {
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
                 const SizedBox(height: 12),
+                if (preview != null && c.profile?.photo != null)
+                  ProfileOwnerPhoto(
+                    controller: c,
+                    photoClient: widget.photoClient,
+                  ),
                 Text(
                   AppStrings.of(context)
                       .messages
                       .profileFeedPreviewPageTheseAreThePartsOfYour,
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
                 const SizedBox(height: 20),
                 if (c.loading)

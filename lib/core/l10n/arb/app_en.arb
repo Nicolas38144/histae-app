@@ -429,15 +429,8 @@
   "devicesPageTheSystemAllowsQuietNotifications": "The system allows quiet notifications.",
   "devicesPageTheSystemDidNotAllowNotifications": "The system did not allow notifications. You can change this permission in device settings.",
   "devicesPageThisDeviceWasRemovedFromYour": "This device was removed from your account. It will not be registered again automatically.",
-  "devicesPageReceiveNotifications": "Receive notifications?",
-  "devicesPageHistaeWillAskForSystemPermission": "Allow Histae to notify you on this device. You can turn notifications off here at any time.",
-  "devicesPageContinue": "Continue",
   "devicesPageResumeThisRegistration": "Resume this registration",
-  "devicesPageEnableNotifications": "Enable notifications",
-  "devicesPageStopNotificationsHere": "Stop notifications here?",
-  "devicesPageThisDeviceWillBeRemovedFrom": "This device will be removed from the notification service. Your sign-in session stays open.",
   "devicesPageStop": "Stop",
-  "devicesPageStopNotificationsOnThisDevice": "Stop notifications on this device",
   "devicesPageYourRegisteredDevices": "Your registered devices",
   "devicesPageThisListIsForNotificationsRemoving": "This list is for notifications. Removing a device does not close its sign-in session; sessions are managed separately.",
   "devicesPageRefreshingDevices": "Refreshing devices",
@@ -1084,7 +1077,6 @@
   "storeUpdateTitle": "An update is ready.",
   "storeUpdateBody": "A new version of Histae is available. Update the app to continue.",
   "storeUpdateOpen": "Open the store",
-  "storeUpdateCheck": "Check again",
   "storeUpdateOpenFailed": "The store could not be opened. Please try again in a moment.",
   "notificationPreferencesTitle": "My notifications",
   "notificationPreferencesDescription": "These choices apply to your account on all your devices. Messages and in-app counters remain available.",
@@ -1134,5 +1126,6 @@
   "photoCropBack": "Back to photo selection",
   "photoCropSelectionReady": "Your new photo has not been saved yet.",
   "photoCropSavePhoto": "Save my photo",
-  "photoCropResumeUpload": "Resume upload"
+  "photoCropResumeUpload": "Resume upload",
+  "devicesPageReceiveAlerts": "Receive notifications"
 }
