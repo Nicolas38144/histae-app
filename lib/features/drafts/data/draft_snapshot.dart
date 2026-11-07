@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import '../../../core/network/json_fields.dart';
+import '../../matches/data/match_models.dart';
 import 'saved_answer_draft.dart';
 
 class DraftSnapshot {
@@ -7,12 +9,15 @@ class DraftSnapshot {
     required this.owner,
     required Map<String, String> messages,
     required List<SavedAnswerDraft>? answers,
+    List<MessageIntent> pending = const [],
   }) : messages = Map.unmodifiable(messages),
-       answers = answers == null ? null : List.unmodifiable(answers);
+       answers = answers == null ? null : List.unmodifiable(answers),
+       pending = List.unmodifiable(pending);
 
   final String owner;
   final Map<String, String> messages;
   final List<SavedAnswerDraft>? answers;
+  final List<MessageIntent> pending;
 
   factory DraftSnapshot.decode(String raw) {
     final value = jsonDecode(raw);
@@ -42,6 +47,12 @@ class DraftSnapshot {
       owner: value['owner'] as String,
       messages: messages.cast<String, String>(),
       answers: answers,
+      pending:
+          (value['pending'] == null
+                  ? <dynamic>[]
+                  : jsonField<List<dynamic>>(value, 'pending'))
+              .map(MessageIntent.fromJson)
+              .toList(),
     );
   }
 
@@ -49,5 +60,6 @@ class DraftSnapshot {
     'owner': owner,
     'messages': messages,
     'answers': answers?.map((answer) => answer.toJson()).toList(),
+    'pending': pending.map((intent) => intent.toJson()).toList(),
   });
 }

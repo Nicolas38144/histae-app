@@ -51,17 +51,22 @@ clears access. Logout/deletion barriers prevent stale responses restoring a sess
 [Session recovery](docs/session-recovery.md) for the protocol and deployment order.
 
 Mutations keep immutable intentions and idempotency keys until resolved. Do not automatically
-repeat writes after a timeout or treat a local success state as server confirmation.
+repeat arbitrary writes after a timeout or treat a local success state as server confirmation.
+Message retries are a specific exception: the API durably deduplicates the frozen send key.
 
 ## Local state and messages
 
 Encrypted drafts are scoped to account and API origin. Debounced, serialized writes flush on
 lifecycle changes; logout clears them. Only unsent messages and unpublished answers persist,
-excluding biographies, photos and tokens. Submitted message intentions remain in memory and
-must not reappear as fresh sendable drafts after restart.
+excluding biographies, photos and tokens. Submitted message intentions persist separately with
+their exact text, match and original key, in the same atomic encrypted snapshot. Flush must succeed
+before POST. Restart restores pending intentions without turning them into new sendable drafts.
 
 Messages use a FIFO outbox while the composer remains editable. Acknowledgement requires the
-confirmed server message. Retries retain the original text, language and key. Realtime updates
+confirmed server message. Retries retain the original text and key. Recoverable transport failures
+retry after 2/5/10/20 seconds; realtime reconnection or reopening an interrupted chat resumes them.
+Backgrounding flushes the composer; suspension cancels retry timers and active requests. Storage,
+validation and permission failures do not enter the network retry loop. Realtime updates
 merge silently without rebuilding the composer, showing a loading bar or disturbing focus.
 
 `RealtimeHub` shares one SSE connection between matches, notifications and subscription state.

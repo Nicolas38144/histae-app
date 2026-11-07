@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/theme.dart';
 import 'package:histae_app/features/drafts/application/draft_controller.dart';
+import 'package:histae_app/features/drafts/data/draft_snapshot.dart';
 import 'package:histae_app/features/drafts/data/draft_vault.dart';
 import 'package:histae_app/features/drafts/data/saved_answer_draft.dart';
 import 'package:histae_app/features/matches/application/matches_controller.dart';
@@ -136,7 +137,10 @@ void main() {
       if (r.method == 'POST' && r.url.path.endsWith('/messages')) {
         sends++;
         keys.add(r.headers['Idempotency-Key']);
-        expect(vault.value?.contains('Texte à envoyer') ?? false, isFalse);
+        final saved = DraftSnapshot.decode(vault.value!);
+        expect(saved.messages, isEmpty);
+        expect(saved.pending.single.content, 'Texte à envoyer');
+        expect(saved.pending.single.key, r.headers['Idempotency-Key']);
         throw TimeoutException('Synthetic lost response');
       }
       return defaultMatchesResponse(r);

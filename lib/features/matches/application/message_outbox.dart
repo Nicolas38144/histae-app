@@ -1,10 +1,11 @@
 import '../../../core/network/api_failure.dart';
 import '../data/match_models.dart';
 
-/// Drafts can be restored from the device vault; send intentions stay in memory.
+/// Drafts and immutable send intentions are restored from the account's vault.
 /// A pending message freezes its content and key until a definitive response.
 class MessageOutbox {
-  MessageOutbox({this.onChanged});
+  MessageOutbox({this.onChanged, this.onPendingChanged});
+  final void Function(String id, List<MessageIntent> values)? onPendingChanged;
   final void Function(String id, String? text)? onChanged;
   final _drafts = <String, String>{};
   final _pending = <String, List<MessageIntent>>{};
@@ -39,6 +40,14 @@ class MessageOutbox {
     _drafts.remove(id);
     // Once submitted, a message must never return as a new sendable draft.
     onChanged?.call(id, null);
+    onPendingChanged?.call(id, pendingMessages(id));
+  }
+
+  void restorePending(List<MessageIntent> values) {
+    for (final intent in values) {
+      final items = _pending[intent.matchId] ??= [];
+      if (!items.any((item) => item.key == intent.key)) items.add(intent);
+    }
   }
 
   void acknowledge(String id, MessageIntent intent) {
@@ -46,6 +55,7 @@ class MessageOutbox {
     _pending[id]!.removeAt(0);
     if (_pending[id]!.isEmpty) _pending.remove(id);
     _failures.remove(id);
+    onPendingChanged?.call(id, pendingMessages(id));
   }
 
   void fail(String id, MessageIntent intent, ApiFailure error) {
@@ -64,6 +74,7 @@ class MessageOutbox {
     _failures.remove(id);
     _drafts.remove(id);
     onChanged?.call(id, null);
+    onPendingChanged?.call(id, const []);
   }
 
   void clear() {

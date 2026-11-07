@@ -87,8 +87,10 @@ Existing Stripe subscriptions are website-managed; mobile offers no Stripe Check
 
 A guide opens at the first usable feed and can reopen from Help and contact in Profile. Local
 encrypted drafts recover unsent messages and unpublished answers, excluding biographies, and clear
-on logout. Submitted messages are not restored as fresh drafts. Abrupt termination may interrupt
-a pending local write.
+on logout. Pending sends persist separately with their original keys before contacting the API;
+reopening their conversation resumes the queue without creating new messages from old drafts.
+Recoverable connection failures use bounded retries and resume on realtime reconnection, leaving
+the next draft and keyboard alone. Abrupt termination may interrupt a pending local write.
 
 Push needs platform configuration, permission and API registration. OS alerts are for background
 delivery; open-app messages/counters use realtime state. Removing a push device does not revoke

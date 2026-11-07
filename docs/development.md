@@ -38,7 +38,7 @@ Documentation-only changes need no Flutter tests. Run Flutter checks/builds seri
 | Cache/navigation | `read_snapshots_test.dart`, `cache_lifecycle_regressions_test.dart`, `cached_conversation_test.dart` |
 | Feed/location | `discovery_test.dart`, `discovery_pause_test.dart`, `device_location_test.dart`, `feed_reading_delay_test.dart` |
 | Photos/privacy | `photo_crop_test.dart`, `profile_widget_test.dart`, `photo_sharing_test.dart`, `continuation_test.dart`, `private_photo_cache_test.dart`, `private_photo_test.dart`, `match_profile_test.dart` |
-| Messaging/matches | `conversation_updates_test.dart`, `matches_inactivity_test.dart`, `matches_visibility_test.dart` |
+| Messaging/matches | `message_recovery_test.dart`, `local_drafts_test.dart`, `conversation_updates_test.dart`, `matches_inactivity_test.dart`, `matches_visibility_test.dart` |
 | Native boundaries | `billing_test.dart`, `store_updates_test.dart`, `app_privacy_shield_test.dart` |
 | Notifications | `notification_preferences_test.dart`, `notifications_test.dart`, `notification_navigation_test.dart` |
 | Localization | `localization_test.dart`, `api_language_test.dart` |

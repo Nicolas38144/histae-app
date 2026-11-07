@@ -4,11 +4,12 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/async/serial_executor.dart';
 import '../../auth/domain/authenticated_session.dart';
+import '../../matches/data/match_models.dart';
 import '../data/draft_snapshot.dart';
 import '../data/draft_vault.dart';
 import '../data/saved_answer_draft.dart';
 
-/// Stores unsent text only, scoped to a verified account and API origin.
+/// Stores drafts and unconfirmed sends, scoped to a verified account and API origin.
 class DraftController extends ChangeNotifier {
   DraftController(this.session, this.vault) {
     session.addListener(_sessionChanged);
@@ -19,6 +20,9 @@ class DraftController extends ChangeNotifier {
   final DraftVault vault;
   final _queue = SerialExecutor();
   final _messages = <String, String>{};
+  final _pending = <String, List<MessageIntent>>{};
+  List<MessageIntent> get pending =>
+      List.unmodifiable(_pending.values.expand((items) => items));
   List<SavedAnswerDraft>? _answers;
   String? _owner;
   int _epoch = 0;
@@ -45,6 +49,7 @@ class DraftController extends ChangeNotifier {
       _epoch++;
       _debounce?.cancel();
       _messages.clear();
+      _pending.clear();
       _answers = null;
       loaded = false;
       _ready = _queue.run(() async {
@@ -66,6 +71,7 @@ class DraftController extends ChangeNotifier {
     final epoch = ++_epoch;
     loaded = false;
     _messages.clear();
+    _pending.clear();
     _answers = null;
     _ready = _queue.run(() async {
       try {
@@ -78,6 +84,12 @@ class DraftController extends ChangeNotifier {
           } else {
             if (!_alive(epoch)) return;
             _messages.addAll(value.messages);
+            for (final intent in value.pending) {
+              final items = _pending[intent.matchId] ??= [];
+              if (!items.any((item) => item.key == intent.key)) {
+                items.add(intent);
+              }
+            }
             _answers = value.answers;
           }
         }
@@ -109,6 +121,16 @@ class DraftController extends ChangeNotifier {
     _schedule();
   }
 
+  void setPending(String id, List<MessageIntent> values) {
+    if (!loaded || _owner == null) return;
+    if (values.isEmpty) {
+      _pending.remove(id);
+    } else {
+      _pending[id] = List.of(values);
+    }
+    _schedule();
+  }
+
   void _schedule() {
     _debounce?.cancel();
     _debounce = Timer(
@@ -122,12 +144,13 @@ class DraftController extends ChangeNotifier {
     _debounce?.cancel();
     if (!loaded || _owner == null || _disposed) return Future.value(false);
     final epoch = _epoch;
-    final value = _messages.isEmpty && _answers == null
+    final value = _messages.isEmpty && _answers == null && _pending.isEmpty
         ? null
         : DraftSnapshot(
             owner: _owner!,
             messages: _messages,
             answers: _answers,
+            pending: pending,
           ).encode();
     return _queue.run(() async {
       if (_epoch != epoch || _owner == null) return false;

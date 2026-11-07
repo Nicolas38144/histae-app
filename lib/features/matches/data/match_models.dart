@@ -222,6 +222,24 @@ class MessageIntent {
   MessageIntent(this.matchId, String content)
     : content = trimMessage(content),
       key = newUuidV4();
+  MessageIntent._(this.matchId, this.content, this.key);
+  factory MessageIntent.fromJson(Object? value) {
+    final j = jsonObject(value);
+    final content = jsonString(j, 'content');
+    if (validateMessage(content) != null || content != trimMessage(content)) {
+      invalidResponse();
+    }
+    return MessageIntent._(
+      serverId(j, 'match_id'),
+      content,
+      serverId(j, 'key'),
+    );
+  }
+  Map<String, String> toJson() => {
+    'match_id': matchId,
+    'content': content,
+    'key': key,
+  };
   final String matchId, content, key;
 
   @override

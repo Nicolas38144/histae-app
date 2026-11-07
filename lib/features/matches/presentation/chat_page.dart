@@ -120,6 +120,8 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       _scheduleRead();
       _ensureContinuation();
+    } else {
+      unawaited(c.drafts?.flush());
     }
   }
 
