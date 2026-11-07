@@ -44,7 +44,7 @@ class _ProfileFeedPreviewPageState extends State<ProfileFeedPreviewPage> {
         body: SafeArea(
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(24),
+            padding: HistaeTokens.pagePadding,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -54,19 +54,14 @@ class _ProfileFeedPreviewPageState extends State<ProfileFeedPreviewPage> {
                       .profileFeedPreviewPageThroughYourWords,
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
-                const SizedBox(height: 12),
-                if (preview != null && c.profile?.photo != null)
+                const SizedBox(height: HistaeTokens.contentSpacing),
+                if (preview != null && c.profile?.photo != null) ...[
                   ProfileOwnerPhoto(
                     controller: c,
                     photoClient: widget.photoClient,
                   ),
-                Text(
-                  AppStrings.of(context)
-                      .messages
-                      .profileFeedPreviewPageTheseAreThePartsOfYour,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-                const SizedBox(height: 20),
+                  const SizedBox(height: HistaeTokens.contentSpacing),
+                ],
                 if (c.loading)
                   LinearProgressIndicator(
                     semanticsLabel: AppStrings.of(context)
@@ -101,6 +96,13 @@ class _ProfileFeedPreviewPageState extends State<ProfileFeedPreviewPage> {
                       ),
                     ),
                   ),
+                const SizedBox(height: HistaeTokens.contentSpacing),
+                Text(
+                  AppStrings.of(context)
+                      .messages
+                      .profileFeedPreviewPageTheseAreThePartsOfYour,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
               ],
             ),
           ),

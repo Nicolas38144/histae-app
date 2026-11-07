@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../data/profile_models.dart';
 import 'profile_strings.dart';
@@ -26,7 +27,7 @@ class ProfilePanel extends StatelessWidget {
     final theme = Theme.of(context), colors = theme.colorScheme;
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(22),
+        padding: HistaeTokens.panelPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -55,9 +56,9 @@ class ProfilePanel extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(title, style: theme.textTheme.headlineSmall),
-            const SizedBox(height: 16),
+            const SizedBox(height: HistaeTokens.textSpacing),
             child,
-            const SizedBox(height: 16),
+            const SizedBox(height: HistaeTokens.labelSpacing),
             Align(
               alignment: Alignment.centerLeft,
               child: HistaeButton.textIcon(
@@ -179,7 +180,7 @@ class ProfileDetailTile extends StatelessWidget {
     final theme = Theme.of(context), colors = theme.colorScheme;
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: HistaeTokens.panelPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -193,7 +194,7 @@ class ProfileDetailTile extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: HistaeTokens.textSpacing),
             Text(
               summary,
               style: theme.textTheme.bodySmall?.copyWith(

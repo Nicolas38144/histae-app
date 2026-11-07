@@ -50,7 +50,6 @@ class ProfileOwnerPhoto extends StatelessWidget {
               ),
             ),
           if (failed) Text(text.photoPagePreviewUnavailable),
-          const SizedBox(height: 12),
         ],
       ),
     );

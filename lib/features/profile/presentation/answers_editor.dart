@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter/services.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
@@ -231,7 +233,7 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
         Card(
           key: ValueKey(inputs[i].id),
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: HistaeTokens.panelPadding,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -241,7 +243,7 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
                   style: Theme.of(context).textTheme.labelSmall
                       ?.copyWith(color: Theme.of(context).colorScheme.primary),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: HistaeTokens.textSpacing),
                 Text(
                   controller.questionPrompt(inputs[i].id, inputs[i].prompt),
                   style: Theme.of(context).textTheme.titleLarge,

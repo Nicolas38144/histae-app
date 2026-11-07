@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
@@ -117,7 +118,7 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 680),
               child: ListView(
-                padding: const EdgeInsets.all(24),
+                padding: HistaeTokens.pagePadding,
                 children: [
                   EditorialCard(
                     eyebrow: AppStrings.of(context)
@@ -135,6 +136,7 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                     AppStrings.of(context).messages.devicesPageOnThisDevice,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
+                  const SizedBox(height: HistaeTokens.labelSpacing),
                   if (p?.configured != true)
                     Text(
                       AppStrings.of(context)
@@ -233,6 +235,7 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                         .devicesPageYourRegisteredDevices,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
+                  const SizedBox(height: HistaeTokens.labelSpacing),
                   Text(
                     AppStrings.of(context)
                         .messages
@@ -281,7 +284,7 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                   for (final device in c.devices)
                     Card(
                       child: Padding(
-                        padding: const EdgeInsets.all(20),
+                        padding: HistaeTokens.panelPadding,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
@@ -289,6 +292,7 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                               '${device.platform == 'ios' ? AppStrings.of(context).messages.devicesPageIos : AppStrings.of(context).messages.devicesPageAndroid}${p?.deviceId == device.id ? AppStrings.of(context).messages.devicesPageThisDevice : ''}',
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
+                            const SizedBox(height: HistaeTokens.labelSpacing),
                             if (device.version != null)
                               Text(
                                 AppStrings.of(context).messages
@@ -313,6 +317,7 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                                       ),
                                     ),
                               ),
+                            const SizedBox(height: HistaeTokens.labelSpacing),
                             HistaeButton.outlined(
                               onPressed:
                                   enabled &&

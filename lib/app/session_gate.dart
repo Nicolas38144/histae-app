@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/l10n/app_strings.dart';
+import '../core/theme/histae_tokens.dart';
 import '../core/widgets/histae_button.dart';
 import '../core/widgets/histae_scaffold.dart';
 import '../core/widgets/status_view.dart';
@@ -88,7 +89,7 @@ class _SessionGateState extends State<SessionGate> {
           appBar: AppBar(title: Text(strings.appName)),
           body: SafeArea(
             child: ListView(
-              padding: const EdgeInsets.all(24),
+              padding: HistaeTokens.pagePadding,
               children: [
                 LinearProgressIndicator(semanticsLabel: strings.sessionLoading),
                 const SizedBox(height: 24),
@@ -108,7 +109,7 @@ class _SessionGateState extends State<SessionGate> {
           appBar: AppBar(title: Text(strings.appName)),
           body: SafeArea(
             child: ListView(
-              padding: const EdgeInsets.all(24),
+              padding: HistaeTokens.pagePadding,
               children: [
                 StatusView(
                   title: strings.sessionUnavailable,

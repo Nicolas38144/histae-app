@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../application/continuation_controller.dart';
 
@@ -27,7 +28,7 @@ class PhotoRevealPanel extends StatelessWidget {
     final color = Theme.of(context).colorScheme.primary;
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(22),
+        padding: HistaeTokens.panelPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -67,14 +68,14 @@ class PhotoRevealPanel extends StatelessWidget {
                 children: [
                   if (c.pendingWithdrawal) ...[
                     Text(text.photoRevealWithdrawalPending),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: HistaeTokens.labelSpacing),
                     HistaeButton(
                       onPressed: c.canWithdrawReveal ? c.withdrawReveal : null,
                       child: Text(text.photoRevealRetryWithdrawal),
                     ),
                   ] else if (shared) ...[
                     Text(text.photoRevealShared),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: HistaeTokens.labelSpacing),
                     HistaeButton.icon(
                       onPressed: c.access.verified ? onOpenProfile : null,
                       icon: const Icon(Icons.person_outline_rounded),
@@ -84,7 +85,7 @@ class PhotoRevealPanel extends StatelessWidget {
                     Text(text.photoRevealWaiting),
                   ] else if (c.pendingReveal) ...[
                     Text(text.continuationPageYourPhotoRevealRequestStillNeeds),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: HistaeTokens.labelSpacing),
                     HistaeButton(
                       onPressed: c.canReveal ? c.reveal : null,
                       child: Text(
@@ -94,7 +95,7 @@ class PhotoRevealPanel extends StatelessWidget {
                   ] else ...[
                     if (c.notice == 'reveal_withdrawn') ...[
                       Text(text.photoRevealWithdrawn),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: HistaeTokens.labelSpacing),
                     ],
                     HistaeButton.icon(
                       onPressed: c.canReveal ? onReveal : null,
@@ -104,7 +105,6 @@ class PhotoRevealPanel extends StatelessWidget {
                   ],
                   if (!c.pendingWithdrawal &&
                       (c.myRevealed || c.pendingReveal)) ...[
-                    const SizedBox(height: 12),
                     HistaeButton.textIcon(
                       onPressed: c.canWithdrawReveal ? onWithdraw : null,
                       icon: const Icon(Icons.visibility_off_outlined, size: 18),

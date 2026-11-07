@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../consents/data/legal_document_opener.dart';
 import '../../consents/domain/consent_state.dart';
@@ -35,7 +36,7 @@ class _RegistrationConsentsStepState extends State<RegistrationConsentsStep> {
     final strings = AppStrings.of(context);
     return ListView(
       key: const PageStorageKey('registration-consents'),
-      padding: const EdgeInsets.all(24),
+      padding: HistaeTokens.pagePadding,
       children: [
         Text(strings.consentsIntro),
         const SizedBox(height: 16),

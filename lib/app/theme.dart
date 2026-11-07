@@ -111,7 +111,7 @@ ThemeData histaeTheme(Brightness brightness) {
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       scrolledUnderElevation: 0,
-      titleSpacing: 24,
+      titleSpacing: HistaeTokens.pageInset,
       toolbarHeight: 64,
       titleTextStyle: textTheme.titleMedium?.copyWith(
         color: colors.onSurface,
@@ -123,7 +123,7 @@ ThemeData histaeTheme(Brightness brightness) {
       color: colors.surfaceContainerLow,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
-      margin: const EdgeInsets.symmetric(vertical: 8),
+      margin: const EdgeInsets.symmetric(vertical: HistaeTokens.labelSpacing),
       shape: panelShape,
       clipBehavior: Clip.antiAlias,
     ),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter/services.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../application/otp_controller.dart';
@@ -60,7 +62,7 @@ class _OtpFormState extends State<OtpForm> {
         final canSend = enabled && controller.resendSeconds == 0;
         return AutofillGroup(
           child: ListView(
-            padding: const EdgeInsets.all(24),
+            padding: HistaeTokens.pagePadding,
             children: [
               EditorialCard(
                 title: widget.registration

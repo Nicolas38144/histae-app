@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../application/store_update_controller.dart';
@@ -53,7 +54,7 @@ class _UpdatePage extends StatelessWidget {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 480),
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(28),
+              padding: HistaeTokens.pagePadding,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
@@ -68,7 +69,7 @@ class _UpdatePage extends StatelessWidget {
                     text.storeUpdateTitle,
                     style: theme.textTheme.headlineMedium,
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: HistaeTokens.textSpacing),
                   Text(text.storeUpdateBody),
                   const SizedBox(height: 28),
                   HistaeButton.icon(

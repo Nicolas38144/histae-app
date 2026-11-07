@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/signed_photo_loader.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/private_photo.dart';
 import '../application/match_access.dart';
 
@@ -74,7 +75,7 @@ class _PartnerPhotoState extends State<PartnerPhoto>
                         fit: BoxFit.contain,
                         semanticLabel: text.partnerPhotoPageYourMatchSPhoto,
                         errorBuilder: (_, _, _) => Padding(
-                          padding: const EdgeInsets.all(24),
+                          padding: HistaeTokens.pagePadding,
                           child: Text(
                             text.partnerPhotoPageThisPhotoIsCurrentlyUnavailable,
                           ),

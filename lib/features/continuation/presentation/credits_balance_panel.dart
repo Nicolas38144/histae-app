@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../data/continuation_models.dart';
 import 'weekly_renewal_label.dart';
 
@@ -181,7 +182,7 @@ class _Balance extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, color: color, size: 22),
-          const SizedBox(height: 10),
+          const SizedBox(height: HistaeTokens.textSpacing),
           Text(
             '$count',
             style: theme.textTheme.headlineMedium?.copyWith(color: color),
@@ -202,7 +203,7 @@ class CreditsWeekPanel extends StatelessWidget {
     final q = quota, theme = Theme.of(context), colors = theme.colorScheme;
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: HistaeTokens.panelPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -232,7 +233,7 @@ class CreditsWeekPanel extends StatelessWidget {
                     q.weeklyLimit!,
                   ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: HistaeTokens.textSpacing),
             Text(
               AppStrings.of(context).messages
                   .creditsBalancePanelFreeCreditsRenewedOnMondaysAt(
@@ -242,10 +243,10 @@ class CreditsWeekPanel extends StatelessWidget {
                 color: colors.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: HistaeTokens.textSpacing),
             const WeeklyRenewalLabel(),
             if (q.remaining == 0) ...[
-              const SizedBox(height: 10),
+              const SizedBox(height: HistaeTokens.textSpacing),
               Text(
                 AppStrings.of(context)
                     .messages

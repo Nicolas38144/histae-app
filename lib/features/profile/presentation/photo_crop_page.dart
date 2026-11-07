@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../auth/domain/authenticated_session.dart';
@@ -168,7 +169,7 @@ class _PhotoCropPageState extends State<PhotoCropPage>
                 ),
               )
             : ListView(
-                padding: const EdgeInsets.all(24),
+                padding: HistaeTokens.pagePadding,
                 children: [
                   Text(
                     text.photoCropInstructions,

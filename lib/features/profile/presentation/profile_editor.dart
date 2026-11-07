@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
@@ -132,7 +133,7 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
               : null,
           body: SafeArea(
             child: ListView(
-              padding: const EdgeInsets.all(24),
+              padding: HistaeTokens.pagePadding,
               children: [
                 ...children,
                 if (busy || controller.loading)

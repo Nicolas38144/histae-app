@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+
 import 'package:share_plus/share_plus.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/read_snapshots.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
@@ -152,7 +154,7 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
     for (final session in c.sessions)
       Card(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: HistaeTokens.panelPadding,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -166,6 +168,7 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
                           .privacyDetailPageOtherSession,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
+              const SizedBox(height: HistaeTokens.labelSpacing),
               Text(
                 AppStrings.of(context).messages.privacyDetailPageCreatedOn(
                   privacyDate(AppStrings.of(context), session.createdAt),
@@ -181,6 +184,7 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
                   privacyDate(AppStrings.of(context), session.expiresAt),
                 ),
               ),
+              const SizedBox(height: HistaeTokens.labelSpacing),
               HistaeButton.outlined(
                 onPressed:
                     enabled &&
@@ -274,7 +278,7 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
     for (final person in c.blocks)
       Card(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: HistaeTokens.panelPadding,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -285,11 +289,13 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
                         .privacyDetailPageBlockedProfile,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
+              const SizedBox(height: HistaeTokens.labelSpacing),
               Text(
                 AppStrings.of(context).messages.privacyDetailPageBlockedOn(
                   privacyDate(AppStrings.of(context), person.blockedAt),
                 ),
               ),
+              const SizedBox(height: HistaeTokens.labelSpacing),
               HistaeButton.outlined(
                 onPressed:
                     enabled &&

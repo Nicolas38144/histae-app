@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/histae_tokens.dart';
+
 /// A shared heading and optional value for registration and saved preferences.
 class PreferenceField extends StatelessWidget {
   const PreferenceField({
@@ -27,15 +29,17 @@ class PreferenceField extends StatelessWidget {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 18),
+        padding: const EdgeInsets.symmetric(
+          vertical: HistaeTokens.contentSpacing,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Wrap(
               alignment: WrapAlignment.spaceBetween,
               crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 12,
-              runSpacing: 8,
+              spacing: HistaeTokens.textSpacing,
+              runSpacing: HistaeTokens.labelSpacing,
               children: [
                 Text(
                   label,
@@ -55,7 +59,7 @@ class PreferenceField extends StatelessWidget {
                   ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: HistaeTokens.labelSpacing),
             child,
           ],
         ),

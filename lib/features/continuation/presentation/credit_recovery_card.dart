@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../data/continuation_models.dart';
 
@@ -27,7 +28,7 @@ class CreditRecoveryCard extends StatelessWidget {
     }
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: HistaeTokens.panelPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -37,13 +38,13 @@ class CreditRecoveryCard extends StatelessWidget {
                   : text.creditRecoveryFreeTitle,
               style: Theme.of(context).textTheme.titleMedium,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: HistaeTokens.textSpacing),
             Text(
               subscription
                   ? text.creditRecoveryWeeklyLimit
                   : text.creditRecoveryWatchDescription,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: HistaeTokens.labelSpacing),
             HistaeButton.icon(
               key: Key(subscription ? 'credit-subscription' : 'credit-video'),
               onPressed: enabled

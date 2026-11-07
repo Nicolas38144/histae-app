@@ -15,7 +15,18 @@ abstract final class HistaeTokens {
   static const serif = 'SourceSerif4';
   static const sans = 'Inter';
   static const panelRadius = 20.0;
-  static const actionSpacing = 16.0;
+
+  // Layout rhythm. Control sizes, reading line height and system insets are
+  // independent of the gaps between content blocks.
+  static const pageInset = 24.0;
+  static const panelInset = 20.0;
+  static const sectionSpacing = 24.0;
+  static const contentSpacing = 16.0;
+  static const textSpacing = 12.0;
+  static const labelSpacing = 8.0;
+  static const pagePadding = EdgeInsets.all(pageInset);
+  static const panelPadding = EdgeInsets.all(panelInset);
+  static const actionSpacing = contentSpacing;
   static const actionGradient = LinearGradient(
     colors: [Color(0xfff2a48c), Color(0xffd8b3f7)],
     begin: Alignment.centerLeft,

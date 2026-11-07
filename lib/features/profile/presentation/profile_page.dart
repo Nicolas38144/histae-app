@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/l10n/language_picker.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/account_benefits_actions.dart';
 import '../../../core/widgets/account_identifier.dart';
 import '../../../core/widgets/editorial_card.dart';
@@ -115,7 +116,7 @@ class _ProfilePageState extends State<ProfilePage> {
         body: SafeArea(
           child: ListView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(24),
+            padding: HistaeTokens.pagePadding,
             children: [
               EditorialCard(
                 eyebrow: AppStrings.of(context).messages.profilePageYourProfile,

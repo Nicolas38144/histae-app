@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/histae_button.dart';
 import 'help_scope.dart';
 
@@ -54,7 +55,9 @@ Future<void> showFeedGuide(BuildContext context) async {
                   ),
                 ])
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 22),
+                    padding: const EdgeInsets.only(
+                      bottom: HistaeTokens.sectionSpacing,
+                    ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -71,7 +74,7 @@ Future<void> showFeedGuide(BuildContext context) async {
                                 step.$2,
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
-                              const SizedBox(height: 6),
+                              const SizedBox(height: HistaeTokens.labelSpacing),
                               Text(step.$3),
                             ],
                           ),

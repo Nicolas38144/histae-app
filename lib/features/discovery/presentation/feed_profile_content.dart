@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/models/public_profile_answer.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../reading/domain/reading_preferences.dart';
 import '../../reading/presentation/reading_scope.dart';
@@ -79,8 +80,8 @@ class FeedProfileContent extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Wrap(
-            spacing: 10,
-            runSpacing: 10,
+            spacing: HistaeTokens.labelSpacing,
+            runSpacing: HistaeTokens.labelSpacing,
             children: traits
                 .map(
                   (t) => Chip(
@@ -95,7 +96,7 @@ class FeedProfileContent extends StatelessWidget {
         for (final answer in answers) ...[
           const EditorialDivider(),
           Text(answer.question, style: theme.textTheme.titleLarge),
-          const SizedBox(height: 14),
+          const SizedBox(height: HistaeTokens.textSpacing),
           Text(answer.answer, style: prose),
         ],
       ],

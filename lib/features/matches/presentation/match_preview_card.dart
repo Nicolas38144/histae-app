@@ -35,7 +35,7 @@ class MatchPreviewCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(HistaeTokens.panelRadius),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: HistaeTokens.panelPadding,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [

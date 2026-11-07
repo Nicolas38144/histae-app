@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 
 class PrivacyFrame extends StatelessWidget {
@@ -15,7 +16,7 @@ class PrivacyFrame extends StatelessWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 680),
           child: ListView(
-            padding: const EdgeInsets.all(24),
+            padding: HistaeTokens.pagePadding,
             children: children,
           ),
         ),

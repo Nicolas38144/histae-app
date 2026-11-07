@@ -7,8 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
+import 'package:histae_app/app/theme.dart';
+import 'package:histae_app/core/l10n/generated/app_messages.dart';
 import 'package:histae_app/features/consents/domain/consent_state.dart';
 import 'package:histae_app/features/consents/presentation/consents_page.dart';
+import 'package:histae_app/features/profile/application/profile_controller.dart';
+import 'package:histae_app/features/profile/data/profile_repository.dart';
+import 'package:histae_app/features/profile/presentation/profile_feed_preview_page.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 
 import '../test/support/auth_fixture.dart';
 import '../test/support/continuation_fixture.dart';
@@ -33,6 +40,80 @@ void main() {
       'MaterialIcons',
     )..addFont(Future.value(ByteData.sublistView(bytes)))).load();
   });
+
+  testWidgets('review owner photo and footer in each language', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    tester.view.padding = const FakeViewPadding(top: 24, bottom: 34);
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPadding);
+    final portrait = (await tester.runAsync(
+      () => File('pictures/fixtures/fictional-portrait.png').readAsBytes(),
+    ))!;
+    final session = testSession(
+      (r) async => r.url.path == '/api/users/me'
+          ? jsonResponse(
+              ownerJson(photo: 'https://storage.example/owner-preview'),
+            )
+          : defaultProfileResponse(r),
+    );
+    addTearDown(session.dispose);
+    await session.establish(testTokens);
+    final controller = ProfileController(ProfileRepository(session));
+    addTearDown(controller.dispose);
+    await controller.load();
+    const frame = Key('owner-spacing-preview');
+    for (final language in ['fr', 'en', 'es', 'it']) {
+      await tester.pumpWidget(
+        MaterialApp(
+          key: ValueKey(language),
+          debugShowCheckedModeBanner: false,
+          theme: histaeTheme(Brightness.dark),
+          locale: Locale(language),
+          supportedLocales: AppMessages.supportedLocales,
+          localizationsDelegates: AppMessages.localizationsDelegates,
+          home: RepaintBoundary(
+            key: frame,
+            child: ProfileFeedPreviewPage(
+              controller: controller,
+              photoClient: () =>
+                  MockClient((_) async => http.Response.bytes(portrait, 200)),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final photo = find.byType(Image);
+      await tester.runAsync(
+        () => precacheImage(
+          tester.widget<Image>(photo).image,
+          tester.element(photo),
+        ),
+      );
+      await tester.pumpAndSettle();
+      if (language == 'fr') {
+        await expectLater(
+          find.byKey(frame),
+          matchesGoldenFile('../build/previews/profile/owner-top.png'),
+        );
+      }
+      final position = tester
+          .state<ScrollableState>(find.byType(Scrollable))
+          .position;
+      position.jumpTo(position.maxScrollExtent);
+      await tester.pumpAndSettle();
+      await expectLater(
+        find.byKey(frame),
+        matchesGoldenFile(
+          '../build/previews/profile/owner-footer-$language.png',
+        ),
+      );
+      expect(tester.takeException(), isNull);
+    }
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
   testWidgets('review profile, answer management and consent clarity', (
     tester,
   ) async {

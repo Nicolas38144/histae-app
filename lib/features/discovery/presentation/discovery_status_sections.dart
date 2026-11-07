@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../data/device_location.dart';
@@ -45,7 +46,7 @@ class DiscoveryReadinessCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Card(
     child: Padding(
-      padding: const EdgeInsets.all(24),
+      padding: HistaeTokens.panelPadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -55,7 +56,7 @@ class DiscoveryReadinessCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(DiscoveryStrings(AppStrings.of(context)).actionBody(action)),
-          const SizedBox(height: 20),
+          const SizedBox(height: HistaeTokens.labelSpacing),
           HistaeButton.outlined(
             onPressed: onRepair,
             child: Text(
@@ -126,7 +127,7 @@ class DiscoveryPendingChoiceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Card(
     child: Padding(
-      padding: const EdgeInsets.all(24),
+      padding: HistaeTokens.panelPadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -135,7 +136,7 @@ class DiscoveryPendingChoiceCard extends StatelessWidget {
                 .discoveryStatusSectionsYourChoiceFor(intent.profile.firstname),
             style: Theme.of(context).textTheme.headlineSmall,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: HistaeTokens.textSpacing),
           Text(
             uncertain
                 ? AppStrings.of(context)
@@ -145,7 +146,7 @@ class DiscoveryPendingChoiceCard extends StatelessWidget {
                       .messages
                       .discoveryStatusSectionsYourRequestIsAwaitingConfirmationNo,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: HistaeTokens.labelSpacing),
           HistaeButton(
             onPressed: onResume,
             child: Text(

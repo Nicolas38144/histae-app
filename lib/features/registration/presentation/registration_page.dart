@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/l10n/language_picker.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
@@ -78,7 +79,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         children: [
           if (controller.failure case final failure?)
             Padding(
-              padding: const EdgeInsets.all(24),
+              padding: HistaeTokens.pagePadding,
               child: Semantics(
                 liveRegion: true,
                 child: Text(strings.authFailure(failure)),
@@ -97,7 +98,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
     final copy = strings.messages;
     return ListView(
-      padding: const EdgeInsets.all(24),
+      padding: HistaeTokens.pagePadding,
       children: [
         Text(
           controller.existingAccount

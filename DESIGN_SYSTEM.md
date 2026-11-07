@@ -25,6 +25,23 @@ including Android adaptive/monochrome layers. See the [iOS launch assets](ios/Ru
 `tool/generate_brand_assets.cjs` uses Node.js/Sharp and SVG sources in
 `pictures/logos/nouvelle-da/02-les-pages/`; `--site` also exports website assets.
 
+## Spacing
+
+Use the layout values in `HistaeTokens`: 24 px page insets and section gaps,
+20 px standard card insets, 16 px between content blocks, 12 px between paragraphs,
+and 8 px for labels and supporting details. Reuse `pagePadding` and `panelPadding`.
+Reading/offer/balance panels may keep 24 px insets; compact consent and balance
+controls use 16 px. Registration and saved preferences share `PreferenceField`.
+
+Count existing component margins: cards add 8 px above/below and standard buttons
+do the same. Two adjacent cards or buttons already have a 16 px gap. Add 8 px
+between text and a button when a 16 px visible gap is needed. Put spacing around
+standalone photos in their parent rather than hiding trailing gaps inside them.
+
+Chat bubbles, receipts, navigation, carousels, icon backgrounds and crop controls
+have deliberately denser geometry. Keep those dimensions, reading line height,
+minimum touch targets and safe-area/keyboard insets independent of page spacing.
+
 ## Copy and screen hierarchy
 
 Use concrete, welcoming language; French addresses people formally. Explain actions rather than

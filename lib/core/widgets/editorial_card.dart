@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../theme/histae_tokens.dart';
+
 class EditorialDivider extends StatelessWidget {
   const EditorialDivider({super.key});
 
   @override
   Widget build(BuildContext context) => const ExcludeSemantics(
     child: Padding(
-      padding: EdgeInsets.symmetric(vertical: 22),
+      padding: EdgeInsets.symmetric(vertical: HistaeTokens.sectionSpacing),
       child: Divider(height: 1),
     ),
   );
@@ -28,7 +30,7 @@ class EditorialCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.symmetric(vertical: HistaeTokens.textSpacing),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -39,7 +41,7 @@ class EditorialCard extends StatelessWidget {
                 color: theme.colorScheme.primary,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: HistaeTokens.textSpacing),
           ],
           Semantics(
             header: true,
@@ -49,7 +51,7 @@ class EditorialCard extends StatelessWidget {
             ),
           ),
           if (body case final description?) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: HistaeTokens.textSpacing),
             Text(
               description,
               style: theme.textTheme.bodyLarge?.copyWith(

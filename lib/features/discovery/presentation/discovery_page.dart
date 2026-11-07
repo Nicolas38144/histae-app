@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
@@ -591,7 +592,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                     ],
                   )
                 : ListView(
-                    padding: const EdgeInsets.all(24),
+                    padding: HistaeTokens.pagePadding,
                     children: statusBody,
                   ),
           ),

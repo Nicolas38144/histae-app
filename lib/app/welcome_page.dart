@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/l10n/app_strings.dart';
 import '../core/l10n/language_picker.dart';
+import '../core/theme/histae_tokens.dart';
 import '../core/widgets/connection_artwork.dart';
 import '../core/widgets/histae_button.dart';
 import '../core/widgets/histae_scaffold.dart';
@@ -28,7 +29,7 @@ class WelcomePage extends StatelessWidget {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 600),
             child: ListView(
-              padding: const EdgeInsets.all(24),
+              padding: HistaeTokens.pagePadding,
               children: [
                 const SizedBox(height: 12),
                 Text(

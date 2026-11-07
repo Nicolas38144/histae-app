@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/histae_tokens.dart';
+
 class StatusView extends StatelessWidget {
   const StatusView({
     super.key,
@@ -34,20 +36,23 @@ class StatusView extends StatelessWidget {
           ),
         ),
       ),
-      const SizedBox(height: 20),
+      const SizedBox(height: HistaeTokens.sectionSpacing),
       Semantics(
         header: true,
         child: Text(title, style: Theme.of(context).textTheme.headlineSmall),
       ),
-      const SizedBox(height: 12),
+      const SizedBox(height: HistaeTokens.textSpacing),
       Text(
         message,
         style: Theme.of(context).textTheme.bodyMedium
             ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
       ),
-      if (action != null) ...[const SizedBox(height: 24), action!],
+      if (action != null) ...[
+        const SizedBox(height: HistaeTokens.sectionSpacing),
+        action!,
+      ],
       if (reference != null) ...[
-        const SizedBox(height: 24),
+        const SizedBox(height: HistaeTokens.sectionSpacing),
         SelectableText(
           reference!,
           style: Theme.of(context).textTheme.bodySmall,
