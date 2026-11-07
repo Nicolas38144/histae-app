@@ -18,6 +18,7 @@ import '../data/matches_repository.dart';
 import '../data/realtime_client.dart';
 import 'match_deadline_scheduler.dart';
 import 'message_outbox.dart';
+import 'message_retry_scheduler.dart';
 
 class MatchesController extends ChangeNotifier implements MatchAccess {
   MatchesController(
@@ -35,7 +36,9 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     this.realtime.onState = (connected, _) {
       if (!active || !_realtimeEnabled) return;
       realtimeConnected = connected;
-      if (connected && _recoverableSend(sendFailure) && canSend) {
+      if (connected &&
+          MessageRetryScheduler.isRecoverable(sendFailure) &&
+          canSend) {
         unawaited(resumeSend());
       }
       _notify();
@@ -125,26 +128,19 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   RequestCancellation _scope = RequestCancellation(),
       _chatScope = RequestCancellation();
   Future<void>? _sync;
-  Timer? _debounce, _sendRetry;
-  int _sendAttempts = 0;
-
-  bool _recoverableSend(ApiFailure? error) =>
-      error != null &&
-      {
-        ApiFailureKind.network,
-        ApiFailureKind.timeout,
-        ApiFailureKind.server,
-        ApiFailureKind.unavailable,
-        ApiFailureKind.cancelled,
-      }.contains(error.kind);
+  Timer? _debounce;
+  late final _sendRetry = MessageRetryScheduler(
+    onRetry: () {
+      if (canSend) unawaited(resumeSend(automatic: true));
+    },
+  );
 
   void _retrySendLater() {
-    _sendRetry?.cancel();
-    if (!active || !_recoverableSend(sendFailure) || _sendAttempts >= 4) return;
-    final delay = [2, 5, 10, 20][_sendAttempts++];
-    _sendRetry = Timer(Duration(seconds: delay), () {
-      if (canSend) unawaited(resumeSend(automatic: true));
-    });
+    if (!active || !MessageRetryScheduler.isRecoverable(sendFailure)) {
+      _sendRetry.cancel();
+      return;
+    }
+    _sendRetry.schedule();
   }
 
   late final _deadlines = MatchDeadlineScheduler(
@@ -304,6 +300,11 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     _notify();
   }
 
+  void _restoreDrafts(DraftController drafts) {
+    _outbox.restore(drafts.messages);
+    _outbox.restorePending(drafts.pending);
+  }
+
   Future<void> activate({bool refresh = false}) async {
     if (!accessible || _active) return;
     if (!_active) {
@@ -315,8 +316,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     if (drafts case final drafts?) {
       await drafts.ready;
       if (!_alive(epoch)) return;
-      _outbox.restore(drafts.messages);
-      _outbox.restorePending(drafts.pending);
+      _restoreDrafts(drafts);
     }
     await _sync;
     if (!_alive(epoch)) return;
@@ -334,7 +334,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     realtime.stop();
     _deadlines.cancel();
     _debounce?.cancel();
-    _sendRetry?.cancel();
+    _sendRetry.cancel();
     _verified = false;
     _listVerified = false;
     realtimeConnected = false;
@@ -626,8 +626,8 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
             pendingMessage != null) {
           unawaited(resumeSend());
         } else if (canSend &&
-            _recoverableSend(sendFailure) &&
-            _sendRetry?.isActive != true) {
+            MessageRetryScheduler.isRecoverable(sendFailure) &&
+            !_sendRetry.isActive) {
           _retrySendLater();
         }
       }
@@ -764,10 +764,9 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       final owner = session.resourceKey;
       await drafts.ready;
       if (!accessible || session.resourceKey != owner) return;
-      _outbox.restore(drafts.messages);
-      _outbox.restorePending(drafts.pending);
+      _restoreDrafts(drafts);
     }
-    _sendRetry?.cancel();
+    _sendRetry.cancel();
     _chatEpoch++;
     _chatScope.cancel();
     _chatScope = RequestCancellation();
@@ -791,7 +790,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   void closeChat(String id, {bool notify = true}) {
     if (selectedId != id) return;
     if (sending) _outbox.interrupt(id);
-    _sendRetry?.cancel();
+    _sendRetry.cancel();
     _chatEpoch++;
     _chatScope.cancel();
     _chatScope = RequestCancellation();
@@ -873,8 +872,8 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   Future<void> resumeSend({bool automatic = false}) async {
     final match = selected, intent = pendingMessage;
     if (!canSend || sending || match == null || intent == null) return;
-    _sendRetry?.cancel();
-    if (!automatic) _sendAttempts = 0;
+    _sendRetry.cancel();
+    if (!automatic) _sendRetry.reset();
     final epoch = _epoch, chatEpoch = _chatEpoch;
     sending = true;
     _outbox.clearFailure(match.id);
@@ -895,7 +894,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
             _messages.insert(0, message);
           }
           _outbox.acknowledge(match.id, next);
-          _sendAttempts = 0;
+          _sendRetry.reset();
           _notify();
         } on ApiFailure catch (e) {
           if (!_chatAlive(epoch, chatEpoch, match.id)) return;

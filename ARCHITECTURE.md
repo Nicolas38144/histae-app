@@ -69,6 +69,9 @@ Backgrounding flushes the composer; suspension cancels retry timers and active r
 validation and permission failures do not enter the network retry loop. Realtime updates
 merge silently without rebuilding the composer, showing a loading bar or disturbing focus.
 
+`MessageRetryScheduler` owns retry delays, attempt limits and timer cancellation. The matches
+controller checks current access before invoking the transport and restores drafts/intents together.
+
 `RealtimeHub` shares one SSE connection between matches, notifications and subscription state.
 Relevant events invalidate only affected resources; reconnection resynchronizes state. An unrelated
 match event must not reload the current history. Notification navigation rechecks authorized access.
@@ -97,7 +100,9 @@ Use the snapshot's original timestamp for the 50-second download window of a 60-
 A stale/rejected URL permits one authorized renewal, without rereading unchanged message history
 or entering a retry loop. Private photos never use disk caching or speculative partner downloads.
 
-Camera/gallery selection stages an oriented, EXIF-free JPEG of at most 500,000 bytes. Upload is
+`PhotoCropPage` owns private image/session lifecycle and preparation; `PhotoCropEditor` owns
+gestures and controls. Immutable geometry and the shared renderer keep export/avatar framing aligned.
+Camera/gallery selection opens local cropping, then stages an EXIF-free JPEG of at most 500,000 bytes. Upload is
 explicit; an uncertain retry preserves the bytes and key. Discard interrupted Android capture copies.
 Photo availability comes from the API; do not use its compatibility moderation status as a review
 step. Biography and answer moderation remain separate.

@@ -214,6 +214,7 @@ void main() {
         await tester.pumpAndSettle();
         final out = find.byKey(const Key('photo-crop-zoom-out'));
         await tester.scrollUntilVisible(out, 150);
+        await tester.pumpAndSettle();
         expect(tester.widget<IconButton>(out).onPressed, isNull);
         await tester.tap(find.byKey(const Key('photo-crop-rotate')));
         await tester.pumpAndSettle();
@@ -221,6 +222,7 @@ void main() {
           find.byKey(const Key('photo-crop-avatar-preview')),
           100,
         );
+        await tester.pumpAndSettle();
         final views = tester
             .widgetList<PhotoCropImage>(find.byType(PhotoCropImage))
             .toList();
