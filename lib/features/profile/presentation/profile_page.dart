@@ -20,8 +20,6 @@ import '../../discovery/application/discovery_visibility_controller.dart';
 import '../../discovery/presentation/discovery_pause_card.dart';
 import '../../help/presentation/help_page.dart';
 import '../../notifications/data/device_repository.dart';
-import '../../notifications/presentation/devices_page.dart';
-import '../../notifications/presentation/push_scope.dart';
 import '../../privacy/data/privacy_repository.dart';
 import '../../privacy/presentation/privacy_hub_page.dart';
 import '../application/profile_controller.dart';
@@ -257,21 +255,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     session: controller.session,
                     repository: widget.privacyRepository,
                     deviceRepository: widget.deviceRepository,
-                  ),
-                ),
-              ),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.notifications_none),
-                trailing: const Icon(Icons.chevron_right_rounded),
-                title: Text(
-                  strings.messages.devicesPageDevicesAndNotifications,
-                ),
-                onTap: () => _open(
-                  DevicesPage(
-                    session: controller.session,
-                    repository: widget.deviceRepository,
-                    push: PushScope.maybeOf(context),
                   ),
                 ),
               ),
