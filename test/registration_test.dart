@@ -9,7 +9,6 @@ import 'package:histae_app/core/widgets/preference_slider.dart';
 import 'package:histae_app/features/consents/domain/consent_state.dart';
 import 'package:histae_app/features/profile/data/profile_models.dart';
 import 'package:histae_app/features/registration/application/registration_controller.dart';
-import 'package:histae_app/features/registration/application/registration_dates.dart';
 import 'package:histae_app/features/registration/application/registration_draft.dart';
 import 'package:histae_app/features/registration/presentation/registration_page.dart';
 import 'package:histae_app/features/registration/presentation/registration_preferences_step.dart';

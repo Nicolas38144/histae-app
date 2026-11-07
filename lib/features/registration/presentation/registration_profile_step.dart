@@ -5,8 +5,8 @@ import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../profile/data/profile_models.dart';
+import '../../profile/presentation/birthdate_field.dart';
 import '../../profile/presentation/profile_strings.dart';
-import '../application/registration_dates.dart';
 import '../application/registration_draft.dart';
 
 class RegistrationProfileStep extends StatefulWidget {
@@ -49,25 +49,6 @@ class _RegistrationProfileStepState extends State<RegistrationProfileStep> {
     super.dispose();
   }
 
-  Future<void> _chooseBirthdate() async {
-    FocusScope.of(context).unfocus();
-    final latest = latestAdultBirthdate(DateTime.now());
-    final selected = await showDatePicker(
-      context: context,
-      initialDate: _birthdate ?? latest,
-      firstDate: DateTime(1900),
-      lastDate: latest,
-      initialEntryMode: DatePickerEntryMode.calendarOnly,
-      initialDatePickerMode: DatePickerMode.year,
-      helpText: AppStrings.of(context).messages.identityEditorDateOfBirth,
-    );
-    if (selected == null || !mounted) return;
-    setState(() {
-      _birthdate = selected;
-      _changed();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
@@ -90,26 +71,13 @@ class _RegistrationProfileStepState extends State<RegistrationProfileStep> {
           onChanged: (_) => _changed(),
         ),
         const SizedBox(height: 20),
-        Semantics(
+        BirthdateField(
           key: const Key('registration-birthdate'),
-          button: true,
-          child: InkWell(
-            onTap: _chooseBirthdate,
-            borderRadius: BorderRadius.circular(16),
-            child: InputDecorator(
-              decoration: InputDecoration(
-                labelText: copy.identityEditorDateOfBirth,
-                helperText: copy.registrationAdultOnly,
-                suffixIcon: const Icon(Icons.calendar_month_outlined),
-              ),
-              child: Text(
-                _birthdate == null
-                    ? copy.registrationChooseDate
-                    : MaterialLocalizations.of(context)
-                          .formatMediumDate(_birthdate!),
-              ),
-            ),
-          ),
+          value: _birthdate,
+          onChanged: (value) => setState(() {
+            _birthdate = value;
+            _changed();
+          }),
         ),
         const SizedBox(height: 20),
         DropdownButtonFormField<String>(

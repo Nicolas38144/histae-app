@@ -2626,10 +2626,6 @@
   "@identityEditorDateOfBirth": {
     "description": "Interface: lib/features/profile/presentation/identity_editor.dart"
   },
-  "identityEditorYyyyMmDdYouMustBe": "AAAA-MM-JJ · Vous devez avoir 18 ans ou plus.",
-  "@identityEditorYyyyMmDdYouMustBe": {
-    "description": "Interface: lib/features/profile/presentation/identity_editor.dart"
-  },
   "identityEditorSex": "Sexe",
   "@identityEditorSex": {
     "description": "Interface: lib/features/profile/presentation/identity_editor.dart"

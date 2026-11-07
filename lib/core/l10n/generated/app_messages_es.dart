@@ -2258,10 +2258,6 @@ class AppMessagesEs extends AppMessages {
   String get identityEditorDateOfBirth => 'Fecha de nacimiento';
 
   @override
-  String get identityEditorYyyyMmDdYouMustBe =>
-      'AAAA-MM-DD · Debes tener 18 años o más.';
-
-  @override
   String get identityEditorSex => 'Sexo';
 
   @override

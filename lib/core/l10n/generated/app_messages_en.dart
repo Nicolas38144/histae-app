@@ -2232,10 +2232,6 @@ class AppMessagesEn extends AppMessages {
   String get identityEditorDateOfBirth => 'Date of birth';
 
   @override
-  String get identityEditorYyyyMmDdYouMustBe =>
-      'YYYY-MM-DD · You must be 18 or over.';
-
-  @override
   String get identityEditorSex => 'Sex';
 
   @override

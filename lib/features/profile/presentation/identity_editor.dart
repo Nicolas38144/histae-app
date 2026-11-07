@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../application/profile_controller.dart';
 import '../data/profile_models.dart';
+import 'birthdate_field.dart';
 import 'profile_editor.dart';
 import 'profile_strings.dart';
 
@@ -21,8 +23,8 @@ class _IdentityEditorState extends ProfileEditorState<IdentityEditor> {
   late final firstname = TextEditingController(
     text: controller.profile?.firstname,
   );
-  late final birthdate = TextEditingController(
-    text: controller.profile?.birthdate,
+  late DateTime? birthdate = parseBirthdate(
+    controller.profile?.birthdate ?? '',
   );
   late final bio = TextEditingController(text: controller.profile?.bio);
   late String sex = controller.profile?.sex ?? '';
@@ -30,7 +32,6 @@ class _IdentityEditorState extends ProfileEditorState<IdentityEditor> {
   @override
   void dispose() {
     firstname.dispose();
-    birthdate.dispose();
     bio.dispose();
     super.dispose();
   }
@@ -47,11 +48,18 @@ class _IdentityEditorState extends ProfileEditorState<IdentityEditor> {
       ),
       const SizedBox(height: 24),
       field(firstname, AppStrings.of(context).messages.identityEditorFirstName),
-      field(
-        birthdate,
-        AppStrings.of(context).messages.identityEditorDateOfBirth,
-        keyboard: TextInputType.datetime,
-        hint: AppStrings.of(context).messages.identityEditorYyyyMmDdYouMustBe,
+      Padding(
+        padding: const EdgeInsets.only(bottom: HistaeTokens.panelInset),
+        child: BirthdateField(
+          key: const Key('profile-birthdate'),
+          value: birthdate,
+          onChanged: busy || controller.saving
+              ? null
+              : (value) => setState(() {
+                  birthdate = value;
+                  changed();
+                }),
+        ),
       ),
       if (controller.sensitiveAllowed)
         DropdownButtonFormField<String>(
@@ -85,16 +93,11 @@ class _IdentityEditorState extends ProfileEditorState<IdentityEditor> {
             .messages
             .identityEditor2000BytesMaximumAvoidContact,
       ),
-      if (controller.profile?.bioModeration != null)
-        Text(
-          ProfileStrings(AppStrings.of(context))
-              .moderation(controller.profile!.bioModeration),
-        ),
     ],
     save: () {
       final draft = ProfileDraft(
         firstname.text,
-        birthdate.text.trim(),
+        birthdate?.toIso8601String().substring(0, 10) ?? '',
         sex.isEmpty ? null : sex,
         bio.text.isEmpty && controller.profile?.bio == null ? null : bio.text,
       );

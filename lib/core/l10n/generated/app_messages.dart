@@ -3726,12 +3726,6 @@ abstract class AppMessages {
   /// Interface: lib/features/profile/presentation/identity_editor.dart
   ///
   /// In fr, this message translates to:
-  /// **'AAAA-MM-JJ · Vous devez avoir 18 ans ou plus.'**
-  String get identityEditorYyyyMmDdYouMustBe;
-
-  /// Interface: lib/features/profile/presentation/identity_editor.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Sexe'**
   String get identityEditorSex;
 

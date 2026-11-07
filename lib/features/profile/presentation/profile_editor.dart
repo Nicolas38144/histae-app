@@ -211,7 +211,6 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
     TextEditingController text,
     String label, {
     int lines = 1,
-    TextInputType? keyboard,
     String? hint,
   }) => Padding(
     padding: const EdgeInsets.only(bottom: 20),
@@ -225,7 +224,6 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
         helperMaxLines: 4,
       ),
       maxLines: lines,
-      keyboardType: keyboard,
     ),
   );
 }

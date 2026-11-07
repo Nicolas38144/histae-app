@@ -12,6 +12,7 @@ import 'package:histae_app/features/consents/domain/consent_state.dart';
 import 'package:histae_app/features/profile/application/profile_controller.dart';
 import 'package:histae_app/features/profile/data/photo_crop_processor.dart';
 import 'package:histae_app/features/profile/data/photo_preparer.dart';
+import 'package:histae_app/features/profile/data/profile_models.dart';
 import 'package:histae_app/features/profile/data/profile_repository.dart';
 import 'package:histae_app/features/profile/presentation/photo_page.dart';
 import 'package:histae_app/features/profile/presentation/profile_editors.dart';
@@ -373,10 +374,13 @@ void main() {
       await tester.pumpAndSettle();
       await tapVisible(tester, find.text('Créer mon profil'));
       await tester.enterText(find.widgetWithText(TextField, 'Prénom'), 'Alex');
-      await tester.enterText(
-        find.widgetWithText(TextField, 'Date de naissance'),
-        '1995-06-12',
-      );
+      await tapVisible(tester, find.byKey(const Key('profile-birthdate')));
+      tester
+          .widget<CalendarDatePicker>(find.byType(CalendarDatePicker))
+          .onDateChanged(DateTime(1995, 6, 12));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
       await tapVisible(tester, find.text('Enregistrer'));
       expect(profile, {
         'firstname': 'Alex',
@@ -414,7 +418,7 @@ void main() {
     expect(find.byType(IdentityEditor), findsNothing);
   });
   testWidgets(
-    'minor birthdate is rejected before network and unsaved edits ask before leaving',
+    'profile date picker excludes minors, preserves cancelled dates and protects unsaved edits',
     (tester) async {
       var patches = 0;
       final session = testSession((r) async {
@@ -446,16 +450,39 @@ void main() {
       );
       await tester.tap(find.text('Ouvrir'));
       await tester.pumpAndSettle();
-      await tester.enterText(
-        find.widgetWithText(TextField, 'Date de naissance'),
-        '2020-01-01',
+      expect(find.text('Approuvé'), findsNothing);
+      expect(find.widgetWithText(TextField, 'Date de naissance'), findsNothing);
+      await tapVisible(tester, find.byKey(const Key('profile-birthdate')));
+      final dialog = find.byType(DatePickerDialog);
+      final picker = tester.widget<DatePickerDialog>(dialog);
+      expect(picker.initialEntryMode, DatePickerEntryMode.calendarOnly);
+      expect(picker.initialDate, DateTime(1995, 6, 12));
+      expect(picker.lastDate, latestAdultBirthdate(DateTime.now()));
+      expect(
+        find.descendant(of: dialog, matching: find.byType(EditableText)),
+        findsNothing,
       );
-      await tapVisible(tester, find.text('Enregistrer'));
+      await tester.tap(
+        find.text(
+          MaterialLocalizations.of(tester.element(dialog)).cancelButtonLabel,
+        ),
+      );
+      await tester.pumpAndSettle();
       expect(patches, 0);
       expect(
-        find.text('Histae est réservé aux personnes de 18 ans et plus.'),
+        find.text(
+          MaterialLocalizations.of(tester.element(find.byType(IdentityEditor)))
+              .formatCompactDate(DateTime(1995, 6, 12)),
+        ),
         findsOneWidget,
       );
+      tester
+          .state<ScrollableState>(verticalScrollables.first)
+          .position
+          .jumpTo(0);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.widgetWithText(TextField, 'Prénom'), 'Alex');
+      await tester.pumpAndSettle();
       await tester.pageBack();
       await tester.pumpAndSettle();
       expect(find.text('Quitter sans enregistrer ?'), findsOneWidget);
