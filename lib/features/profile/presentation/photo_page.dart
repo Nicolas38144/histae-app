@@ -10,8 +10,11 @@ import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../application/profile_controller.dart';
+import '../data/photo_crop_processor.dart';
 import '../data/photo_preparer.dart';
 import '../data/profile_models.dart';
+import 'photo_crop_page.dart';
+import 'photo_selection_preview.dart';
 import 'profile_strings.dart';
 
 class PhotoPage extends StatefulWidget {
@@ -19,10 +22,12 @@ class PhotoPage extends StatefulWidget {
     super.key,
     required this.controller,
     this.preparer,
+    this.cropProcessor,
     this.photoClient,
   });
   final ProfileController controller;
   final PhotoPreparer? preparer;
+  final PhotoCropProcessor? cropProcessor;
   final PhotoClientFactory? photoClient;
 
   @override
@@ -188,7 +193,21 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
           c.accessible &&
           c.session.resourceKey == _ownerScope &&
           bytes != null) {
-        c.setPhoto(bytes);
+        final prepared = await Navigator.of(context).push<Uint8List>(
+          MaterialPageRoute(
+            builder: (_) => PhotoCropPage(
+              bytes: bytes,
+              session: c.session,
+              processor: widget.cropProcessor,
+            ),
+          ),
+        );
+        if (mounted &&
+            c.accessible &&
+            c.session.resourceKey == _ownerScope &&
+            prepared != null) {
+          c.setPhoto(prepared);
+        }
       }
     } on ApiFailure catch (e) {
       if (mounted) {
@@ -259,30 +278,15 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
               ),
               const SizedBox(height: 24),
               if (preview != null)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(28),
-                  child: Image.memory(
-                    preview,
-                    height: 320,
-                    fit: BoxFit.contain,
-                    semanticLabel: intent == null
-                        ? AppStrings.of(context)
-                              .messages
-                              .photoPageYourCurrentPhoto
-                        : AppStrings.of(context)
-                              .messages
-                              .photoPageYourSelectionNotYetConfirmedBy,
-                    errorBuilder: (_, _, _) => SizedBox(
-                      height: 120,
-                      child: Center(
-                        child: Text(
-                          AppStrings.of(context)
-                              .messages
-                              .photoPagePreviewUnavailable,
-                        ),
-                      ),
-                    ),
-                  ),
+                PhotoSelectionPreview(
+                  bytes: preview,
+                  label: intent == null
+                      ? AppStrings.of(context)
+                            .messages
+                            .photoPageYourCurrentPhoto
+                      : AppStrings.of(context)
+                            .messages
+                            .photoPageYourSelectionNotYetConfirmedBy,
                 ),
               if (_fetching || _choosing || c.saving || c.loading)
                 LinearProgressIndicator(
@@ -291,11 +295,11 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
                       .photoPagePreparingOrLoadingPhoto,
                 ),
               if (intent != null)
-                Text(
-                  AppStrings.of(context).messages
-                      .photoPagePreparedSelectionBytesItWillReplace(
-                        intent.bytes.length,
-                      ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: Text(
+                    AppStrings.of(context).messages.photoCropSelectionReady,
+                  ),
                 ),
               if (_message != null)
                 Padding(
@@ -317,6 +321,20 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
                       .appStringsTryAgainInS(c.retrySeconds),
                 ),
               const SizedBox(height: 24),
+              if (intent != null) ...[
+                const SizedBox(height: 12),
+                HistaeButton(
+                  onPressed:
+                      _choosing || c.saving || c.loading || c.retrySeconds > 0
+                      ? null
+                      : _upload,
+                  child: Text(
+                    c.uncertain
+                        ? AppStrings.of(context).messages.photoCropResumeUpload
+                        : AppStrings.of(context).messages.photoCropSavePhoto,
+                  ),
+                ),
+              ],
               HistaeButton.outlinedIcon(
                 onPressed: !c.canWrite || _choosing
                     ? null
@@ -338,20 +356,6 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
                             .photoPageChooseAnotherPhoto,
                 ),
               ),
-              if (intent != null) ...[
-                const SizedBox(height: 12),
-                HistaeButton(
-                  onPressed:
-                      _choosing || c.saving || c.loading || c.retrySeconds > 0
-                      ? null
-                      : _upload,
-                  child: Text(
-                    AppStrings.of(context)
-                        .messages
-                        .photoPageSendOrResumeThisPhoto,
-                  ),
-                ),
-              ],
               if (c.uncertain || _needsPreviewRecovery)
                 HistaeButton.text(
                   onPressed: c.loading || c.saving || c.retrySeconds > 0

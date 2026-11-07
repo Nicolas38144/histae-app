@@ -2336,7 +2336,7 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get photoPageYourSelectionNotYetConfirmedBy =>
-      'Su selección, aún sin guardar';
+      'Vista previa de tu nueva foto, aún sin guardar';
 
   @override
   String get photoPagePreviewUnavailable => 'Vista previa no disponible';
@@ -2346,19 +2346,11 @@ class AppMessagesEs extends AppMessages {
       'Preparando o cargando la foto';
 
   @override
-  String photoPagePreparedSelectionBytesItWillReplace(Object arg0) {
-    return 'Selección preparada: $arg0 bytes. Sustituirá tu foto actual tras el envío.';
-  }
-
-  @override
   String get photoPageTheUploadMayHaveSucceededResuming =>
       'El envío puede haber tenido éxito. Al retomarlo se conservan la misma foto y solicitud. No hay reenvío automático.';
 
   @override
   String get photoPageChooseAPhoto => 'Elegir una foto';
-
-  @override
-  String get photoPageSendOrResumeThisPhoto => 'Enviar o retomar esta foto';
 
   @override
   String get photoPageRefreshPhoto => 'Actualizar la foto';
@@ -3636,4 +3628,55 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get notificationMuteIndefinitely => 'Silenciar hasta que las reactive';
+
+  @override
+  String get photoCropTitle => 'Ajustar mi foto';
+
+  @override
+  String get photoCropInstructions =>
+      'Mueve la foto o pellizca para ajustar el zoom. Revisa también el avatar.';
+
+  @override
+  String get photoCropPortrait => 'Foto revelada';
+
+  @override
+  String get photoCropAvatar => 'Avatar en tus conversaciones';
+
+  @override
+  String get photoCropZoom => 'Zoom';
+
+  @override
+  String photoCropZoomPercent(int percent) {
+    return '$percent %';
+  }
+
+  @override
+  String get photoCropRotate => 'Girar la foto';
+
+  @override
+  String get photoCropReset => 'Restablecer el encuadre';
+
+  @override
+  String get photoCropZoomOut => 'Alejar';
+
+  @override
+  String get photoCropZoomIn => 'Acercar';
+
+  @override
+  String get photoCropUse => 'Usar este encuadre';
+
+  @override
+  String get photoCropPreparing => 'Preparando la foto…';
+
+  @override
+  String get photoCropBack => 'Volver a elegir la foto';
+
+  @override
+  String get photoCropSelectionReady => 'Tu nueva foto aún no se ha guardado.';
+
+  @override
+  String get photoCropSavePhoto => 'Guardar mi foto';
+
+  @override
+  String get photoCropResumeUpload => 'Reanudar el envío';
 }

@@ -31,7 +31,10 @@ atomic with publication; see the roadmap.
 Profiles contain identity, biography, traits and up to three ordered answers. Saving answers
 replaces the whole list. Public projections show approved text; owners see text moderation state.
 A private photo is required for discovery, becomes available after upload, and stays hidden from
-the feed. Selecting/capturing stages it before upload; replacement affects authorized reveals.
+the feed. Camera/gallery selection opens a local portrait crop with drag/pinch, accessible zoom,
+rotation/reset and a live circular avatar preview. Confirming stages the framed photo; only explicit
+Save uploads it. Processing strips metadata and bounds decoded dimensions and final JPEG size.
+Cancelling preserves an earlier staged choice; replacement affects authorized reveals.
 The owner preview reuses public components without inventing a distance or partner photo.
 
 Readiness explains missing steps. Requesting location obtains one fresh position, with no

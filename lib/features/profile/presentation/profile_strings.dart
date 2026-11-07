@@ -19,7 +19,7 @@ class ProfileStrings {
       strings.messages.profileStringsThisTraitIsNoLongerAvailable,
     'profile_not_found' =>
       strings.messages.profileStringsCreateYourProfileFirst,
-    'photo_selection_unavailable' =>
+    'photo_selection_unavailable' || 'photo_crop_unavailable' =>
       strings.messages.profileStringsThePhotoCouldNotBePrepared,
     'invalid_photo' =>
       strings.messages.profileStringsThisPhotoIsNotRecognizedChoose,

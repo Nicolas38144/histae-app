@@ -37,7 +37,7 @@ Documentation-only changes need no Flutter tests. Run Flutter checks/builds seri
 | Sessions/OTP | `session_test.dart`, `auth_widget_test.dart`, `otp_test.dart` |
 | Cache/navigation | `read_snapshots_test.dart`, `cache_lifecycle_regressions_test.dart`, `cached_conversation_test.dart` |
 | Feed/location | `discovery_test.dart`, `discovery_pause_test.dart`, `device_location_test.dart`, `feed_reading_delay_test.dart` |
-| Photos/privacy | `photo_sharing_test.dart`, `continuation_test.dart`, `private_photo_cache_test.dart`, `private_photo_test.dart`, `match_profile_test.dart` |
+| Photos/privacy | `photo_crop_test.dart`, `profile_widget_test.dart`, `photo_sharing_test.dart`, `continuation_test.dart`, `private_photo_cache_test.dart`, `private_photo_test.dart`, `match_profile_test.dart` |
 | Messaging/matches | `conversation_updates_test.dart`, `matches_inactivity_test.dart`, `matches_visibility_test.dart` |
 | Native boundaries | `billing_test.dart`, `store_updates_test.dart`, `app_privacy_shield_test.dart` |
 | Notifications | `notification_preferences_test.dart`, `notifications_test.dart`, `notification_navigation_test.dart` |
@@ -66,6 +66,7 @@ translations, 200% text, keyboard layouts and insets against the [design system]
 | `preview_continuation_test.dart` | Credit/Premium continuation, automatic confirmation, empty balances and refresh controls |
 | `preview_feed_test.dart`, `preview_reading_test.dart` | Feed actions and Aa settings |
 | `preview_photo_reveal_test.dart` | Match, chat, photo consent and withdrawal |
+| `preview_photo_crop_test.dart` | Local crop controls, live avatar and staged profile previews |
 | `preview_refactor_test.dart` | Navigation, archives/search and profile states |
 | `preview_website_test.dart` | Website captures, followed by the site's `scripts/export-app-screenshots.mjs` |
 

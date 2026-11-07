@@ -2714,7 +2714,7 @@
   "@photoPageYourCurrentPhoto": {
     "description": "Interface: lib/features/profile/presentation/photo_page.dart"
   },
-  "photoPageYourSelectionNotYetConfirmedBy": "Votre sélection, pas encore enregistrée",
+  "photoPageYourSelectionNotYetConfirmedBy": "Aperçu de votre nouvelle photo, pas encore enregistrée",
   "@photoPageYourSelectionNotYetConfirmedBy": {
     "description": "Interface: lib/features/profile/presentation/photo_page.dart"
   },
@@ -2726,25 +2726,12 @@
   "@photoPagePreparingOrLoadingPhoto": {
     "description": "Interface: lib/features/profile/presentation/photo_page.dart"
   },
-  "photoPagePreparedSelectionBytesItWillReplace": "Sélection préparée : {arg0} octets. Elle remplacera votre photo actuelle après envoi.",
-  "@photoPagePreparedSelectionBytesItWillReplace": {
-    "description": "Interface: lib/features/profile/presentation/photo_page.dart",
-    "placeholders": {
-      "arg0": {
-        "type": "Object"
-      }
-    }
-  },
   "photoPageTheUploadMayHaveSucceededResuming": "L’envoi peut avoir abouti. Reprendre conserve exactement la même photo et la même demande. Aucun renvoi automatique.",
   "@photoPageTheUploadMayHaveSucceededResuming": {
     "description": "Interface: lib/features/profile/presentation/photo_page.dart"
   },
   "photoPageChooseAPhoto": "Choisir une photo",
   "@photoPageChooseAPhoto": {
-    "description": "Interface: lib/features/profile/presentation/photo_page.dart"
-  },
-  "photoPageSendOrResumeThisPhoto": "Envoyer ou reprendre cette photo",
-  "@photoPageSendOrResumeThisPhoto": {
     "description": "Interface: lib/features/profile/presentation/photo_page.dart"
   },
   "photoPageRefreshPhoto": "Actualiser la photo",
@@ -4129,5 +4116,28 @@
   "notificationUnmute": "Réactiver les alertes",
   "notificationMuteHour": "Couper pendant une heure",
   "notificationMuteTomorrow": "Couper jusqu’à demain",
-  "notificationMuteIndefinitely": "Couper jusqu’à réactivation"
+  "notificationMuteIndefinitely": "Couper jusqu’à réactivation",
+  "photoCropTitle": "Ajuster ma photo",
+  "photoCropInstructions": "Déplacez la photo ou pincez pour zoomer. Vérifiez aussi le petit avatar.",
+  "photoCropPortrait": "Photo dévoilée",
+  "photoCropAvatar": "Avatar dans vos échanges",
+  "photoCropZoom": "Zoom",
+  "photoCropZoomPercent": "{percent} %",
+  "@photoCropZoomPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "photoCropRotate": "Tourner la photo",
+  "photoCropReset": "Réinitialiser le cadrage",
+  "photoCropZoomOut": "Réduire le zoom",
+  "photoCropZoomIn": "Augmenter le zoom",
+  "photoCropUse": "Utiliser ce cadrage",
+  "photoCropPreparing": "Préparation de la photo…",
+  "photoCropBack": "Revenir au choix de la photo",
+  "photoCropSelectionReady": "Votre nouvelle photo n’est pas encore enregistrée.",
+  "photoCropSavePhoto": "Enregistrer ma photo",
+  "photoCropResumeUpload": "Reprendre l’envoi"
 }

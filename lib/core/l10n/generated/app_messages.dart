@@ -3858,7 +3858,7 @@ abstract class AppMessages {
   /// Interface: lib/features/profile/presentation/photo_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Votre sélection, pas encore enregistrée'**
+  /// **'Aperçu de votre nouvelle photo, pas encore enregistrée'**
   String get photoPageYourSelectionNotYetConfirmedBy;
 
   /// Interface: lib/features/profile/presentation/photo_page.dart
@@ -3876,12 +3876,6 @@ abstract class AppMessages {
   /// Interface: lib/features/profile/presentation/photo_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Sélection préparée : {arg0} octets. Elle remplacera votre photo actuelle après envoi.'**
-  String photoPagePreparedSelectionBytesItWillReplace(Object arg0);
-
-  /// Interface: lib/features/profile/presentation/photo_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'L’envoi peut avoir abouti. Reprendre conserve exactement la même photo et la même demande. Aucun renvoi automatique.'**
   String get photoPageTheUploadMayHaveSucceededResuming;
 
@@ -3890,12 +3884,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Choisir une photo'**
   String get photoPageChooseAPhoto;
-
-  /// Interface: lib/features/profile/presentation/photo_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Envoyer ou reprendre cette photo'**
-  String get photoPageSendOrResumeThisPhoto;
 
   /// Profile photo capture, availability and private sharing.
   ///
@@ -6001,6 +5989,102 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Couper jusqu’à réactivation'**
   String get notificationMuteIndefinitely;
+
+  /// No description provided for @photoCropTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajuster ma photo'**
+  String get photoCropTitle;
+
+  /// No description provided for @photoCropInstructions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déplacez la photo ou pincez pour zoomer. Vérifiez aussi le petit avatar.'**
+  String get photoCropInstructions;
+
+  /// No description provided for @photoCropPortrait.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo dévoilée'**
+  String get photoCropPortrait;
+
+  /// No description provided for @photoCropAvatar.
+  ///
+  /// In fr, this message translates to:
+  /// **'Avatar dans vos échanges'**
+  String get photoCropAvatar;
+
+  /// No description provided for @photoCropZoom.
+  ///
+  /// In fr, this message translates to:
+  /// **'Zoom'**
+  String get photoCropZoom;
+
+  /// No description provided for @photoCropZoomPercent.
+  ///
+  /// In fr, this message translates to:
+  /// **'{percent} %'**
+  String photoCropZoomPercent(int percent);
+
+  /// No description provided for @photoCropRotate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tourner la photo'**
+  String get photoCropRotate;
+
+  /// No description provided for @photoCropReset.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réinitialiser le cadrage'**
+  String get photoCropReset;
+
+  /// No description provided for @photoCropZoomOut.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réduire le zoom'**
+  String get photoCropZoomOut;
+
+  /// No description provided for @photoCropZoomIn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Augmenter le zoom'**
+  String get photoCropZoomIn;
+
+  /// No description provided for @photoCropUse.
+  ///
+  /// In fr, this message translates to:
+  /// **'Utiliser ce cadrage'**
+  String get photoCropUse;
+
+  /// No description provided for @photoCropPreparing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Préparation de la photo…'**
+  String get photoCropPreparing;
+
+  /// No description provided for @photoCropBack.
+  ///
+  /// In fr, this message translates to:
+  /// **'Revenir au choix de la photo'**
+  String get photoCropBack;
+
+  /// No description provided for @photoCropSelectionReady.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre nouvelle photo n’est pas encore enregistrée.'**
+  String get photoCropSelectionReady;
+
+  /// No description provided for @photoCropSavePhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrer ma photo'**
+  String get photoCropSavePhoto;
+
+  /// No description provided for @photoCropResumeUpload.
+  ///
+  /// In fr, this message translates to:
+  /// **'Reprendre l’envoi'**
+  String get photoCropResumeUpload;
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

@@ -33,6 +33,9 @@ class PhotoPreparer {
             : ImageSource.gallery,
         preferredCameraDevice: CameraDevice.front,
         requestFullMetadata: false,
+        maxWidth: 2400,
+        maxHeight: 2400,
+        imageQuality: 100,
       );
       if (file == null) return null;
       // Bound memory before decoding; input remains local and never goes to API.
@@ -40,23 +43,23 @@ class PhotoPreparer {
         throw const ApiFailure(ApiFailureKind.payloadTooLarge);
       }
       final input = await file.readAsBytes();
-      for (final size in [1600, 1200, 900, 640]) {
-        final output = await FlutterImageCompress.compressWithList(
-          input,
-          minWidth: size,
-          minHeight: size,
-          quality: 80,
-          keepExif: false,
-          autoCorrectionAngle: true,
-          format: CompressFormat.jpeg,
-        );
-        if (output.length >= 3 &&
-            output[0] == 255 &&
-            output[1] == 216 &&
-            output[2] == 255 &&
-            output.length <= 500000) {
-          return output;
-        }
+      // Keep detail for the local crop. The final 500 KB bound is applied only
+      // after the user chooses the framing, never to an uncropped upload.
+      final output = await FlutterImageCompress.compressWithList(
+        input,
+        minWidth: 2400,
+        minHeight: 2400,
+        quality: 95,
+        keepExif: false,
+        autoCorrectionAngle: true,
+        format: CompressFormat.jpeg,
+      );
+      if (output.length >= 3 &&
+          output[0] == 255 &&
+          output[1] == 216 &&
+          output[2] == 255 &&
+          output.length <= 30000000) {
+        return output;
       }
       throw const ApiFailure(ApiFailureKind.payloadTooLarge);
     } on ApiFailure {

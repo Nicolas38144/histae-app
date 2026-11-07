@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,6 +10,7 @@ import 'package:histae_app/core/widgets/histae_button.dart';
 import 'package:histae_app/core/widgets/preference_slider.dart';
 import 'package:histae_app/features/consents/domain/consent_state.dart';
 import 'package:histae_app/features/profile/application/profile_controller.dart';
+import 'package:histae_app/features/profile/data/photo_crop_processor.dart';
 import 'package:histae_app/features/profile/data/photo_preparer.dart';
 import 'package:histae_app/features/profile/data/profile_repository.dart';
 import 'package:histae_app/features/profile/presentation/photo_page.dart';
@@ -20,17 +20,9 @@ import 'package:http/testing.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'support/auth_fixture.dart';
+import 'support/photo_crop_fixture.dart';
 import 'support/profile_fixture.dart';
 import 'support/scrolling.dart';
-
-class TestPhotoPreparer extends PhotoPreparer {
-  Uint8List? selection;
-  @override
-  Future<bool> discardInterruptedSelection() async => false;
-  @override
-  Future<Uint8List?> choose({PhotoSource source = PhotoSource.gallery}) async =>
-      selection;
-}
 
 class _CancelledPicker extends ImagePicker {
   final sources = <ImageSource>[];
@@ -210,8 +202,14 @@ void main() {
     'a captured photo stays staged until sent and an available upload has no review step',
     (tester) async {
       var writes = 0;
-      final pixels = base64Decode(
-        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jLZkAAAAASUVORK5CYII=',
+      final pixels = (await tester.runAsync(() => syntheticCropSource()))!;
+      final decoded = (await tester.runAsync(
+        () => PhotoCropProcessor().decode(pixels),
+      ))!;
+      addTearDown(decoded.dispose);
+      final processor = TestPhotoCropProcessor(
+        image: decoded,
+        prepared: pixels,
       );
       final session = testSession((r) async {
         if (r.url.path.endsWith('/photo') && r.method == 'PUT') writes++;
@@ -240,6 +238,7 @@ void main() {
           home: PhotoPage(
             controller: c,
             preparer: TestPhotoPreparer()..selection = pixels,
+            cropProcessor: processor,
             photoClient: () =>
                 MockClient((_) async => http.Response.bytes(pixels, 200)),
           ),
@@ -247,9 +246,13 @@ void main() {
       );
       await tester.pumpAndSettle();
       await tapVisible(tester, find.text('Prendre une photo'));
+      expect(c.photoIntent, isNull);
+      expect(writes, 0);
+      await tester.tap(find.byKey(const Key('photo-crop-confirm')));
+      await tester.pumpAndSettle();
       expect(c.photoIntent, isNotNull);
       expect(writes, 0);
-      await tapVisible(tester, find.text('Envoyer ou reprendre cette photo'));
+      await tapVisible(tester, find.text('Enregistrer ma photo'));
       expect(writes, 1);
       expect(c.photoIntent, isNull);
       expect(c.profile?.photo, isNotNull);
