@@ -259,7 +259,6 @@ void main() {
       expect(writes, 1);
       expect(c.photoIntent, isNull);
       expect(c.profile?.photo, isNotNull);
-      expect(find.text('Photo enregistrée.'), findsOneWidget);
       expect(find.textContaining('vérification'), findsNothing);
       expect(find.textContaining('après validation'), findsNothing);
       await tester.pumpWidget(const SizedBox.shrink());

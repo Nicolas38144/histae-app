@@ -2256,9 +2256,6 @@ class AppMessagesEn extends AppMessages {
   String get photoPageChooseAnotherPhoto => 'Choose another photo';
 
   @override
-  String get photoPageSaved => 'Photo saved.';
-
-  @override
   String get photoPageYourPhoto => 'Your photo';
 
   @override
@@ -3557,9 +3554,6 @@ class AppMessagesEn extends AppMessages {
   @override
   String get photoCropInstructions =>
       'Move or pinch the photo to adjust it. Check the small avatar too.';
-
-  @override
-  String get photoCropPortrait => 'Revealed photo';
 
   @override
   String get photoCropAvatar => 'Avatar in your conversations';

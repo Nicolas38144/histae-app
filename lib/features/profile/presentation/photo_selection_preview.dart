@@ -19,11 +19,6 @@ class PhotoSelectionPreview extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          text.photoCropPortrait,
-          style: Theme.of(context).textTheme.titleSmall,
-        ),
-        const SizedBox(height: 12),
         Center(
           child: ClipRRect(
             borderRadius: BorderRadius.circular(24),

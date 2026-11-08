@@ -226,13 +226,9 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
   }
 
   Future<void> _upload() async {
+    setState(() => _message = null);
     try {
       await c.upload();
-      if (mounted) {
-        setState(() {
-          _message = (strings) => strings.messages.photoPageSaved;
-        });
-      }
     } on ApiFailure catch (e) {
       if (mounted) {
         setState(() {

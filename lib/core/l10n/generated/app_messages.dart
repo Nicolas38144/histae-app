@@ -3765,12 +3765,6 @@ abstract class AppMessages {
   /// **'Choisir une autre photo'**
   String get photoPageChooseAnotherPhoto;
 
-  /// Profile photo capture, availability and private sharing.
-  ///
-  /// In fr, this message translates to:
-  /// **'Photo enregistrée.'**
-  String get photoPageSaved;
-
   /// Interface: lib/features/profile/presentation/photo_page.dart
   ///
   /// In fr, this message translates to:
@@ -5935,12 +5929,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Déplacez la photo ou pincez pour zoomer. Vérifiez aussi le petit avatar.'**
   String get photoCropInstructions;
-
-  /// No description provided for @photoCropPortrait.
-  ///
-  /// In fr, this message translates to:
-  /// **'Photo dévoilée'**
-  String get photoCropPortrait;
 
   /// No description provided for @photoCropAvatar.
   ///

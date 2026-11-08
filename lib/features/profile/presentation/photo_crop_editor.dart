@@ -34,11 +34,6 @@ class _PhotoCropEditorState extends State<PhotoCropEditor> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          text.photoCropPortrait,
-          style: Theme.of(context).textTheme.titleSmall,
-        ),
-        const SizedBox(height: 12),
         Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 300),
@@ -78,7 +73,7 @@ class _PhotoCropEditorState extends State<PhotoCropEditor> {
                             image: image,
                             crop: crop,
                             grid: true,
-                            label: text.photoCropPortrait,
+                            label: text.photoPageYourSelectionNotYetConfirmedBy,
                           ),
                         ),
                         Positioned(

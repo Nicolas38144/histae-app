@@ -2654,10 +2654,6 @@
   "@photoPageChooseAnotherPhoto": {
     "description": "Interface: lib/features/profile/presentation/photo_page.dart"
   },
-  "photoPageSaved": "Photo enregistrée.",
-  "@photoPageSaved": {
-    "description": "Profile photo capture, availability and private sharing."
-  },
   "photoPageYourPhoto": "Votre photo",
   "@photoPageYourPhoto": {
     "description": "Interface: lib/features/profile/presentation/photo_page.dart"
@@ -4078,7 +4074,6 @@
   "notificationMuteIndefinitely": "Couper jusqu’à réactivation",
   "photoCropTitle": "Ajuster ma photo",
   "photoCropInstructions": "Déplacez la photo ou pincez pour zoomer. Vérifiez aussi le petit avatar.",
-  "photoCropPortrait": "Photo dévoilée",
   "photoCropAvatar": "Avatar dans vos échanges",
   "photoCropZoom": "Zoom",
   "photoCropZoomPercent": "{percent} %",
