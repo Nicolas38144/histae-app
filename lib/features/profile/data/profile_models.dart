@@ -106,8 +106,18 @@ ClientMessage? validateBirthdate(String value, DateTime now) {
 
 class ProfileDraft {
   const ProfileDraft(this.firstname, this.birthdate, this.sex, this.bio);
+
+  /// A biography edit always keeps the identity currently held by the owner.
+  factory ProfileDraft.forBiography(OwnerProfile profile, String? bio) =>
+      ProfileDraft(profile.firstname, profile.birthdate, profile.sex, bio);
+
   final String firstname, birthdate;
   final String? sex, bio;
+
+  bool preservesIdentityOf(OwnerProfile profile) =>
+      firstname.trim() == profile.firstname &&
+      birthdate == profile.birthdate &&
+      sex == profile.sex;
 
   ClientMessage? validate(DateTime now) {
     if (firstname.trim().isEmpty ||

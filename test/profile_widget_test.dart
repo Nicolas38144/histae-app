@@ -405,40 +405,57 @@ void main() {
       expect(find.byType(IdentityEditor), findsNothing);
     },
   );
-  testWidgets('bio edits preserve the locked profile identity', (tester) async {
-    Map<String, dynamic>? patch;
-    final session = testSession((r) async {
-      if (r.url.path == '/api/users/me/consents') {
-        return jsonResponse(
-          consentJson(complete: true, grants: {ConsentType.sensitive: true}),
-        );
-      }
-      if (r.method == 'PATCH') {
-        patch = jsonDecode(r.body) as Map<String, dynamic>;
-      }
-      return defaultProfileResponse(r);
-    });
-    await session.establish(testTokens);
-    await tester.pumpWidget(HistaeApp(sessionController: session));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('main-tab-profile')));
-    await tester.pumpAndSettle();
-    await tapVisible(tester, find.text('Modifier ma présentation'));
-    await tapVisible(
-      tester,
-      find.widgetWithText(TextField, 'Quelques mots sur vous'),
-    );
-    await tester.enterText(
-      find.widgetWithText(TextField, 'Quelques mots sur vous'),
-      'Une nouvelle bio.',
-    );
-    await tapVisible(tester, find.text('Enregistrer'));
-    expect(patch?['firstname'], 'Camille');
-    expect(patch?['birthdate'], '1995-06-12');
-    expect(patch?['sex'], 'female');
-    expect(patch?['bio'], 'Une nouvelle bio.');
-    expect(find.byType(IdentityEditor), findsNothing);
-  });
+  testWidgets(
+    'bio edits preserve identity corrections received while editing',
+    (tester) async {
+      Map<String, dynamic>? patch;
+      var owner = ownerJson();
+      final session = testSession((r) async {
+        if (r.url.path == '/api/users/me') return jsonResponse(owner);
+        if (r.url.path == '/api/users/me/consents') {
+          return jsonResponse(
+            consentJson(complete: true, grants: {ConsentType.sensitive: true}),
+          );
+        }
+        if (r.method == 'PATCH') {
+          patch = jsonDecode(r.body) as Map<String, dynamic>;
+        }
+        return defaultProfileResponse(r);
+      });
+      await session.establish(testTokens);
+      await tester.pumpWidget(HistaeApp(sessionController: session));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('main-tab-profile')));
+      await tester.pumpAndSettle();
+      await tapVisible(tester, find.text('Modifier ma présentation'));
+      await tapVisible(
+        tester,
+        find.widgetWithText(TextField, 'Quelques mots sur vous'),
+      );
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Quelques mots sur vous'),
+        'Une nouvelle bio.',
+      );
+      owner = {
+        ...owner,
+        'firstname': 'Alex',
+        'birthdate': '1992-07-09',
+        'sex': 'male',
+      };
+      final controller = tester
+          .widget<IdentityEditor>(find.byType(IdentityEditor))
+          .controller;
+      await controller.load();
+      await tester.pumpAndSettle();
+      expect(find.text('Une nouvelle bio.'), findsOneWidget);
+      await tapVisible(tester, find.text('Enregistrer'));
+      expect(patch?['firstname'], 'Alex');
+      expect(patch?['birthdate'], '1992-07-09');
+      expect(patch?['sex'], 'male');
+      expect(patch?['bio'], 'Une nouvelle bio.');
+      expect(find.byType(IdentityEditor), findsNothing);
+    },
+  );
   testWidgets(
     'existing identity is read-only while biography edits remain protected',
     (tester) async {

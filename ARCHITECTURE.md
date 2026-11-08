@@ -37,6 +37,10 @@ native location activation; iOS and unsupported devices offer settings.
 
 Registration keeps profile, preferences and consent choices in memory until phone verification.
 Then it rechecks legal metadata and saves permitted fields, preserving an existing account.
+Profile identity is immutable after creation: `ProfileDraft` owns identity comparison and
+biography-only drafts, and the controller rejects identity changes before HTTP. The editor
+keeps creation controls separate from the stateless identity summary. Biography edits use
+the latest owner snapshot, preserving corrections received while the editor stays open.
 The consent precheck compares version, URL and language but cannot make document publication and
 acceptance atomic without an API version precondition.
 

@@ -202,17 +202,14 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
         });
         return;
       }
-      if (action == DiscoveryAction.sex && profile.profile != null) {
-        await _open(PrivacyHubPage(session: c.session));
-        return;
-      }
-      await _open(
-        action == DiscoveryAction.photo
-            ? PhotoPage(controller: profile)
-            : action == DiscoveryAction.preferences
-            ? PreferencesEditor(controller: profile)
-            : IdentityEditor(controller: profile),
-      );
+      await _open(switch (action) {
+        DiscoveryAction.photo => PhotoPage(controller: profile),
+        DiscoveryAction.preferences => PreferencesEditor(controller: profile),
+        DiscoveryAction.sex when profile.profile != null => PrivacyHubPage(
+          session: c.session,
+        ),
+        _ => IdentityEditor(controller: profile),
+      });
     } finally {
       _opening = false;
     }

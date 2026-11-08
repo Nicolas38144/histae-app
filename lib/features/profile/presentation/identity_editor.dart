@@ -7,6 +7,7 @@ import '../application/profile_controller.dart';
 import '../data/profile_models.dart';
 import 'birthdate_field.dart';
 import 'profile_editor.dart';
+import 'profile_identity_summary.dart';
 import 'profile_strings.dart';
 
 class IdentityEditor extends StatefulWidget {
@@ -37,114 +38,91 @@ class _IdentityEditorState extends ProfileEditorState<IdentityEditor> {
   }
 
   @override
-  Widget build(BuildContext context) => page(
-    AppStrings.of(context).messages.discoveryStringsYourIntroduction,
-    [
+  Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
+    final text = strings.messages;
+    final current = controller.profile;
+    return page(text.discoveryStringsYourIntroduction, [
       EditorialCard(
-        title: AppStrings.of(context).messages.identityEditorYourOwnWay,
-        body: AppStrings.of(context)
-            .messages
-            .identityEditorEverydayDetailsOftenMakeTheBest,
+        title: text.identityEditorYourOwnWay,
+        body: text.identityEditorEverydayDetailsOftenMakeTheBest,
       ),
-      const SizedBox(height: 24),
-      if (controller.profile case final current?)
-        _lockedField(
-          AppStrings.of(context).messages.identityEditorFirstName,
-          current.firstname,
-        )
+      const SizedBox(height: HistaeTokens.sectionSpacing),
+      if (current == null)
+        ..._creationFields(strings)
       else
-        field(
-          firstname,
-          AppStrings.of(context).messages.identityEditorFirstName,
-        ),
+        ProfileIdentitySummary(profile: current),
+      const SizedBox(height: HistaeTokens.sectionSpacing),
+      field(
+        bio,
+        text.identityEditorAFewWordsAboutYou,
+        lines: 5,
+        hint: text.identityEditor2000BytesMaximumAvoidContact,
+      ),
+    ], save: _save);
+  }
+
+  List<Widget> _creationFields(AppStrings strings) {
+    final text = strings.messages;
+    final editable = !busy && !controller.saving;
+    return [
+      field(firstname, text.identityEditorFirstName),
       Padding(
         padding: const EdgeInsets.only(bottom: HistaeTokens.panelInset),
         child: BirthdateField(
           key: const Key('profile-birthdate'),
-          value: controller.profile == null
-              ? birthdate
-              : parseBirthdate(controller.profile!.birthdate),
-          onChanged: controller.profile != null || busy || controller.saving
-              ? null
-              : (value) => setState(() {
+          value: birthdate,
+          onChanged: editable
+              ? (value) => setState(() {
                   birthdate = value;
                   changed();
-                }),
+                })
+              : null,
         ),
       ),
-      if (controller.profile case final current?)
-        _lockedField(
-          AppStrings.of(context).messages.identityEditorSex,
-          ProfileStrings(AppStrings.of(context)).sexes[current.sex ?? '']!,
-        )
-      else if (controller.sensitiveAllowed)
+      if (controller.sensitiveAllowed)
         DropdownButtonFormField<String>(
           initialValue: sex,
           isExpanded: true,
-          decoration: InputDecoration(
-            labelText: AppStrings.of(context).messages.identityEditorSex,
-          ),
-          items: ProfileStrings(AppStrings.of(context)).sexes.entries
-              .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
+          decoration: InputDecoration(labelText: text.identityEditorSex),
+          items: ProfileStrings(strings).sexes.entries
+              .map(
+                (entry) => DropdownMenuItem(
+                  value: entry.key,
+                  child: Text(entry.value),
+                ),
+              )
               .toList(),
-          onChanged: busy
-              ? null
-              : (v) => setState(() {
-                  sex = v!;
+          onChanged: editable
+              ? (value) => setState(() {
+                  sex = value!;
                   changed();
-                }),
-        ),
-      if (controller.profile == null && !controller.sensitiveAllowed)
-        Text(
-          AppStrings.of(context)
-              .messages
-              .identityEditorSexIsOptionalWhenSavingThis,
-        ),
-      if (controller.profile != null)
-        Text(
-          AppStrings.of(context).messages.profileIdentityLocked,
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-      const SizedBox(height: HistaeTokens.sectionSpacing),
-      field(
-        bio,
-        AppStrings.of(context).messages.identityEditorAFewWordsAboutYou,
-        lines: 5,
-        hint: AppStrings.of(context)
-            .messages
-            .identityEditor2000BytesMaximumAvoidContact,
-      ),
-    ],
-    save: () {
-      final current = controller.profile;
-      final draft = ProfileDraft(
-        current?.firstname ?? firstname.text,
-        current?.birthdate ??
-            birthdate?.toIso8601String().substring(0, 10) ??
-            '',
-        current != null
-            ? current.sex
-            : sex.isEmpty
-            ? null
-            : sex,
-        bio.text.isEmpty && controller.profile?.bio == null ? null : bio.text,
-      );
-      final error = draft.validate(DateTime.now());
-      if (error != null) {
-        setState(() {
-          message = error;
-        });
-        return;
-      }
-      submit(() => controller.saveIdentity(draft));
-    },
-  );
+                })
+              : null,
+        )
+      else
+        Text(text.identityEditorSexIsOptionalWhenSavingThis),
+    ];
+  }
 
-  Widget _lockedField(String label, String value) => Padding(
-    padding: const EdgeInsets.only(bottom: HistaeTokens.panelInset),
-    child: InputDecorator(
-      decoration: InputDecoration(labelText: label, enabled: false),
-      child: Text(value),
-    ),
-  );
+  Future<void> _save() async {
+    final current = controller.profile;
+    final biography = bio.text.isEmpty && current?.bio == null
+        ? null
+        : bio.text;
+    final draft = current == null
+        ? ProfileDraft(
+            firstname.text,
+            birthdate?.toIso8601String().substring(0, 10) ?? '',
+            sex.isEmpty ? null : sex,
+            biography,
+          )
+        : ProfileDraft.forBiography(current, biography);
+    final error = draft.validate(DateTime.now());
+    if (error != null) {
+      setState(() => message = error);
+      return;
+    }
+    await submit(() => controller.saveIdentity(draft));
+  }
 }

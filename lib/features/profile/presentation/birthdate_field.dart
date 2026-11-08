@@ -14,17 +14,12 @@ class BirthdateField extends StatelessWidget {
     FocusScope.of(context).unfocus();
     final first = DateTime(1900);
     final latest = latestAdultBirthdate(DateTime.now());
-    final current = value;
-    final initial = current == null
-        ? latest
-        : DateTime(current.year, current.month, current.day);
+    var initial = DateUtils.dateOnly(value ?? latest);
+    if (initial.isBefore(first)) initial = first;
+    if (initial.isAfter(latest)) initial = latest;
     final selected = await showDatePicker(
       context: context,
-      initialDate: initial.isBefore(first)
-          ? first
-          : initial.isAfter(latest)
-          ? latest
-          : initial,
+      initialDate: initial,
       firstDate: first,
       lastDate: latest,
       initialEntryMode: DatePickerEntryMode.calendarOnly,

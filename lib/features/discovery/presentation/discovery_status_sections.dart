@@ -44,44 +44,31 @@ class DiscoveryReadinessCard extends StatelessWidget {
   final Widget? feedback;
 
   @override
-  Widget build(BuildContext context) => Card(
-    child: Padding(
-      padding: HistaeTokens.panelPadding,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            DiscoveryStrings(AppStrings.of(context)).actionTitle(action),
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: 12),
-          Text(DiscoveryStrings(AppStrings.of(context)).actionBody(action)),
-          const SizedBox(height: HistaeTokens.labelSpacing),
-          HistaeButton.outlined(
-            onPressed: onRepair,
-            child: Text(
-              action == DiscoveryAction.freshPresence
-                  ? AppStrings.of(context)
-                        .messages
-                        .discoveryPageRefreshMyLocation
-                  : action == DiscoveryAction.sex
-                  ? AppStrings.of(context)
-                        .messages
-                        .discoveryRequestIdentityCorrection
-                  : action == DiscoveryAction.resumeDiscovery
-                  ? AppStrings.of(context)
-                        .messages
-                        .discoveryStatusSectionsResumeDiscovery
-                  : AppStrings.of(context)
-                        .messages
-                        .discoveryStatusSectionsCompleteThisStep,
+  Widget build(BuildContext context) {
+    final strings = DiscoveryStrings(AppStrings.of(context));
+    return Card(
+      child: Padding(
+        padding: HistaeTokens.panelPadding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              strings.actionTitle(action),
+              style: Theme.of(context).textTheme.titleLarge,
             ),
-          ),
-          ?feedback,
-        ],
+            const SizedBox(height: HistaeTokens.textSpacing),
+            Text(strings.actionBody(action)),
+            const SizedBox(height: HistaeTokens.labelSpacing),
+            HistaeButton.outlined(
+              onPressed: onRepair,
+              child: Text(strings.actionLabel(action)),
+            ),
+            ?feedback,
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class DiscoveryLocationFeedback extends StatelessWidget {

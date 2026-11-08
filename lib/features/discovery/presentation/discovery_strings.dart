@@ -76,6 +76,15 @@ class DiscoveryStrings {
       strings.messages.discoveryStringsOneLocationReadingIsEnoughYour,
   };
 
+  String actionLabel(DiscoveryAction action) => switch (action) {
+    DiscoveryAction.freshPresence =>
+      strings.messages.discoveryPageRefreshMyLocation,
+    DiscoveryAction.sex => strings.messages.discoveryRequestIdentityCorrection,
+    DiscoveryAction.resumeDiscovery =>
+      strings.messages.discoveryStatusSectionsResumeDiscovery,
+    _ => strings.messages.discoveryStatusSectionsCompleteThisStep,
+  };
+
   String notice(String? code) => switch (code) {
     'location_approximate' =>
       strings.messages.discoveryStringsApproximateLocationUsedDistancesMayBe,

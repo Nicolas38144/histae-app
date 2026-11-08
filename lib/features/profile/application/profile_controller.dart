@@ -268,10 +268,7 @@ class ProfileController extends ChangeNotifier {
 
   Future<void> saveIdentity(ProfileDraft draft) async {
     final current = profile;
-    if (current != null &&
-        (draft.firstname.trim() != current.firstname ||
-            draft.birthdate != current.birthdate ||
-            draft.sex != current.sex)) {
+    if (current != null && !draft.preservesIdentityOf(current)) {
       throw const ApiFailure(
         ApiFailureKind.conflict,
         code: 'profile_identity_locked',
