@@ -320,6 +320,15 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Modifier ma présentation'));
       await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.widgetWithText(TextField, 'Quelques mots sur vous'),
+        160,
+        scrollable: verticalScrollables.first,
+      );
+      await tester.ensureVisible(
+        find.widgetWithText(TextField, 'Quelques mots sur vous'),
+      );
+      await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField).first, 'Draft local');
       final state = tester.state(find.byType(IdentityEditor));
       final resource = session.resourceKey;
@@ -333,7 +342,7 @@ void main() {
               .widget<TextField>(find.byType(TextField).first)
               .decoration
               ?.labelText,
-          AppStrings(language).messages.identityEditorFirstName,
+          AppStrings(language).messages.identityEditorAFewWordsAboutYou,
         );
         expect(session.resourceKey, resource);
         expect(tester.takeException(), isNull);

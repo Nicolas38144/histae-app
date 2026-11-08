@@ -65,8 +65,7 @@ class DiscoveryStrings {
       strings.messages.discoveryStringsAddYourFirstNameDateOf,
     DiscoveryAction.resumeDiscovery =>
       strings.messages.discoveryStringsYourProfileIsHiddenFromNew,
-    DiscoveryAction.sex =>
-      strings.messages.discoveryStringsFillInThisFieldToEnable,
+    DiscoveryAction.sex => strings.messages.discoveryIdentityCorrectionNeeded,
     DiscoveryAction.preferences =>
       strings.messages.discoveryStringsChooseThePeopleAgesAndDistance,
     DiscoveryAction.sensitiveConsent =>

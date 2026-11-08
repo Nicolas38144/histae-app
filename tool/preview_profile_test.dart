@@ -213,12 +213,6 @@ void main() {
     await tester.tap(find.text('Modifier ma présentation'));
     await tester.pumpAndSettle();
     await capture('identity');
-    await reveal(find.byKey(const Key('profile-birthdate')));
-    await tester.tap(find.byKey(const Key('profile-birthdate')));
-    await tester.pumpAndSettle();
-    await capture('identity-calendar');
-    await tester.tap(find.text('Annuler'));
-    await tester.pumpAndSettle();
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
     await reveal(find.byKey(const Key('profile-feed-preview')));

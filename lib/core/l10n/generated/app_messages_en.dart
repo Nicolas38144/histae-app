@@ -1318,10 +1318,6 @@ class AppMessagesEn extends AppMessages {
       'Your profile is hidden from new discoveries. You can keep chatting and resume encounters at your own pace.';
 
   @override
-  String get discoveryStringsFillInThisFieldToEnable =>
-      'Fill in this field to enable mutual matching criteria.';
-
-  @override
   String get discoveryStringsChooseThePeopleAgesAndDistance =>
       'Choose the people, ages and distance that suit you.';
 
@@ -3613,4 +3609,15 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get devicesPageReceiveAlerts => 'Receive notifications';
+
+  @override
+  String get profileIdentityLocked =>
+      'Your first name, date of birth and sex are fixed when your profile is created. To request an administrator correction, use “My data requests” in your privacy settings.';
+
+  @override
+  String get discoveryIdentityCorrectionNeeded =>
+      'An administrator must add or correct sex on an existing profile. Send a request from your privacy settings.';
+
+  @override
+  String get discoveryRequestIdentityCorrection => 'Request a correction';
 }

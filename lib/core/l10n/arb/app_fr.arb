@@ -1515,10 +1515,6 @@
   "@discoveryStringsYourProfileIsHiddenFromNew": {
     "description": "Interface: lib/features/discovery/presentation/discovery_strings.dart"
   },
-  "discoveryStringsFillInThisFieldToEnable": "Renseignez ce champ pour permettre les critères réciproques de rencontre.",
-  "@discoveryStringsFillInThisFieldToEnable": {
-    "description": "Interface: lib/features/discovery/presentation/discovery_strings.dart"
-  },
   "discoveryStringsChooseThePeopleAgesAndDistance": "Choisissez les personnes, les âges et la distance qui vous correspondent.",
   "@discoveryStringsChooseThePeopleAgesAndDistance": {
     "description": "Interface: lib/features/discovery/presentation/discovery_strings.dart"
@@ -4107,5 +4103,17 @@
   "photoCropSelectionReady": "Votre nouvelle photo n’est pas encore enregistrée.",
   "photoCropSavePhoto": "Enregistrer ma photo",
   "photoCropResumeUpload": "Reprendre l’envoi",
-  "devicesPageReceiveAlerts": "Recevoir les notifications"
+  "devicesPageReceiveAlerts": "Recevoir les notifications",
+  "profileIdentityLocked": "Le prénom, la date de naissance et le sexe sont fixés à la création du profil. Pour une correction par un administrateur, utilisez « Mes demandes de données » dans vos choix de vie privée.",
+  "@profileIdentityLocked": {
+    "description": "Identity fields are immutable after profile creation; corrections use the existing privacy request workflow."
+  },
+  "discoveryIdentityCorrectionNeeded": "Le sexe d’un profil déjà créé se renseigne ou se corrige par un administrateur. Envoyez une demande dans vos choix de vie privée.",
+  "discoveryRequestIdentityCorrection": "Demander une correction",
+  "@discoveryIdentityCorrectionNeeded": {
+    "description": "Discovery recovery for an existing profile whose sex must be corrected by an administrator."
+  },
+  "@discoveryRequestIdentityCorrection": {
+    "description": "Discovery recovery for an existing profile whose sex must be corrected by an administrator."
+  }
 }

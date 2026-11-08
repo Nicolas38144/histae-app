@@ -2172,12 +2172,6 @@ abstract class AppMessages {
   /// Interface: lib/features/discovery/presentation/discovery_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Renseignez ce champ pour permettre les critères réciproques de rencontre.'**
-  String get discoveryStringsFillInThisFieldToEnable;
-
-  /// Interface: lib/features/discovery/presentation/discovery_strings.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Choisissez les personnes, les âges et la distance qui vous correspondent.'**
   String get discoveryStringsChooseThePeopleAgesAndDistance;
 
@@ -6037,6 +6031,24 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Recevoir les notifications'**
   String get devicesPageReceiveAlerts;
+
+  /// Identity fields are immutable after profile creation; corrections use the existing privacy request workflow.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le prénom, la date de naissance et le sexe sont fixés à la création du profil. Pour une correction par un administrateur, utilisez « Mes demandes de données » dans vos choix de vie privée.'**
+  String get profileIdentityLocked;
+
+  /// Discovery recovery for an existing profile whose sex must be corrected by an administrator.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le sexe d’un profil déjà créé se renseigne ou se corrige par un administrateur. Envoyez une demande dans vos choix de vie privée.'**
+  String get discoveryIdentityCorrectionNeeded;
+
+  /// Discovery recovery for an existing profile whose sex must be corrected by an administrator.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demander une correction'**
+  String get discoveryRequestIdentityCorrection;
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

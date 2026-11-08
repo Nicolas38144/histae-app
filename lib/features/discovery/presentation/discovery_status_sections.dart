@@ -64,6 +64,10 @@ class DiscoveryReadinessCard extends StatelessWidget {
                   ? AppStrings.of(context)
                         .messages
                         .discoveryPageRefreshMyLocation
+                  : action == DiscoveryAction.sex
+                  ? AppStrings.of(context)
+                        .messages
+                        .discoveryRequestIdentityCorrection
                   : action == DiscoveryAction.resumeDiscovery
                   ? AppStrings.of(context)
                         .messages

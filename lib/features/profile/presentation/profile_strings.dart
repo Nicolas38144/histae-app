@@ -7,6 +7,7 @@ class ProfileStrings {
   final AppStrings strings;
 
   String failure(ApiFailure e) => switch (e.code) {
+    'profile_identity_locked' => strings.messages.profileIdentityLocked,
     'invalid_profile' =>
       strings.messages.profileStringsCheckYourFirstNameDateOf,
     'invalid_preferences' =>

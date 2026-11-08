@@ -68,7 +68,10 @@ Reuse `PreferenceField` and sliders for registration and saved preferences. Full
 and adjacent value badges replace floating captions. Disable steppers at bounds. Saved preferences
 keep Save visible but disabled until values change; initial onboarding stays enabled.
 Registration and profile editing reuse `BirthdateField`: a calendar-only adult
-date selector with localized display and an ISO date sent to the API.
+date selector with localized display and an ISO date sent to the API. Once a
+profile exists, first name, birthdate and sex are read-only; only the biography
+remains editable here. Identity corrections go through the privacy request
+workflow and a separate audited administrator endpoint.
 
 The transparent Profile / Feed / Matches bar has no panel, shadow or separator. Use 22 px icons,
 a 38 px selected circle and touch targets of at least 48 px. Feed is the initial center tab.

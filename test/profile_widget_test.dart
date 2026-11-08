@@ -14,6 +14,7 @@ import 'package:histae_app/features/profile/data/photo_crop_processor.dart';
 import 'package:histae_app/features/profile/data/photo_preparer.dart';
 import 'package:histae_app/features/profile/data/profile_models.dart';
 import 'package:histae_app/features/profile/data/profile_repository.dart';
+import 'package:histae_app/features/profile/presentation/birthdate_field.dart';
 import 'package:histae_app/features/profile/presentation/photo_page.dart';
 import 'package:histae_app/features/profile/presentation/profile_editors.dart';
 import 'package:http/http.dart' as http;
@@ -375,6 +376,19 @@ void main() {
       await tapVisible(tester, find.text('Créer mon profil'));
       await tester.enterText(find.widgetWithText(TextField, 'Prénom'), 'Alex');
       await tapVisible(tester, find.byKey(const Key('profile-birthdate')));
+      final picker = tester.widget<DatePickerDialog>(
+        find.byType(DatePickerDialog),
+      );
+      expect(picker.initialEntryMode, DatePickerEntryMode.calendarOnly);
+      expect(picker.lastDate, latestAdultBirthdate(DateTime.now()));
+      expect(
+        find.descendant(
+          of: find.byType(DatePickerDialog),
+          matching: find.byType(EditableText),
+        ),
+        findsNothing,
+      );
+
       tester
           .widget<CalendarDatePicker>(find.byType(CalendarDatePicker))
           .onDateChanged(DateTime(1995, 6, 12));
@@ -391,7 +405,7 @@ void main() {
       expect(find.byType(IdentityEditor), findsNothing);
     },
   );
-  testWidgets('profile edits never silently erase sex or bio', (tester) async {
+  testWidgets('bio edits preserve the locked profile identity', (tester) async {
     Map<String, dynamic>? patch;
     final session = testSession((r) async {
       if (r.url.path == '/api/users/me/consents') {
@@ -410,15 +424,23 @@ void main() {
     await tester.tap(find.byKey(const Key('main-tab-profile')));
     await tester.pumpAndSettle();
     await tapVisible(tester, find.text('Modifier ma présentation'));
-    await tester.enterText(find.widgetWithText(TextField, 'Prénom'), 'Alex');
+    await tapVisible(
+      tester,
+      find.widgetWithText(TextField, 'Quelques mots sur vous'),
+    );
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Quelques mots sur vous'),
+      'Une nouvelle bio.',
+    );
     await tapVisible(tester, find.text('Enregistrer'));
-    expect(patch?['firstname'], 'Alex');
+    expect(patch?['firstname'], 'Camille');
+    expect(patch?['birthdate'], '1995-06-12');
     expect(patch?['sex'], 'female');
-    expect(patch?['bio'], ownerJson()['bio']);
+    expect(patch?['bio'], 'Une nouvelle bio.');
     expect(find.byType(IdentityEditor), findsNothing);
   });
   testWidgets(
-    'profile date picker excludes minors, preserves cancelled dates and protects unsaved edits',
+    'existing identity is read-only while biography edits remain protected',
     (tester) async {
       var patches = 0;
       final session = testSession((r) async {
@@ -452,36 +474,16 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Approuvé'), findsNothing);
       expect(find.widgetWithText(TextField, 'Date de naissance'), findsNothing);
-      await tapVisible(tester, find.byKey(const Key('profile-birthdate')));
-      final dialog = find.byType(DatePickerDialog);
-      final picker = tester.widget<DatePickerDialog>(dialog);
-      expect(picker.initialEntryMode, DatePickerEntryMode.calendarOnly);
-      expect(picker.initialDate, DateTime(1995, 6, 12));
-      expect(picker.lastDate, latestAdultBirthdate(DateTime.now()));
-      expect(
-        find.descendant(of: dialog, matching: find.byType(EditableText)),
-        findsNothing,
+      expect(find.widgetWithText(TextField, 'Prénom'), findsNothing);
+      expect(find.byType(DropdownButtonFormField<String>), findsNothing);
+      final date = tester.widget<BirthdateField>(
+        find.byKey(const Key('profile-birthdate')),
       );
-      await tester.tap(
-        find.text(
-          MaterialLocalizations.of(tester.element(dialog)).cancelButtonLabel,
-        ),
-      );
-      await tester.pumpAndSettle();
+      expect(date.onChanged, isNull);
       expect(patches, 0);
-      expect(
-        find.text(
-          MaterialLocalizations.of(tester.element(find.byType(IdentityEditor)))
-              .formatCompactDate(DateTime(1995, 6, 12)),
-        ),
-        findsOneWidget,
-      );
-      tester
-          .state<ScrollableState>(verticalScrollables.first)
-          .position
-          .jumpTo(0);
-      await tester.pumpAndSettle();
-      await tester.enterText(find.widgetWithText(TextField, 'Prénom'), 'Alex');
+      final bio = find.widgetWithText(TextField, 'Quelques mots sur vous');
+      await tapVisible(tester, bio);
+      await tester.enterText(bio, 'Une nouvelle bio non enregistrée.');
       await tester.pumpAndSettle();
       await tester.pageBack();
       await tester.pumpAndSettle();
@@ -595,8 +597,12 @@ void main() {
       await tester.tap(find.byKey(const Key('main-tab-profile')));
       await tester.pumpAndSettle();
       await tapVisible(tester, find.text('Modifier ma présentation'));
+      await tapVisible(
+        tester,
+        find.widgetWithText(TextField, 'Quelques mots sur vous'),
+      );
       await tester.enterText(
-        find.widgetWithText(TextField, 'Prénom'),
+        find.widgetWithText(TextField, 'Quelques mots sur vous'),
         'Brouillon privé',
       );
       sensitive = false;

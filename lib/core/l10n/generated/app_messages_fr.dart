@@ -1330,10 +1330,6 @@ class AppMessagesFr extends AppMessages {
       'Votre profil est masqué des nouvelles découvertes. Vous pouvez poursuivre vos conversations et reprendre les rencontres à votre rythme.';
 
   @override
-  String get discoveryStringsFillInThisFieldToEnable =>
-      'Renseignez ce champ pour permettre les critères réciproques de rencontre.';
-
-  @override
   String get discoveryStringsChooseThePeopleAgesAndDistance =>
       'Choisissez les personnes, les âges et la distance qui vous correspondent.';
 
@@ -3660,4 +3656,15 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get devicesPageReceiveAlerts => 'Recevoir les notifications';
+
+  @override
+  String get profileIdentityLocked =>
+      'Le prénom, la date de naissance et le sexe sont fixés à la création du profil. Pour une correction par un administrateur, utilisez « Mes demandes de données » dans vos choix de vie privée.';
+
+  @override
+  String get discoveryIdentityCorrectionNeeded =>
+      'Le sexe d’un profil déjà créé se renseigne ou se corrige par un administrateur. Envoyez une demande dans vos choix de vie privée.';
+
+  @override
+  String get discoveryRequestIdentityCorrection => 'Demander une correction';
 }

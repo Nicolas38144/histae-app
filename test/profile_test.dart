@@ -37,6 +37,40 @@ void main() {
       isNotNull,
     );
   });
+
+  test(
+    'existing identity changes fail locally without contacting the API',
+    () async {
+      var writes = 0;
+      final session = testSession((r) async {
+        if (r.method == 'PATCH') writes++;
+        return defaultProfileResponse(r);
+      });
+      addTearDown(session.dispose);
+      await session.establish(testTokens);
+      final controller = ProfileController(ProfileRepository(session));
+      addTearDown(controller.dispose);
+      await controller.load();
+      for (final draft in [
+        const ProfileDraft('Alex', '1995-06-12', 'female', 'Une bio.'),
+        const ProfileDraft('Camille', '1996-06-12', 'female', 'Une bio.'),
+        const ProfileDraft('Camille', '1995-06-12', 'male', 'Une bio.'),
+        const ProfileDraft('Camille', '1995-06-12', null, 'Une bio.'),
+      ]) {
+        await expectLater(
+          controller.saveIdentity(draft),
+          throwsA(
+            isA<ApiFailure>().having(
+              (error) => error.code,
+              'code',
+              'profile_identity_locked',
+            ),
+          ),
+        );
+      }
+      expect(writes, 0);
+    },
+  );
   test('profile byte limits preserve nullable fields explicitly', () {
     final draft = ProfileDraft(' Camille ', '1995-06-12', null, null);
     expect(draft.toJson(), {

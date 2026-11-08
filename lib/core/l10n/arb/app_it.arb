@@ -344,7 +344,6 @@
   "discoveryStringsARecentLocation": "Una posizione recente",
   "discoveryStringsAddYourFirstNameDateOf": "Aggiungi nome, data di nascita e presentazione.",
   "discoveryStringsYourProfileIsHiddenFromNew": "Il profilo è nascosto nelle nuove scoperte. Puoi continuare le conversazioni e riprendere gli incontri al tuo ritmo.",
-  "discoveryStringsFillInThisFieldToEnable": "Compila questo campo per consentire criteri d’incontro reciproci.",
   "discoveryStringsChooseThePeopleAgesAndDistance": "Scegli persone, età e distanza che fanno per te.",
   "discoveryStringsUsingSexAndPreferencesRequiresYour": "L’uso di sesso e preferenze richiede un consenso separato.",
   "discoveryStringsDecideWhetherHistaeCanUseYour": "Decidi se Histae può usare la posizione per incontri nelle vicinanze.",
@@ -1126,5 +1125,8 @@
   "photoCropSelectionReady": "La nuova foto non è ancora stata salvata.",
   "photoCropSavePhoto": "Salva la mia foto",
   "photoCropResumeUpload": "Riprendi l’invio",
-  "devicesPageReceiveAlerts": "Ricevi notifiche"
+  "devicesPageReceiveAlerts": "Ricevi notifiche",
+  "profileIdentityLocked": "Nome, data di nascita e sesso vengono fissati alla creazione del profilo. Per richiedere una correzione a un amministratore, usa «Le mie richieste sui dati» nelle impostazioni della privacy.",
+  "discoveryIdentityCorrectionNeeded": "Un amministratore deve aggiungere o correggere il sesso in un profilo già creato. Invia una richiesta dalle impostazioni della privacy.",
+  "discoveryRequestIdentityCorrection": "Richiedi una correzione"
 }

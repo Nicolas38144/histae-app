@@ -15,6 +15,7 @@ import '../../consents/presentation/consents_page.dart';
 import '../../help/application/help_controller.dart';
 import '../../help/presentation/feed_guide.dart';
 import '../../help/presentation/help_scope.dart';
+import '../../privacy/presentation/privacy_hub_page.dart';
 import '../../privacy/presentation/report_page.dart';
 import '../../profile/application/profile_controller.dart';
 import '../../profile/presentation/photo_page.dart';
@@ -199,6 +200,10 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
               .messages
               .discoveryPageYourProfileCouldNotBeRefreshed;
         });
+        return;
+      }
+      if (action == DiscoveryAction.sex && profile.profile != null) {
+        await _open(PrivacyHubPage(session: c.session));
         return;
       }
       await _open(

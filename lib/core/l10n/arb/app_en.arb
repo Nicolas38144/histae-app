@@ -344,7 +344,6 @@
   "discoveryStringsARecentLocation": "A recent location",
   "discoveryStringsAddYourFirstNameDateOf": "Add your first name, date of birth and introduction.",
   "discoveryStringsYourProfileIsHiddenFromNew": "Your profile is hidden from new discoveries. You can keep chatting and resume encounters at your own pace.",
-  "discoveryStringsFillInThisFieldToEnable": "Fill in this field to enable mutual matching criteria.",
   "discoveryStringsChooseThePeopleAgesAndDistance": "Choose the people, ages and distance that suit you.",
   "discoveryStringsUsingSexAndPreferencesRequiresYour": "Using sex and preferences requires your separate consent.",
   "discoveryStringsDecideWhetherHistaeCanUseYour": "Decide whether Histae can use your location for nearby encounters.",
@@ -1126,5 +1125,8 @@
   "photoCropSelectionReady": "Your new photo has not been saved yet.",
   "photoCropSavePhoto": "Save my photo",
   "photoCropResumeUpload": "Resume upload",
-  "devicesPageReceiveAlerts": "Receive notifications"
+  "devicesPageReceiveAlerts": "Receive notifications",
+  "profileIdentityLocked": "Your first name, date of birth and sex are fixed when your profile is created. To request an administrator correction, use “My data requests” in your privacy settings.",
+  "discoveryIdentityCorrectionNeeded": "An administrator must add or correct sex on an existing profile. Send a request from your privacy settings.",
+  "discoveryRequestIdentityCorrection": "Request a correction"
 }

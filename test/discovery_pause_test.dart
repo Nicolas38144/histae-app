@@ -5,16 +5,67 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
 import 'package:histae_app/core/network/api_failure.dart';
+import 'package:histae_app/features/consents/domain/consent_state.dart';
 import 'package:histae_app/features/discovery/application/discovery_visibility_controller.dart';
 import 'package:histae_app/features/discovery/presentation/feed_profile_card.dart';
+import 'package:histae_app/features/privacy/presentation/privacy_hub_page.dart';
+import 'package:histae_app/features/profile/presentation/identity_editor.dart';
 import 'package:http/http.dart' as http;
 
 import 'support/auth_fixture.dart';
 import 'support/continuation_fixture.dart';
 import 'support/discovery_fixture.dart';
+import 'support/profile_fixture.dart';
 import 'support/scrolling.dart';
 
 void main() {
+  testWidgets('a missing locked sex leads to a privacy correction request', (
+    tester,
+  ) async {
+    var writes = 0;
+    final session = testSession((r) async {
+      if (r.method == 'PATCH' && r.url.path == '/api/users/me/profile') {
+        writes++;
+      }
+      if (r.url.path == '/api/users/me') {
+        return jsonResponse(ownerJson(sex: null));
+      }
+      if (r.url.path.endsWith('/discovery-status')) {
+        return jsonResponse({
+          ...discoveryStatusJson(ready: false),
+          'required_actions': ['sex'],
+        });
+      }
+      if (r.url.path.endsWith('/consents')) {
+        return jsonResponse(
+          consentJson(
+            complete: true,
+            grants: {ConsentType.sensitive: true, ConsentType.location: true},
+          ),
+        );
+      }
+      return defaultContinuationResponse(r);
+    });
+    await session.establish(testTokens);
+    await tester.pumpWidget(HistaeApp(sessionController: session));
+    await tester.pumpAndSettle();
+    final correction = find.text('Demander une correction');
+    await tester.scrollUntilVisible(
+      correction,
+      160,
+      scrollable: verticalScrollables.first,
+    );
+    await tester.ensureVisible(correction);
+    await tester.pumpAndSettle();
+    await tester.tap(correction);
+    await tester.pumpAndSettle();
+    expect(find.byType(PrivacyHubPage), findsOneWidget);
+    expect(find.byType(IdentityEditor), findsNothing);
+    expect(writes, 0);
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
   test('pause state is confirmed by the server, resynced after uncertainty and purged on logout', () async {
     var paused = false, lostResponse = true, writes = 0;
     Completer<http.Response>? pending;

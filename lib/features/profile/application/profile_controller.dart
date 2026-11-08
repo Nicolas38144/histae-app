@@ -266,8 +266,19 @@ class ProfileController extends ChangeNotifier {
     return fallback;
   }
 
-  Future<void> saveIdentity(ProfileDraft draft) =>
-      mutate(() => repository.saveProfile(draft));
+  Future<void> saveIdentity(ProfileDraft draft) async {
+    final current = profile;
+    if (current != null &&
+        (draft.firstname.trim() != current.firstname ||
+            draft.birthdate != current.birthdate ||
+            draft.sex != current.sex)) {
+      throw const ApiFailure(
+        ApiFailureKind.conflict,
+        code: 'profile_identity_locked',
+      );
+    }
+    await mutate(() => repository.saveProfile(draft));
+  }
 
   Future<void> savePreferences(Preferences preferences) =>
       mutate(() => repository.savePreferences(preferences));

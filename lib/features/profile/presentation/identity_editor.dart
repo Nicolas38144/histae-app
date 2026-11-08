@@ -47,13 +47,24 @@ class _IdentityEditorState extends ProfileEditorState<IdentityEditor> {
             .identityEditorEverydayDetailsOftenMakeTheBest,
       ),
       const SizedBox(height: 24),
-      field(firstname, AppStrings.of(context).messages.identityEditorFirstName),
+      if (controller.profile case final current?)
+        _lockedField(
+          AppStrings.of(context).messages.identityEditorFirstName,
+          current.firstname,
+        )
+      else
+        field(
+          firstname,
+          AppStrings.of(context).messages.identityEditorFirstName,
+        ),
       Padding(
         padding: const EdgeInsets.only(bottom: HistaeTokens.panelInset),
         child: BirthdateField(
           key: const Key('profile-birthdate'),
-          value: birthdate,
-          onChanged: busy || controller.saving
+          value: controller.profile == null
+              ? birthdate
+              : parseBirthdate(controller.profile!.birthdate),
+          onChanged: controller.profile != null || busy || controller.saving
               ? null
               : (value) => setState(() {
                   birthdate = value;
@@ -61,7 +72,12 @@ class _IdentityEditorState extends ProfileEditorState<IdentityEditor> {
                 }),
         ),
       ),
-      if (controller.sensitiveAllowed)
+      if (controller.profile case final current?)
+        _lockedField(
+          AppStrings.of(context).messages.identityEditorSex,
+          ProfileStrings(AppStrings.of(context)).sexes[current.sex ?? '']!,
+        )
+      else if (controller.sensitiveAllowed)
         DropdownButtonFormField<String>(
           initialValue: sex,
           isExpanded: true,
@@ -78,13 +94,18 @@ class _IdentityEditorState extends ProfileEditorState<IdentityEditor> {
                   changed();
                 }),
         ),
-      if (!controller.sensitiveAllowed)
+      if (controller.profile == null && !controller.sensitiveAllowed)
         Text(
           AppStrings.of(context)
               .messages
               .identityEditorSexIsOptionalWhenSavingThis,
         ),
-      const SizedBox(height: 24),
+      if (controller.profile != null)
+        Text(
+          AppStrings.of(context).messages.profileIdentityLocked,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      const SizedBox(height: HistaeTokens.sectionSpacing),
       field(
         bio,
         AppStrings.of(context).messages.identityEditorAFewWordsAboutYou,
@@ -95,10 +116,17 @@ class _IdentityEditorState extends ProfileEditorState<IdentityEditor> {
       ),
     ],
     save: () {
+      final current = controller.profile;
       final draft = ProfileDraft(
-        firstname.text,
-        birthdate?.toIso8601String().substring(0, 10) ?? '',
-        sex.isEmpty ? null : sex,
+        current?.firstname ?? firstname.text,
+        current?.birthdate ??
+            birthdate?.toIso8601String().substring(0, 10) ??
+            '',
+        current != null
+            ? current.sex
+            : sex.isEmpty
+            ? null
+            : sex,
         bio.text.isEmpty && controller.profile?.bio == null ? null : bio.text,
       );
       final error = draft.validate(DateTime.now());
@@ -110,5 +138,13 @@ class _IdentityEditorState extends ProfileEditorState<IdentityEditor> {
       }
       submit(() => controller.saveIdentity(draft));
     },
+  );
+
+  Widget _lockedField(String label, String value) => Padding(
+    padding: const EdgeInsets.only(bottom: HistaeTokens.panelInset),
+    child: InputDecorator(
+      decoration: InputDecoration(labelText: label, enabled: false),
+      child: Text(value),
+    ),
   );
 }
