@@ -2139,7 +2139,7 @@ class AppMessagesFr extends AppMessages {
   String get sexInvalid => 'Choisissez une valeur proposée.';
 
   @override
-  String get bioTooLong => 'La présentation dépasse 2 000 octets.';
+  String get bioTooLong => 'La présentation est trop longue.';
 
   @override
   String get ageRangeInvalid =>
@@ -2265,10 +2265,6 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get identityEditorAFewWordsAboutYou => 'Quelques mots sur vous';
-
-  @override
-  String get identityEditor2000BytesMaximumAvoidContact =>
-      '2 000 octets maximum · Évitez vos coordonnées.';
 
   @override
   String get photoPageSelectionWasInterruptedChooseYourPhoto =>
@@ -3658,13 +3654,12 @@ class AppMessagesFr extends AppMessages {
   String get devicesPageReceiveAlerts => 'Recevoir les notifications';
 
   @override
-  String get profileIdentityLocked =>
-      'Le prénom, la date de naissance et le sexe sont fixés à la création du profil. Pour une correction par un administrateur, utilisez « Mes demandes de données » dans vos choix de vie privée.';
-
-  @override
   String get discoveryIdentityCorrectionNeeded =>
       'Le sexe d’un profil déjà créé se renseigne ou se corrige par un administrateur. Envoyez une demande dans vos choix de vie privée.';
 
   @override
   String get discoveryRequestIdentityCorrection => 'Demander une correction';
+
+  @override
+  String get biographyLimitReached => 'Limite de la présentation atteinte.';
 }

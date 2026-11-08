@@ -2469,7 +2469,7 @@
   "@sexInvalid": {
     "description": "Interface: lib/features/profile/data/profile_models.dart"
   },
-  "bioTooLong": "La présentation dépasse 2 000 octets.",
+  "bioTooLong": "La présentation est trop longue.",
   "@bioTooLong": {
     "description": "Interface: lib/features/profile/data/profile_models.dart"
   },
@@ -2632,10 +2632,6 @@
   },
   "identityEditorAFewWordsAboutYou": "Quelques mots sur vous",
   "@identityEditorAFewWordsAboutYou": {
-    "description": "Interface: lib/features/profile/presentation/identity_editor.dart"
-  },
-  "identityEditor2000BytesMaximumAvoidContact": "2 000 octets maximum · Évitez vos coordonnées.",
-  "@identityEditor2000BytesMaximumAvoidContact": {
     "description": "Interface: lib/features/profile/presentation/identity_editor.dart"
   },
   "photoPageSelectionWasInterruptedChooseYourPhoto": "Une sélection a été interrompue. Choisissez à nouveau votre photo pour ce compte.",
@@ -4104,10 +4100,6 @@
   "photoCropSavePhoto": "Enregistrer ma photo",
   "photoCropResumeUpload": "Reprendre l’envoi",
   "devicesPageReceiveAlerts": "Recevoir les notifications",
-  "profileIdentityLocked": "Le prénom, la date de naissance et le sexe sont fixés à la création du profil. Pour une correction par un administrateur, utilisez « Mes demandes de données » dans vos choix de vie privée.",
-  "@profileIdentityLocked": {
-    "description": "Identity fields are immutable after profile creation; corrections use the existing privacy request workflow."
-  },
   "discoveryIdentityCorrectionNeeded": "Le sexe d’un profil déjà créé se renseigne ou se corrige par un administrateur. Envoyez une demande dans vos choix de vie privée.",
   "discoveryRequestIdentityCorrection": "Demander une correction",
   "@discoveryIdentityCorrectionNeeded": {
@@ -4115,5 +4107,9 @@
   },
   "@discoveryRequestIdentityCorrection": {
     "description": "Discovery recovery for an existing profile whose sex must be corrected by an administrator."
+  },
+  "biographyLimitReached": "Limite de la présentation atteinte.",
+  "@biographyLimitReached": {
+    "description": "Accessibility hint for the visual biography limit indicator; never a permanent helper or counter."
   }
 }

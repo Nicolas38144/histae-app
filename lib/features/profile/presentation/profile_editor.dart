@@ -207,23 +207,15 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
     ),
   );
 
-  Widget field(
-    TextEditingController text,
-    String label, {
-    int lines = 1,
-    String? hint,
-  }) => Padding(
-    padding: const EdgeInsets.only(bottom: 20),
-    child: TextField(
-      controller: text,
-      onChanged: (_) => setState(changed),
-      enabled: !busy && !controller.saving,
-      decoration: InputDecoration(
-        labelText: label,
-        helperText: hint,
-        helperMaxLines: 4,
-      ),
-      maxLines: lines,
-    ),
-  );
+  Widget field(TextEditingController text, String label, {int lines = 1}) =>
+      Padding(
+        padding: const EdgeInsets.only(bottom: 20),
+        child: TextField(
+          controller: text,
+          onChanged: (_) => setState(changed),
+          enabled: !busy && !controller.saving,
+          decoration: InputDecoration(labelText: label),
+          maxLines: lines,
+        ),
+      );
 }

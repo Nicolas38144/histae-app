@@ -570,7 +570,7 @@
   "underage": "Histae está reservado a mayores de 18 años.",
   "firstnameInvalid": "El nombre es obligatorio (máximo 100 bytes).",
   "sexInvalid": "Elige uno de los valores disponibles.",
-  "bioTooLong": "Tu presentación supera los 2000 bytes.",
+  "bioTooLong": "Tu presentación es demasiado larga.",
   "ageRangeInvalid": "Las edades deben ir de 18 a 99 años, en ese orden.",
   "distanceInvalid": "La distancia debe estar entre 1 y 500 km.",
   "answerInvalid": "Cada respuesta debe tener de 10 a 300 caracteres en una línea (máximo 1000 bytes).",
@@ -605,7 +605,6 @@
   "identityEditorSex": "Sexo",
   "identityEditorSexIsOptionalWhenSavingThis": "El sexo es opcional para guardar el perfil. Su uso requiere tu consentimiento para datos sensibles, disponible en tus opciones de privacidad.",
   "identityEditorAFewWordsAboutYou": "Unas palabras sobre ti",
-  "identityEditor2000BytesMaximumAvoidContact": "Máximo 2000 bytes · Evita datos de contacto.",
   "photoPageSelectionWasInterruptedChooseYourPhoto": "La selección se ha interrumpido. Elige de nuevo tu foto para esta cuenta.",
   "photoPageTheTemporaryPreviewIsUnavailableRefresh": "La vista previa temporal no está disponible. Actualiza para obtener otro enlace.",
   "photoPageChangeSelection": "¿Cambiar la selección?",
@@ -1126,7 +1125,7 @@
   "photoCropSavePhoto": "Guardar mi foto",
   "photoCropResumeUpload": "Reanudar el envío",
   "devicesPageReceiveAlerts": "Recibir notificaciones",
-  "profileIdentityLocked": "Tu nombre, fecha de nacimiento y sexo quedan fijados al crear el perfil. Para solicitar una corrección a un administrador, utiliza «Mis solicitudes de datos» en tus ajustes de privacidad.",
   "discoveryIdentityCorrectionNeeded": "Un administrador debe añadir o corregir el sexo en un perfil ya creado. Envía una solicitud desde tus ajustes de privacidad.",
-  "discoveryRequestIdentityCorrection": "Solicitar una corrección"
+  "discoveryRequestIdentityCorrection": "Solicitar una corrección",
+  "biographyLimitReached": "Has alcanzado el límite de la presentación."
 }

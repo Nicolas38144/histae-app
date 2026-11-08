@@ -5,6 +5,7 @@ import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../application/profile_controller.dart';
 import '../data/profile_models.dart';
+import 'biography_field.dart';
 import 'birthdate_field.dart';
 import 'profile_editor.dart';
 import 'profile_identity_summary.dart';
@@ -42,24 +43,31 @@ class _IdentityEditorState extends ProfileEditorState<IdentityEditor> {
     final strings = AppStrings.of(context);
     final text = strings.messages;
     final current = controller.profile;
-    return page(text.discoveryStringsYourIntroduction, [
-      EditorialCard(
-        title: text.identityEditorYourOwnWay,
-        body: text.identityEditorEverydayDetailsOftenMakeTheBest,
-      ),
-      const SizedBox(height: HistaeTokens.sectionSpacing),
-      if (current == null)
-        ..._creationFields(strings)
-      else
-        ProfileIdentitySummary(profile: current),
-      const SizedBox(height: HistaeTokens.sectionSpacing),
-      field(
-        bio,
-        text.identityEditorAFewWordsAboutYou,
-        lines: 5,
-        hint: text.identityEditor2000BytesMaximumAvoidContact,
-      ),
-    ], save: _save);
+    return page(
+      text.discoveryStringsYourIntroduction,
+      [
+        EditorialCard(
+          title: text.identityEditorYourOwnWay,
+          body: text.identityEditorEverydayDetailsOftenMakeTheBest,
+        ),
+        const SizedBox(height: HistaeTokens.sectionSpacing),
+        if (current == null)
+          ..._creationFields(strings)
+        else
+          ProfileIdentitySummary(profile: current),
+        const SizedBox(height: HistaeTokens.sectionSpacing),
+        Padding(
+          padding: const EdgeInsets.only(bottom: HistaeTokens.panelInset),
+          child: BiographyField(
+            controller: bio,
+            enabled: !busy && !controller.saving,
+            onChanged: (_) => setState(changed),
+          ),
+        ),
+      ],
+      save: _save,
+      saveEnabled: biographyByteLength(bio.text) <= biographyByteLimit,
+    );
   }
 
   List<Widget> _creationFields(AppStrings strings) {

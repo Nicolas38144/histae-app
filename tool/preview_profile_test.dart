@@ -13,6 +13,7 @@ import 'package:histae_app/features/consents/domain/consent_state.dart';
 import 'package:histae_app/features/consents/presentation/consents_page.dart';
 import 'package:histae_app/features/profile/application/profile_controller.dart';
 import 'package:histae_app/features/profile/data/profile_repository.dart';
+import 'package:histae_app/features/profile/data/profile_models.dart';
 import 'package:histae_app/features/profile/presentation/profile_feed_preview_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -21,6 +22,22 @@ import '../test/support/auth_fixture.dart';
 import '../test/support/continuation_fixture.dart';
 import '../test/support/profile_fixture.dart';
 import '../test/support/scrolling.dart';
+
+String _limitBiography() {
+  final sample = List.filled(
+    12,
+    'J’aime les dimanches où une balade finit en café avec des amis. '
+    'Je rapporte souvent un livre ou une recette de mes voyages, et je prends '
+    'toujours le temps de les partager. Racontez-moi ce qui vous occupe en ce moment.',
+  ).join('\n\n');
+  var result = '';
+  for (final character in sample.characters) {
+    if (biographyByteLength('$result$character') > biographyByteLimit) break;
+    result += character;
+  }
+  result = result.trim();
+  return result + '.' * (biographyByteLimit - biographyByteLength(result));
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -213,7 +230,15 @@ void main() {
     await tester.tap(find.text('Modifier ma présentation'));
     await tester.pumpAndSettle();
     await capture('identity');
+    final biography = find.widgetWithText(TextField, 'Quelques mots sur vous');
+    await reveal(biography);
+    await tester.enterText(biography, _limitBiography());
+    tester.binding.focusManager.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
+    await capture('identity-limit');
     await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Quitter'));
     await tester.pumpAndSettle();
     await reveal(find.byKey(const Key('profile-feed-preview')));
     await tester.tap(find.byKey(const Key('profile-feed-preview')));

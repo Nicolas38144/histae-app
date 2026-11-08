@@ -3528,7 +3528,7 @@ abstract class AppMessages {
   /// Interface: lib/features/profile/data/profile_models.dart
   ///
   /// In fr, this message translates to:
-  /// **'La présentation dépasse 2 000 octets.'**
+  /// **'La présentation est trop longue.'**
   String get bioTooLong;
 
   /// Interface: lib/features/profile/data/profile_models.dart
@@ -3734,12 +3734,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Quelques mots sur vous'**
   String get identityEditorAFewWordsAboutYou;
-
-  /// Interface: lib/features/profile/presentation/identity_editor.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'2 000 octets maximum · Évitez vos coordonnées.'**
-  String get identityEditor2000BytesMaximumAvoidContact;
 
   /// Interface: lib/features/profile/presentation/photo_page.dart
   ///
@@ -6032,12 +6026,6 @@ abstract class AppMessages {
   /// **'Recevoir les notifications'**
   String get devicesPageReceiveAlerts;
 
-  /// Identity fields are immutable after profile creation; corrections use the existing privacy request workflow.
-  ///
-  /// In fr, this message translates to:
-  /// **'Le prénom, la date de naissance et le sexe sont fixés à la création du profil. Pour une correction par un administrateur, utilisez « Mes demandes de données » dans vos choix de vie privée.'**
-  String get profileIdentityLocked;
-
   /// Discovery recovery for an existing profile whose sex must be corrected by an administrator.
   ///
   /// In fr, this message translates to:
@@ -6049,6 +6037,12 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Demander une correction'**
   String get discoveryRequestIdentityCorrection;
+
+  /// Accessibility hint for the visual biography limit indicator; never a permanent helper or counter.
+  ///
+  /// In fr, this message translates to:
+  /// **'Limite de la présentation atteinte.'**
+  String get biographyLimitReached;
 }
 
 class _AppMessagesDelegate extends LocalizationsDelegate<AppMessages> {

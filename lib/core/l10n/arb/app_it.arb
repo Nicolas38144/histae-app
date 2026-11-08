@@ -570,7 +570,7 @@
   "underage": "Histae è riservata alle persone dai 18 anni in su.",
   "firstnameInvalid": "Il nome è obbligatorio (massimo 100 byte).",
   "sexInvalid": "Scegli uno dei valori proposti.",
-  "bioTooLong": "La presentazione supera 2000 byte.",
+  "bioTooLong": "La presentazione è troppo lunga.",
   "ageRangeInvalid": "Le età devono andare da 18 a 99 anni, in questo ordine.",
   "distanceInvalid": "La distanza deve essere compresa tra 1 e 500 km.",
   "answerInvalid": "Ogni risposta deve contenere da 10 a 300 caratteri su una riga (massimo 1000 byte).",
@@ -605,7 +605,6 @@
   "identityEditorSex": "Sesso",
   "identityEditorSexIsOptionalWhenSavingThis": "Il sesso è facoltativo per salvare il profilo. Il suo utilizzo richiede il consenso ai dati sensibili, disponibile nelle scelte sulla privacy.",
   "identityEditorAFewWordsAboutYou": "Qualche parola su di te",
-  "identityEditor2000BytesMaximumAvoidContact": "Massimo 2000 byte · Evita i recapiti personali.",
   "photoPageSelectionWasInterruptedChooseYourPhoto": "La selezione è stata interrotta. Scegli di nuovo la foto per questo account.",
   "photoPageTheTemporaryPreviewIsUnavailableRefresh": "L’anteprima temporanea non è disponibile. Aggiorna per ottenere un nuovo link.",
   "photoPageChangeSelection": "Cambiare selezione?",
@@ -1126,7 +1125,7 @@
   "photoCropSavePhoto": "Salva la mia foto",
   "photoCropResumeUpload": "Riprendi l’invio",
   "devicesPageReceiveAlerts": "Ricevi notifiche",
-  "profileIdentityLocked": "Nome, data di nascita e sesso vengono fissati alla creazione del profilo. Per richiedere una correzione a un amministratore, usa «Le mie richieste sui dati» nelle impostazioni della privacy.",
   "discoveryIdentityCorrectionNeeded": "Un amministratore deve aggiungere o correggere il sesso in un profilo già creato. Invia una richiesta dalle impostazioni della privacy.",
-  "discoveryRequestIdentityCorrection": "Richiedi una correzione"
+  "discoveryRequestIdentityCorrection": "Richiedi una correzione",
+  "biographyLimitReached": "Limite della presentazione raggiunto."
 }

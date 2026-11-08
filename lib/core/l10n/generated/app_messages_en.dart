@@ -2112,7 +2112,7 @@ class AppMessagesEn extends AppMessages {
   String get sexInvalid => 'Choose one of the available values.';
 
   @override
-  String get bioTooLong => 'Your introduction exceeds 2,000 bytes.';
+  String get bioTooLong => 'Your introduction is too long.';
 
   @override
   String get ageRangeInvalid => 'Ages must range from 18 to 99, in that order.';
@@ -2236,10 +2236,6 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get identityEditorAFewWordsAboutYou => 'A few words about you';
-
-  @override
-  String get identityEditor2000BytesMaximumAvoidContact =>
-      '2,000 bytes maximum · Avoid contact details.';
 
   @override
   String get photoPageSelectionWasInterruptedChooseYourPhoto =>
@@ -3611,13 +3607,12 @@ class AppMessagesEn extends AppMessages {
   String get devicesPageReceiveAlerts => 'Receive notifications';
 
   @override
-  String get profileIdentityLocked =>
-      'Your first name, date of birth and sex are fixed when your profile is created. To request an administrator correction, use “My data requests” in your privacy settings.';
-
-  @override
   String get discoveryIdentityCorrectionNeeded =>
       'An administrator must add or correct sex on an existing profile. Send a request from your privacy settings.';
 
   @override
   String get discoveryRequestIdentityCorrection => 'Request a correction';
+
+  @override
+  String get biographyLimitReached => 'Introduction limit reached.';
 }

@@ -104,6 +104,10 @@ ClientMessage? validateBirthdate(String value, DateTime now) {
   return ageOn(d, now) < 18 ? ClientMessage.underage : null;
 }
 
+const biographyByteLimit = 2000;
+
+int biographyByteLength(String value) => utf8.encode(value.trim()).length;
+
 class ProfileDraft {
   const ProfileDraft(this.firstname, this.birthdate, this.sex, this.bio);
 
@@ -129,7 +133,7 @@ class ProfileDraft {
     if (sex != null && !['male', 'female', 'other'].contains(sex)) {
       return ClientMessage.sexInvalid;
     }
-    if (bio != null && utf8.encode(bio!.trim()).length > 2000) {
+    if (bio != null && biographyByteLength(bio!) > biographyByteLimit) {
       return ClientMessage.bioTooLong;
     }
     return null;

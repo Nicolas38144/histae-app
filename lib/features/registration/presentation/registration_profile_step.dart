@@ -5,6 +5,7 @@ import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../profile/data/profile_models.dart';
+import '../../profile/presentation/biography_field.dart';
 import '../../profile/presentation/birthdate_field.dart';
 import '../../profile/presentation/profile_strings.dart';
 import '../application/registration_draft.dart';
@@ -100,17 +101,11 @@ class _RegistrationProfileStepState extends State<RegistrationProfileStep> {
           },
         ),
         const SizedBox(height: 20),
-        TextField(
+        BiographyField(
           key: const Key('registration-bio'),
           controller: _bio,
           minLines: MediaQuery.textScalerOf(context).scale(16) > 20 ? 3 : 6,
           maxLines: 12,
-          textCapitalization: TextCapitalization.sentences,
-          decoration: InputDecoration(
-            labelText: copy.identityEditorAFewWordsAboutYou,
-            helperText: copy.identityEditor2000BytesMaximumAvoidContact,
-            helperMaxLines: 4,
-          ),
           onChanged: (_) => _changed(),
         ),
         const SizedBox(height: 20),
@@ -123,21 +118,28 @@ class _RegistrationProfileStepState extends State<RegistrationProfileStep> {
           ),
         ],
         const SizedBox(height: 24),
-        HistaeButton(
-          key: const Key('registration-next'),
-          onPressed: () {
-            _changed();
-            final error = widget.draft.profile.validate(DateTime.now());
-            if (error != null) {
-              setState(() => _error = error);
-              return;
-            }
-            FocusScope.of(context).unfocus();
-            widget.onContinue();
-          },
-          child: Text(copy.registrationContinue),
+        ValueListenableBuilder<TextEditingValue>(
+          valueListenable: _bio,
+          builder: (context, value, _) => HistaeButton(
+            key: const Key('registration-next'),
+            onPressed: biographyByteLength(value.text) <= biographyByteLimit
+                ? _continue
+                : null,
+            child: Text(copy.registrationContinue),
+          ),
         ),
       ],
     );
+  }
+
+  void _continue() {
+    _changed();
+    final error = widget.draft.profile.validate(DateTime.now());
+    if (error != null) {
+      setState(() => _error = error);
+      return;
+    }
+    FocusScope.of(context).unfocus();
+    widget.onContinue();
   }
 }

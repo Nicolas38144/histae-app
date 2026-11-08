@@ -570,7 +570,7 @@
   "underage": "Histae is for people aged 18 and over.",
   "firstnameInvalid": "First name is required (100 bytes maximum).",
   "sexInvalid": "Choose one of the available values.",
-  "bioTooLong": "Your introduction exceeds 2,000 bytes.",
+  "bioTooLong": "Your introduction is too long.",
   "ageRangeInvalid": "Ages must range from 18 to 99, in that order.",
   "distanceInvalid": "Distance must be between 1 and 500 km.",
   "answerInvalid": "Each answer must contain 10 to 300 characters on one line (1,000 bytes maximum).",
@@ -605,7 +605,6 @@
   "identityEditorSex": "Sex",
   "identityEditorSexIsOptionalWhenSavingThis": "Sex is optional when saving this profile. Using it requires your sensitive data consent, available in your privacy choices.",
   "identityEditorAFewWordsAboutYou": "A few words about you",
-  "identityEditor2000BytesMaximumAvoidContact": "2,000 bytes maximum · Avoid contact details.",
   "photoPageSelectionWasInterruptedChooseYourPhoto": "Selection was interrupted. Choose your photo again for this account.",
   "photoPageTheTemporaryPreviewIsUnavailableRefresh": "The temporary preview is unavailable. Refresh for a new link.",
   "photoPageChangeSelection": "Change selection?",
@@ -1126,7 +1125,7 @@
   "photoCropSavePhoto": "Save my photo",
   "photoCropResumeUpload": "Resume upload",
   "devicesPageReceiveAlerts": "Receive notifications",
-  "profileIdentityLocked": "Your first name, date of birth and sex are fixed when your profile is created. To request an administrator correction, use “My data requests” in your privacy settings.",
   "discoveryIdentityCorrectionNeeded": "An administrator must add or correct sex on an existing profile. Send a request from your privacy settings.",
-  "discoveryRequestIdentityCorrection": "Request a correction"
+  "discoveryRequestIdentityCorrection": "Request a correction",
+  "biographyLimitReached": "Introduction limit reached."
 }

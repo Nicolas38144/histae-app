@@ -21,33 +21,28 @@ class ProfileIdentitySummary extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _detail(context, text.identityEditorFirstName, profile.firstname),
+        const SizedBox(height: HistaeTokens.contentSpacing),
         _detail(context, text.identityEditorDateOfBirth, birthdate),
+        const SizedBox(height: HistaeTokens.contentSpacing),
         _detail(
           context,
           text.identityEditorSex,
           ProfileStrings(strings).sexes[profile.sex ?? '']!,
         ),
-        Text(
-          text.profileIdentityLocked,
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
       ],
     );
   }
 
-  Widget _detail(BuildContext context, String label, String value) => Padding(
-    padding: const EdgeInsets.only(bottom: HistaeTokens.contentSpacing),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodySmall
-              ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
-        ),
-        const SizedBox(height: 4),
-        Text(value, style: Theme.of(context).textTheme.bodyLarge),
-      ],
-    ),
+  Widget _detail(BuildContext context, String label, String value) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        label,
+        style: Theme.of(context).textTheme.bodySmall
+            ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+      ),
+      const SizedBox(height: 4),
+      Text(value, style: Theme.of(context).textTheme.bodyLarge),
+    ],
   );
 }

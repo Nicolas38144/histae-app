@@ -73,6 +73,9 @@ profile exists, first name, birthdate and sex use plain label/value text, withou
 input borders, picker icons or age-entry hints; only the biography
 remains editable here. Identity corrections go through the privacy request
 workflow and a separate audited administrator endpoint.
+Biography fields share the API's UTF-8 limit. A coral outline and soft glow appear
+at the limit, respecting reduced motion. There is no persistent limit hint or
+counter; over-limit text stays intact and blocks saving until shortened.
 
 The transparent Profile / Feed / Matches bar has no panel, shadow or separator. Use 22 px icons,
 a 38 px selected circle and touch targets of at least 48 px. Feed is the initial center tab.
