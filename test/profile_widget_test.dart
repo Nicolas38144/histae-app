@@ -17,6 +17,7 @@ import 'package:histae_app/features/profile/data/profile_repository.dart';
 import 'package:histae_app/features/profile/presentation/birthdate_field.dart';
 import 'package:histae_app/features/profile/presentation/photo_page.dart';
 import 'package:histae_app/features/profile/presentation/profile_editors.dart';
+import 'package:histae_app/features/profile/presentation/profile_identity_summary.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:image_picker/image_picker.dart';
@@ -493,10 +494,15 @@ void main() {
       expect(find.widgetWithText(TextField, 'Date de naissance'), findsNothing);
       expect(find.widgetWithText(TextField, 'Prénom'), findsNothing);
       expect(find.byType(DropdownButtonFormField<String>), findsNothing);
-      final date = tester.widget<BirthdateField>(
-        find.byKey(const Key('profile-birthdate')),
+      final identity = find.byType(ProfileIdentitySummary);
+      expect(
+        find.descendant(of: identity, matching: find.byType(InputDecorator)),
+        findsNothing,
       );
-      expect(date.onChanged, isNull);
+      expect(
+        find.descendant(of: identity, matching: find.byType(BirthdateField)),
+        findsNothing,
+      );
       expect(patches, 0);
       final bio = find.widgetWithText(TextField, 'Quelques mots sur vous');
       await tapVisible(tester, bio);

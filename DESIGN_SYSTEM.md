@@ -67,9 +67,10 @@ text; previews use clearly identified fictional people.
 Reuse `PreferenceField` and sliders for registration and saved preferences. Full-size headings
 and adjacent value badges replace floating captions. Disable steppers at bounds. Saved preferences
 keep Save visible but disabled until values change; initial onboarding stays enabled.
-Registration and profile editing reuse `BirthdateField`: a calendar-only adult
+Registration and profile creation reuse `BirthdateField`: a calendar-only adult
 date selector with localized display and an ISO date sent to the API. Once a
-profile exists, first name, birthdate and sex are read-only; only the biography
+profile exists, first name, birthdate and sex use plain label/value text, without
+input borders, picker icons or age-entry hints; only the biography
 remains editable here. Identity corrections go through the privacy request
 workflow and a separate audited administrator endpoint.
 
