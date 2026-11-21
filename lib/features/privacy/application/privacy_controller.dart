@@ -417,7 +417,7 @@ class PrivacyController extends ChangeNotifier {
     }
   }
 
-  Future<void> downloadExport() async {
+  Future<void> downloadExport({String? assistedExportId}) async {
     if (!active || busy || loading || sharing || retrySeconds > 0) return;
     final epoch = _epoch, scope = _scope;
     busy = true;
@@ -427,8 +427,15 @@ class PrivacyController extends ChangeNotifier {
     try {
       await _cleanExport();
       if (!_alive(epoch)) return;
-      final stream = await session.openDataExport(scope);
-      final path = await exportStore.save(stream, scope);
+      final stream = await session.openDataExport(
+        scope,
+        assistedExportId: assistedExportId,
+      );
+      final path = await exportStore.save(
+        stream,
+        scope,
+        assisted: assistedExportId != null,
+      );
       if (!_alive(epoch)) {
         await _cleanExport();
         return;

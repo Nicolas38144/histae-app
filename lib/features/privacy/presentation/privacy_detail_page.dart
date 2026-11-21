@@ -11,7 +11,10 @@ import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
+import '../../help/presentation/casework_page.dart';
+import '../../help/presentation/casework_strings.dart';
 import '../application/privacy_controller.dart';
+import '../data/privacy_models.dart';
 import 'privacy_frame.dart';
 import 'privacy_request_form.dart';
 import 'privacy_strings.dart';
@@ -23,11 +26,13 @@ class PrivacyDetailPage extends StatefulWidget {
     required this.section,
     this.notificationFlow = false,
     this.initialRequestId,
+    this.assistedExportId,
   });
   final PrivacyController controller;
   final PrivacySection section;
   final bool notificationFlow;
   final String? initialRequestId;
+  final String? assistedExportId;
 
   @override
   State<PrivacyDetailPage> createState() => _PrivacyDetailPageState();
@@ -65,6 +70,41 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
 
   Future<bool> _confirm(String title, String body, {String? action}) =>
       confirmAction(context, title, body, action: action);
+
+  Future<void> _openThread(RightsRequest request) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (threadContext) => CaseworkPage(
+          view: CaseworkView.thread,
+          session: c.session,
+          requestId: request.id,
+          canReply: request.open,
+          showExport:
+              request.type == DataRight.access ||
+              request.type == DataRight.portability,
+          openExport: (grant) => unawaited(_openExport(threadContext, grant)),
+        ),
+      ),
+    );
+    if (mounted) await c.load();
+  }
+
+  Future<void> _openExport(BuildContext threadContext, String grant) async {
+    final controller = PrivacyController(c.repository);
+    try {
+      await Navigator.of(threadContext).push(
+        MaterialPageRoute<void>(
+          builder: (_) => PrivacyDetailPage(
+            controller: controller,
+            section: PrivacySection.export,
+            assistedExportId: grant,
+          ),
+        ),
+      );
+    } finally {
+      controller.dispose();
+    }
+  }
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
@@ -369,6 +409,11 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
                   subtitle: Text(
                     '${rightStatus(AppStrings.of(context), request.status)} · ${privacyDate(AppStrings.of(context), request.requestedAt)}${request.completedAt == null ? '' : AppStrings.of(context).messages.privacyDetailPageCompletedOn(privacyDate(AppStrings.of(context), request.completedAt!))}',
                   ),
+                  onTap:
+                      request.type == DataRight.restriction ||
+                          request.type == DataRight.objection
+                      ? null
+                      : () => _openThread(request),
                 )
               : ExpansionTile(
                   key: ValueKey(('privacy-request', request.id)),
@@ -380,6 +425,16 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
                   expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
                   childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
                   children: [
+                    if (request.type != DataRight.restriction &&
+                        request.type != DataRight.objection)
+                      HistaeButton.text(
+                        onPressed: () => _openThread(request),
+                        child: Text(
+                          caseworkStrings(AppStrings.of(context).localeName)(
+                            'thread',
+                          ),
+                        ),
+                      ),
                     if (request.details != null) ...[
                       Text(
                         AppStrings.of(context)
@@ -448,7 +503,9 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
     ),
     const SizedBox(height: 20),
     HistaeButton.icon(
-      onPressed: enabled ? c.downloadExport : null,
+      onPressed: enabled
+          ? () => c.downloadExport(assistedExportId: widget.assistedExportId)
+          : null,
       icon: const Icon(Icons.download_outlined),
       label: Text(
         c.exportPath == null
@@ -510,6 +567,21 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
 
   List<Widget> _delete() => [
     Text(AppStrings.of(context).messages.billingStoreDeletionNotice),
+    HistaeButton.outlined(
+      onPressed: enabled
+          ? () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => CaseworkPage(
+                  view: CaseworkView.receipt,
+                  session: c.session,
+                ),
+              ),
+            )
+          : null,
+      child: Text(
+        caseworkStrings(AppStrings.of(context).localeName)('receipt'),
+      ),
+    ),
     const SizedBox(height: 16),
     EditorialCard(
       eyebrow: AppStrings.of(context)

@@ -49,16 +49,19 @@ class ApiClient {
   Future<ApiDownload> openDataExport({
     required String bearer,
     required RequestCancellation cancellation,
+    String? assistedExportId,
   }) async => await _openAuthenticatedStream(
     bearer: bearer,
     cancellation: cancellation,
     dataExport: true,
+    assistedExportId: assistedExportId,
   ) as ApiDownload;
 
   Future<ApiEventStream> _openAuthenticatedStream({
     required String bearer,
     required RequestCancellation cancellation,
     required bool dataExport,
+    String? assistedExportId,
   }) async {
     if (_closed || cancellation.isCancelled) {
       throw const ApiFailure(ApiFailureKind.cancelled);
@@ -75,7 +78,11 @@ class ApiClient {
         http.AbortableRequest(
             'GET',
             origin.resolve(
-              dataExport ? '/api/users/me/data-export' : '/api/users/me/events',
+              !dataExport
+                  ? '/api/users/me/events'
+                  : assistedExportId == null
+                  ? '/api/users/me/data-export'
+                  : '/api/users/me/assisted-exports/${Uri.encodeComponent(assistedExportId)}',
             ),
             abortTrigger: Future.any([
               abort.whenCancelled,

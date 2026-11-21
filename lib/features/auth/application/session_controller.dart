@@ -335,6 +335,7 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
           ? await repository.api.openDataExport(
               bearer: tokens.accessToken,
               cancellation: combined,
+              assistedExportId: query?['assisted_export_id'],
             )
           : events
           ? await repository.api.openEvents(
@@ -426,13 +427,18 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
       ) as ApiEventStream;
 
   @override
-  Future<ApiDownload> openDataExport(RequestCancellation cancellation) async =>
-      await _authorized(
-        'GET',
-        '/api/users/me/data-export',
-        download: true,
-        cancellation: cancellation,
-      ) as ApiDownload;
+  Future<ApiDownload> openDataExport(
+    RequestCancellation cancellation, {
+    String? assistedExportId,
+  }) async => await _authorized(
+    'GET',
+    '/api/users/me/data-export',
+    download: true,
+    query: assistedExportId == null
+        ? null
+        : {'assisted_export_id': assistedExportId},
+    cancellation: cancellation,
+  ) as ApiDownload;
   // These operations revoke this very session. First remove the reusable
   // refresh from durable storage, then cross the barrier that purges all UI.
   // The single request uses the latest access token, with no replay/rotation

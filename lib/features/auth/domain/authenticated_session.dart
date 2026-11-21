@@ -73,5 +73,8 @@ abstract interface class AuthenticatedSession implements Listenable {
 
   Future<ApiEventStream> openEvents(RequestCancellation cancellation);
 
-  Future<ApiDownload> openDataExport(RequestCancellation cancellation);
+  Future<ApiDownload> openDataExport(
+    RequestCancellation cancellation, {
+    String? assistedExportId,
+  });
 }

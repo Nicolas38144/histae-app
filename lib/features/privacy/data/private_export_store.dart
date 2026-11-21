@@ -65,15 +65,24 @@ class PrivateExportStore {
     }
   }
 
-  Future<String> save(ApiDownload download, RequestCancellation scope) =>
-      _serialized(() => _save(download, scope));
+  Future<String> save(
+    ApiDownload download,
+    RequestCancellation scope, {
+    bool assisted = false,
+  }) => _serialized(
+    () => _save(download, scope, assisted ? 2 * maxBytes : maxBytes),
+  );
 
-  Future<String> _save(ApiDownload download, RequestCancellation scope) async {
+  Future<String> _save(
+    ApiDownload download,
+    RequestCancellation scope,
+    int limit,
+  ) async {
     String? partial;
     RandomAccessFile? file;
     try {
       if (scope.isCancelled) throw const ApiFailure(ApiFailureKind.cancelled);
-      if (download.contentLength > maxBytes) {
+      if (download.contentLength > limit) {
         throw const ApiFailure(
           ApiFailureKind.payloadTooLarge,
           code: 'export_local_limit',
@@ -93,7 +102,7 @@ class PrivateExportStore {
             throw const ApiFailure(ApiFailureKind.cancelled);
           }
           count += chunk.length;
-          if (count > maxBytes || count > download.contentLength) {
+          if (count > limit || count > download.contentLength) {
             throw const ApiFailure(ApiFailureKind.invalidResponse);
           }
           for (final b in chunk) {
