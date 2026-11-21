@@ -5,13 +5,6 @@ import 'package:histae_app/features/catalog/data/plan_catalog.dart';
 import 'support/catalog_fixture.dart';
 
 void main() {
-  test('rejects a plans-only response instead of reconstructing offers', () {
-    final json = catalogJson()..remove('offers');
-    expect(() => PlanCatalog.fromJson(json), throwsA(isA<ApiFailure>()));
-    json['plans'] = <dynamic>[];
-    expect(() => PlanCatalog.fromJson(json), throwsA(isA<ApiFailure>()));
-  });
-
   test('explicitly empty offers stay empty without reconstructing them', () {
     final explicit = catalogJson()..['offers'] = <dynamic>[];
     expect(PlanCatalog.fromJson(explicit).offers, isEmpty);

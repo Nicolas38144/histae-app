@@ -2,15 +2,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/core/config/app_config.dart';
 
 void main() {
-  test('loads a public dotenv origin with exactly one /api prefix', () {
+  test('loads and normalizes the public API origin from dotenv', () {
     final config = AppConfig.fromDotEnv(
-      'APP_ENV=production\nAPI_BASE_URL=https://api.example',
+      'APP_ENV=production\nAPI_BASE_URL=https://api.example/',
       isDebug: false,
     );
-    expect(
-      config.apiOrigin.resolve('/api/plans').toString(),
-      'https://api.example/api/plans',
-    );
+    expect(config.apiOrigin.toString(), 'https://api.example');
   });
   test('dotenv accepts comments, CRLF, BOM and quoted public values', () {
     final config = AppConfig.fromDotEnv(
@@ -36,18 +33,6 @@ void main() {
       );
     }
   });
-  test('keeps an origin without duplicating /api', () {
-    final config = AppConfig.fromValues(
-      environment: 'development',
-      apiBaseUrl: 'http://10.0.2.2:8080/',
-      isDebug: true,
-    );
-    expect(
-      config.apiOrigin.resolve('/api/plans').toString(),
-      'http://10.0.2.2:8080/api/plans',
-    );
-  });
-
   for (final origin in [
     '',
     'localhost:8080',

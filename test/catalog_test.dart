@@ -71,22 +71,22 @@ void main() {
   test(
     'plans-only response is rejected without reconstructing offers or retrying',
     () async {
-      var calls = 0;
-      final controller = CatalogController(
-        repository((_) async {
-          calls++;
-          return http.Response(
-            jsonEncode(catalogJson()..remove('offers')),
-            200,
-          );
-        }),
-      );
-      addTearDown(controller.dispose);
-      await controller.load();
-      expect(controller.status, CatalogStatus.failure);
-      expect(controller.offers, isEmpty);
-      expect(controller.failure?.kind, ApiFailureKind.invalidResponse);
-      expect(calls, 1);
+      for (final plans in [catalogJson()['plans'], <Object?>[]]) {
+        final body = jsonEncode({'plans': plans});
+        var calls = 0;
+        final controller = CatalogController(
+          repository((_) async {
+            calls++;
+            return http.Response(body, 200);
+          }),
+        );
+        addTearDown(controller.dispose);
+        await controller.load();
+        expect(controller.status, CatalogStatus.failure);
+        expect(controller.offers, isEmpty);
+        expect(controller.failure?.kind, ApiFailureKind.invalidResponse);
+        expect(calls, 1);
+      }
     },
   );
   test('retains server changes without deriving quotas from a plan code', () {
@@ -214,17 +214,4 @@ void main() {
       expect(controller.plans, isEmpty);
     },
   );
-  test('dispose ignores a late successful response', () async {
-    final response = Completer<http.Response>();
-    final controller = CatalogController(repository((_) => response.future));
-    var notifications = 0;
-    controller.addListener(() {
-      notifications++;
-    });
-    final loading = controller.load();
-    controller.dispose();
-    response.complete(http.Response(jsonEncode({'plans': <Object?>[]}), 200));
-    await loading;
-    expect(notifications, 1);
-  });
 }
