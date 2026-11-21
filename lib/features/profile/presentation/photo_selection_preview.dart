@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/theme/histae_tokens.dart';
 
 /// Uses the same contain/center-cover fits as revealed profiles and match avatars.
 class PhotoSelectionPreview extends StatelessWidget {
@@ -16,6 +17,7 @@ class PhotoSelectionPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = AppStrings.of(context).messages;
+    const avatarSize = 64.0;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -37,17 +39,17 @@ class PhotoSelectionPreview extends StatelessWidget {
             ClipOval(
               child: Image.memory(
                 bytes,
-                width: 64,
-                height: 64,
+                width: avatarSize,
+                height: avatarSize,
                 fit: BoxFit.cover,
-                semanticLabel: text.photoCropAvatar,
+                excludeFromSemantics: true,
                 errorBuilder: (_, _, _) => const SizedBox.square(
-                  dimension: 64,
+                  dimension: avatarSize,
                   child: Icon(Icons.person_outline_rounded),
                 ),
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: HistaeTokens.contentSpacing),
             Expanded(child: Text(text.photoCropAvatar)),
           ],
         ),

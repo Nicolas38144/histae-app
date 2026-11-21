@@ -191,17 +191,16 @@ class ProfilePhotoTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = controller;
-    final p = c.profile;
+    final text = AppStrings.of(context).messages;
+    final profileUnavailable = c.errors.containsKey('profile');
     return ProfileDetailTile(
-      title: AppStrings.of(context).messages.profileSectionsAPhotoForLater,
+      title: text.profileSectionsAPhotoForLater,
       icon: Icons.photo_outlined,
-      summary: c.errors.containsKey('profile')
-          ? AppStrings.of(context).messages.profilePhotoLoadFailed
-          : AppStrings.of(context)
-                .messages
-                .profileSectionsOnePhotoRevealedAfterMutualConsent,
-      action: AppStrings.of(context).messages.profileSectionsManageMyPhoto,
-      onTap: p != null && !c.loading && !c.errors.containsKey('profile')
+      summary: profileUnavailable
+          ? text.profilePhotoLoadFailed
+          : text.profileSectionsOnePhotoRevealedAfterMutualConsent,
+      action: text.profileSectionsManageMyPhoto,
+      onTap: c.profile != null && !c.loading && !profileUnavailable
           ? onEdit
           : null,
     );

@@ -39,6 +39,9 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
   ProfileController get c => widget.controller;
   late final preparer = widget.preparer ?? PhotoPreparer();
   late final String _ownerScope = c.session.resourceKey;
+  bool get _canAccessPhoto =>
+      c.accessible && c.session.resourceKey == _ownerScope;
+
   Uint8List? _remote;
   String? _url;
   String Function(AppStrings)? _message;
@@ -88,7 +91,7 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
 
   void _changed() {
     if (!mounted) return;
-    if (!c.accessible || c.session.resourceKey != _ownerScope) {
+    if (!_canAccessPhoto) {
       setState(_purgeRemote);
       return;
     }
@@ -137,8 +140,7 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
       if (mounted &&
           _active &&
           generation == _downloadGeneration &&
-          c.accessible &&
-          c.session.resourceKey == _ownerScope) {
+          _canAccessPhoto) {
         setState(() {
           _remote = bytes;
           _needsPreviewRecovery = false;
@@ -174,14 +176,16 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
 
   Future<void> _choose(PhotoSource source) async {
     if (_choosing || !c.canWrite) return;
-    if (c.photoIntent != null &&
-        !await confirmAction(
-          context,
-          AppStrings.of(context).messages.photoPageChangeSelection,
-          AppStrings.of(context).messages.photoPageTheSavedPhotoRequestWillBe,
-          action: AppStrings.of(context).messages.photoPageChooseAnotherPhoto,
-        )) {
-      return;
+    if (c.photoIntent != null) {
+      final text = AppStrings.of(context).messages;
+      if (!await confirmAction(
+        context,
+        text.photoPageChangeSelection,
+        text.photoPageTheSavedPhotoRequestWillBe,
+        action: text.photoPageChooseAnotherPhoto,
+      )) {
+        return;
+      }
     }
     if (!mounted) return;
     setState(() {
@@ -190,32 +194,21 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
     });
     try {
       final bytes = await preparer.choose(source: source);
-      if (mounted &&
-          c.accessible &&
-          c.session.resourceKey == _ownerScope &&
-          bytes != null) {
-        final prepared = await Navigator.of(context).push<Uint8List>(
-          MaterialPageRoute(
-            builder: (_) => PhotoCropPage(
-              bytes: bytes,
-              session: c.session,
-              processor: widget.cropProcessor,
-            ),
+      if (!mounted || !_canAccessPhoto || bytes == null) return;
+      final prepared = await Navigator.of(context).push<Uint8List>(
+        MaterialPageRoute(
+          builder: (_) => PhotoCropPage(
+            bytes: bytes,
+            session: c.session,
+            processor: widget.cropProcessor,
           ),
-        );
-        if (mounted &&
-            c.accessible &&
-            c.session.resourceKey == _ownerScope &&
-            prepared != null) {
-          c.setPhoto(prepared);
-        }
+        ),
+      );
+      if (mounted && _canAccessPhoto && prepared != null) {
+        c.setPhoto(prepared);
       }
-    } on ApiFailure catch (e) {
-      if (mounted) {
-        setState(() {
-          _message = (strings) => ProfileStrings(strings).failure(e);
-        });
-      }
+    } on ApiFailure catch (failure) {
+      _showFailure(failure);
     } finally {
       if (mounted) {
         setState(() {
@@ -229,13 +222,16 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
     setState(() => _message = null);
     try {
       await c.upload();
-    } on ApiFailure catch (e) {
-      if (mounted) {
-        setState(() {
-          _message = (strings) => ProfileStrings(strings).failure(e);
-        });
-      }
+    } on ApiFailure catch (failure) {
+      _showFailure(failure);
     }
+  }
+
+  void _showFailure(ApiFailure failure) {
+    if (!mounted) return;
+    setState(() {
+      _message = (strings) => ProfileStrings(strings).failure(failure);
+    });
   }
 
   @override
@@ -250,76 +246,59 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: c,
     builder: (context, _) {
-      if (!c.accessible || c.session.resourceKey != _ownerScope) {
+      if (!_canAccessPhoto) {
         return const HistaeScaffold(body: SizedBox.shrink());
       }
+      final strings = AppStrings.of(context);
+      final text = strings.messages;
       final intent = c.photoIntent;
-      final preview = intent == null ? _remote : intent.bytes;
+      final preview = intent?.bytes ?? _remote;
       return HistaeScaffold(
-        appBar: AppBar(
-          title: Text(AppStrings.of(context).messages.photoPageYourPhoto),
-        ),
+        appBar: AppBar(title: Text(text.photoPageYourPhoto)),
         body: SafeArea(
           child: ListView(
             padding: HistaeTokens.pagePadding,
             children: [
               Text(
-                AppStrings.of(context).messages.photoPageAFaceAtTheRightTime,
+                text.photoPageAFaceAtTheRightTime,
                 style: Theme.of(context).textTheme.headlineLarge,
               ),
               const SizedBox(height: 20),
-              Text(
-                AppStrings.of(context)
-                    .messages
-                    .photoPageOnePersonalPhotoItDoesNot,
-              ),
-              const SizedBox(height: 24),
+              Text(text.photoPageOnePersonalPhotoItDoesNot),
+              const SizedBox(height: HistaeTokens.sectionSpacing),
               if (preview != null)
                 PhotoSelectionPreview(
                   bytes: preview,
                   label: intent == null
-                      ? AppStrings.of(context)
-                            .messages
-                            .photoPageYourCurrentPhoto
-                      : AppStrings.of(context)
-                            .messages
-                            .photoPageYourSelectionNotYetConfirmedBy,
+                      ? text.photoPageYourCurrentPhoto
+                      : text.photoPageYourSelectionNotYetConfirmedBy,
                 ),
               if (_fetching || _choosing || c.saving || c.loading)
                 LinearProgressIndicator(
-                  semanticsLabel: AppStrings.of(context)
-                      .messages
-                      .photoPagePreparingOrLoadingPhoto,
+                  semanticsLabel: text.photoPagePreparingOrLoadingPhoto,
                 ),
               if (intent != null)
                 Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: Text(
-                    AppStrings.of(context).messages.photoCropSelectionReady,
+                  padding: const EdgeInsets.only(
+                    top: HistaeTokens.contentSpacing,
                   ),
+                  child: Text(text.photoCropSelectionReady),
                 ),
-              if (_message != null)
+              if (_message case final message?)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child: Semantics(
                     liveRegion: true,
-                    child: Text(_message!(AppStrings.of(context))),
+                    child: Text(message(strings)),
                   ),
                 ),
               if (c.uncertain)
-                Text(
-                  AppStrings.of(context)
-                      .messages
-                      .photoPageTheUploadMayHaveSucceededResuming,
-                ),
+                Text(text.photoPageTheUploadMayHaveSucceededResuming),
               if (c.retrySeconds > 0)
-                Text(
-                  AppStrings.of(context).messages
-                      .appStringsTryAgainInS(c.retrySeconds),
-                ),
-              const SizedBox(height: 24),
+                Text(text.appStringsTryAgainInS(c.retrySeconds)),
+              const SizedBox(height: HistaeTokens.sectionSpacing),
               if (intent != null) ...[
-                const SizedBox(height: 12),
+                const SizedBox(height: HistaeTokens.textSpacing),
                 HistaeButton(
                   onPressed:
                       _choosing || c.saving || c.loading || c.retrySeconds > 0
@@ -327,8 +306,8 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
                       : _upload,
                   child: Text(
                     c.uncertain
-                        ? AppStrings.of(context).messages.photoCropResumeUpload
-                        : AppStrings.of(context).messages.photoCropSavePhoto,
+                        ? text.photoCropResumeUpload
+                        : text.photoCropSavePhoto,
                   ),
                 ),
               ],
@@ -337,9 +316,7 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
                     ? null
                     : () => _choose(PhotoSource.camera),
                 icon: const Icon(Icons.camera_alt_outlined),
-                label: Text(
-                  AppStrings.of(context).messages.photoPageTakeAPhoto,
-                ),
+                label: Text(text.photoPageTakeAPhoto),
               ),
               HistaeButton.outlined(
                 onPressed: !c.canWrite || _choosing
@@ -347,10 +324,8 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
                     : () => _choose(PhotoSource.gallery),
                 child: Text(
                   intent == null && c.profile?.photo == null
-                      ? AppStrings.of(context).messages.photoPageChooseAPhoto
-                      : AppStrings.of(context)
-                            .messages
-                            .photoPageChooseAnotherPhoto,
+                      ? text.photoPageChooseAPhoto
+                      : text.photoPageChooseAnotherPhoto,
                 ),
               ),
               if (c.uncertain || _needsPreviewRecovery)
@@ -362,9 +337,7 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
                           await c.load();
                           if (mounted) _changed();
                         },
-                  child: Text(
-                    AppStrings.of(context).messages.photoPageRefreshPhoto,
-                  ),
+                  child: Text(text.photoPageRefreshPhoto),
                 ),
               if (c.profile?.photo != null)
                 HistaeButton.text(
@@ -373,33 +346,20 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
                       : () async {
                           if (!await confirmAction(
                                 context,
-                                AppStrings.of(context)
-                                    .messages
-                                    .photoPageRemoveYourPhoto,
-                                AppStrings.of(context)
-                                    .messages
-                                    .photoPageThePhotoWillNoLongerBe,
-                                action: AppStrings.of(context)
-                                    .messages
-                                    .photoPageRemovePhoto,
+                                text.photoPageRemoveYourPhoto,
+                                text.photoPageThePhotoWillNoLongerBe,
+                                action: text.photoPageRemovePhoto,
                               ) ||
                               !mounted) {
                             return;
                           }
                           try {
                             await c.removePhoto();
-                          } on ApiFailure catch (e) {
-                            if (mounted) {
-                              setState(() {
-                                _message = (strings) =>
-                                    ProfileStrings(strings).failure(e);
-                              });
-                            }
+                          } on ApiFailure catch (failure) {
+                            _showFailure(failure);
                           }
                         },
-                  child: Text(
-                    AppStrings.of(context).messages.photoPageRemoveMyPhoto,
-                  ),
+                  child: Text(text.photoPageRemoveMyPhoto),
                 ),
             ],
           ),
