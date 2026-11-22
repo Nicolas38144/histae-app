@@ -64,13 +64,6 @@ class RewardVideoCard extends StatelessWidget {
             ),
             const SizedBox(height: 18),
             Text(
-              AppStrings.of(context).messages.rewardVideoCardAHelpingHand,
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: colors.secondary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
               AppStrings.of(context)
                   .messages
                   .rewardVideoCardAVideoForTheNextChapter,

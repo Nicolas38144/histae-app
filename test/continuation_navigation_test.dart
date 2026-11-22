@@ -70,6 +70,14 @@ void main() {
         await tester.tap(find.byKey(const Key('chat-decisions')));
         await tester.pumpAndSettle();
         expect(find.byType(ContinuationPage), findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byType(AppBar),
+            matching: find.text('Votre conversation avec Elsa'),
+          ),
+          findsOneWidget,
+        );
+        expect(find.text('Elsa'), findsNothing);
         expect(find.text('Continuer cette conversation'), findsNothing);
         expect(find.text('Voir mes crédits'), findsNothing);
         expect(find.byIcon(Icons.refresh), findsNothing);

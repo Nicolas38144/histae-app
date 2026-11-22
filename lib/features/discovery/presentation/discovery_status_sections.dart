@@ -14,9 +14,6 @@ class DiscoveryReadinessIntro extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => EditorialCard(
-    eyebrow: AppStrings.of(context)
-        .messages
-        .discoveryStatusSectionsBeforeYouMeet,
     title: paused
         ? AppStrings.of(context).messages.discoveryStatusSectionsTakeYourTime
         : AppStrings.of(context)

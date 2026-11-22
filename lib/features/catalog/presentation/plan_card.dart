@@ -61,17 +61,6 @@ class PlanCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                featured
-                    ? AppStrings.of(context).messages.planCardTakeYourTimeFreely
-                    : AppStrings.of(context)
-                          .messages
-                          .planCardToGetToKnowEachOther,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-              const SizedBox(height: 18),
               Semantics(
                 header: true,
                 child: Text(

@@ -484,7 +484,6 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
 
   List<Widget> _export() => [
     EditorialCard(
-      eyebrow: AppStrings.of(context).messages.privacyDetailPageACopyForYou,
       title: AppStrings.of(context)
           .messages
           .privacyDetailPageYourDataWithinReach,
@@ -579,9 +578,6 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
     ),
     const SizedBox(height: 16),
     EditorialCard(
-      eyebrow: AppStrings.of(context)
-          .messages
-          .privacyDetailPageAPersonalDecision,
       title: AppStrings.of(context).messages.privacyDetailPageCloseThisChapter,
       body: AppStrings.of(context)
           .messages

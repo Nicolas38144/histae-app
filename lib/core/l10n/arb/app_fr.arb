@@ -28,10 +28,6 @@
   "@mainNavigationBarProfile": {
     "description": "Interface: lib/app/main_navigation_bar.dart"
   },
-  "welcomePageAnotherWayToMeet": "D’ABORD, UNE CONVERSATION",
-  "@welcomePageAnotherWayToMeet": {
-    "description": "Interface: lib/app/welcome_page.dart"
-  },
   "welcomePageTimeReciprocityConsent": "À votre rythme. Et toujours à deux.",
   "@welcomePageTimeReciprocityConsent": {
     "description": "Interface: lib/app/welcome_page.dart"
@@ -618,21 +614,9 @@
   "@subscriptionSummaryYourPaymentNeedsAttentionTheEntitlements": {
     "description": "Interface: lib/features/billing/presentation/subscription_summary.dart"
   },
-  "catalogPageSimplePlans": "DES FORMULES SIMPLES",
-  "@catalogPageSimplePlans": {
-    "description": "Interface: lib/features/catalog/presentation/catalog_page.dart"
-  },
   "catalogPageAtYourPaceAtAFair": "À votre rythme. Au prix juste.",
   "@catalogPageAtYourPaceAtAFair": {
     "description": "Interface: lib/features/catalog/presentation/catalog_page.dart"
-  },
-  "planCardTakeYourTimeFreely": "PRENDRE LE TEMPS, LIBREMENT",
-  "@planCardTakeYourTimeFreely": {
-    "description": "Interface: lib/features/catalog/presentation/plan_card.dart"
-  },
-  "planCardToGetToKnowEachOther": "POUR FAIRE CONNAISSANCE",
-  "@planCardToGetToKnowEachOther": {
-    "description": "Interface: lib/features/catalog/presentation/plan_card.dart"
   },
   "planCardBilledMonthlyAutomaticRenewal": "Facturé chaque mois. Renouvellement automatique.",
   "@planCardBilledMonthlyAutomaticRenewal": {
@@ -880,16 +864,22 @@
   "@continuationPageYourMatch": {
     "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
   },
+  "continuationPageYourConversation": "Votre conversation",
+  "continuationPageYourConversationWith": "Votre conversation avec {firstname}",
+  "@continuationPageYourConversationWith": {
+    "description": "Conversation details title with the other person's first name.",
+    "placeholders": {
+      "firstname": {
+        "type": "String"
+      }
+    }
+  },
   "continuationPageThisMatchIsNoLongerAvailable": "Cette rencontre\nn’est plus disponible.",
   "@continuationPageThisMatchIsNoLongerAvailable": {
     "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
   },
   "continuationPageReturnToYourMatchesToCheck": "Revenez à vos rencontres pour relire leur état.",
   "@continuationPageReturnToYourMatchesToCheck": {
-    "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
-  },
-  "continuationPageTheNextChapterIsWrittenTogether": "La suite\ns’écrit à deux.",
-  "@continuationPageTheNextChapterIsWrittenTogether": {
     "description": "Interface: lib/features/continuation/presentation/continuation_page.dart"
   },
   "continuationPageRefreshingMatch": "Actualisation de la rencontre",
@@ -1104,10 +1094,6 @@
   "@creditsPageRefreshMyCredits": {
     "description": "Interface: lib/features/continuation/presentation/credits_page.dart"
   },
-  "creditsPageTimeToContinue": "LE TEMPS DE CONTINUER",
-  "@creditsPageTimeToContinue": {
-    "description": "Interface: lib/features/continuation/presentation/credits_page.dart"
-  },
   "creditsPageTheNextChapterStartsHere": "La suite commence\nici.",
   "@creditsPageTheNextChapterStartsHere": {
     "description": "Interface: lib/features/continuation/presentation/credits_page.dart"
@@ -1162,10 +1148,6 @@
   },
   "rewardVideoCardVideoPlaying": "Vidéo en cours…",
   "@rewardVideoCardVideoPlaying": {
-    "description": "Interface: lib/features/continuation/presentation/reward_video_card.dart"
-  },
-  "rewardVideoCardAHelpingHand": "UN COUP DE POUCE",
-  "@rewardVideoCardAHelpingHand": {
     "description": "Interface: lib/features/continuation/presentation/reward_video_card.dart"
   },
   "rewardVideoCardAVideoForTheNextChapter": "Une vidéo pour\nla suite de l’histoire.",
@@ -1258,10 +1240,6 @@
   },
   "discoveryPageBlock": "Bloquer",
   "@discoveryPageBlock": {
-    "description": "Interface: lib/features/discovery/presentation/discovery_page.dart"
-  },
-  "discoveryPageTakeYourTime": "PRENDRE LE TEMPS",
-  "@discoveryPageTakeYourTime": {
     "description": "Interface: lib/features/discovery/presentation/discovery_page.dart"
   },
   "discoveryPageAQuietMomentForNow": "Vous avez fait le tour, pour l’instant.",
@@ -1381,10 +1359,6 @@
   "discoveryPauseCardRefreshMyVisibility": "Actualiser ma visibilité",
   "@discoveryPauseCardRefreshMyVisibility": {
     "description": "Interface: lib/features/discovery/presentation/discovery_pause_card.dart"
-  },
-  "discoveryStatusSectionsBeforeYouMeet": "AVANT LA RENCONTRE",
-  "@discoveryStatusSectionsBeforeYouMeet": {
-    "description": "Interface: lib/features/discovery/presentation/discovery_status_sections.dart"
   },
   "discoveryStatusSectionsTakeYourTime": "Prenez votre temps.",
   "@discoveryStatusSectionsTakeYourTime": {
@@ -1567,10 +1541,6 @@
   "@encounterPageAMatch": {
     "description": "Interface: lib/features/discovery/presentation/encounter_page.dart"
   },
-  "encounterPageMutualInterest": "UN INTÉRÊT RÉCIPROQUE",
-  "@encounterPageMutualInterest": {
-    "description": "Interface: lib/features/discovery/presentation/encounter_page.dart"
-  },
   "encounterPageWordsBroughtYouTogether": "Les mots vous\nont rapprochés.",
   "@encounterPageWordsBroughtYouTogether": {
     "description": "Interface: lib/features/discovery/presentation/encounter_page.dart"
@@ -1627,10 +1597,6 @@
   "feedProfileCardLike": "J’aime",
   "@feedProfileCardLike": {
     "description": "Interface: lib/features/discovery/presentation/feed_profile_card.dart"
-  },
-  "feedProfileContentThroughWords": "AU FIL DES MOTS",
-  "@feedProfileContentThroughWords": {
-    "description": "Interface: lib/features/discovery/presentation/feed_profile_content.dart"
   },
   "feedProfileContentAFewTraits": "Quelques traits",
   "@feedProfileContentAFewTraits": {
@@ -1811,10 +1777,6 @@
   },
   "devicesPageDevicesAndNotifications": "Appareils et notifications",
   "@devicesPageDevicesAndNotifications": {
-    "description": "Interface: lib/features/notifications/presentation/devices_page.dart"
-  },
-  "devicesPageStayInTouchAtYourPace": "GARDER LE LIEN, À VOTRE RYTHME",
-  "@devicesPageStayInTouchAtYourPace": {
     "description": "Interface: lib/features/notifications/presentation/devices_page.dart"
   },
   "devicesPageASignIfYouWish": "Un signe,\nsi vous le souhaitez.",
@@ -2153,10 +2115,6 @@
   "@privacyDetailPageRefreshTracking": {
     "description": "Interface: lib/features/privacy/presentation/privacy_detail_page.dart"
   },
-  "privacyDetailPageACopyForYou": "UNE COPIE POUR VOUS",
-  "@privacyDetailPageACopyForYou": {
-    "description": "Interface: lib/features/privacy/presentation/privacy_detail_page.dart"
-  },
   "privacyDetailPageYourDataWithinReach": "Vos données,\nà portée de main.",
   "@privacyDetailPageYourDataWithinReach": {
     "description": "Interface: lib/features/privacy/presentation/privacy_detail_page.dart"
@@ -2201,10 +2159,6 @@
   "@privacyDetailPageEraseTemporaryFile": {
     "description": "Interface: lib/features/privacy/presentation/privacy_detail_page.dart"
   },
-  "privacyDetailPageAPersonalDecision": "UNE DÉCISION PERSONNELLE",
-  "@privacyDetailPageAPersonalDecision": {
-    "description": "Interface: lib/features/privacy/presentation/privacy_detail_page.dart"
-  },
   "privacyDetailPageCloseThisChapter": "Clore ce\nchapitre.",
   "@privacyDetailPageCloseThisChapter": {
     "description": "Interface: lib/features/privacy/presentation/privacy_detail_page.dart"
@@ -2243,10 +2197,6 @@
   },
   "privacyHubPagePrivacyAndSecurity": "Vie privée et sécurité",
   "@privacyHubPagePrivacyAndSecurity": {
-    "description": "Interface: lib/features/privacy/presentation/privacy_hub_page.dart"
-  },
-  "privacyHubPageYourSpaceYourChoices": "VOTRE ESPACE, VOS CHOIX",
-  "@privacyHubPageYourSpaceYourChoices": {
     "description": "Interface: lib/features/privacy/presentation/privacy_hub_page.dart"
   },
   "privacyHubPageWithConfidence": "En toute\nconfiance.",
@@ -2417,10 +2367,6 @@
   "@reportPageReportAProfile": {
     "description": "Interface: lib/features/privacy/presentation/report_page.dart"
   },
-  "reportPageCaringForConversations": "PRENDRE SOIN DES ÉCHANGES",
-  "@reportPageCaringForConversations": {
-    "description": "Interface: lib/features/privacy/presentation/report_page.dart"
-  },
   "reportPageASpaceToFeelAtEase": "Un espace\noù se sentir bien.",
   "@reportPageASpaceToFeelAtEase": {
     "description": "Interface: lib/features/privacy/presentation/report_page.dart"
@@ -2489,10 +2435,6 @@
   "@answersEditorYourAnswers": {
     "description": "Interface: lib/features/profile/presentation/answers_editor.dart"
   },
-  "answersEditorYourWordsYourStory": "VOS MOTS, VOTRE HISTOIRE",
-  "@answersEditorYourWordsYourStory": {
-    "description": "Interface: lib/features/profile/presentation/answers_editor.dart"
-  },
   "answersEditorThreeQuestionsAThousandWaysTo": "Trois questions.\nMille façons d’être vous.",
   "@answersEditorThreeQuestionsAThousandWaysTo": {
     "description": "Interface: lib/features/profile/presentation/answers_editor.dart"
@@ -2521,15 +2463,6 @@
   "answersEditorAHabitAWishALittle": "Une habitude, une envie, une petite chose qui vous rend heureux. Commencez par une question.",
   "@answersEditorAHabitAWishALittle": {
     "description": "Interface: lib/features/profile/presentation/answers_editor.dart"
-  },
-  "answersEditorAnswer": "RÉPONSE {arg0}",
-  "@answersEditorAnswer": {
-    "description": "Interface: lib/features/profile/presentation/answers_editor.dart",
-    "placeholders": {
-      "arg0": {
-        "type": "Object"
-      }
-    }
   },
   "answersEditorAnswer737": "Réponse {arg0}",
   "@answersEditorAnswer737": {
@@ -2777,10 +2710,6 @@
   "profileFeedPreviewPageDistanceDependsOnTheViewer": "Distance selon la personne",
   "@profileFeedPreviewPageDistanceDependsOnTheViewer": {
     "description": "Interface: lib/features/profile/presentation/profile_feed_preview_page.dart"
-  },
-  "profilePageYourProfile": "VOTRE HISTOIRE",
-  "@profilePageYourProfile": {
-    "description": "Interface: lib/features/profile/presentation/profile_page.dart"
   },
   "profilePageAMeetingStartsWithYou": "Une rencontre\ncommence par vous.",
   "@profilePageAMeetingStartsWithYou": {

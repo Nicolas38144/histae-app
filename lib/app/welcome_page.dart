@@ -32,12 +32,6 @@ class WelcomePage extends StatelessWidget {
               padding: HistaeTokens.pagePadding,
               children: [
                 const SizedBox(height: 12),
-                Text(
-                  AppStrings.of(context).messages.welcomePageAnotherWayToMeet,
-                  style: Theme.of(context).textTheme.labelSmall
-                      ?.copyWith(color: Theme.of(context).colorScheme.primary),
-                ),
-                const SizedBox(height: 20),
                 Semantics(
                   header: true,
                   child: Text(

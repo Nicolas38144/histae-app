@@ -76,9 +76,6 @@ class _ReportPageState extends State<ReportPage> {
                 padding: HistaeTokens.pagePadding,
                 children: [
                   EditorialCard(
-                    eyebrow: AppStrings.of(context)
-                        .messages
-                        .reportPageCaringForConversations,
                     title: AppStrings.of(context)
                         .messages
                         .reportPageASpaceToFeelAtEase,

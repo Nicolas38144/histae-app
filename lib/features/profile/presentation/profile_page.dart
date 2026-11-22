@@ -119,7 +119,6 @@ class _ProfilePageState extends State<ProfilePage> {
             padding: HistaeTokens.pagePadding,
             children: [
               EditorialCard(
-                eyebrow: AppStrings.of(context).messages.profilePageYourProfile,
                 title: p == null
                     ? AppStrings.of(context)
                           .messages

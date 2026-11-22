@@ -158,9 +158,6 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
     AppStrings.of(context).messages.answersEditorYourAnswers,
     [
       EditorialCard(
-        eyebrow: AppStrings.of(context)
-            .messages
-            .answersEditorYourWordsYourStory,
         title: AppStrings.of(context)
             .messages
             .answersEditorThreeQuestionsAThousandWaysTo,
@@ -238,13 +235,6 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  AppStrings.of(context).messages
-                      .answersEditorAnswer((i + 1).toString().padLeft(2, '0')),
-                  style: Theme.of(context).textTheme.labelSmall
-                      ?.copyWith(color: Theme.of(context).colorScheme.primary),
-                ),
-                const SizedBox(height: HistaeTokens.textSpacing),
                 Text(
                   controller.questionPrompt(inputs[i].id, inputs[i].prompt),
                   style: Theme.of(context).textTheme.titleLarge,

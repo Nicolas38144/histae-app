@@ -38,13 +38,6 @@ class FeedProfileContent extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          AppStrings.of(context).messages.feedProfileContentThroughWords,
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: theme.colorScheme.primary,
-          ),
-        ),
-        const SizedBox(height: 16),
         Semantics(
           header: true,
           child: Text(

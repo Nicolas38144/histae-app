@@ -119,9 +119,6 @@ class _PrivacyHubPageState extends State<PrivacyHubPage>
         title: AppStrings.of(context).messages.privacyHubPagePrivacyAndSecurity,
         children: [
           EditorialCard(
-            eyebrow: AppStrings.of(context)
-                .messages
-                .privacyHubPageYourSpaceYourChoices,
             title: AppStrings.of(context).messages.privacyHubPageWithConfidence,
             body: AppStrings.of(context)
                 .messages

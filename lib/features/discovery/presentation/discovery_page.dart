@@ -362,9 +362,6 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
             )
           else
             EditorialCard(
-              eyebrow: AppStrings.of(context)
-                  .messages
-                  .discoveryPageTakeYourTime,
               title: AppStrings.of(context).messages.discoveryPageJustAMoment,
               body: AppStrings.of(context)
                   .messages

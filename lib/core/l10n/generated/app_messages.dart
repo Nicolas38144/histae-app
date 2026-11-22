@@ -147,12 +147,6 @@ abstract class AppMessages {
   /// Interface: lib/app/welcome_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'D’ABORD, UNE CONVERSATION'**
-  String get welcomePageAnotherWayToMeet;
-
-  /// Interface: lib/app/welcome_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'À votre rythme. Et toujours à deux.'**
   String get welcomePageTimeReciprocityConsent;
 
@@ -957,26 +951,8 @@ abstract class AppMessages {
   /// Interface: lib/features/catalog/presentation/catalog_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'DES FORMULES SIMPLES'**
-  String get catalogPageSimplePlans;
-
-  /// Interface: lib/features/catalog/presentation/catalog_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'À votre rythme. Au prix juste.'**
   String get catalogPageAtYourPaceAtAFair;
-
-  /// Interface: lib/features/catalog/presentation/plan_card.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'PRENDRE LE TEMPS, LIBREMENT'**
-  String get planCardTakeYourTimeFreely;
-
-  /// Interface: lib/features/catalog/presentation/plan_card.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'POUR FAIRE CONNAISSANCE'**
-  String get planCardToGetToKnowEachOther;
 
   /// Interface: lib/features/catalog/presentation/plan_card.dart
   ///
@@ -1332,6 +1308,18 @@ abstract class AppMessages {
   /// **'Votre rencontre'**
   String get continuationPageYourMatch;
 
+  /// No description provided for @continuationPageYourConversation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre conversation'**
+  String get continuationPageYourConversation;
+
+  /// Conversation details title with the other person's first name.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre conversation avec {firstname}'**
+  String continuationPageYourConversationWith(String firstname);
+
   /// Interface: lib/features/continuation/presentation/continuation_page.dart
   ///
   /// In fr, this message translates to:
@@ -1343,12 +1331,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Revenez à vos rencontres pour relire leur état.'**
   String get continuationPageReturnToYourMatchesToCheck;
-
-  /// Interface: lib/features/continuation/presentation/continuation_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'La suite\ns’écrit à deux.'**
-  String get continuationPageTheNextChapterIsWrittenTogether;
 
   /// Interface: lib/features/continuation/presentation/continuation_page.dart
   ///
@@ -1596,12 +1578,6 @@ abstract class AppMessages {
   /// Interface: lib/features/continuation/presentation/credits_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'LE TEMPS DE CONTINUER'**
-  String get creditsPageTimeToContinue;
-
-  /// Interface: lib/features/continuation/presentation/credits_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'La suite commence\nici.'**
   String get creditsPageTheNextChapterStartsHere;
 
@@ -1682,12 +1658,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Vidéo en cours…'**
   String get rewardVideoCardVideoPlaying;
-
-  /// Interface: lib/features/continuation/presentation/reward_video_card.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'UN COUP DE POUCE'**
-  String get rewardVideoCardAHelpingHand;
 
   /// Interface: lib/features/continuation/presentation/reward_video_card.dart
   ///
@@ -1808,12 +1778,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Bloquer'**
   String get discoveryPageBlock;
-
-  /// Interface: lib/features/discovery/presentation/discovery_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'PRENDRE LE TEMPS'**
-  String get discoveryPageTakeYourTime;
 
   /// Interface: lib/features/discovery/presentation/discovery_page.dart
   ///
@@ -1976,12 +1940,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Actualiser ma visibilité'**
   String get discoveryPauseCardRefreshMyVisibility;
-
-  /// Interface: lib/features/discovery/presentation/discovery_status_sections.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'AVANT LA RENCONTRE'**
-  String get discoveryStatusSectionsBeforeYouMeet;
 
   /// Interface: lib/features/discovery/presentation/discovery_status_sections.dart
   ///
@@ -2250,12 +2208,6 @@ abstract class AppMessages {
   /// Interface: lib/features/discovery/presentation/encounter_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'UN INTÉRÊT RÉCIPROQUE'**
-  String get encounterPageMutualInterest;
-
-  /// Interface: lib/features/discovery/presentation/encounter_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Les mots vous\nont rapprochés.'**
   String get encounterPageWordsBroughtYouTogether;
 
@@ -2330,12 +2282,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'J’aime'**
   String get feedProfileCardLike;
-
-  /// Interface: lib/features/discovery/presentation/feed_profile_content.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'AU FIL DES MOTS'**
-  String get feedProfileContentThroughWords;
 
   /// Interface: lib/features/discovery/presentation/feed_profile_content.dart
   ///
@@ -2600,12 +2546,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Appareils et notifications'**
   String get devicesPageDevicesAndNotifications;
-
-  /// Interface: lib/features/notifications/presentation/devices_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'GARDER LE LIEN, À VOTRE RYTHME'**
-  String get devicesPageStayInTouchAtYourPace;
 
   /// Interface: lib/features/notifications/presentation/devices_page.dart
   ///
@@ -3054,12 +2994,6 @@ abstract class AppMessages {
   /// Interface: lib/features/privacy/presentation/privacy_detail_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'UNE COPIE POUR VOUS'**
-  String get privacyDetailPageACopyForYou;
-
-  /// Interface: lib/features/privacy/presentation/privacy_detail_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Vos données,\nà portée de main.'**
   String get privacyDetailPageYourDataWithinReach;
 
@@ -3126,12 +3060,6 @@ abstract class AppMessages {
   /// Interface: lib/features/privacy/presentation/privacy_detail_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'UNE DÉCISION PERSONNELLE'**
-  String get privacyDetailPageAPersonalDecision;
-
-  /// Interface: lib/features/privacy/presentation/privacy_detail_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Clore ce\nchapitre.'**
   String get privacyDetailPageCloseThisChapter;
 
@@ -3188,12 +3116,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Vie privée et sécurité'**
   String get privacyHubPagePrivacyAndSecurity;
-
-  /// Interface: lib/features/privacy/presentation/privacy_hub_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'VOTRE ESPACE, VOS CHOIX'**
-  String get privacyHubPageYourSpaceYourChoices;
 
   /// Interface: lib/features/privacy/presentation/privacy_hub_page.dart
   ///
@@ -3450,12 +3372,6 @@ abstract class AppMessages {
   /// Interface: lib/features/privacy/presentation/report_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'PRENDRE SOIN DES ÉCHANGES'**
-  String get reportPageCaringForConversations;
-
-  /// Interface: lib/features/privacy/presentation/report_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Un espace\noù se sentir bien.'**
   String get reportPageASpaceToFeelAtEase;
 
@@ -3558,12 +3474,6 @@ abstract class AppMessages {
   /// Interface: lib/features/profile/presentation/answers_editor.dart
   ///
   /// In fr, this message translates to:
-  /// **'VOS MOTS, VOTRE HISTOIRE'**
-  String get answersEditorYourWordsYourStory;
-
-  /// Interface: lib/features/profile/presentation/answers_editor.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Trois questions.\nMille façons d’être vous.'**
   String get answersEditorThreeQuestionsAThousandWaysTo;
 
@@ -3596,12 +3506,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Une habitude, une envie, une petite chose qui vous rend heureux. Commencez par une question.'**
   String get answersEditorAHabitAWishALittle;
-
-  /// Interface: lib/features/profile/presentation/answers_editor.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'RÉPONSE {arg0}'**
-  String answersEditorAnswer(Object arg0);
 
   /// Interface: lib/features/profile/presentation/answers_editor.dart
   ///
@@ -3950,12 +3854,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Distance selon la personne'**
   String get profileFeedPreviewPageDistanceDependsOnTheViewer;
-
-  /// Interface: lib/features/profile/presentation/profile_page.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'VOTRE HISTOIRE'**
-  String get profilePageYourProfile;
 
   /// Interface: lib/features/profile/presentation/profile_page.dart
   ///

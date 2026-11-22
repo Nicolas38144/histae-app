@@ -189,13 +189,6 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
               padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
               children: [
                 Text(
-                  AppStrings.of(context).messages.creditsPageTimeToContinue,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
                   AppStrings.of(context)
                       .messages
                       .creditsPageTheNextChapterStartsHere,

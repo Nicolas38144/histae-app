@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -101,22 +102,40 @@ class _ContinuationPageState extends State<ContinuationPage>
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: Listenable.merge([c, c.access]),
     builder: (context, _) {
-      final m = c.match?.id == widget.matchId ? c.match : null;
-      final allowed =
+      final match = c.match;
+      final m =
           c.accessible &&
-          c.access.session.resourceKey == _key &&
-          m?.historyAllowed == true;
+              c.access.session.resourceKey == _key &&
+              match?.id == widget.matchId &&
+              match?.historyAllowed == true
+          ? match
+          : null;
+      final strings = AppStrings.of(context);
+      final theme = Theme.of(context);
+      final titleStyle = theme.appBarTheme.titleTextStyle;
+      final titleSize = MediaQuery.textScalerOf(context)
+          .scale(titleStyle?.fontSize ?? 22);
       return HistaeScaffold(
         appBar: AppBar(
+          toolbarHeight: math.max(
+            theme.appBarTheme.toolbarHeight ?? kToolbarHeight,
+            2 * titleSize * (titleStyle?.height ?? 1.3) + 8,
+          ),
           title: Text(
-            AppStrings.of(context).messages.continuationPageYourMatch,
+            m == null
+                ? strings.messages.continuationPageYourConversation
+                : strings.messages.continuationPageYourConversationWith(
+                    m.partner.firstname,
+                  ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
         body: SafeArea(
           child: ListView(
             padding: HistaeTokens.pagePadding,
             children: [
-              if (!allowed)
+              if (m == null)
                 EditorialCard(
                   title: AppStrings.of(context)
                       .messages
@@ -126,15 +145,18 @@ class _ContinuationPageState extends State<ContinuationPage>
                       .continuationPageReturnToYourMatchesToCheck,
                 )
               else ...[
-                EditorialCard(
-                  eyebrow: m!.partner.firstname.toUpperCase(),
-                  title: AppStrings.of(context)
-                      .messages
-                      .continuationPageTheNextChapterIsWrittenTogether,
-                  body: m.status == MatchStatus.active
-                      ? null
-                      : MatchesStrings(AppStrings.of(context)).stateBody(m),
-                ),
+                if (m.status != MatchStatus.active)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: HistaeTokens.textSpacing,
+                    ),
+                    child: Text(
+                      MatchesStrings(strings).stateBody(m),
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
                 if (c.loading || c.busy || !c.access.verified)
                   LinearProgressIndicator(
                     semanticsLabel: AppStrings.of(context)

@@ -121,9 +121,6 @@ class _DevicesPageState extends State<DevicesPage> with WidgetsBindingObserver {
                 padding: HistaeTokens.pagePadding,
                 children: [
                   EditorialCard(
-                    eyebrow: AppStrings.of(context)
-                        .messages
-                        .devicesPageStayInTouchAtYourPace,
                     title: AppStrings.of(context)
                         .messages
                         .devicesPageASignIfYouWish,

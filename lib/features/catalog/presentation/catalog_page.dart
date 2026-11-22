@@ -109,7 +109,6 @@ class _CatalogPageState extends State<CatalogPage> with WidgetsBindingObserver {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           EditorialCard(
-            eyebrow: AppStrings.of(context).messages.catalogPageSimplePlans,
             title: AppStrings.of(context).messages.catalogPageAtYourPaceAtAFair,
             body: strings.catalogIntro,
           ),

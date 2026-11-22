@@ -53,9 +53,6 @@ class EncounterPage extends StatelessWidget {
             padding: HistaeTokens.pagePadding,
             children: [
               EditorialCard(
-                eyebrow: AppStrings.of(context)
-                    .messages
-                    .encounterPageMutualInterest,
                 title: AppStrings.of(context)
                     .messages
                     .encounterPageWordsBroughtYouTogether,

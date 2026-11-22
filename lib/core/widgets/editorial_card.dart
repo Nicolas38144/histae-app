@@ -14,17 +14,11 @@ class EditorialDivider extends StatelessWidget {
   );
 }
 
-/// Shared section heading, with the same hierarchy as the website's intros.
+/// Shared section heading with an optional description.
 class EditorialCard extends StatelessWidget {
-  const EditorialCard({
-    super.key,
-    required this.title,
-    this.body,
-    this.eyebrow,
-  });
+  const EditorialCard({super.key, required this.title, this.body});
   final String title;
   final String? body;
-  final String? eyebrow;
 
   @override
   Widget build(BuildContext context) {
@@ -34,15 +28,6 @@ class EditorialCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (eyebrow != null) ...[
-            Text(
-              eyebrow!,
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.primary,
-              ),
-            ),
-            const SizedBox(height: HistaeTokens.textSpacing),
-          ],
           Semantics(
             header: true,
             child: Text(

@@ -31,9 +31,6 @@ class AppMessagesFr extends AppMessages {
   String get mainNavigationBarProfile => 'Profil';
 
   @override
-  String get welcomePageAnotherWayToMeet => 'D’ABORD, UNE CONVERSATION';
-
-  @override
   String get welcomePageTimeReciprocityConsent =>
       'À votre rythme. Et toujours à deux.';
 
@@ -524,16 +521,7 @@ class AppMessagesFr extends AppMessages {
       'Votre paiement demande une régularisation. Les droits affichés sont ceux confirmés par Histae.';
 
   @override
-  String get catalogPageSimplePlans => 'DES FORMULES SIMPLES';
-
-  @override
   String get catalogPageAtYourPaceAtAFair => 'À votre rythme. Au prix juste.';
-
-  @override
-  String get planCardTakeYourTimeFreely => 'PRENDRE LE TEMPS, LIBREMENT';
-
-  @override
-  String get planCardToGetToKnowEachOther => 'POUR FAIRE CONNAISSANCE';
 
   @override
   String get planCardBilledMonthlyAutomaticRenewal =>
@@ -756,16 +744,20 @@ class AppMessagesFr extends AppMessages {
   String get continuationPageYourMatch => 'Votre rencontre';
 
   @override
+  String get continuationPageYourConversation => 'Votre conversation';
+
+  @override
+  String continuationPageYourConversationWith(String firstname) {
+    return 'Votre conversation avec $firstname';
+  }
+
+  @override
   String get continuationPageThisMatchIsNoLongerAvailable =>
       'Cette rencontre\nn’est plus disponible.';
 
   @override
   String get continuationPageReturnToYourMatchesToCheck =>
       'Revenez à vos rencontres pour relire leur état.';
-
-  @override
-  String get continuationPageTheNextChapterIsWrittenTogether =>
-      'La suite\ns’écrit à deux.';
 
   @override
   String get continuationPageRefreshingMatch => 'Actualisation de la rencontre';
@@ -960,9 +952,6 @@ class AppMessagesFr extends AppMessages {
   String get creditsPageRefreshMyCredits => 'Actualiser mes crédits';
 
   @override
-  String get creditsPageTimeToContinue => 'LE TEMPS DE CONTINUER';
-
-  @override
   String get creditsPageTheNextChapterStartsHere => 'La suite commence\nici.';
 
   @override
@@ -1008,9 +997,6 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get rewardVideoCardVideoPlaying => 'Vidéo en cours…';
-
-  @override
-  String get rewardVideoCardAHelpingHand => 'UN COUP DE POUCE';
 
   @override
   String get rewardVideoCardAVideoForTheNextChapter =>
@@ -1106,9 +1092,6 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get discoveryPageBlock => 'Bloquer';
-
-  @override
-  String get discoveryPageTakeYourTime => 'PRENDRE LE TEMPS';
 
   @override
   String get discoveryPageAQuietMomentForNow =>
@@ -1208,9 +1191,6 @@ class AppMessagesFr extends AppMessages {
   @override
   String get discoveryPauseCardRefreshMyVisibility =>
       'Actualiser ma visibilité';
-
-  @override
-  String get discoveryStatusSectionsBeforeYouMeet => 'AVANT LA RENCONTRE';
 
   @override
   String get discoveryStatusSectionsTakeYourTime => 'Prenez votre temps.';
@@ -1379,9 +1359,6 @@ class AppMessagesFr extends AppMessages {
   String get encounterPageAMatch => 'Une rencontre';
 
   @override
-  String get encounterPageMutualInterest => 'UN INTÉRÊT RÉCIPROQUE';
-
-  @override
   String get encounterPageWordsBroughtYouTogether =>
       'Les mots vous\nont rapprochés.';
 
@@ -1425,9 +1402,6 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get feedProfileCardLike => 'J’aime';
-
-  @override
-  String get feedProfileContentThroughWords => 'AU FIL DES MOTS';
 
   @override
   String get feedProfileContentAFewTraits => 'Quelques traits';
@@ -1581,10 +1555,6 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get devicesPageDevicesAndNotifications => 'Appareils et notifications';
-
-  @override
-  String get devicesPageStayInTouchAtYourPace =>
-      'GARDER LE LIEN, À VOTRE RYTHME';
 
   @override
   String get devicesPageASignIfYouWish => 'Un signe,\nsi vous le souhaitez.';
@@ -1855,9 +1825,6 @@ class AppMessagesFr extends AppMessages {
   String get privacyDetailPageRefreshTracking => 'Actualiser le suivi';
 
   @override
-  String get privacyDetailPageACopyForYou => 'UNE COPIE POUR VOUS';
-
-  @override
   String get privacyDetailPageYourDataWithinReach =>
       'Vos données,\nà portée de main.';
 
@@ -1897,9 +1864,6 @@ class AppMessagesFr extends AppMessages {
       'Effacer le fichier temporaire';
 
   @override
-  String get privacyDetailPageAPersonalDecision => 'UNE DÉCISION PERSONNELLE';
-
-  @override
   String get privacyDetailPageCloseThisChapter => 'Clore ce\nchapitre.';
 
   @override
@@ -1935,9 +1899,6 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get privacyHubPagePrivacyAndSecurity => 'Vie privée et sécurité';
-
-  @override
-  String get privacyHubPageYourSpaceYourChoices => 'VOTRE ESPACE, VOS CHOIX';
 
   @override
   String get privacyHubPageWithConfidence => 'En toute\nconfiance.';
@@ -2094,9 +2055,6 @@ class AppMessagesFr extends AppMessages {
   String get reportPageReportAProfile => 'Signaler un profil';
 
   @override
-  String get reportPageCaringForConversations => 'PRENDRE SOIN DES ÉCHANGES';
-
-  @override
   String get reportPageASpaceToFeelAtEase => 'Un espace\noù se sentir bien.';
 
   @override
@@ -2156,9 +2114,6 @@ class AppMessagesFr extends AppMessages {
   String get answersEditorYourAnswers => 'Vos réponses';
 
   @override
-  String get answersEditorYourWordsYourStory => 'VOS MOTS, VOTRE HISTOIRE';
-
-  @override
   String get answersEditorThreeQuestionsAThousandWaysTo =>
       'Trois questions.\nMille façons d’être vous.';
 
@@ -2180,11 +2135,6 @@ class AppMessagesFr extends AppMessages {
   @override
   String get answersEditorAHabitAWishALittle =>
       'Une habitude, une envie, une petite chose qui vous rend heureux. Commencez par une question.';
-
-  @override
-  String answersEditorAnswer(Object arg0) {
-    return 'RÉPONSE $arg0';
-  }
 
   @override
   String answersEditorAnswer737(Object arg0) {
@@ -2389,9 +2339,6 @@ class AppMessagesFr extends AppMessages {
   @override
   String get profileFeedPreviewPageDistanceDependsOnTheViewer =>
       'Distance selon la personne';
-
-  @override
-  String get profilePageYourProfile => 'VOTRE HISTOIRE';
 
   @override
   String get profilePageAMeetingStartsWithYou =>

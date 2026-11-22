@@ -42,7 +42,6 @@ class InterfaceLiteralAudit extends RecursiveAstVisitor<void> {
     'semanticsLabel',
     'title',
     'body',
-    'eyebrow',
     'message',
   };
 
