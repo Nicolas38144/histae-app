@@ -970,6 +970,7 @@
   "caseworkAssistedExport": "Download assisted export",
   "caseworkMessage": "Your message",
   "caseworkLimit": "Maximum 2,000 characters.",
+  "caseworkMessageLimitReached": "Message limit reached.",
   "caseworkSend": "Send",
   "caseworkCategory": "Request topic",
   "caseworkYou": "You",

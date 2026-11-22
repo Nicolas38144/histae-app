@@ -3328,6 +3328,10 @@ class AppMessagesEs extends AppMessages {
   String get caseworkLimit => 'Máximo de 2.000 caracteres.';
 
   @override
+  String get caseworkMessageLimitReached =>
+      'Has alcanzado el límite del mensaje.';
+
+  @override
   String get caseworkSend => 'Enviar';
 
   @override

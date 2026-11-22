@@ -5486,6 +5486,12 @@ abstract class AppMessages {
   /// **'2 000 caractères maximum.'**
   String get caseworkLimit;
 
+  /// No description provided for @caseworkMessageLimitReached.
+  ///
+  /// In fr, this message translates to:
+  /// **'Limite du message atteinte.'**
+  String get caseworkMessageLimitReached;
+
   /// No description provided for @caseworkSend.
   ///
   /// In fr, this message translates to:

@@ -11,6 +11,7 @@ import '../../../core/network/request_cancellation.dart';
 import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
+import '../../../core/widgets/text_limit_highlight.dart';
 import '../../auth/domain/authenticated_session.dart';
 import '../../privacy/presentation/privacy_strings.dart';
 import '../data/casework_entry.dart';
@@ -42,6 +43,8 @@ class CaseworkPage extends StatefulWidget {
 }
 
 class _CaseworkPageState extends State<CaseworkPage> {
+  static const _messageLimit = 2000;
+
   final _scope = RequestCancellation();
   final _message = TextEditingController();
   final _rows = <CaseworkEntry>[];
@@ -178,7 +181,7 @@ class _CaseworkPageState extends State<CaseworkPage> {
   bool get _validMessage {
     final text = _message.text.trim();
     return text.isNotEmpty &&
-        text.runes.length <= 2000 &&
+        text.runes.length <= _messageLimit &&
         !RegExp(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]').hasMatch(text);
   }
 
@@ -261,10 +264,7 @@ class _CaseworkPageState extends State<CaseworkPage> {
                         ? null
                         : (value) =>
                               setState(() => _category = value ?? _category),
-                    composer: _compose(
-                      text,
-                      actionGap: HistaeTokens.sectionSpacing,
-                    ),
+                    composer: _compose(text),
                   ),
                   const SizedBox(height: HistaeTokens.contentSpacing),
                 ],
@@ -345,31 +345,44 @@ class _CaseworkPageState extends State<CaseworkPage> {
     );
   }
 
-  Widget _compose(
-    AppMessages text, {
-    double actionGap = HistaeTokens.labelSpacing,
-  }) => Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-      TextField(
-        controller: _message,
-        minLines: 3,
-        maxLines: 8,
-        enabled: !_busy,
-        decoration: InputDecoration(
-          labelText: text.caseworkMessage,
-          helperText: text.caseworkLimit,
-          alignLabelWithHint: true,
+  Widget _compose(AppMessages text) {
+    final support = widget.view == CaseworkView.support;
+    final decoration = InputDecoration(
+      labelText: text.caseworkMessage,
+      helperText: support ? null : text.caseworkLimit,
+      alignLabelWithHint: true,
+    );
+    Widget field(InputDecoration decoration) => TextField(
+      controller: _message,
+      minLines: 3,
+      maxLines: 8,
+      enabled: !_busy,
+      decoration: decoration,
+      onChanged: (_) => setState(() {}),
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (support)
+          TextLimitHighlight(
+            reached: _message.text.trim().runes.length >= _messageLimit,
+            limitHint: text.caseworkMessageLimitReached,
+            decoration: decoration,
+            builder: field,
+          )
+        else
+          field(decoration),
+        const SizedBox(
+          height: HistaeTokens.contentSpacing - HistaeTokens.actionSpacing / 2,
         ),
-        onChanged: (_) => setState(() {}),
-      ),
-      SizedBox(height: actionGap),
-      HistaeButton(
-        onPressed: _busy || !_validMessage ? null : () => _run(_send),
-        child: Text(text.caseworkSend),
-      ),
-    ],
-  );
+        HistaeButton(
+          onPressed: _busy || !_validMessage ? null : () => _run(_send),
+          child: Text(text.caseworkSend),
+        ),
+      ],
+    );
+  }
 
   Widget _supportHistoryHeading(AppMessages text) {
     return Row(

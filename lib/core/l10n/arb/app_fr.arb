@@ -3830,6 +3830,7 @@
   "caseworkAssistedExport": "Télécharger l’export assisté",
   "caseworkMessage": "Votre message",
   "caseworkLimit": "2 000 caractères maximum.",
+  "caseworkMessageLimitReached": "Limite du message atteinte.",
   "caseworkSend": "Envoyer",
   "caseworkCategory": "Sujet de la demande",
   "caseworkYou": "Vous",

@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
 import 'package:histae_app/core/l10n/locale_controller.dart';
+import 'package:histae_app/core/theme/histae_tokens.dart';
 import 'package:histae_app/features/help/presentation/casework_page.dart';
 import 'package:histae_app/features/help/presentation/help_page.dart';
 import 'package:histae_app/features/matches/presentation/match_preview_card.dart';
@@ -338,6 +339,16 @@ void main() {
       );
       await tester.pump();
       expect(tester.widget<FilledButton>(send).onPressed, isNotNull);
+      await tester.enterText(message, 'é' * 2000);
+      await tester.pumpAndSettle();
+      final border =
+          tester.widget<TextField>(message).decoration!.focusedBorder
+              as OutlineInputBorder;
+      expect(border.borderSide.color, HistaeTokens.coral);
+      expect(tester.widget<FilledButton>(send).onPressed, isNotNull);
+      await tester.enterText(message, 'é' * 2001);
+      await tester.pumpAndSettle();
+      expect(tester.widget<FilledButton>(send).onPressed, isNull);
       await tester.enterText(message, '');
       await tester.pump();
       expect(tester.widget<FilledButton>(send).onPressed, isNull);
