@@ -1420,7 +1420,7 @@ class AppMessagesEn extends AppMessages {
   String get feedProfileContentAFewTraits => 'A few traits';
 
   @override
-  String get messageTooLong => 'Your message exceeds 2,000 characters.';
+  String get messageTooLong => 'Your message exceeds 500 characters.';
 
   @override
   String get chatPageEndThisMatch => 'End this match?';
@@ -1513,7 +1513,7 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get matchesStringsWriteANonEmptyMessageOf =>
-      'Write a non-empty message of up to 2,000 characters.';
+      'Write a non-empty message of up to 500 characters.';
 
   @override
   String get matchesStringsThisSendRequestNoLongerMatches =>
@@ -3137,7 +3137,7 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get privacyRequestDetailsInvalid =>
-      'Describe your request in no more than 2,000 characters.';
+      'Describe your request in no more than 1,000 characters.';
 
   @override
   String get privacyRequestYourMessage => 'Your message';
@@ -3290,7 +3290,7 @@ class AppMessagesEn extends AppMessages {
   String get caseworkMessage => 'Your message';
 
   @override
-  String get caseworkLimit => 'Maximum 2,000 characters.';
+  String get caseworkLimit => 'Maximum 1,000 characters.';
 
   @override
   String get caseworkMessageLimitReached => 'Message limit reached.';
@@ -3529,7 +3529,7 @@ class AppMessagesEn extends AppMessages {
       'Suspected minor or exploitation concern? Choose “Other reason” and describe what happened below. Do not copy explicit sexual content or try to collect copies of it.';
 
   @override
-  String get chatPageMessageLimitReached => '2,000-character limit reached.';
+  String get chatPageMessageLimitReached => '500-character limit reached.';
 
   @override
   String get storeUpdateTitle => 'An update is ready.';

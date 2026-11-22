@@ -8,6 +8,7 @@ import '../../../core/l10n/generated/app_messages.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/network/json_fields.dart';
 import '../../../core/network/request_cancellation.dart';
+import '../../../core/text/text_limits.dart';
 import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
@@ -43,8 +44,6 @@ class CaseworkPage extends StatefulWidget {
 }
 
 class _CaseworkPageState extends State<CaseworkPage> {
-  static const _messageLimit = 2000;
-
   final _scope = RequestCancellation();
   final _message = TextEditingController();
   final _rows = <CaseworkEntry>[];
@@ -181,7 +180,7 @@ class _CaseworkPageState extends State<CaseworkPage> {
   bool get _validMessage {
     final text = _message.text.trim();
     return text.isNotEmpty &&
-        text.runes.length <= _messageLimit &&
+        text.runes.length <= longTextCharacterLimit &&
         !RegExp(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]').hasMatch(text);
   }
 
@@ -366,7 +365,8 @@ class _CaseworkPageState extends State<CaseworkPage> {
       children: [
         if (support)
           TextLimitHighlight(
-            reached: _message.text.trim().runes.length >= _messageLimit,
+            reached:
+                _message.text.trim().runes.length >= longTextCharacterLimit,
             limitHint: text.caseworkMessageLimitReached,
             decoration: decoration,
             builder: field,

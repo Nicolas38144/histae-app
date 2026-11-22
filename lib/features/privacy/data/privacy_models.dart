@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import '../../../core/models/client_message.dart';
 import '../../../core/network/json_fields.dart';
+import '../../../core/text/text_limits.dart';
 import '../../../core/text/whitespace.dart';
 
 enum DataRight {
@@ -29,7 +30,7 @@ class RightsRequestIntent {
   }
   const RightsRequestIntent._(this.type, this.details);
 
-  static const maxDetailsLength = 2000;
+  static const maxDetailsLength = longTextCharacterLimit;
   final DataRight type;
   final String? details;
 
@@ -193,5 +194,10 @@ class ReportIntent {
   String toString() => 'ReportIntent(redacted)';
 }
 
+const _reportApiByteLimit = 2000;
+
 ClientMessage? validateReport(String value) =>
-    utf8.encode(value).length > 2000 ? ClientMessage.reportTooLong : null;
+    value.runes.length > longTextCharacterLimit ||
+        utf8.encode(value).length > _reportApiByteLimit
+    ? ClientMessage.reportTooLong
+    : null;

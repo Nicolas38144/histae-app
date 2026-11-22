@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import '../../../core/models/client_message.dart';
 import '../../../core/network/json_fields.dart';
+import '../../../core/text/text_limits.dart';
 
 export '../../../core/network/json_fields.dart' show optionalText, serverId;
 
@@ -104,9 +105,19 @@ ClientMessage? validateBirthdate(String value, DateTime now) {
   return ageOn(d, now) < 18 ? ClientMessage.underage : null;
 }
 
-const biographyByteLimit = 2000;
+const _biographyApiByteLimit = 2000;
 
-int biographyByteLength(String value) => utf8.encode(value.trim()).length;
+bool biographyWithinLimit(String value) {
+  final text = value.trim();
+  return text.runes.length <= longTextCharacterLimit &&
+      utf8.encode(text).length <= _biographyApiByteLimit;
+}
+
+bool biographyLimitReached(String value) {
+  final text = value.trim();
+  return text.runes.length >= longTextCharacterLimit ||
+      utf8.encode(text).length >= _biographyApiByteLimit;
+}
 
 class ProfileDraft {
   const ProfileDraft(this.firstname, this.birthdate, this.sex, this.bio);
@@ -133,7 +144,7 @@ class ProfileDraft {
     if (sex != null && !['male', 'female', 'other'].contains(sex)) {
       return ClientMessage.sexInvalid;
     }
-    if (bio != null && biographyByteLength(bio!) > biographyByteLimit) {
+    if (bio case final biography? when !biographyWithinLimit(biography)) {
       return ClientMessage.bioTooLong;
     }
     return null;

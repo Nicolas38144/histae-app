@@ -4,7 +4,7 @@ import '../../../core/l10n/app_strings.dart';
 import '../../../core/widgets/text_limit_highlight.dart';
 import '../data/profile_models.dart';
 
-/// Keeps text and composition intact while making the API byte limit visible.
+/// Keeps text and composition intact while showing when a limit is reached.
 class BiographyField extends StatelessWidget {
   const BiographyField({
     super.key,
@@ -27,9 +27,8 @@ class BiographyField extends StatelessWidget {
         valueListenable: controller,
         builder: (context, value, _) {
           final text = AppStrings.of(context).messages;
-          final reached = biographyByteLength(value.text) >= biographyByteLimit;
           return TextLimitHighlight(
-            reached: reached,
+            reached: biographyLimitReached(value.text),
             limitHint: text.biographyLimitReached,
             decoration: InputDecoration(
               labelText: text.identityEditorAFewWordsAboutYou,

@@ -244,7 +244,7 @@ void main() {
           tester.widget<TextField>(composer).controller!.text,
           'Mon prochain brouillon',
         );
-        await tester.enterText(composer, List.filled(2000, '🌿').join());
+        await tester.enterText(composer, '🌿' * 500);
         await tester.pump();
         expect(
           tester.widget<TextField>(composer).decoration!.helperText,

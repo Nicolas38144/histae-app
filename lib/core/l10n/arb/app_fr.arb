@@ -1636,7 +1636,7 @@
   "@feedProfileContentAFewTraits": {
     "description": "Interface: lib/features/discovery/presentation/feed_profile_content.dart"
   },
-  "messageTooLong": "Votre message dépasse 2 000 caractères.",
+  "messageTooLong": "Votre message dépasse 500 caractères.",
   "@messageTooLong": {
     "description": "Interface: lib/features/matches/data/match_models.dart"
   },
@@ -1748,7 +1748,7 @@
   "@matchesStringsSendingIsUnavailableInThisMatch": {
     "description": "Interface: lib/features/matches/presentation/matches_strings.dart"
   },
-  "matchesStringsWriteANonEmptyMessageOf": "Écrivez un message non vide de 2 000 caractères maximum.",
+  "matchesStringsWriteANonEmptyMessageOf": "Écrivez un message non vide de 500 caractères maximum.",
   "@matchesStringsWriteANonEmptyMessageOf": {
     "description": "Interface: lib/features/matches/presentation/matches_strings.dart"
   },
@@ -3706,7 +3706,7 @@
   },
   "privacyRequestDetailsLabel": "Précisez votre demande",
   "privacyRequestRectificationPrompt": "Indiquez la donnée à corriger et la modification souhaitée.",
-  "privacyRequestDetailsInvalid": "Précisez votre demande en 2 000 caractères maximum.",
+  "privacyRequestDetailsInvalid": "Précisez votre demande en 1 000 caractères maximum.",
   "privacyRequestYourMessage": "Votre message",
   "privacyRequestTeamResponse": "Réponse de l’équipe",
   "consentDocumentDate": "Document du {date}",
@@ -3829,7 +3829,7 @@
   "caseworkMore": "Afficher la suite",
   "caseworkAssistedExport": "Télécharger l’export assisté",
   "caseworkMessage": "Votre message",
-  "caseworkLimit": "2 000 caractères maximum.",
+  "caseworkLimit": "1 000 caractères maximum.",
   "caseworkMessageLimitReached": "Limite du message atteinte.",
   "caseworkSend": "Envoyer",
   "caseworkCategory": "Sujet de la demande",
@@ -4064,7 +4064,7 @@
   "@reportChildSafetyHint": {
     "description": "Child-safety reporting guidance and public standards link."
   },
-  "chatPageMessageLimitReached": "Limite de 2 000 caractères atteinte.",
+  "chatPageMessageLimitReached": "Limite de 500 caractères atteinte.",
   "storeUpdateTitle": "Une mise à jour vous attend.",
   "storeUpdateBody": "Une nouvelle version de Histae est disponible. Mettez l’application à jour pour continuer.",
   "storeUpdateOpen": "Ouvrir le store",

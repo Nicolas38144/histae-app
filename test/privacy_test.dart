@@ -200,7 +200,7 @@ void main() {
     await c.submit(ReportReason.harassment, '😀' * 501);
     expect(bodies, isEmpty);
     expect(c.validation, isNotNull);
-    await c.submit(ReportReason.harassment, ' ' * 2001);
+    await c.submit(ReportReason.harassment, ' ' * 1001);
     expect(bodies, isEmpty);
     await c.submit(ReportReason.harassment, '  Récit des faits.\uFEFF');
     expect(jsonDecode(bodies.single), {
@@ -359,7 +359,7 @@ void main() {
       DataRight.restriction,
       DataRight.objection,
     ]) {
-      for (final details in [null, ' \n\t', 'a' * 2001, 'bad\u0000value']) {
+      for (final details in [null, ' \n\t', 'a' * 1001, 'bad\u0000value']) {
         await c.request(type, details: details);
         expect(c.failure!.code, 'invalid_data_request');
         expect(c.pendingRequest, isNull);

@@ -49,8 +49,8 @@ void main() {
     addTearDown(c.dispose);
     await c.activate();
     await c.openChat(testMatch);
-    expect(validateMessage(List.filled(2000, '🌿').join()), isNull);
-    expect(validateMessage(List.filled(2001, '🌿').join()), isNotNull);
+    expect(validateMessage('🌿' * 500), isNull);
+    expect(validateMessage('🌿' * 501), isNotNull);
     expect(trimMessage('\u0085'), '\u0085');
     await c.send(' \uFEFFBonjour 🌿\n');
     final key = c.pendingMessage!.key;

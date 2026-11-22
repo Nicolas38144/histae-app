@@ -189,7 +189,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       await capture(tester, 'sent');
-      await tester.enterText(composer, List.filled(2000, 'a').join());
+      await tester.enterText(composer, 'a' * 500);
       await tester.pump();
       await capture(tester, 'limit');
       store.available = StoreUpdate(

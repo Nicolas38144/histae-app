@@ -50,7 +50,7 @@ void main() {
     expect(c.pendingMessages, isEmpty);
   });
 
-  test('process loss during POST restores ordered send keys and a separate composer draft', () async {
+  test('process loss restores ordered send keys, including a message queued before the lower limit', () async {
     final vault = MemoryDraftVault();
     final lostResponse = Completer<http.Response>();
     final keys = <String>[];
@@ -86,12 +86,20 @@ void main() {
     await local.flush();
     // The second process starts from the last durable bytes, without relying on
     // any dispose callback from the killed process.
-    final afterKill = MemoryDraftVault()..value = vault.value;
-    final snapshot = DraftSnapshot.decode(afterKill.value!);
-    expect(snapshot.pending.map((i) => i.content), [
+    final beforeUpdate = DraftSnapshot.decode(vault.value!);
+    expect(beforeUpdate.pending.map((i) => i.content), [
       'Premier message',
       'Deuxième message',
     ]);
+    // The previous app version accepted this message before its response was lost.
+    final legacyText = 'a' * 501;
+    final encoded = jsonDecode(vault.value!) as Map<String, dynamic>;
+    final queue = encoded['pending'] as List<dynamic>;
+    (queue.first as Map<String, dynamic>)['content'] = legacyText;
+    final legacyKey = beforeUpdate.pending.first.key;
+    server[legacyKey]!['content'] = legacyText;
+    final afterKill = MemoryDraftVault()..value = jsonEncode(encoded);
+    final snapshot = DraftSnapshot.decode(afterKill.value!);
     first.dispose();
     lostResponse.completeError(http.ClientException('Synthetic lost response'));
     await sending;
@@ -102,6 +110,9 @@ void main() {
       if (r.method == 'POST' && r.url.path.endsWith('/messages')) {
         final key = r.headers['Idempotency-Key']!;
         keys.add(key);
+        if (key == legacyKey) {
+          expect(jsonDecode(r.body), {'content': legacyText});
+        }
         final value = server.putIfAbsent(
           key,
           () => messageJson(

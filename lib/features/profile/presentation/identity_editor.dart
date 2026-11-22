@@ -66,7 +66,7 @@ class _IdentityEditorState extends ProfileEditorState<IdentityEditor> {
         ),
       ],
       save: _save,
-      saveEnabled: biographyByteLength(bio.text) <= biographyByteLimit,
+      saveEnabled: biographyWithinLimit(bio.text),
     );
   }
 

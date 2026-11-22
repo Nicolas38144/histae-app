@@ -339,14 +339,14 @@ void main() {
       );
       await tester.pump();
       expect(tester.widget<FilledButton>(send).onPressed, isNotNull);
-      await tester.enterText(message, 'é' * 2000);
+      await tester.enterText(message, 'é' * 1000);
       await tester.pumpAndSettle();
       final border =
           tester.widget<TextField>(message).decoration!.focusedBorder
               as OutlineInputBorder;
       expect(border.borderSide.color, HistaeTokens.coral);
       expect(tester.widget<FilledButton>(send).onPressed, isNotNull);
-      await tester.enterText(message, 'é' * 2001);
+      await tester.enterText(message, 'é' * 1001);
       await tester.pumpAndSettle();
       expect(tester.widget<FilledButton>(send).onPressed, isNull);
       await tester.enterText(message, '');

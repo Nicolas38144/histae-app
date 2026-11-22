@@ -2346,7 +2346,7 @@ abstract class AppMessages {
   /// Interface: lib/features/matches/data/match_models.dart
   ///
   /// In fr, this message translates to:
-  /// **'Votre message dépasse 2 000 caractères.'**
+  /// **'Votre message dépasse 500 caractères.'**
   String get messageTooLong;
 
   /// Interface: lib/features/matches/presentation/chat_page.dart
@@ -2514,7 +2514,7 @@ abstract class AppMessages {
   /// Interface: lib/features/matches/presentation/matches_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Écrivez un message non vide de 2 000 caractères maximum.'**
+  /// **'Écrivez un message non vide de 500 caractères maximum.'**
   String get matchesStringsWriteANonEmptyMessageOf;
 
   /// Interface: lib/features/matches/presentation/matches_strings.dart
@@ -5207,7 +5207,7 @@ abstract class AppMessages {
   /// No description provided for @privacyRequestDetailsInvalid.
   ///
   /// In fr, this message translates to:
-  /// **'Précisez votre demande en 2 000 caractères maximum.'**
+  /// **'Précisez votre demande en 1 000 caractères maximum.'**
   String get privacyRequestDetailsInvalid;
 
   /// No description provided for @privacyRequestYourMessage.
@@ -5483,7 +5483,7 @@ abstract class AppMessages {
   /// No description provided for @caseworkLimit.
   ///
   /// In fr, this message translates to:
-  /// **'2 000 caractères maximum.'**
+  /// **'1 000 caractères maximum.'**
   String get caseworkLimit;
 
   /// No description provided for @caseworkMessageLimitReached.
@@ -5915,7 +5915,7 @@ abstract class AppMessages {
   /// No description provided for @chatPageMessageLimitReached.
   ///
   /// In fr, this message translates to:
-  /// **'Limite de 2 000 caractères atteinte.'**
+  /// **'Limite de 500 caractères atteinte.'**
   String get chatPageMessageLimitReached;
 
   /// No description provided for @storeUpdateTitle.

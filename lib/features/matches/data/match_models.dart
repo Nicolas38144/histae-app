@@ -207,7 +207,8 @@ class MessagePage {
 
 String trimMessage(String value) => trimOuterWhitespace(value);
 
-const messageCharacterLimit = 2000;
+const messageCharacterLimit = 500;
+const _queuedMessageApiCharacterLimit = 2000;
 
 ClientMessage? validateMessage(String value) {
   final content = trimMessage(value);
@@ -218,15 +219,18 @@ ClientMessage? validateMessage(String value) {
   return null;
 }
 
-class MessageIntent {
-  MessageIntent(this.matchId, String content)
-    : content = trimMessage(content),
-      key = newUuidV4();
+final class MessageIntent {
+  factory MessageIntent(String matchId, String content) {
+    if (validateMessage(content) != null) invalidResponse();
+    return MessageIntent._(matchId, trimMessage(content), newUuidV4());
+  }
   MessageIntent._(this.matchId, this.content, this.key);
   factory MessageIntent.fromJson(Object? value) {
     final j = jsonObject(value);
     final content = jsonString(j, 'content');
-    if (validateMessage(content) != null || content != trimMessage(content)) {
+    // Replay pre-update messages with their original content and operation key.
+    if (content.runes.length > _queuedMessageApiCharacterLimit ||
+        content != trimMessage(content)) {
       invalidResponse();
     }
     return MessageIntent._(

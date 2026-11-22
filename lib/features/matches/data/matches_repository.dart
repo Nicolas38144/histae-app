@@ -193,7 +193,7 @@ final class ApiMatchesRepository implements MatchesRepository {
     MessageIntent intent,
     RequestCancellation scope,
   ) async {
-    if (intent.matchId != match.id || validateMessage(intent.content) != null) {
+    if (intent.matchId != match.id) {
       invalidResponse();
     }
     final message = ChatMessage.fromJson(

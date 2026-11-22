@@ -21,7 +21,7 @@ void main() {
       await tester.tap(field);
       await tester.enterText(field, 'é' * 1000);
       await tester.pumpAndSettle();
-      expect(biographyByteLength(controller.text), biographyByteLimit);
+      expect(biographyWithinLimit(controller.text), isTrue);
       expect(
         (tester.widget<TextField>(field).decoration!.enabledBorder!
                 as OutlineInputBorder)

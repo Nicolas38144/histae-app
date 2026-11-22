@@ -122,9 +122,7 @@ class _RegistrationProfileStepState extends State<RegistrationProfileStep> {
           valueListenable: _bio,
           builder: (context, value, _) => HistaeButton(
             key: const Key('registration-next'),
-            onPressed: biographyByteLength(value.text) <= biographyByteLimit
-                ? _continue
-                : null,
+            onPressed: biographyWithinLimit(value.text) ? _continue : null,
             child: Text(copy.registrationContinue),
           ),
         ),

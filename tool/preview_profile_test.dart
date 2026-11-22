@@ -9,10 +9,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
 import 'package:histae_app/app/theme.dart';
 import 'package:histae_app/core/l10n/generated/app_messages.dart';
+import 'package:histae_app/core/text/text_limits.dart';
 import 'package:histae_app/features/consents/domain/consent_state.dart';
 import 'package:histae_app/features/consents/presentation/consents_page.dart';
 import 'package:histae_app/features/profile/application/profile_controller.dart';
-import 'package:histae_app/features/profile/data/profile_models.dart';
 import 'package:histae_app/features/profile/data/profile_repository.dart';
 import 'package:histae_app/features/profile/presentation/profile_feed_preview_page.dart';
 import 'package:http/http.dart' as http;
@@ -30,13 +30,9 @@ String _limitBiography() {
     'Je rapporte souvent un livre ou une recette de mes voyages, et je prends '
     'toujours le temps de les partager. Racontez-moi ce qui vous occupe en ce moment.',
   ).join('\n\n');
-  var result = '';
-  for (final character in sample.characters) {
-    if (biographyByteLength('$result$character') > biographyByteLimit) break;
-    result += character;
-  }
-  result = result.trim();
-  return result + '.' * (biographyByteLimit - biographyByteLength(result));
+  final result = String.fromCharCodes(sample.runes.take(longTextCharacterLimit))
+      .trimRight();
+  return result + '.' * (longTextCharacterLimit - result.runes.length);
 }
 
 void main() {

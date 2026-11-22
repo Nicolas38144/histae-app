@@ -88,11 +88,13 @@ void main() {
         'Camille',
         '1995-06-12',
         null,
-        'é' * 1001,
+        'a' * 1001,
       ).validate(DateTime.now()),
       isNotNull,
     );
     expect(OwnerProfile.fromJson(ownerJson(sex: null, bio: null)).sex, isNull);
+    expect(biographyWithinLimit('a' * 1000), isTrue);
+    expect(biographyWithinLimit('😀' * 501), isFalse);
   });
   test(
     'preferences enforce four fields and integral age and distance bounds',

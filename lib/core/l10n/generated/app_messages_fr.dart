@@ -1433,7 +1433,7 @@ class AppMessagesFr extends AppMessages {
   String get feedProfileContentAFewTraits => 'Quelques traits';
 
   @override
-  String get messageTooLong => 'Votre message dépasse 2 000 caractères.';
+  String get messageTooLong => 'Votre message dépasse 500 caractères.';
 
   @override
   String get chatPageEndThisMatch => 'Terminer cette rencontre ?';
@@ -1528,7 +1528,7 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get matchesStringsWriteANonEmptyMessageOf =>
-      'Écrivez un message non vide de 2 000 caractères maximum.';
+      'Écrivez un message non vide de 500 caractères maximum.';
 
   @override
   String get matchesStringsThisSendRequestNoLongerMatches =>
@@ -3175,7 +3175,7 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get privacyRequestDetailsInvalid =>
-      'Précisez votre demande en 2 000 caractères maximum.';
+      'Précisez votre demande en 1 000 caractères maximum.';
 
   @override
   String get privacyRequestYourMessage => 'Votre message';
@@ -3330,7 +3330,7 @@ class AppMessagesFr extends AppMessages {
   String get caseworkMessage => 'Votre message';
 
   @override
-  String get caseworkLimit => '2 000 caractères maximum.';
+  String get caseworkLimit => '1 000 caractères maximum.';
 
   @override
   String get caseworkMessageLimitReached => 'Limite du message atteinte.';
@@ -3574,7 +3574,7 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get chatPageMessageLimitReached =>
-      'Limite de 2 000 caractères atteinte.';
+      'Limite de 500 caractères atteinte.';
 
   @override
   String get storeUpdateTitle => 'Une mise à jour vous attend.';

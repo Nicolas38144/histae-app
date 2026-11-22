@@ -434,7 +434,7 @@ void main() {
       );
       await tester.enterText(
         find.widgetWithText(TextField, 'Quelques mots sur vous'),
-        'é' * 1001,
+        'a' * 1001,
       );
       await tapVisible(tester, find.text('Enregistrer'));
       expect(
