@@ -270,6 +270,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 onTap: () => _open(const HelpPage()),
               ),
               ListTile(
+                contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.support_agent),
                 trailing: const Icon(Icons.chevron_right_rounded),
                 title: Text(caseworkStrings(strings.localeName)('support')),
@@ -278,6 +279,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               ListTile(
+                contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.flag_outlined),
                 trailing: const Icon(Icons.chevron_right_rounded),
                 title: Text(caseworkStrings(strings.localeName)('reports')),
