@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
 import 'package:histae_app/core/l10n/locale_controller.dart';
+import 'package:histae_app/features/help/presentation/casework_page.dart';
 import 'package:histae_app/features/help/presentation/help_page.dart';
 import 'package:histae_app/features/matches/presentation/match_preview_card.dart';
 import 'package:histae_app/features/profile/presentation/profile_page.dart';
@@ -103,6 +104,9 @@ void main() {
         ),
       };
       final session = testSession((request) async {
+        if (request.url.path == '/api/users/me/reports') {
+          return jsonResponse({'reports': <Object?>[], 'next_cursor': null});
+        }
         if (request.url.path == '/api/users/me/support-cases') {
           return jsonResponse({
             'cases': [
@@ -288,33 +292,29 @@ void main() {
       await _capture(tester, 'profile-actions');
       await tester.tap(find.byKey(const Key('profile-help')));
       await tester.pumpAndSettle();
+      final helpScroller = find
+          .descendant(
+            of: find.byType(HelpPage),
+            matching: find.byType(Scrollable),
+          )
+          .first;
       final policy = find.text('Archivage et suppression');
-      await tester.scrollUntilVisible(
-        policy,
-        180,
-        scrollable: find
-            .descendant(
-              of: find.byType(HelpPage),
-              matching: find.byType(Scrollable),
-            )
-            .first,
-      );
+      await tester.scrollUntilVisible(policy, 180, scrollable: helpScroller);
       await tester.tap(policy);
       await tester.pumpAndSettle();
       await _capture(tester, 'archive-policy');
+      final reports = find.text('Mes signalements');
+      await tester.scrollUntilVisible(reports, 160, scrollable: helpScroller);
+      await tester.tap(reports);
+      await tester.pumpAndSettle();
+      expect(
+        tester.widget<CaseworkPage>(find.byType(CaseworkPage)).view,
+        CaseworkView.reports,
+      );
       await tester.tap(find.byTooltip('Retour'));
       await tester.pumpAndSettle();
       final support = find.text('Assistance');
-      await tester.scrollUntilVisible(
-        support,
-        160,
-        scrollable: find
-            .descendant(
-              of: find.byType(ProfilePage),
-              matching: find.byType(Scrollable),
-            )
-            .first,
-      );
+      await tester.scrollUntilVisible(support, 160, scrollable: helpScroller);
       await tester.tap(support);
       await tester.pumpAndSettle();
       tester.view.physicalSize = const Size(390, 960);

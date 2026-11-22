@@ -6,12 +6,16 @@ import '../../../core/l10n/app_strings.dart';
 import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
+import '../../auth/domain/authenticated_session.dart';
+import 'casework_page.dart';
 import 'feed_guide.dart';
 import 'help_scope.dart';
 import 'linked_help_answer.dart';
 
 class HelpPage extends StatefulWidget {
-  const HelpPage({super.key});
+  const HelpPage({super.key, this.session});
+
+  final AuthenticatedSession? session;
 
   @override
   State<HelpPage> createState() => _HelpPageState();
@@ -65,6 +69,18 @@ class _HelpPageState extends State<HelpPage> {
         _failed = !opened;
       });
     }
+  }
+
+  Future<void> _openCasework(
+    AuthenticatedSession session,
+    CaseworkView view,
+  ) async {
+    if (!session.hasSession) return;
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => CaseworkPage(view: view, session: session),
+      ),
+    );
   }
 
   @override
@@ -124,12 +140,12 @@ class _HelpPageState extends State<HelpPage> {
                   ],
                 ),
               ),
-            const SizedBox(height: 24),
+            const SizedBox(height: HistaeTokens.sectionSpacing),
             Text(
               text.helpContactTitle,
               style: Theme.of(context).textTheme.titleLarge,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: HistaeTokens.textSpacing),
             if (email == null)
               Text(text.helpEmailComingSoon)
             else ...[
@@ -142,6 +158,23 @@ class _HelpPageState extends State<HelpPage> {
               ),
             ],
             if (_failed) Text(text.helpEmailFailed),
+            if (widget.session case final session? when session.hasSession) ...[
+              const SizedBox(height: HistaeTokens.contentSpacing),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.support_agent),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                title: Text(text.caseworkSupport),
+                onTap: () => _openCasework(session, CaseworkView.support),
+              ),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.flag_outlined),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                title: Text(text.caseworkReports),
+                onTap: () => _openCasework(session, CaseworkView.reports),
+              ),
+            ],
           ],
         ),
       ),

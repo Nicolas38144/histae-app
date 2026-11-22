@@ -19,7 +19,6 @@ import '../../continuation/application/continuation_controller.dart';
 import '../../continuation/presentation/credits_page.dart';
 import '../../discovery/application/discovery_visibility_controller.dart';
 import '../../discovery/presentation/discovery_pause_card.dart';
-import '../../help/presentation/casework_page.dart';
 import '../../help/presentation/help_page.dart';
 import '../../notifications/data/device_repository.dart';
 import '../../privacy/data/privacy_repository.dart';
@@ -266,25 +265,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 leading: const Icon(Icons.help_outline_rounded),
                 trailing: const Icon(Icons.chevron_right_rounded),
                 title: Text(strings.messages.helpTitle),
-                onTap: () => _open(const HelpPage()),
-              ),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.support_agent),
-                trailing: const Icon(Icons.chevron_right_rounded),
-                title: Text(strings.messages.caseworkSupport),
-                onTap: () => _open(
-                  CaseworkPage(view: CaseworkView.support, session: c.session),
-                ),
-              ),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.flag_outlined),
-                trailing: const Icon(Icons.chevron_right_rounded),
-                title: Text(strings.messages.caseworkReports),
-                onTap: () => _open(
-                  CaseworkPage(view: CaseworkView.reports, session: c.session),
-                ),
+                onTap: () => _open(HelpPage(session: c.session)),
               ),
               const SizedBox(height: 12),
               HistaeButton.text(
