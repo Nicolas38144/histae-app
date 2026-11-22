@@ -3449,7 +3449,7 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get helpEmailFailed =>
-      'No se ha podido abrir tu aplicación de correo. Puedes usar la dirección mostrada en tu servicio de correo habitual.';
+      'No se ha podido abrir tu aplicación de correo.';
 
   @override
   String get matchesSearchLabel => 'Buscar por nombre';

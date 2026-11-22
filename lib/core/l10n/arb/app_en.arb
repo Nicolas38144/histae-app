@@ -1007,7 +1007,7 @@
   "helpEmailComingSoon": "Email address coming soon.",
   "helpContactButton": "Contact support",
   "helpEmailSubject": "Histae support",
-  "helpEmailFailed": "Your email app could not be opened. You can use the address shown in your usual email service.",
+  "helpEmailFailed": "Your email app could not be opened.",
   "matchesSearchLabel": "Search by first name",
   "matchesSearchClear": "Clear search",
   "matchesSearchEmpty": "No loaded matches have this first name.",

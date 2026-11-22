@@ -1007,7 +1007,7 @@
   "helpEmailComingSoon": "Indirizzo e-mail in arrivo.",
   "helpContactButton": "Contatta l’assistenza",
   "helpEmailSubject": "Assistenza Histae",
-  "helpEmailFailed": "Non è stato possibile aprire l’app di posta. Puoi usare l’indirizzo mostrato nel tuo servizio di posta abituale.",
+  "helpEmailFailed": "Non è stato possibile aprire la tua app di posta.",
   "matchesSearchLabel": "Cerca per nome",
   "matchesSearchClear": "Cancella la ricerca",
   "matchesSearchEmpty": "Nessun match caricato corrisponde a questo nome.",

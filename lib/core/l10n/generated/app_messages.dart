@@ -5711,7 +5711,7 @@ abstract class AppMessages {
   /// Local drafts, feed guidance, help, local match search and weekly renewal.
   ///
   /// In fr, this message translates to:
-  /// **'L’application de messagerie n’a pas pu être ouverte. Vous pouvez utiliser l’adresse affichée dans votre messagerie habituelle.'**
+  /// **'Impossible d’ouvrir votre application de messagerie.'**
   String get helpEmailFailed;
 
   /// Local drafts, feed guidance, help, local match search and weekly renewal.

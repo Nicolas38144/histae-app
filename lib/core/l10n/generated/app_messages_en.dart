@@ -3413,8 +3413,7 @@ class AppMessagesEn extends AppMessages {
   String get helpEmailSubject => 'Histae support';
 
   @override
-  String get helpEmailFailed =>
-      'Your email app could not be opened. You can use the address shown in your usual email service.';
+  String get helpEmailFailed => 'Your email app could not be opened.';
 
   @override
   String get matchesSearchLabel => 'Search by first name';

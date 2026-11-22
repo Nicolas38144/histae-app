@@ -233,8 +233,9 @@ void main() {
         isTrue,
       );
       final context = tester.element(find.byType(DiscoveryPage));
-      Navigator.of(context)
-          .push(MaterialPageRoute<void>(builder: (_) => const HelpPage()));
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (_) => HelpPage(session: session)),
+      );
       await tester.pumpAndSettle();
       final helpScroller = find
           .descendant(
@@ -279,14 +280,18 @@ void main() {
         histaeTheme(Brightness.dark).colorScheme.primary,
       );
       expect(linkSpan.recognizer, isNotNull);
+      final contactButton = find.text('Contacter le support');
       await tester.scrollUntilVisible(
-        find.text('support@example.test'),
+        contactButton,
         200,
         scrollable: helpScroller,
       );
       await tester.pumpAndSettle();
-      expect(find.text('support@example.test'), findsOneWidget);
-      expect(find.text('Contacter le support'), findsOneWidget);
+      expect(find.text('support@example.test'), findsNothing);
+      expect(
+        tester.getTopLeft(contactButton).dy,
+        greaterThan(tester.getBottomLeft(find.text('Mes signalements')).dy),
+      );
       expect(find.text('E-mail à venir.'), findsNothing);
       tester.state<ScrollableState>(helpScroller).position.jumpTo(0);
       await tester.pumpAndSettle();

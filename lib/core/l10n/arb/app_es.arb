@@ -1007,7 +1007,7 @@
   "helpEmailComingSoon": "Correo electrónico próximamente.",
   "helpContactButton": "Contactar con soporte",
   "helpEmailSubject": "Ayuda Histae",
-  "helpEmailFailed": "No se ha podido abrir tu aplicación de correo. Puedes usar la dirección mostrada en tu servicio de correo habitual.",
+  "helpEmailFailed": "No se ha podido abrir tu aplicación de correo.",
   "matchesSearchLabel": "Buscar por nombre",
   "matchesSearchClear": "Borrar la búsqueda",
   "matchesSearchEmpty": "Ningún match cargado coincide con este nombre.",

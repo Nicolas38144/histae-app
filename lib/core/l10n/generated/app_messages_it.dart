@@ -3456,7 +3456,7 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get helpEmailFailed =>
-      'Non è stato possibile aprire l’app di posta. Puoi usare l’indirizzo mostrato nel tuo servizio di posta abituale.';
+      'Non è stato possibile aprire la tua app di posta.';
 
   @override
   String get matchesSearchLabel => 'Cerca per nome';

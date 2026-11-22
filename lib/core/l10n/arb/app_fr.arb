@@ -3927,7 +3927,7 @@
   "@helpEmailSubject": {
     "description": "Local drafts, feed guidance, help, local match search and weekly renewal."
   },
-  "helpEmailFailed": "L’application de messagerie n’a pas pu être ouverte. Vous pouvez utiliser l’adresse affichée dans votre messagerie habituelle.",
+  "helpEmailFailed": "Impossible d’ouvrir votre application de messagerie.",
   "@helpEmailFailed": {
     "description": "Local drafts, feed guidance, help, local match search and weekly renewal."
   },

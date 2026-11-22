@@ -3454,7 +3454,7 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get helpEmailFailed =>
-      'L’application de messagerie n’a pas pu être ouverte. Vous pouvez utiliser l’adresse affichée dans votre messagerie habituelle.';
+      'Impossible d’ouvrir votre application de messagerie.';
 
   @override
   String get matchesSearchLabel => 'Rechercher un prénom';

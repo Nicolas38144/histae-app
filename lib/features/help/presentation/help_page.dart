@@ -61,7 +61,7 @@ class _HelpPageState extends State<HelpPage> {
         ),
       );
     } catch (_) {
-      /* Keep the address visible for manual use. */
+      /* Report the launch failure in the contact section. */
     }
     if (mounted) {
       setState(() {
@@ -146,20 +146,7 @@ class _HelpPageState extends State<HelpPage> {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: HistaeTokens.textSpacing),
-            if (email == null)
-              Text(text.helpEmailComingSoon)
-            else ...[
-              SelectableText(email),
-              const SizedBox(height: 12),
-              HistaeButton.icon(
-                onPressed: _launching ? null : () => _contact(email),
-                icon: const Icon(Icons.mail_outline),
-                label: Text(text.helpContactButton),
-              ),
-            ],
-            if (_failed) Text(text.helpEmailFailed),
             if (widget.session case final session? when session.hasSession) ...[
-              const SizedBox(height: HistaeTokens.contentSpacing),
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.support_agent),
@@ -173,6 +160,18 @@ class _HelpPageState extends State<HelpPage> {
                 trailing: const Icon(Icons.chevron_right_rounded),
                 title: Text(text.caseworkReports),
                 onTap: () => _openCasework(session, CaseworkView.reports),
+              ),
+            ],
+            const SizedBox(height: HistaeTokens.labelSpacing),
+            if (email == null)
+              Text(text.helpEmailComingSoon)
+            else ...[
+              if (_failed)
+                Semantics(liveRegion: true, child: Text(text.helpEmailFailed)),
+              HistaeButton.icon(
+                onPressed: _launching ? null : () => _contact(email),
+                icon: const Icon(Icons.mail_outline),
+                label: Text(text.helpContactButton),
               ),
             ],
           ],
