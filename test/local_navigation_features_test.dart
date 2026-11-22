@@ -280,7 +280,7 @@ void main() {
         histaeTheme(Brightness.dark).colorScheme.primary,
       );
       expect(linkSpan.recognizer, isNotNull);
-      final contactButton = find.text('Contacter le support');
+      final contactButton = find.text('Contacter par mail');
       await tester.scrollUntilVisible(
         contactButton,
         200,

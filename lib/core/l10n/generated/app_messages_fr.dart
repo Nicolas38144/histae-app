@@ -3447,7 +3447,7 @@ class AppMessagesFr extends AppMessages {
   String get helpEmailComingSoon => 'E-mail à venir.';
 
   @override
-  String get helpContactButton => 'Contacter le support';
+  String get helpContactButton => 'Contacter par mail';
 
   @override
   String get helpEmailSubject => 'Aide Histae';

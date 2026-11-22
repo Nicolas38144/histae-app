@@ -3919,7 +3919,7 @@
   "@helpEmailComingSoon": {
     "description": "Local drafts, feed guidance, help, local match search and weekly renewal."
   },
-  "helpContactButton": "Contacter le support",
+  "helpContactButton": "Contacter par mail",
   "@helpContactButton": {
     "description": "Local drafts, feed guidance, help, local match search and weekly renewal."
   },

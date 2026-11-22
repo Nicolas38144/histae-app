@@ -5699,7 +5699,7 @@ abstract class AppMessages {
   /// Local drafts, feed guidance, help, local match search and weekly renewal.
   ///
   /// In fr, this message translates to:
-  /// **'Contacter le support'**
+  /// **'Contacter par mail'**
   String get helpContactButton;
 
   /// Local drafts, feed guidance, help, local match search and weekly renewal.

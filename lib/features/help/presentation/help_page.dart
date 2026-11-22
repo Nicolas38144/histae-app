@@ -86,6 +86,7 @@ class _HelpPageState extends State<HelpPage> {
   @override
   Widget build(BuildContext context) {
     final text = AppStrings.of(context).messages;
+    final headingStyle = Theme.of(context).textTheme.titleLarge;
     final support = HelpScope.maybeOf(context)?.support;
     final email = support?.email;
     final standards = support?.websiteOrigin?.resolve(
@@ -97,7 +98,7 @@ class _HelpPageState extends State<HelpPage> {
         child: ListView(
           padding: HistaeTokens.pagePadding,
           children: [
-            Text(text.helpIntro, style: Theme.of(context).textTheme.bodyLarge),
+            Text(text.helpIntro, style: headingStyle),
             const SizedBox(height: 20),
             HistaeButton.outlinedIcon(
               key: const Key('help-feed-guide'),
@@ -141,10 +142,7 @@ class _HelpPageState extends State<HelpPage> {
                 ),
               ),
             const SizedBox(height: HistaeTokens.sectionSpacing),
-            Text(
-              text.helpContactTitle,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
+            Text(text.helpContactTitle, style: headingStyle),
             const SizedBox(height: HistaeTokens.textSpacing),
             if (widget.session case final session? when session.hasSession) ...[
               ListTile(
