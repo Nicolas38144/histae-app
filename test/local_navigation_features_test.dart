@@ -248,6 +248,7 @@ void main() {
         200,
         scrollable: helpScroller,
       );
+      await tester.pumpAndSettle();
       expect(
         find.byKey(const Key('help-child-safety-standards')),
         findsNothing,
@@ -293,9 +294,14 @@ void main() {
         greaterThan(tester.getBottomLeft(find.text('Mes signalements')).dy),
       );
       expect(find.text('E-mail à venir.'), findsNothing);
-      tester.state<ScrollableState>(helpScroller).position.jumpTo(0);
+      final reviewGuide = find.byKey(const Key('help-feed-guide'));
+      await tester.scrollUntilVisible(
+        reviewGuide,
+        -160,
+        scrollable: helpScroller,
+      );
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('help-feed-guide')));
+      await tester.tap(reviewGuide);
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('feed-mini-guide')), findsOneWidget);
       await tester.pumpWidget(const SizedBox.shrink());

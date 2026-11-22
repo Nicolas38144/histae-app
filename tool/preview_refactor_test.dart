@@ -321,6 +321,26 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Équipe Histae'), findsOneWidget);
       await _capture(tester, 'assistance');
+      final send = find.widgetWithText(FilledButton, 'Envoyer');
+      final message = find.byType(TextField);
+      expect(tester.widget<FilledButton>(send).onPressed, isNull);
+      await tester.tap(find.byType(DropdownButtonFormField<String>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Recours').hitTestable().last);
+      await tester.pumpAndSettle();
+      expect(tester.widget<FilledButton>(send).onPressed, isNull);
+      await tester.enterText(message, '   ');
+      await tester.pump();
+      expect(tester.widget<FilledButton>(send).onPressed, isNull);
+      await tester.enterText(
+        message,
+        'Bonjour, pouvez-vous vérifier mon dossier ?',
+      );
+      await tester.pump();
+      expect(tester.widget<FilledButton>(send).onPressed, isNotNull);
+      await tester.enterText(message, '');
+      await tester.pump();
+      expect(tester.widget<FilledButton>(send).onPressed, isNull);
       await tester.pumpWidget(const SizedBox.shrink());
     },
     timeout: const Timeout(Duration(minutes: 2)),

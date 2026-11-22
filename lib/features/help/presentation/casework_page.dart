@@ -183,6 +183,7 @@ class _CaseworkPageState extends State<CaseworkPage> {
   }
 
   Future<void> _send() async {
+    if (!_validMessage) return;
     final message = _message.text.trim();
     switch (widget.view) {
       case CaseworkView.thread:
@@ -260,7 +261,10 @@ class _CaseworkPageState extends State<CaseworkPage> {
                         ? null
                         : (value) =>
                               setState(() => _category = value ?? _category),
-                    composer: _compose(text),
+                    composer: _compose(
+                      text,
+                      actionGap: HistaeTokens.sectionSpacing,
+                    ),
                   ),
                   const SizedBox(height: HistaeTokens.contentSpacing),
                 ],
@@ -341,7 +345,10 @@ class _CaseworkPageState extends State<CaseworkPage> {
     );
   }
 
-  Widget _compose(AppMessages text) => Column(
+  Widget _compose(
+    AppMessages text, {
+    double actionGap = HistaeTokens.labelSpacing,
+  }) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       TextField(
@@ -356,7 +363,7 @@ class _CaseworkPageState extends State<CaseworkPage> {
         ),
         onChanged: (_) => setState(() {}),
       ),
-      const SizedBox(height: HistaeTokens.labelSpacing),
+      SizedBox(height: actionGap),
       HistaeButton(
         onPressed: _busy || !_validMessage ? null : () => _run(_send),
         child: Text(text.caseworkSend),

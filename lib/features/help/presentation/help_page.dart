@@ -99,14 +99,7 @@ class _HelpPageState extends State<HelpPage> {
           padding: HistaeTokens.pagePadding,
           children: [
             Text(text.helpIntro, style: headingStyle),
-            const SizedBox(height: 20),
-            HistaeButton.outlinedIcon(
-              key: const Key('help-feed-guide'),
-              onPressed: () => showFeedGuide(context),
-              icon: const Icon(Icons.swipe_outlined),
-              label: Text(text.helpReviewGuide),
-            ),
-            const SizedBox(height: 20),
+            const SizedBox(height: HistaeTokens.contentSpacing),
             for (final entry in [
               (text.helpFeedQuestion, text.helpFeedAnswer, false),
               (text.helpPhotoQuestion, text.helpPhotoAnswer, false),
@@ -144,6 +137,14 @@ class _HelpPageState extends State<HelpPage> {
             const SizedBox(height: HistaeTokens.sectionSpacing),
             Text(text.helpContactTitle, style: headingStyle),
             const SizedBox(height: HistaeTokens.textSpacing),
+            ListTile(
+              key: const Key('help-feed-guide'),
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.swipe_outlined),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              title: Text(text.helpReviewGuide),
+              onTap: () => showFeedGuide(context),
+            ),
             if (widget.session case final session? when session.hasSession) ...[
               ListTile(
                 contentPadding: EdgeInsets.zero,

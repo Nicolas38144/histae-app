@@ -28,37 +28,28 @@ class SupportRequestForm extends StatelessWidget {
           title: text.supportNewRequest,
           body: text.caseworkSupportHelp,
         ),
-        Card(
-          child: Padding(
-            padding: HistaeTokens.panelPadding,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                DropdownButtonFormField<String>(
-                  initialValue: category,
-                  isExpanded: true,
-                  decoration: InputDecoration(labelText: text.caseworkCategory),
-                  items: [
-                    for (final value in [
-                      'login',
-                      'billing',
-                      'appeal',
-                      'privacy',
-                      'other',
-                    ])
-                      DropdownMenuItem(
-                        value: value,
-                        child: Text(caseworkValueLabel(text, value)),
-                      ),
-                  ],
-                  onChanged: onCategoryChanged,
-                ),
-                const SizedBox(height: HistaeTokens.contentSpacing),
-                composer,
-              ],
-            ),
-          ),
+        const SizedBox(height: HistaeTokens.textSpacing),
+        DropdownButtonFormField<String>(
+          initialValue: category,
+          isExpanded: true,
+          decoration: InputDecoration(labelText: text.caseworkCategory),
+          items: [
+            for (final value in [
+              'login',
+              'billing',
+              'appeal',
+              'privacy',
+              'other',
+            ])
+              DropdownMenuItem(
+                value: value,
+                child: Text(caseworkValueLabel(text, value)),
+              ),
+          ],
+          onChanged: onCategoryChanged,
         ),
+        const SizedBox(height: HistaeTokens.contentSpacing),
+        composer,
       ],
     );
   }
