@@ -22,7 +22,7 @@ abstract interface class DiscoveryRepository {
     RequestCancellation scope,
   );
 
-  Future<SwipeResult> swipe(PendingChoice intent, RequestCancellation scope);
+  Future<ReceivedMatch?> swipe(PendingChoice intent, RequestCancellation scope);
 
   Future<void> block(PendingChoice intent, RequestCancellation scope);
 }
@@ -90,13 +90,13 @@ final class ApiDiscoveryRepository implements DiscoveryRepository {
   }
 
   @override
-  Future<SwipeResult> swipe(
+  Future<ReceivedMatch?> swipe(
     PendingChoice intent,
     RequestCancellation scope,
   ) async {
     final owner = session.identity?.userId;
     if (owner == null) invalidResponse();
-    return SwipeResult.fromJson(
+    return ReceivedMatch.fromSwipeResponse(
       await _request(
         'POST',
         '/api/swipes',

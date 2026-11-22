@@ -421,8 +421,8 @@ class DiscoveryController extends ChangeNotifier {
       if (intent.action == PendingAction.block) {
         await repository.block(intent, _scope);
       } else {
-        final result = await repository.swipe(intent, _scope);
-        if (result.match case final match?) {
+        final match = await repository.swipe(intent, _scope);
+        if (match != null) {
           received = EncounterReceipt(match, intent.profile);
         }
       }

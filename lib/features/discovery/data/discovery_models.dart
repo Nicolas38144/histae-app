@@ -132,9 +132,27 @@ class PendingChoice {
 }
 
 class ReceivedMatch {
-  const ReceivedMatch(this.id, this.status, this.createdAt, this.expiresAt);
+  const ReceivedMatch._(this.id, this.createdAt);
 
-  factory ReceivedMatch.fromJson(Object? value, String owner, String target) {
+  static ReceivedMatch? fromSwipeResponse(
+    Object? value,
+    String owner,
+    PendingChoice intent,
+  ) {
+    final j = jsonObject(value);
+    final decision = jsonString(j, 'decision');
+    final matched = jsonField<bool>(j, 'matched');
+    if (decision != intent.action.name ||
+        matched != (j['match'] != null) ||
+        (matched && decision != 'like')) {
+      invalidResponse();
+    }
+    return matched
+        ? ReceivedMatch._fromJson(j['match'], owner, intent.profile.id)
+        : null;
+  }
+
+  factory ReceivedMatch._fromJson(Object? value, String owner, String target) {
     final j = jsonObject(value);
     final members = {serverId(j, 'user1_id'), serverId(j, 'user2_id')};
     final status = jsonString(j, 'status');
@@ -150,40 +168,11 @@ class ReceivedMatch {
         ].contains(status)) {
       invalidResponse();
     }
-    return ReceivedMatch(
-      serverId(j, 'id'),
-      status,
-      wireTime(j['created_at']),
-      wireTime(j['expires_at']),
-    );
+    final id = serverId(j, 'id');
+    final createdAt = wireTime(j['created_at']);
+    wireTime(j['expires_at']);
+    return ReceivedMatch._(id, createdAt);
   }
-  final String id, status;
-  final DateTime createdAt, expiresAt;
-}
-
-class SwipeResult {
-  const SwipeResult(this.decision, this.match);
-
-  factory SwipeResult.fromJson(
-    Object? value,
-    String owner,
-    PendingChoice intent,
-  ) {
-    final j = jsonObject(value);
-    final decision = jsonString(j, 'decision');
-    final matched = jsonField<bool>(j, 'matched');
-    if (decision != intent.action.name ||
-        matched != (j['match'] != null) ||
-        (matched && decision != 'like')) {
-      invalidResponse();
-    }
-    return SwipeResult(
-      SwipeDecision.values.byName(decision),
-      matched
-          ? ReceivedMatch.fromJson(j['match'], owner, intent.profile.id)
-          : null,
-    );
-  }
-  final SwipeDecision decision;
-  final ReceivedMatch? match;
+  final String id;
+  final DateTime createdAt;
 }
