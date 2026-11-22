@@ -9,8 +9,6 @@ import '../core/widgets/histae_scaffold.dart';
 import '../core/widgets/histae_wordmark.dart';
 import '../features/auth/application/session_controller.dart';
 import '../features/auth/presentation/otp_page.dart';
-import '../features/help/presentation/casework_page.dart';
-import '../features/help/presentation/casework_strings.dart';
 import '../features/privacy/presentation/privacy_strings.dart';
 
 class WelcomePage extends StatelessWidget {
@@ -77,17 +75,6 @@ class WelcomePage extends StatelessWidget {
                       ),
                     ),
                     child: Text(strings.existingAccount),
-                  ),
-                  HistaeButton.text(
-                    onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) => CaseworkPage(
-                          view: CaseworkView.guest,
-                          publicApi: auth.repository.api,
-                        ),
-                      ),
-                    ),
-                    child: Text(caseworkStrings(strings.localeName)('support')),
                   ),
                 ],
                 const SizedBox(height: 28),

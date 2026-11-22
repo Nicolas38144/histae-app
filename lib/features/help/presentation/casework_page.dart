@@ -4,23 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/l10n/app_strings.dart';
-import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/network/json_fields.dart';
+import '../../../core/network/request_cancellation.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../auth/domain/authenticated_session.dart';
 import '../../privacy/presentation/privacy_strings.dart';
 import 'casework_strings.dart';
 
-enum CaseworkView { reports, support, guest, receipt, thread }
+enum CaseworkView { reports, support, receipt, thread }
 
 class CaseworkPage extends StatefulWidget {
   const CaseworkPage({
     super.key,
     required this.view,
-    this.session,
-    this.publicApi,
+    required this.session,
     this.requestId,
     this.canReply = false,
     this.showExport = false,
@@ -28,8 +27,7 @@ class CaseworkPage extends StatefulWidget {
   });
 
   final CaseworkView view;
-  final AuthenticatedSession? session;
-  final ApiClient? publicApi;
+  final AuthenticatedSession session;
   final String? requestId;
   final bool canReply;
   final bool showExport;
@@ -42,21 +40,17 @@ class CaseworkPage extends StatefulWidget {
 class _CaseworkPageState extends State<CaseworkPage> {
   final _scope = RequestCancellation();
   final _message = TextEditingController();
-  final _followUpCode = TextEditingController();
   final _rows = <Map<String, dynamic>>[];
-  late final String? _account;
+  late final String _account;
   String? _before;
   String? _initial;
   String? _threadStatus;
   String? _exportId;
   String? _issuedCode;
   DateTime? _codeExpiry;
-  String? _erasureStatus;
-  Map<String, dynamic>? _foundCase;
   ApiFailure? _error;
   String _category = 'login';
   bool _busy = false;
-  bool _lookupErasure = false;
   bool _sessionLost = false;
 
   bool get _canReply => switch (_threadStatus) {
@@ -74,14 +68,13 @@ class _CaseworkPageState extends State<CaseworkPage> {
   @override
   void initState() {
     super.initState();
-    _account = widget.session?.resourceKey;
-    widget.session?.addListener(_onSessionChanged);
+    _account = widget.session.resourceKey;
+    widget.session.addListener(_onSessionChanged);
     if (_hasList) unawaited(_run(() => _load()));
   }
 
   void _onSessionChanged() {
-    if (widget.session?.resourceKey == _account &&
-        widget.session?.hasSession == true) {
+    if (widget.session.resourceKey == _account && widget.session.hasSession) {
       return;
     }
     _scope.cancel();
@@ -96,10 +89,9 @@ class _CaseworkPageState extends State<CaseworkPage> {
 
   @override
   void dispose() {
-    widget.session?.removeListener(_onSessionChanged);
+    widget.session.removeListener(_onSessionChanged);
     _scope.cancel();
     _message.dispose();
-    _followUpCode.dispose();
     super.dispose();
   }
 
@@ -112,7 +104,7 @@ class _CaseworkPageState extends State<CaseworkPage> {
     Object? body,
     int expected = 200,
     Map<String, String>? query,
-  }) => widget.session!.request(
+  }) => widget.session.request(
     method,
     path,
     body: body,
@@ -121,15 +113,6 @@ class _CaseworkPageState extends State<CaseworkPage> {
     replayAfterRefresh: method == 'GET',
     cancellation: _scope,
   );
-
-  Future<Object?> _publicPost(String path, Object body, {int expected = 200}) =>
-      widget.publicApi!.requestJson(
-        'POST',
-        path,
-        body: body,
-        expectedStatus: expected,
-        cancellation: _scope,
-      );
 
   Future<void> _run(Future<void> Function() action) async {
     if (_busy || _scope.isCancelled) return;
@@ -208,17 +191,6 @@ class _CaseworkPageState extends State<CaseworkPage> {
           body: {'category': _category, 'message': message},
           expected: 201,
         );
-      case CaseworkView.guest:
-        final answer = jsonObject(
-          await _publicPost('/api/public/support-cases', {
-            'category': _category,
-            'message': message,
-          }, expected: 201),
-        );
-        if (_scope.isCancelled) return;
-        _issuedCode = jsonString(answer, 'code');
-        _followUpCode.text = _issuedCode!;
-        _lookupErasure = false;
       default:
         return;
     }
@@ -236,30 +208,13 @@ class _CaseworkPageState extends State<CaseworkPage> {
     _codeExpiry = wireTime(answer['expires_at']);
   }
 
-  Future<void> _lookup() async {
-    _erasureStatus = null;
-    _foundCase = null;
-    final path = _lookupErasure
-        ? '/api/public/erasure-status'
-        : '/api/public/support-cases/status';
-    final reply = jsonObject(
-      await _publicPost(path, {'code': _followUpCode.text.trim()}),
-    );
-    if (_scope.isCancelled) return;
-    if (_lookupErasure) {
-      _erasureStatus = jsonString(reply, 'status');
-    } else {
-      _foundCase = reply;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
     final s = caseworkStrings(strings.localeName);
     final title = switch (widget.view) {
       CaseworkView.reports => s('reports'),
-      CaseworkView.support || CaseworkView.guest => s('support'),
+      CaseworkView.support => s('support'),
       CaseworkView.receipt => s('receipt'),
       CaseworkView.thread => s('thread'),
     };
@@ -289,15 +244,8 @@ class _CaseworkPageState extends State<CaseworkPage> {
                       child: Text(s('generate')),
                     ),
                 ],
-                if (widget.view == CaseworkView.guest ||
-                    widget.view == CaseworkView.support) ...[
-                  Text(
-                    s(
-                      widget.view == CaseworkView.guest
-                          ? 'guestHelp'
-                          : 'supportHelp',
-                    ),
-                  ),
+                if (widget.view == CaseworkView.support) ...[
+                  Text(s('supportHelp')),
                   const SizedBox(height: 12),
                   _supportForm(s),
                 ],
@@ -321,44 +269,6 @@ class _CaseworkPageState extends State<CaseworkPage> {
                       ),
                     ),
                   ),
-                if (widget.view == CaseworkView.guest) ...[
-                  const SizedBox(height: 20),
-                  DropdownButtonFormField<bool>(
-                    key: ValueKey(_lookupErasure),
-                    initialValue: _lookupErasure,
-                    decoration: InputDecoration(labelText: s('track')),
-                    items: [
-                      DropdownMenuItem(value: false, child: Text(s('support'))),
-                      DropdownMenuItem(value: true, child: Text(s('receipt'))),
-                    ],
-                    onChanged: _busy
-                        ? null
-                        : (value) => setState(() {
-                            _lookupErasure = value ?? false;
-                            _erasureStatus = null;
-                            _foundCase = null;
-                          }),
-                  ),
-                  TextField(
-                    controller: _followUpCode,
-                    autocorrect: false,
-                    enableSuggestions: false,
-                    decoration: InputDecoration(labelText: s('code')),
-                    enabled: !_busy,
-                    onChanged: (_) => setState(() {}),
-                  ),
-                  HistaeButton.outlined(
-                    onPressed:
-                        _busy ||
-                            !RegExp(r'^[A-Za-z0-9_-]{43}$')
-                                .hasMatch(_followUpCode.text.trim())
-                        ? null
-                        : () => _run(_lookup),
-                    child: Text(s('check')),
-                  ),
-                  if (_erasureStatus case final status?) Text(s(status)),
-                  if (_foundCase case final entry?) _card(entry, s),
-                ],
                 if (_hasList) ...[
                   const SizedBox(height: 12),
                   HistaeButton.text(
@@ -391,7 +301,7 @@ class _CaseworkPageState extends State<CaseworkPage> {
                       child: Text(s('more')),
                     ),
                 ],
-          if (widget.view == CaseworkView.thread && _canReply)
+                if (widget.view == CaseworkView.thread && _canReply)
                   _compose(s),
                 if (_exportId case final id?)
                   HistaeButton.outlined(
