@@ -250,6 +250,9 @@ void main() {
           tester.widget<TextField>(composer).decoration!.helperText,
           text.chatPageMessageLimitReached,
         );
+        await tester.enterText(composer, '${'🌿' * 500}a');
+        await tester.pump();
+        expect(tester.widget<TextField>(composer).controller!.text, '🌿' * 500);
         await tester.enterText(composer, 'Un texte court');
         await tester.pump();
         expect(

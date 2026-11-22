@@ -348,7 +348,8 @@ void main() {
       expect(tester.widget<FilledButton>(send).onPressed, isNotNull);
       await tester.enterText(message, 'é' * 1001);
       await tester.pumpAndSettle();
-      expect(tester.widget<FilledButton>(send).onPressed, isNull);
+      expect(tester.widget<TextField>(message).controller!.text, 'é' * 1000);
+      expect(tester.widget<FilledButton>(send).onPressed, isNotNull);
       await tester.enterText(message, '');
       await tester.pump();
       expect(tester.widget<FilledButton>(send).onPressed, isNull);

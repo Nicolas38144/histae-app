@@ -105,19 +105,13 @@ ClientMessage? validateBirthdate(String value, DateTime now) {
   return ageOn(d, now) < 18 ? ClientMessage.underage : null;
 }
 
-const _biographyApiByteLimit = 2000;
+const biographyTextLimit = TextLengthLimit(
+  longTextCharacterLimit,
+  utf8Bytes: 2000,
+);
 
-bool biographyWithinLimit(String value) {
-  final text = value.trim();
-  return text.runes.length <= longTextCharacterLimit &&
-      utf8.encode(text).length <= _biographyApiByteLimit;
-}
-
-bool biographyLimitReached(String value) {
-  final text = value.trim();
-  return text.runes.length >= longTextCharacterLimit ||
-      utf8.encode(text).length >= _biographyApiByteLimit;
-}
+bool biographyWithinLimit(String value) =>
+    biographyTextLimit.allows(value.trim());
 
 class ProfileDraft {
   const ProfileDraft(this.firstname, this.birthdate, this.sex, this.bio);
@@ -252,6 +246,7 @@ class ProfileAnswer {
 
 class AnswerDraft {
   const AnswerDraft(this.questionId, this.answer);
+  static const textLimit = TextLengthLimit(300, utf8Bytes: 1000);
   final String questionId, answer;
 
   Map<String, String> toJson() => {
@@ -262,8 +257,7 @@ class AnswerDraft {
   ClientMessage? validate() {
     final text = answer.trim();
     if (text.runes.length < 10 ||
-        text.runes.length > 300 ||
-        utf8.encode(text).length > 1000 ||
+        !textLimit.allows(text) ||
         text.runes.any((c) => c < 32 || (c >= 127 && c <= 159))) {
       return ClientMessage.answerInvalid;
     }

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/text/text_limit_input_formatter.dart';
 import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
@@ -260,6 +261,7 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
                       RegExp(r'[\r\n]'),
                       replacementString: ' ',
                     ),
+                    const TextLimitInputFormatter(AnswerDraft.textLimit),
                   ],
                   minLines: 3,
                   maxLines: 6,
@@ -272,11 +274,9 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
                         .answersEditor10To300Characters,
                     helperMaxLines: 2,
                     counterText: AppStrings.of(context).messages
-                        .answersEditor300(
-                          inputs[i].text.text.trim().runes.length,
-                        ),
+                        .answersEditor300(inputs[i].text.text.runes.length),
                     counterStyle: TextStyle(
-                      color: inputs[i].text.text.trim().runes.length > 300
+                      color: !AnswerDraft.textLimit.allows(inputs[i].text.text)
                           ? Theme.of(context).colorScheme.error
                           : null,
                     ),

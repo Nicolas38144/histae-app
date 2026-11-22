@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/text/text_limit_input_formatter.dart';
 import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
@@ -106,6 +107,9 @@ class _ReportPageState extends State<ReportPage> {
                     const SizedBox(height: 16),
                     TextField(
                       controller: _text,
+                      inputFormatters: const [
+                        TextLimitInputFormatter(reportTextLimit),
+                      ],
                       enabled: editable,
                       minLines: 3,
                       maxLines: 8,

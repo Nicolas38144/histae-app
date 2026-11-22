@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import '../../../core/models/client_message.dart';
 import '../../../core/network/json_fields.dart';
 import '../../../core/text/text_limits.dart';
@@ -194,10 +192,10 @@ class ReportIntent {
   String toString() => 'ReportIntent(redacted)';
 }
 
-const _reportApiByteLimit = 2000;
+const reportTextLimit = TextLengthLimit(
+  longTextCharacterLimit,
+  utf8Bytes: 2000,
+);
 
 ClientMessage? validateReport(String value) =>
-    value.runes.length > longTextCharacterLimit ||
-        utf8.encode(value).length > _reportApiByteLimit
-    ? ClientMessage.reportTooLong
-    : null;
+    reportTextLimit.allows(value) ? null : ClientMessage.reportTooLong;

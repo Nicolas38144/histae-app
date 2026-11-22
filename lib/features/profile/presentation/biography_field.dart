@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/text/text_limit_input_formatter.dart';
 import '../../../core/widgets/text_limit_highlight.dart';
 import '../data/profile_models.dart';
 
@@ -28,7 +29,7 @@ class BiographyField extends StatelessWidget {
         builder: (context, value, _) {
           final text = AppStrings.of(context).messages;
           return TextLimitHighlight(
-            reached: biographyLimitReached(value.text),
+            reached: biographyTextLimit.reached(value.text),
             limitHint: text.biographyLimitReached,
             decoration: InputDecoration(
               labelText: text.identityEditorAFewWordsAboutYou,
@@ -36,6 +37,9 @@ class BiographyField extends StatelessWidget {
             ),
             builder: (decoration) => TextField(
               controller: controller,
+              inputFormatters: const [
+                TextLimitInputFormatter(biographyTextLimit),
+              ],
               enabled: enabled,
               onChanged: onChanged,
               minLines: minLines,

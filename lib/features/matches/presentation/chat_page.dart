@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/text/text_limit_input_formatter.dart';
+import '../../../core/text/text_limits.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
@@ -256,7 +258,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
     final messages = c.messages;
     final pending = c.pendingMessages.reversed.toList();
     final messageLength = trimMessage(_text.text).runes.length;
-    final limitReached = messageLength >= messageCharacterLimit;
+    final limitReached = _text.text.runes.length >= messageCharacterLimit;
     final sent = messages.where((message) => message.senderId == c.ownerId);
     final lastSent = sent.firstOrNull?.id;
     final lastRead = sent
@@ -609,6 +611,11 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                               TextField(
                                 key: const Key('chat-composer'),
                                 controller: _text,
+                                inputFormatters: const [
+                                  TextLimitInputFormatter(
+                                    TextLengthLimit(messageCharacterLimit),
+                                  ),
+                                ],
                                 minLines: 1,
                                 maxLines: 4,
                                 textCapitalization:

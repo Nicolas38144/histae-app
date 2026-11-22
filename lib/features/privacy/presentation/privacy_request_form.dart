@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/text/text_limit_input_formatter.dart';
+import '../../../core/text/text_limits.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../application/privacy_controller.dart';
@@ -86,6 +88,11 @@ class _PrivacyRequestFormState extends State<PrivacyRequestForm> {
                 pending != null,
               )),
               initialValue: details,
+              inputFormatters: const [
+                TextLimitInputFormatter(
+                  TextLengthLimit(RightsRequestIntent.maxDetailsLength),
+                ),
+              ],
               enabled: widget.enabled,
               readOnly: pending != null,
               minLines: 3,

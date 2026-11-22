@@ -8,6 +8,7 @@ import '../../../core/l10n/generated/app_messages.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/network/json_fields.dart';
 import '../../../core/network/request_cancellation.dart';
+import '../../../core/text/text_limit_input_formatter.dart';
 import '../../../core/text/text_limits.dart';
 import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/histae_button.dart';
@@ -353,6 +354,9 @@ class _CaseworkPageState extends State<CaseworkPage> {
     );
     Widget field(InputDecoration decoration) => TextField(
       controller: _message,
+      inputFormatters: const [
+        TextLimitInputFormatter(TextLengthLimit(longTextCharacterLimit)),
+      ],
       minLines: 3,
       maxLines: 8,
       enabled: !_busy,
@@ -365,8 +369,7 @@ class _CaseworkPageState extends State<CaseworkPage> {
       children: [
         if (support)
           TextLimitHighlight(
-            reached:
-                _message.text.trim().runes.length >= longTextCharacterLimit,
+            reached: _message.text.runes.length >= longTextCharacterLimit,
             limitHint: text.caseworkMessageLimitReached,
             decoration: decoration,
             builder: field,

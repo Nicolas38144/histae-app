@@ -409,7 +409,7 @@ void main() {
     'bio edits preserve identity corrections received while editing',
     (tester) async {
       Map<String, dynamic>? patch;
-      var owner = ownerJson();
+      var owner = ownerJson(bio: 'a' * 1002);
       final session = testSession((r) async {
         if (r.url.path == '/api/users/me') return jsonResponse(owner);
         if (r.url.path == '/api/users/me/consents') {
