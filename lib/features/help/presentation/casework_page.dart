@@ -4,14 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/l10n/generated/app_messages.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/network/json_fields.dart';
 import '../../../core/network/request_cancellation.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../auth/domain/authenticated_session.dart';
 import '../../privacy/presentation/privacy_strings.dart';
+import '../data/casework_entry.dart';
 import 'casework_strings.dart';
+import 'support_request_widgets.dart';
 
 enum CaseworkView { reports, support, receipt, thread }
 
@@ -40,7 +44,7 @@ class CaseworkPage extends StatefulWidget {
 class _CaseworkPageState extends State<CaseworkPage> {
   final _scope = RequestCancellation();
   final _message = TextEditingController();
-  final _rows = <Map<String, dynamic>>[];
+  final _rows = <CaseworkEntry>[];
   late final String _account;
   String? _before;
   String? _initial;
@@ -143,18 +147,22 @@ class _CaseworkPageState extends State<CaseworkPage> {
         query: more && _before != null ? {'before': _before!} : null,
       ),
     );
-    final rows = jsonField<List<dynamic>>(page, key).map(jsonObject).toList();
-    for (final row in rows) {
-      serverId(row, 'id');
-    }
+    final isThread = widget.view == CaseworkView.thread;
+    final rows = jsonField<List<dynamic>>(
+      page,
+      key,
+    ).map((row) => CaseworkEntry.fromJson(row, isThread: isThread)).toList();
+    final before = pageCursor(page);
+    final initial = isThread ? optionalText(page, 'details') : null;
+    final status = isThread ? jsonString(page, 'status') : null;
     if (_scope.isCancelled) return;
     if (!more) _rows.clear();
-    final ids = _rows.map((row) => row['id']).toSet();
-    _rows.addAll(rows.where((row) => ids.add(row['id'])));
-    _before = pageCursor(page);
-    if (widget.view == CaseworkView.thread) {
-      _initial = optionalText(page, 'details');
-      _threadStatus = jsonString(page, 'status');
+    final ids = _rows.map((row) => row.id).toSet();
+    _rows.addAll(rows.where((row) => ids.add(row.id)));
+    _before = before;
+    if (isThread) {
+      _initial = initial;
+      _threadStatus = status;
       if (widget.showExport && !more) {
         final grant = await _authenticated(
           'GET',
@@ -211,43 +219,50 @@ class _CaseworkPageState extends State<CaseworkPage> {
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
-    final s = caseworkStrings(strings.localeName);
+    final text = strings.messages;
+    final support = widget.view == CaseworkView.support;
     final title = switch (widget.view) {
-      CaseworkView.reports => s('reports'),
-      CaseworkView.support => s('support'),
-      CaseworkView.receipt => s('receipt'),
-      CaseworkView.thread => s('thread'),
+      CaseworkView.reports => text.caseworkReports,
+      CaseworkView.support => text.caseworkSupport,
+      CaseworkView.receipt => text.caseworkReceipt,
+      CaseworkView.thread => text.caseworkThread,
     };
     return HistaeScaffold(
       appBar: AppBar(title: Text(title)),
       body: _sessionLost
           ? const SizedBox.shrink()
           : ListView(
-              padding: const EdgeInsets.all(20),
+              padding: HistaeTokens.pagePadding,
               children: [
                 if (_busy) const LinearProgressIndicator(),
                 if (_error case final error?)
                   Text(
                     error.code == 'case_not_found'
-                        ? s('unavailable')
+                        ? text.caseworkUnavailable
                         : strings.authFailure(error),
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.error,
                     ),
                   ),
                 if (widget.view == CaseworkView.receipt) ...[
-                  Text(s('receiptHelp')),
+                  Text(text.caseworkReceiptHelp),
                   const SizedBox(height: 12),
                   if (_issuedCode == null)
                     HistaeButton(
                       onPressed: _busy ? null : () => _run(_issueReceipt),
-                      child: Text(s('generate')),
+                      child: Text(text.caseworkGenerate),
                     ),
                 ],
-                if (widget.view == CaseworkView.support) ...[
-                  Text(s('supportHelp')),
-                  const SizedBox(height: 12),
-                  _supportForm(s),
+                if (support) ...[
+                  SupportRequestForm(
+                    category: _category,
+                    onCategoryChanged: _busy
+                        ? null
+                        : (value) =>
+                              setState(() => _category = value ?? _category),
+                    composer: _compose(text),
+                  ),
+                  const SizedBox(height: HistaeTokens.contentSpacing),
                 ],
                 if (_issuedCode case final code?)
                   Card(
@@ -256,88 +271,77 @@ class _CaseworkPageState extends State<CaseworkPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(s('saveCode')),
+                          Text(text.caseworkSaveCode),
                           SelectableText(code),
                           if (_codeExpiry case final expiresAt?)
                             Text(privacyDate(strings, expiresAt)),
                           HistaeButton.text(
                             onPressed: () =>
                                 Clipboard.setData(ClipboardData(text: code)),
-                            child: Text(s('copy')),
+                            child: Text(text.caseworkCopy),
                           ),
                         ],
                       ),
                     ),
                   ),
                 if (_hasList) ...[
-                  const SizedBox(height: 12),
-                  HistaeButton.text(
-                    onPressed: _busy ? null : () => _run(() => _load()),
-                    child: Text(s('refresh')),
-                  ),
+                  if (support)
+                    _supportHistoryHeading(text)
+                  else ...[
+                    const SizedBox(height: HistaeTokens.textSpacing),
+                    HistaeButton.text(
+                      onPressed: _busy ? null : () => _run(() => _load()),
+                      child: Text(text.caseworkRefresh),
+                    ),
+                  ],
                   if (widget.view == CaseworkView.thread && _initial != null)
-                    _entry(s('you'), _initial!),
+                    _entry(text.caseworkYou, _initial!),
                   for (final row
                       in widget.view == CaseworkView.thread
                           ? _rows.reversed
                           : _rows)
                     if (widget.view == CaseworkView.thread)
                       _entry(
-                        s(row['author'] == 'team' ? 'team' : 'you'),
-                        jsonString(row, 'body'),
+                        row.fromTeam ? text.caseworkTeam : text.caseworkYou,
+                        row.body,
                       )
+                    else if (support)
+                      SupportRequestCard(entry: row)
                     else
-                      _card(row, s),
+                      _reportCard(row, text),
                   if (!_busy &&
                       _rows.isEmpty &&
                       _initial == null &&
                       _error == null)
-                    Text(s('empty')),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: HistaeTokens.labelSpacing,
+                      ),
+                      child: Text(
+                        support ? text.supportNoRequests : text.caseworkEmpty,
+                      ),
+                    ),
                   if (_before != null)
                     HistaeButton.outlined(
                       onPressed: _busy
                           ? null
                           : () => _run(() => _load(more: true)),
-                      child: Text(s('more')),
+                      child: Text(text.caseworkMore),
                     ),
                 ],
                 if (widget.view == CaseworkView.thread && _canReply)
-                  _compose(s),
+                  _compose(text),
                 if (_exportId case final id?)
                   HistaeButton.outlined(
                     onPressed: () => widget.openExport?.call(id),
-                    child: Text(s('assistedExport')),
+                    child: Text(text.caseworkAssistedExport),
                   ),
               ],
             ),
     );
   }
 
-  Widget _supportForm(String Function(String) s) => Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-      DropdownButtonFormField<String>(
-        initialValue: _category,
-        decoration: InputDecoration(labelText: s('category')),
-        items: [
-          for (final category in [
-            'login',
-            'billing',
-            'appeal',
-            'privacy',
-            'other',
-          ])
-            DropdownMenuItem(value: category, child: Text(s(category))),
-        ],
-        onChanged: _busy
-            ? null
-            : (value) => setState(() => _category = value ?? _category),
-      ),
-      _compose(s),
-    ],
-  );
-
-  Widget _compose(String Function(String) s) => Column(
+  Widget _compose(AppMessages text) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
       TextField(
@@ -346,25 +350,50 @@ class _CaseworkPageState extends State<CaseworkPage> {
         maxLines: 8,
         enabled: !_busy,
         decoration: InputDecoration(
-          labelText: s('message'),
-          helperText: s('limit'),
+          labelText: text.caseworkMessage,
+          helperText: text.caseworkLimit,
+          alignLabelWithHint: true,
         ),
         onChanged: (_) => setState(() {}),
       ),
-      const SizedBox(height: 8),
+      const SizedBox(height: HistaeTokens.labelSpacing),
       HistaeButton(
         onPressed: _busy || !_validMessage ? null : () => _run(_send),
-        child: Text(s('send')),
+        child: Text(text.caseworkSend),
       ),
     ],
   );
 
-  Widget _card(Map<String, dynamic> entry, String Function(String) s) {
+  Widget _supportHistoryHeading(AppMessages text) {
+    return Row(
+      children: [
+        Expanded(
+          child: Semantics(
+            header: true,
+            child: Text(
+              text.supportRequestHistory,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+          ),
+        ),
+        const SizedBox(width: HistaeTokens.labelSpacing),
+        IconButton(
+          onPressed: _busy ? null : () => _run(() => _load()),
+          icon: const Icon(Icons.refresh_rounded),
+          tooltip: text.caseworkRefresh,
+        ),
+      ],
+    );
+  }
+
+  Widget _reportCard(CaseworkEntry entry, AppMessages text) {
+    final topic = caseworkValueLabel(text, entry.topic);
+    final status = caseworkValueLabel(text, entry.status);
     return _entry(
-      '${s(optionalText(entry, 'reason') ?? optionalText(entry, 'category') ?? 'other')} · ${s(jsonString(entry, 'status'))}',
-      optionalText(entry, 'body') ?? optionalText(entry, 'description') ?? '',
-      response: optionalText(entry, 'response'),
-      team: s('team'),
+      '$topic · $status',
+      entry.body,
+      response: entry.response,
+      team: text.caseworkTeam,
     );
   }
 

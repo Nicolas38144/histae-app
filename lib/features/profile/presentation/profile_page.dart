@@ -20,7 +20,6 @@ import '../../continuation/presentation/credits_page.dart';
 import '../../discovery/application/discovery_visibility_controller.dart';
 import '../../discovery/presentation/discovery_pause_card.dart';
 import '../../help/presentation/casework_page.dart';
-import '../../help/presentation/casework_strings.dart';
 import '../../help/presentation/help_page.dart';
 import '../../notifications/data/device_repository.dart';
 import '../../privacy/data/privacy_repository.dart';
@@ -273,7 +272,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.support_agent),
                 trailing: const Icon(Icons.chevron_right_rounded),
-                title: Text(caseworkStrings(strings.localeName)('support')),
+                title: Text(strings.messages.caseworkSupport),
                 onTap: () => _open(
                   CaseworkPage(view: CaseworkView.support, session: c.session),
                 ),
@@ -282,7 +281,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.flag_outlined),
                 trailing: const Icon(Icons.chevron_right_rounded),
-                title: Text(caseworkStrings(strings.localeName)('reports')),
+                title: Text(strings.messages.caseworkReports),
                 onTap: () => _open(
                   CaseworkPage(view: CaseworkView.reports, session: c.session),
                 ),

@@ -103,6 +103,21 @@ void main() {
         ),
       };
       final session = testSession((request) async {
+        if (request.url.path == '/api/users/me/support-cases') {
+          return jsonResponse({
+            'cases': [
+              {
+                'id': 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee',
+                'category': 'billing',
+                'status': 'closed',
+                'created_at': '2026-11-20T14:00:00Z',
+                'body': 'Où puis-je retrouver mon reçu ?',
+                'response': 'Votre reçu est disponible dans l’historique de vos achats sur Google Play.',
+              },
+            ],
+            'next_cursor': null,
+          });
+        }
         if (request.url.path == '/api/feed') {
           return jsonResponse({
             'profiles': [candidateJson(candidateOne, bio: _biography)],
@@ -287,6 +302,25 @@ void main() {
       await tester.tap(policy);
       await tester.pumpAndSettle();
       await _capture(tester, 'archive-policy');
+      await tester.tap(find.byTooltip('Retour'));
+      await tester.pumpAndSettle();
+      final support = find.text('Assistance');
+      await tester.scrollUntilVisible(
+        support,
+        160,
+        scrollable: find
+            .descendant(
+              of: find.byType(ProfilePage),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      await tester.tap(support);
+      await tester.pumpAndSettle();
+      tester.view.physicalSize = const Size(390, 960);
+      await tester.pumpAndSettle();
+      expect(find.text('Équipe Histae'), findsOneWidget);
+      await _capture(tester, 'assistance');
       await tester.pumpWidget(const SizedBox.shrink());
     },
     timeout: const Timeout(Duration(minutes: 2)),

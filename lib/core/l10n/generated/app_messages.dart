@@ -5372,6 +5372,222 @@ abstract class AppMessages {
   /// **'Aide et contact'**
   String get helpTitle;
 
+  /// No description provided for @supportNewRequest.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle demande'**
+  String get supportNewRequest;
+
+  /// No description provided for @supportRequestHistory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos demandes'**
+  String get supportRequestHistory;
+
+  /// No description provided for @supportNoRequests.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous n’avez pas encore envoyé de demande.'**
+  String get supportNoRequests;
+
+  /// No description provided for @caseworkReports.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mes signalements'**
+  String get caseworkReports;
+
+  /// No description provided for @caseworkSupport.
+  ///
+  /// In fr, this message translates to:
+  /// **'Assistance'**
+  String get caseworkSupport;
+
+  /// No description provided for @caseworkReceipt.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suivi de l’effacement'**
+  String get caseworkReceipt;
+
+  /// No description provided for @caseworkThread.
+  ///
+  /// In fr, this message translates to:
+  /// **'Échanges'**
+  String get caseworkThread;
+
+  /// No description provided for @caseworkUnavailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le dossier est introuvable ou a expiré.'**
+  String get caseworkUnavailable;
+
+  /// No description provided for @caseworkReceiptHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Obtenez un code de suivi avant de fermer le compte. Il est valable pendant 90 jours. Un nouveau code remplace le précédent.'**
+  String get caseworkReceiptHelp;
+
+  /// No description provided for @caseworkGenerate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Obtenir un code de suivi'**
+  String get caseworkGenerate;
+
+  /// No description provided for @caseworkSupportHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Décrivez votre demande et revenez ici pour lire la réponse.'**
+  String get caseworkSupportHelp;
+
+  /// No description provided for @caseworkSaveCode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Conservez ce code dans un endroit sûr.'**
+  String get caseworkSaveCode;
+
+  /// No description provided for @caseworkCopy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Copier le code'**
+  String get caseworkCopy;
+
+  /// No description provided for @caseworkRefresh.
+  ///
+  /// In fr, this message translates to:
+  /// **'Actualiser'**
+  String get caseworkRefresh;
+
+  /// No description provided for @caseworkEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun élément à afficher.'**
+  String get caseworkEmpty;
+
+  /// No description provided for @caseworkMore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Afficher la suite'**
+  String get caseworkMore;
+
+  /// No description provided for @caseworkAssistedExport.
+  ///
+  /// In fr, this message translates to:
+  /// **'Télécharger l’export assisté'**
+  String get caseworkAssistedExport;
+
+  /// No description provided for @caseworkMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre message'**
+  String get caseworkMessage;
+
+  /// No description provided for @caseworkLimit.
+  ///
+  /// In fr, this message translates to:
+  /// **'2 000 caractères maximum.'**
+  String get caseworkLimit;
+
+  /// No description provided for @caseworkSend.
+  ///
+  /// In fr, this message translates to:
+  /// **'Envoyer'**
+  String get caseworkSend;
+
+  /// No description provided for @caseworkCategory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sujet de la demande'**
+  String get caseworkCategory;
+
+  /// No description provided for @caseworkYou.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous'**
+  String get caseworkYou;
+
+  /// No description provided for @caseworkTeam.
+  ///
+  /// In fr, this message translates to:
+  /// **'Équipe Histae'**
+  String get caseworkTeam;
+
+  /// No description provided for @caseworkLogin.
+  ///
+  /// In fr, this message translates to:
+  /// **'Connexion'**
+  String get caseworkLogin;
+
+  /// No description provided for @caseworkBilling.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement'**
+  String get caseworkBilling;
+
+  /// No description provided for @caseworkAppeal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recours'**
+  String get caseworkAppeal;
+
+  /// No description provided for @caseworkPrivacy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Données personnelles'**
+  String get caseworkPrivacy;
+
+  /// No description provided for @caseworkOther.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autre'**
+  String get caseworkOther;
+
+  /// No description provided for @caseworkPending.
+  ///
+  /// In fr, this message translates to:
+  /// **'En attente'**
+  String get caseworkPending;
+
+  /// No description provided for @caseworkClosed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Traité'**
+  String get caseworkClosed;
+
+  /// No description provided for @caseworkInProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'En cours'**
+  String get caseworkInProgress;
+
+  /// No description provided for @caseworkCompleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terminé'**
+  String get caseworkCompleted;
+
+  /// No description provided for @caseworkInappropriateContent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Contenu inapproprié'**
+  String get caseworkInappropriateContent;
+
+  /// No description provided for @caseworkFakeProfile.
+  ///
+  /// In fr, this message translates to:
+  /// **'Faux profil'**
+  String get caseworkFakeProfile;
+
+  /// No description provided for @caseworkHarassment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Harcèlement'**
+  String get caseworkHarassment;
+
+  /// No description provided for @caseworkSpam.
+  ///
+  /// In fr, this message translates to:
+  /// **'Spam'**
+  String get caseworkSpam;
+
   /// Local drafts, feed guidance, help, local match search and weekly renewal.
   ///
   /// In fr, this message translates to:

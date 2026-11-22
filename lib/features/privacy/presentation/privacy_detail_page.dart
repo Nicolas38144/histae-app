@@ -12,7 +12,6 @@ import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
 import '../../help/presentation/casework_page.dart';
-import '../../help/presentation/casework_strings.dart';
 import '../application/privacy_controller.dart';
 import '../data/privacy_models.dart';
 import 'privacy_frame.dart';
@@ -430,9 +429,7 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
                       HistaeButton.text(
                         onPressed: () => _openThread(request),
                         child: Text(
-                          caseworkStrings(AppStrings.of(context).localeName)(
-                            'thread',
-                          ),
+                          AppStrings.of(context).messages.caseworkThread,
                         ),
                       ),
                     if (request.details != null) ...[
@@ -578,9 +575,7 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
               ),
             )
           : null,
-      child: Text(
-        caseworkStrings(AppStrings.of(context).localeName)('receipt'),
-      ),
+      child: Text(AppStrings.of(context).messages.caseworkReceipt),
     ),
     const SizedBox(height: 16),
     EditorialCard(

@@ -3233,6 +3233,117 @@ class AppMessagesEn extends AppMessages {
   String get helpTitle => 'Help and contact';
 
   @override
+  String get supportNewRequest => 'New request';
+
+  @override
+  String get supportRequestHistory => 'Your requests';
+
+  @override
+  String get supportNoRequests => 'You haven’t sent a request yet.';
+
+  @override
+  String get caseworkReports => 'My reports';
+
+  @override
+  String get caseworkSupport => 'Support';
+
+  @override
+  String get caseworkReceipt => 'Erasure tracking';
+
+  @override
+  String get caseworkThread => 'Conversation';
+
+  @override
+  String get caseworkUnavailable =>
+      'This case could not be found or has expired.';
+
+  @override
+  String get caseworkReceiptHelp =>
+      'Get a tracking code before closing your account. It is valid for 90 days. A new code replaces the previous one.';
+
+  @override
+  String get caseworkGenerate => 'Get a tracking code';
+
+  @override
+  String get caseworkSupportHelp =>
+      'Describe your request and come back here to read the reply.';
+
+  @override
+  String get caseworkSaveCode => 'Keep this code somewhere safe.';
+
+  @override
+  String get caseworkCopy => 'Copy code';
+
+  @override
+  String get caseworkRefresh => 'Refresh';
+
+  @override
+  String get caseworkEmpty => 'Nothing to show.';
+
+  @override
+  String get caseworkMore => 'Show more';
+
+  @override
+  String get caseworkAssistedExport => 'Download assisted export';
+
+  @override
+  String get caseworkMessage => 'Your message';
+
+  @override
+  String get caseworkLimit => 'Maximum 2,000 characters.';
+
+  @override
+  String get caseworkSend => 'Send';
+
+  @override
+  String get caseworkCategory => 'Request topic';
+
+  @override
+  String get caseworkYou => 'You';
+
+  @override
+  String get caseworkTeam => 'Histae team';
+
+  @override
+  String get caseworkLogin => 'Sign-in';
+
+  @override
+  String get caseworkBilling => 'Billing';
+
+  @override
+  String get caseworkAppeal => 'Appeal';
+
+  @override
+  String get caseworkPrivacy => 'Personal data';
+
+  @override
+  String get caseworkOther => 'Other';
+
+  @override
+  String get caseworkPending => 'Pending';
+
+  @override
+  String get caseworkClosed => 'Closed';
+
+  @override
+  String get caseworkInProgress => 'In progress';
+
+  @override
+  String get caseworkCompleted => 'Completed';
+
+  @override
+  String get caseworkInappropriateContent => 'Inappropriate content';
+
+  @override
+  String get caseworkFakeProfile => 'Fake profile';
+
+  @override
+  String get caseworkHarassment => 'Harassment';
+
+  @override
+  String get caseworkSpam => 'Spam';
+
+  @override
   String get helpIntro =>
       'Have a question about Histae? Find useful guidance here.';
 

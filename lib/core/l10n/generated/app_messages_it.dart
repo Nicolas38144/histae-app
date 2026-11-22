@@ -3275,6 +3275,117 @@ class AppMessagesIt extends AppMessages {
   String get helpTitle => 'Aiuto e contatti';
 
   @override
+  String get supportNewRequest => 'Nuova richiesta';
+
+  @override
+  String get supportRequestHistory => 'Le tue richieste';
+
+  @override
+  String get supportNoRequests => 'Non hai ancora inviato richieste.';
+
+  @override
+  String get caseworkReports => 'Le mie segnalazioni';
+
+  @override
+  String get caseworkSupport => 'Assistenza';
+
+  @override
+  String get caseworkReceipt => 'Stato della cancellazione';
+
+  @override
+  String get caseworkThread => 'Conversazione';
+
+  @override
+  String get caseworkUnavailable =>
+      'La richiesta non è disponibile o è scaduta.';
+
+  @override
+  String get caseworkReceiptHelp =>
+      'Ottieni un codice di verifica prima di chiudere l’account. È valido per 90 giorni. Un nuovo codice sostituisce quello precedente.';
+
+  @override
+  String get caseworkGenerate => 'Ottieni un codice di verifica';
+
+  @override
+  String get caseworkSupportHelp =>
+      'Descrivi la tua richiesta e torna qui per leggere la risposta.';
+
+  @override
+  String get caseworkSaveCode => 'Conserva questo codice in un luogo sicuro.';
+
+  @override
+  String get caseworkCopy => 'Copia il codice';
+
+  @override
+  String get caseworkRefresh => 'Aggiorna';
+
+  @override
+  String get caseworkEmpty => 'Nessun elemento da mostrare.';
+
+  @override
+  String get caseworkMore => 'Mostra altro';
+
+  @override
+  String get caseworkAssistedExport => 'Scarica l’esportazione assistita';
+
+  @override
+  String get caseworkMessage => 'Il tuo messaggio';
+
+  @override
+  String get caseworkLimit => 'Massimo 2.000 caratteri.';
+
+  @override
+  String get caseworkSend => 'Invia';
+
+  @override
+  String get caseworkCategory => 'Argomento della richiesta';
+
+  @override
+  String get caseworkYou => 'Tu';
+
+  @override
+  String get caseworkTeam => 'Team Histae';
+
+  @override
+  String get caseworkLogin => 'Accesso';
+
+  @override
+  String get caseworkBilling => 'Pagamenti';
+
+  @override
+  String get caseworkAppeal => 'Ricorso';
+
+  @override
+  String get caseworkPrivacy => 'Dati personali';
+
+  @override
+  String get caseworkOther => 'Altro';
+
+  @override
+  String get caseworkPending => 'In attesa';
+
+  @override
+  String get caseworkClosed => 'Chiuso';
+
+  @override
+  String get caseworkInProgress => 'In corso';
+
+  @override
+  String get caseworkCompleted => 'Completato';
+
+  @override
+  String get caseworkInappropriateContent => 'Contenuto inappropriato';
+
+  @override
+  String get caseworkFakeProfile => 'Profilo falso';
+
+  @override
+  String get caseworkHarassment => 'Molestie';
+
+  @override
+  String get caseworkSpam => 'Spam';
+
+  @override
   String get helpIntro =>
       'Hai una domanda su Histae? Qui trovi le indicazioni utili.';
 
