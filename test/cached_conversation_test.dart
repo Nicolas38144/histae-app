@@ -50,10 +50,21 @@ void main() {
   testWidgets(
     'reopening history reuses data; a new message event still reads fresh history',
     (tester) async {
+      const newIncomingId = '99999999-9999-4999-8999-999999999999';
       var lists = 0, histories = 0;
+      var hasNewMessage = false;
       final session = testSession((r) async {
         if (r.url.path == '/api/matches/me') lists++;
-        if (r.url.path.endsWith('/messages')) histories++;
+        if (r.method == 'GET' && r.url.path.endsWith('/messages')) {
+          histories++;
+          return jsonResponse({
+            'messages': [
+              if (hasNewMessage) messageJson(id: newIncomingId),
+              messageJson(),
+            ],
+            'next_cursor': null,
+          });
+        }
         return defaultMatchesResponse(r);
       });
       addTearDown(session.dispose);
@@ -73,12 +84,17 @@ void main() {
       expect(lists, firstLists);
       expect(histories, firstHistories);
       expect(c.readAt, readAt);
+      expect(c.messages.map((message) => message.id), [incomingId]);
+      hasNewMessage = true;
       realtime.emit(const MobileSignal('message.created', matchId: testMatch));
       await tester.pump(const Duration(milliseconds: 180));
       await tester.pumpAndSettle();
       expect(lists, firstLists + 1);
       expect(histories, firstHistories + 1);
-      expect(c.messages, isNotEmpty);
+      expect(c.messages.map((message) => message.id), [
+        newIncomingId,
+        incomingId,
+      ]);
       c.suspend();
     },
   );

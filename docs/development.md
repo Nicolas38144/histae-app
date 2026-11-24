@@ -54,6 +54,8 @@ After ARB changes, run `flutter gen-l10n`; native permission copy also needs the
 ## Visual previews
 
 `tool/preview_*_test.dart` renders real widgets with fictional data into `build/previews/`.
+The `--update-goldens` flag generates reference images. A visual regression check compares
+the current rendering against reviewed reference images with that flag omitted.
 Set `FLUTTER_ROOT` to the SDK when fonts/icons require it. Review the images, including long
 translations, 200% text, keyboard layouts and insets against the [design system](../DESIGN_SYSTEM.md).
 

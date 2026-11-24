@@ -88,6 +88,8 @@ void main() {
               .any((label) => label.contains('Private conversation')),
           isTrue,
         );
+        final action = find.widgetWithText(TextButton, 'Private action');
+        final actionPosition = tester.getCenter(action);
 
         for (final state in [
           AppLifecycleState.inactive,
@@ -103,10 +105,10 @@ void main() {
             isFalse,
           );
           expect(find.bySemanticsLabel('Contenu protégé'), findsOneWidget);
-          expect(find.text('Private action').hitTestable(), findsNothing);
+          await tester.tapAt(actionPosition);
+          expect(actions, 0, reason: state.name);
           expect(draft.text, 'An unfinished biography');
         }
-        expect(actions, 0);
         resume(tester);
         await tester.pump();
         expect(find.byKey(const Key('app-privacy-shield')), findsNothing);
@@ -116,7 +118,7 @@ void main() {
           isTrue,
         );
         expect(draft.text, 'An unfinished biography');
-        await tester.tap(find.text('Private action'));
+        await tester.tap(action);
         expect(actions, 1);
         await tester.pumpWidget(const SizedBox.shrink());
       } finally {

@@ -29,8 +29,8 @@ class MemoryLocaleStore implements LocalePreferenceStore {
   }
 }
 
-// Inspect syntax rather than searching for French characters: English literals
-// and accessibility labels must follow the same localization boundary.
+// Catch direct literals in selected UI arguments. A syntax-only check cannot
+// trace copy passed through variables, helpers, or other widget parameters.
 class InterfaceLiteralAudit extends RecursiveAstVisitor<void> {
   final violations = <int>[];
   static const labels = {
@@ -143,7 +143,7 @@ void main() {
   );
 
   test(
-    'interface widgets do not embed visible copy or accessibility labels',
+    'selected UI and accessibility arguments have no direct text literals',
     () {
       final violations = <String>[];
       for (final file in Directory(
@@ -171,15 +171,83 @@ void main() {
     },
   );
 
-  test('plural rewards use real counts and locale-aware formatting', () async {
-    for (final locale in AppMessages.supportedLocales) {
-      final copy = await AppMessages.delegate.load(locale);
-      expect(copy.videoCreditReward(1), contains('1'));
-      expect(copy.videoCreditReward(2), contains('2'));
-      expect(copy.videoCreditReward(1), isNot(copy.videoCreditReward(2)));
-      expect(copy.unreadMessages(0), contains('0'));
-      expect(copy.reservedCredits(2), isNot(contains('#')));
-    }
+  test(
+    'credit and unread message labels use the expected plural forms',
+    () async {
+      const expected = {
+        'fr': (
+          rewards: [
+            '+ 1 crédit de continuation',
+            '+ 2 crédits de continuation',
+          ],
+          unread: [
+            '0 message non lu',
+            '1 message non lu',
+            '2 messages non lus',
+          ],
+          reserved: ['1 crédit réservé', '2 crédits réservés'],
+        ),
+        'en': (
+          rewards: ['+ 1 continuation credit', '+ 2 continuation credits'],
+          unread: [
+            '0 unread messages',
+            '1 unread message',
+            '2 unread messages',
+          ],
+          reserved: ['1 reserved credit', '2 reserved credits'],
+        ),
+        'es': (
+          rewards: [
+            '+ 1 crédito de continuación',
+            '+ 2 créditos de continuación',
+          ],
+          unread: [
+            '0 mensajes sin leer',
+            '1 mensaje sin leer',
+            '2 mensajes sin leer',
+          ],
+          reserved: ['1 crédito reservado', '2 créditos reservados'],
+        ),
+        'it': (
+          rewards: [
+            '+ 1 credito di proseguimento',
+            '+ 2 crediti di proseguimento',
+          ],
+          unread: [
+            '0 messaggi non letti',
+            '1 messaggio non letto',
+            '2 messaggi non letti',
+          ],
+          reserved: ['1 credito riservato', '2 crediti riservati'],
+        ),
+      };
+      for (final locale in AppMessages.supportedLocales) {
+        final copy = await AppMessages.delegate.load(locale);
+        final labels = expected[locale.languageCode]!;
+        expect(
+          [copy.videoCreditReward(1), copy.videoCreditReward(2)],
+          labels.rewards,
+          reason: '$locale video reward',
+        );
+        expect(
+          [
+            copy.unreadMessages(0),
+            copy.unreadMessages(1),
+            copy.unreadMessages(2),
+          ],
+          labels.unread,
+          reason: '$locale unread messages',
+        );
+        expect(
+          [copy.reservedCredits(1), copy.reservedCredits(2)],
+          labels.reserved,
+          reason: '$locale reserved credits',
+        );
+      }
+    },
+  );
+
+  test('number formats and string lookups follow the requested locale', () {
     expect(const AppStrings('en').money(1234, 'EUR'), contains('12.34'));
     expect(const AppStrings('es').decimal(1.5), '1,5');
     expect(const AppStrings('en').decimal(1.5), '1.5');

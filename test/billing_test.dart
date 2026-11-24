@@ -27,6 +27,7 @@ void main() {
   test('native billing is opt-in on Android and iOS only', () {
     expect(const BillingConfig().available, isFalse);
     expect(testBillingConfig.available, isTrue);
+    expect(testBillingConfig.allows(TargetPlatform.android), isTrue);
     expect(testBillingConfig.allows(TargetPlatform.iOS), isTrue);
     expect(
       testBillingConfig.allows(TargetPlatform.android, web: true),

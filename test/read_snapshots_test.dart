@@ -72,45 +72,40 @@ void main() {
     },
   );
 
-  test('explicit cached reads retain immutable values and their original timestamp', () async {
+  test('cached reads reuse the value and its original timestamp', () async {
     final cache = ReadSnapshots();
     var reads = 0;
-    Future<List<int>> read(ReadPolicy policy) => cache.read(
+    Future<int> read(ReadPolicy policy) => cache.read(
       scope: 'owner:fr',
       key: DataResource.profile,
       policy: policy,
-      fetch: () async => List.unmodifiable([++reads]),
+      fetch: () async => ++reads,
     );
-    final first = await read(ReadPolicy.cached);
+    expect(await read(ReadPolicy.cached), 1);
     final timestamp = cache.readAt(DataResource.profile);
-    expect(() => first.clear(), throwsUnsupportedError);
-    expect(await read(ReadPolicy.cached), [1]);
+    expect(timestamp, isNotNull);
+    expect(await read(ReadPolicy.cached), 1);
     expect(cache.readAt(DataResource.profile), timestamp);
     expect(reads, 1);
-    expect(await read(ReadPolicy.refresh), [2]);
-    expect(await read(ReadPolicy.cached), [2]);
+    expect(await read(ReadPolicy.refresh), 2);
+    expect(await read(ReadPolicy.cached), 2);
     expect(reads, 2);
   });
 
-  test(
-    'owner, consent and language changes isolate private snapshots',
-    () async {
-      final cache = ReadSnapshots();
-      var reads = 0;
-      Future<int> read(String scope) => cache.read(
-        scope: scope,
-        key: DataResource.profile,
-        policy: ReadPolicy.cached,
-        fetch: () async => ++reads,
-      );
-      expect(await read('owner1:consent1:fr'), 1);
-      expect(await read('owner1:consent1:fr'), 1);
-      expect(await read('owner1:consent1:en'), 2);
-      expect(await read('owner1:consent2:en'), 3);
-      expect(await read('owner2:consent2:en'), 4);
-      expect(await read('owner1:consent1:fr'), 5);
-    },
-  );
+  test('changing the cache scope discards the previous snapshot', () async {
+    final cache = ReadSnapshots();
+    var reads = 0;
+    Future<int> read(String scope) => cache.read(
+      scope: scope,
+      key: DataResource.profile,
+      policy: ReadPolicy.cached,
+      fetch: () async => ++reads,
+    );
+    expect(await read('scope-a'), 1);
+    expect(await read('scope-a'), 1);
+    expect(await read('scope-b'), 2);
+    expect(await read('scope-a'), 3);
+  });
 
   test('targeted invalidation rejects late fills without discarding unrelated in-flight reads', () async {
     final cache = ReadSnapshots();
