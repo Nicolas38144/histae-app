@@ -44,6 +44,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   late final _text = TextEditingController(text: c.draftFor(widget.matchId));
   late final _key = c.session.resourceKey;
   final _scroll = ScrollController();
+  final _optionsMenu = MenuController();
   final _viewport = GlobalKey();
   final _incoming = <String, GlobalKey>{};
   Timer? _readTimer;
@@ -112,7 +113,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
 
   void _scheduleRead() {
     _readTimer?.cancel();
-    if (!mounted || !_foreground) return;
+    if (!mounted || !_foreground || _optionsMenu.isOpen) return;
     _readTimer = Timer(const Duration(milliseconds: 450), _readVisible);
   }
 
@@ -130,6 +131,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   void _readVisible({bool explicitRetry = false}) {
     if (!mounted ||
         !_foreground ||
+        _optionsMenu.isOpen ||
         ModalRoute.of(context)?.isCurrent != true ||
         !c.canRead ||
         c.selectedId != widget.matchId) {
@@ -237,6 +239,72 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
     );
   }
 
+  Widget _buildOptionsMenu(BuildContext context) {
+    final text = AppStrings.of(context).messages;
+    final theme = Theme.of(context).popupMenuTheme;
+    final shape = theme.shape;
+    final canEnd = !c.sending && !c.ending;
+    final itemStyle = ButtonStyle(
+      textStyle: WidgetStatePropertyAll(theme.textStyle),
+    );
+    MenuItemButton item(String label, VoidCallback? onPressed, {Key? key}) =>
+        MenuItemButton(
+          key: key,
+          style: itemStyle,
+          onPressed: onPressed,
+          child: Text(label),
+        );
+
+    return MenuAnchor(
+      controller: _optionsMenu,
+      consumeOutsideTap: true,
+      onOpen: () => _readTimer?.cancel(),
+      onClose: _scheduleRead,
+      style: MenuStyle(
+        alignment: AlignmentDirectional.topEnd,
+        backgroundColor: WidgetStatePropertyAll(theme.color),
+        surfaceTintColor: WidgetStatePropertyAll(theme.surfaceTintColor),
+        shape: shape is OutlinedBorder ? WidgetStatePropertyAll(shape) : null,
+      ),
+      builder: (context, menu, _) => PopScope(
+        canPop: !menu.isOpen,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop && menu.isOpen) menu.close();
+        },
+        child: IconButton(
+          key: const Key('chat-options'),
+          tooltip: text.chatPageMatchOptions,
+          icon: const Icon(Icons.more_vert),
+          onPressed: menu.isOpen ? menu.close : () => menu.open(),
+        ),
+      ),
+      menuChildren: [
+        item(
+          text.chatPagePhotosAndContinuation,
+          _decisions,
+          key: const Key('chat-decisions'),
+        ),
+        item(text.chatPageViewTheirProfile, _profile),
+        item(
+          text.notificationConversationTitle,
+          () => showConversationNotifications(
+            context,
+            repository: c.notificationPreferences,
+            matchId: widget.matchId,
+            now: () => c.serverNow,
+          ),
+          key: const Key('chat-notifications'),
+        ),
+        item(text.encounterPageReportThisPerson, _report),
+        item(text.chatPageEndMatch, canEnd ? () => _end(block: false) : null),
+        item(
+          text.encounterPageBlockThisPerson447,
+          canEnd ? () => _end(block: true) : null,
+        ),
+      ],
+    );
+  }
+
   @override
   void dispose() {
     unawaited(c.drafts?.flush());
@@ -315,78 +383,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
             ),
           ),
         ),
-        actions: [
-          if (match != null)
-            PopupMenuButton<String>(
-              key: const Key('chat-options'),
-              tooltip: AppStrings.of(context).messages.chatPageMatchOptions,
-              onSelected: (value) {
-                if (value == 'decisions') unawaited(_decisions());
-                if (value == 'profile') unawaited(_profile());
-                if (value == 'end') unawaited(_end(block: false));
-                if (value == 'block') unawaited(_end(block: true));
-                if (value == 'report') unawaited(_report());
-                if (value == 'notifications') {
-                  unawaited(
-                    showConversationNotifications(
-                      context,
-                      repository: c.notificationPreferences,
-                      matchId: widget.matchId,
-                      now: () => c.serverNow,
-                    ),
-                  );
-                }
-              },
-              itemBuilder: (_) => [
-                PopupMenuItem(
-                  key: const Key('chat-decisions'),
-                  value: 'decisions',
-                  child: Text(
-                    AppStrings.of(context)
-                        .messages
-                        .chatPagePhotosAndContinuation,
-                  ),
-                ),
-                PopupMenuItem(
-                  value: 'profile',
-                  child: Text(
-                    AppStrings.of(context).messages.chatPageViewTheirProfile,
-                  ),
-                ),
-                PopupMenuItem(
-                  key: const Key('chat-notifications'),
-                  value: 'notifications',
-                  child: Text(
-                    AppStrings.of(context)
-                        .messages
-                        .notificationConversationTitle,
-                  ),
-                ),
-                PopupMenuItem(
-                  value: 'report',
-                  child: Text(
-                    AppStrings.of(context)
-                        .messages
-                        .encounterPageReportThisPerson,
-                  ),
-                ),
-                PopupMenuItem(
-                  value: 'end',
-                  enabled: !c.sending && !c.ending,
-                  child: Text(AppStrings.of(context).messages.chatPageEndMatch),
-                ),
-                PopupMenuItem(
-                  value: 'block',
-                  enabled: !c.sending && !c.ending,
-                  child: Text(
-                    AppStrings.of(context)
-                        .messages
-                        .encounterPageBlockThisPerson447,
-                  ),
-                ),
-              ],
-            ),
-        ],
+        actions: [if (match != null) _buildOptionsMenu(context)],
       ),
       body: SafeArea(
         child: unavailable

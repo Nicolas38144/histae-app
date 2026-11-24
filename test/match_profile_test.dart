@@ -126,7 +126,7 @@ void main() {
   );
 
   testWidgets(
-    'list and chat share the same thumbnail across navigation and revoke it immediately',
+    'list and chat share a thumbnail through navigation and the options menu until revocation',
     (tester) async {
       final c = await revealedMatch();
       c.closeChat(testMatch);
@@ -145,6 +145,26 @@ void main() {
             same(original),
           );
           expect(downloads, 1);
+          await tester.tap(find.byKey(const Key('chat-options')));
+          await tester.pumpAndSettle();
+          final firstOption = find.byKey(const Key('chat-decisions'));
+          final appBar = find.descendant(
+            of: find.byType(ChatPage),
+            matching: find.byType(AppBar),
+          );
+          expect(
+            tester.getRect(appBar).contains(tester.getCenter(firstOption)),
+            isTrue,
+          );
+          expect(
+            tester.widget<Image>(find.byType(Image)).image,
+            same(original),
+          );
+          expect(downloads, 1);
+          await tester.binding.handlePopRoute();
+          await tester.pumpAndSettle();
+          expect(find.byKey(const Key('chat-decisions')), findsNothing);
+          expect(find.byType(ChatPage), findsOneWidget);
           await tester.tap(find.byTooltip('Retour'));
           await tester.pumpAndSettle();
           expect(downloads, 1);
@@ -152,13 +172,19 @@ void main() {
             tester.widget<Image>(find.byType(Image)).image,
             same(original),
           );
+          await tester.tap(find.byType(MatchPreviewCard));
+          await tester.pumpAndSettle();
+          await tester.tap(find.byKey(const Key('chat-options')));
+          await tester.pumpAndSettle();
           c.blockPhotos(testMatch);
           await tester.pump();
+          expect(find.byKey(const Key('chat-decisions')), findsOneWidget);
           expect(find.byType(Image), findsNothing);
           expect(
             c.thumbnails.lookup(testMatch, c.items.first.partner.photo!, 144),
             isNull,
           );
+          expect(downloads, 1);
           await tester.pumpWidget(const SizedBox.shrink());
         },
         () => MockClient((_) async {
