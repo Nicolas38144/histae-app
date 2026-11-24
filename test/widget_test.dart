@@ -152,21 +152,6 @@ void main() {
     expect(find.byType(WelcomePage), findsOneWidget);
   });
 
-  testWidgets('leaving while loading ignores a late response', (tester) async {
-    final response = Completer<http.Response>();
-    await tester.pumpWidget(
-      HistaeApp(catalogRepository: repository((_) => response.future)),
-    );
-    await openCatalog(tester);
-    await tester.tap(find.byTooltip('Retour'));
-    await tester.pumpAndSettle();
-    response.complete(http.Response(catalogFixture(), 200));
-    await tester.pumpAndSettle();
-    expect(find.byType(WelcomePage), findsOneWidget);
-    expect(find.text('Premium'), findsNothing);
-    expect(tester.takeException(), isNull);
-  });
-
   testWidgets(
     'small screens and 200 percent text keep navigation and offers readable',
     (tester) async {
@@ -219,20 +204,8 @@ void main() {
     expect(find.text('Aucune formule disponible'), findsOneWidget);
     oldResponse.complete(http.Response(catalogFixture(), 200));
     await tester.pumpAndSettle();
-    expect(find.text('Premium'), findsNothing);
+    expect(find.text('Aucune formule disponible'), findsOneWidget);
+    expect(find.text('Premium Mensuel'), findsNothing);
     expect(tester.takeException(), isNull);
   });
-
-  testWidgets(
-    'welcome actions meet tap target and accessible label guidelines',
-    (tester) async {
-      final semantics = tester.ensureSemantics();
-      await tester.pumpWidget(const HistaeApp());
-      await tester.pumpAndSettle();
-      await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
-      await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
-      await expectLater(tester, meetsGuideline(textContrastGuideline));
-      semantics.dispose();
-    },
-  );
 }

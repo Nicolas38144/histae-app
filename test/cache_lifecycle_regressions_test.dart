@@ -38,54 +38,6 @@ void main() {
   setUpAll(() => initializeDateFormatting('fr'));
 
   testWidgets(
-    'read receipts require the foreground even when realtime data stays active',
-    (tester) async {
-      var receipts = 0;
-      final session = testSession((r) async {
-        if (r.url.path.endsWith('/messages/read')) receipts++;
-        return defaultMatchesResponse(r);
-      });
-      await session.establish(testTokens);
-      final c = MatchesController(
-        MatchesRepository(session),
-        realtime: QuietRealtime(session),
-      );
-      await c.activate();
-      await c.openChat(testMatch);
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: histaeTheme(Brightness.dark),
-          home: ChatPage(controller: c, matchId: testMatch),
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(receipts, 0);
-      for (final state in [
-        AppLifecycleState.inactive,
-        AppLifecycleState.hidden,
-        AppLifecycleState.paused,
-      ]) {
-        tester.binding.handleAppLifecycleStateChanged(state);
-      }
-      await tester.pump(const Duration(milliseconds: 600));
-      expect(receipts, 0);
-      expect(c.active, isTrue);
-      for (final state in [
-        AppLifecycleState.hidden,
-        AppLifecycleState.inactive,
-        AppLifecycleState.resumed,
-      ]) {
-        tester.binding.handleAppLifecycleStateChanged(state);
-      }
-      await tester.pump(const Duration(milliseconds: 600));
-      expect(receipts, 1);
-      await tester.pumpWidget(const SizedBox());
-      c.dispose();
-      session.dispose();
-    },
-  );
-
-  testWidgets(
     'main, notification and billing consumers share one event transport',
     (tester) async {
       var connections = 0, peak = 0;

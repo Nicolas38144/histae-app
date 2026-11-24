@@ -27,10 +27,12 @@ void main() {
     'Monday renewal revalidates credits automatically once while active',
     (tester) async {
       var clock = DateTime.utc(2026, 11, 8, 23, 59, 58), reads = 0;
+      final renewedQuota = Completer<http.Response>();
       final session = testSession((request) async {
         if (request.url.path.endsWith('/continuation-quota')) {
           reads++;
-          return jsonResponse(quotaJson(remaining: reads == 1 ? 0 : 2));
+          if (reads == 1) return jsonResponse(quotaJson(remaining: 0));
+          return renewedQuota.future;
         }
         return defaultContinuationResponse(request);
       });
@@ -45,10 +47,13 @@ void main() {
         await access.activate();
         await c.activate();
         expect(reads, 1);
+        expect(c.quotaReadAt, clock);
         clock = clock.add(const Duration(seconds: 3));
         await tester.pump(const Duration(seconds: 3));
-        await tester.pumpAndSettle();
         expect(reads, 2);
+        expect(c.quotaReadAt, isNull);
+        renewedQuota.complete(jsonResponse(quotaJson(remaining: 2)));
+        await tester.pumpAndSettle();
         expect(c.quotaReadAt, clock);
         expect(c.quota!.remaining, 2);
         await tester.pump(const Duration(seconds: 1));

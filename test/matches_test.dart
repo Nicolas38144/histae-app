@@ -312,6 +312,23 @@ void main() {
       expect(reads, 0);
       await c.activate();
       await tester.pumpAndSettle();
+      for (final state in [
+        AppLifecycleState.inactive,
+        AppLifecycleState.hidden,
+        AppLifecycleState.paused,
+      ]) {
+        tester.binding.handleAppLifecycleStateChanged(state);
+      }
+      await tester.pump(const Duration(milliseconds: 600));
+      expect(reads, 0);
+      expect(c.active, isTrue);
+      for (final state in [
+        AppLifecycleState.hidden,
+        AppLifecycleState.inactive,
+        AppLifecycleState.resumed,
+      ]) {
+        tester.binding.handleAppLifecycleStateChanged(state);
+      }
       await tester.pump(const Duration(milliseconds: 600));
       await tester.pumpAndSettle();
       expect(reads, 1);

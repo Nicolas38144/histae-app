@@ -544,7 +544,7 @@ void main() {
   );
 
   testWidgets(
-    'login and registration actions meet accessibility target and label guidelines',
+    'welcome actions meet accessibility target, label and contrast guidelines',
     (tester) async {
       final session = testSession(
         (request) async => defaultAuthResponse(request),
@@ -554,6 +554,7 @@ void main() {
       final semantics = tester.ensureSemantics();
       await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
       await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+      await expectLater(tester, meetsGuideline(textContrastGuideline));
       semantics.dispose();
     },
   );

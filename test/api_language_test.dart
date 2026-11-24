@@ -8,7 +8,6 @@ import 'package:histae_app/core/l10n/api_language.dart';
 import 'package:histae_app/core/l10n/locale_controller.dart';
 import 'package:histae_app/core/network/api_client.dart';
 import 'package:histae_app/core/network/api_failure.dart';
-import 'package:histae_app/features/auth/application/otp_controller.dart';
 import 'package:histae_app/features/catalog/application/catalog_controller.dart';
 import 'package:histae_app/features/catalog/data/catalog_repository.dart';
 import 'package:histae_app/features/consents/domain/consent_state.dart';
@@ -101,29 +100,6 @@ void main() {
       expect(headers, ['it', 'it']);
     },
   );
-
-  test('technical OTP resume retains language and UUID; explicit resend captures the new choice', () async {
-    var language = ApiLanguage.it;
-    final headers = <String?>[], keys = <String?>[];
-    final session = testSession((request) async {
-      headers.add(request.headers['Accept-Language']);
-      keys.add(request.headers['Idempotency-Key']);
-      expect(jsonDecode(request.body), {'phone_number': '+33612345678'});
-      return headers.length == 1
-          ? apiError(503, 'otp_delivery_unknown')
-          : jsonResponse({'message': 'accepted'}, 202);
-    }, language: () => language);
-    addTearDown(session.dispose);
-    final otp = OtpController(session);
-    addTearDown(otp.dispose);
-    await otp.send('+33612345678');
-    language = ApiLanguage.en;
-    await otp.send('+33612345678', newIntention: false);
-    await otp.send('+33612345678');
-    expect(headers, ['it', 'it', 'en']);
-    expect(keys[0], keys[1]);
-    expect(keys[2], isNot(keys[1]));
-  });
 
   test('models device overrides and explicit null to follow the account', () {
     expect(

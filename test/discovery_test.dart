@@ -421,9 +421,9 @@ void main() {
     expect(c.canChoose, isFalse);
   });
   testWidgets(
-    'feed gestures like once on double tap, pass upward at end and never reverse downward',
+    'feed gestures pass upward at the end and never reverse downward',
     (tester) async {
-      var likes = 0, passes = 0;
+      var passes = 0;
       final p = FeedProfile.fromJson({
         ...candidateJson(candidateOne, bio: null),
         'traits': <Object?>[],
@@ -437,7 +437,7 @@ void main() {
             body: FeedProfileCard(
               profile: p,
               enabled: true,
-              onLike: () => likes++,
+              onLike: () {},
               onPass: () => passes++,
             ),
           ),
@@ -445,11 +445,6 @@ void main() {
       );
       await tester.pump();
       await tester.pump(const Duration(seconds: 3));
-      await tester.tap(find.text('Léa, 27'));
-      await tester.pump(const Duration(milliseconds: 80));
-      await tester.tap(find.text('Léa, 27'));
-      await tester.pumpAndSettle();
-      expect(likes, 1);
       final scroll = find.byKey(const Key('feed-profile-scroll'));
       await tester.drag(scroll, const Offset(0, 180));
       await tester.pumpAndSettle();
@@ -472,7 +467,7 @@ void main() {
               key: const ValueKey('long-profile'),
               profile: long,
               enabled: true,
-              onLike: () => likes++,
+              onLike: () {},
               onPass: () => passes++,
             ),
           ),

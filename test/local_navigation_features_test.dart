@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/theme.dart';
 import 'package:histae_app/core/config/support_config.dart';
-import 'package:histae_app/features/continuation/application/continuation_controller.dart';
 import 'package:histae_app/features/continuation/domain/weekly_renewal.dart';
 import 'package:histae_app/features/discovery/application/discovery_controller.dart';
 import 'package:histae_app/features/discovery/data/discovery_repository.dart';
@@ -53,45 +52,6 @@ void main() {
       );
     }
   });
-
-  testWidgets(
-    'Monday invalidates last week quota without a navigation request',
-    (tester) async {
-      var now = DateTime.utc(2026, 11, 1, 23, 59, 59);
-      var reads = 0;
-      final session = testSession((r) async {
-        if (r.url.path.endsWith('/continuation-quota')) {
-          reads++;
-          return jsonResponse(quotaJson(remaining: reads == 1 ? 0 : 2));
-        }
-        return defaultContinuationResponse(r);
-      });
-      addTearDown(session.dispose);
-      await session.establish(testTokens);
-      final access = MatchesController(
-        MatchesRepository(session),
-        realtime: QuietRealtime(session),
-      );
-      addTearDown(access.dispose);
-      final credits = ContinuationController(access, now: () => now);
-      try {
-        await credits.activate();
-        expect(credits.quotaReadAt, isNotNull);
-        now = DateTime.utc(2026, 11, 2);
-        await tester.pump(const Duration(seconds: 1));
-        expect(credits.quotaReadAt, isNull);
-        expect(credits.quota!.remaining, 0);
-        await credits.activate();
-        expect(reads, 1);
-        await credits.refreshQuota();
-        expect(reads, 2);
-        expect(credits.quotaReadAt, isNotNull);
-        expect(credits.quota!.remaining, 2);
-      } finally {
-        credits.dispose();
-      }
-    },
-  );
 
   test('renewal stays on Monday midnight UTC across local offsets and year changes', () {
     expect(

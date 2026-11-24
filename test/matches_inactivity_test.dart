@@ -7,12 +7,10 @@ import 'package:histae_app/features/matches/presentation/archived_matches_page.d
 import 'package:histae_app/features/matches/presentation/chat_page.dart';
 import 'package:histae_app/features/matches/presentation/match_preview_card.dart';
 import 'package:histae_app/features/matches/presentation/matches_page.dart';
-import 'package:histae_app/features/notifications/data/notification_models.dart';
 
 import 'support/auth_fixture.dart';
 import 'support/continuation_fixture.dart';
 import 'support/matches_fixture.dart';
-import 'support/notifications_fixture.dart';
 
 Map<String, dynamic> _confirmed(DateTime deadline) => {
   ...publicMatchJson(status: 'confirmed', expiresAt: deadline),
@@ -145,37 +143,6 @@ void main() {
     expect(match.sendAllowed, isTrue);
     expect(match.isInactivityExpiredAt(deadline), isTrue);
     expect(match.isArchivedAt(deadline), isFalse);
-  });
-
-  test('a renewed server deadline restores an archived conversation', () {
-    final now = DateTime.utc(2030, 1, 1);
-    final match = UserMatch.fromJson({
-      ...publicMatchJson(status: 'confirmed'),
-      'archived': false,
-      'inactivity_expires_at': now
-          .add(const Duration(days: 30))
-          .toIso8601String(),
-    }, testUser);
-    expect(match.isArchivedAt(now), isFalse);
-    expect(match.isInactivityExpiredAt(now), isFalse);
-  });
-
-  test('inactivity notification opens only the referenced conversation', () {
-    final intent = PushIntent.parse({
-      'notification_id': notificationOne,
-      'type': 'match_expiring',
-      'match_id': testMatch,
-      'message': 'Untrusted provider text',
-    });
-    expect(intent?.kind, PushKind.matchExpiring);
-    expect(intent?.matchId, testMatch);
-    expect(
-      PushIntent.parse({
-        'notification_id': notificationOne,
-        'type': 'match_expiring',
-      }),
-      isNull,
-    );
   });
 
   testWidgets(

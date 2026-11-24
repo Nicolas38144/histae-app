@@ -19,8 +19,9 @@ import 'support/matches_fixture.dart';
 import 'support/notifications_fixture.dart';
 
 void main() {
-  test('new push types require scoped identifiers and ignore untrusted navigation fields', () {
+  test('push types require scoped identifiers and ignore untrusted navigation fields', () {
     for (final entry in {
+      'match_expiring': PushKind.matchExpiring,
       'continuation_requested': PushKind.continuationRequested,
       'conversation_continued': PushKind.conversationContinued,
       'photos_revealed': PushKind.photosRevealed,

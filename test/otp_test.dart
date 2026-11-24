@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:histae_app/core/l10n/api_language.dart';
 import 'package:histae_app/core/network/api_failure.dart';
 import 'package:histae_app/features/auth/application/otp_controller.dart';
 import 'package:histae_app/features/auth/application/session_controller.dart';
@@ -86,18 +87,21 @@ void main() {
     },
   );
 
-  test('uncertain delivery resumes the same UUID and parameters; explicit resend changes UUID', () async {
+  test('OTP recovery keeps its UUID and language; resend after cooldown uses the new language and UUID', () async {
     var now = DateTime.now();
+    var language = ApiLanguage.it;
     final keys = <String>[];
+    final languages = <String?>[];
     final bodies = <Object?>[];
     final session = testSession((request) async {
       keys.add(request.headers['Idempotency-Key']!);
+      languages.add(request.headers['Accept-Language']);
       bodies.add(jsonDecode(request.body));
       expect(request.headers['Authorization'], isNull);
       return keys.length == 1
           ? apiError(503, 'otp_delivery_unknown')
           : defaultAuthResponse(request);
-    });
+    }, language: () => language);
     addTearDown(session.dispose);
     final controller = OtpController(session, now: () => now);
     addTearDown(controller.dispose);
@@ -105,6 +109,7 @@ void main() {
     expect(controller.requested, isTrue);
     expect(controller.failure!.code, 'otp_delivery_unknown');
     expect(controller.canRetrySend, isTrue);
+    language = ApiLanguage.en;
     await controller.send('+33612345678', newIntention: false);
     expect(controller.canRetrySend, isFalse);
     expect(keys[1], keys[0]);
@@ -122,6 +127,7 @@ void main() {
         ),
       ),
     );
+    expect(languages, ['it', 'it', 'en']);
     expect(bodies, everyElement({'phone_number': '+33612345678'}));
   });
 
