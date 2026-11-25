@@ -402,6 +402,105 @@ void main() {
     expect(gateway.registrationsCount, 1);
     expect(p.pending, isNull);
   });
+  test('an account switch after an unconfirmed logout renews the conflicting installation', () async {
+    const nextInstallation = 'synthetic-fcm-installation-renewed';
+    var user = testUser;
+    final registrations = <String>[];
+    final session = testSession((r) async {
+      if (r.url.path == '/api/auth/me') {
+        return jsonResponse(identityJson(user: user, complete: true));
+      }
+      if (r.url.path == '/api/auth/logout') {
+        throw http.ClientException('Synthetic logout response lost');
+      }
+      if (r.method == 'POST' && r.url.path.endsWith('/devices')) {
+        final token = (jsonDecode(r.body) as Map)['push_token'] as String;
+        registrations.add(token);
+        if (user != testUser) {
+          expect(
+            r.headers['Authorization'],
+            'Bearer ${rotatedTokens.accessToken}',
+          );
+          if (token == syntheticRegistration) {
+            return apiError(409, 'device_token_conflict');
+          }
+          if (registrations.length == 3) {
+            throw http.ClientException('Synthetic registration response lost');
+          }
+          return jsonResponse(deviceJson(id: deviceTwo), 201);
+        }
+      }
+      return defaultNotificationsResponse(r);
+    });
+    addTearDown(session.dispose);
+    await session.establish(testTokens);
+    final gateway = FakePushGateway()..renewedRegistrationId = nextInstallation;
+    addTearDown(gateway.close);
+    final vault = MemoryPushVault();
+    final p = PushController(
+      DeviceRepository(session),
+      gateway,
+      vault,
+      appVersion: () async => '1.0',
+    );
+    addTearDown(p.dispose);
+    await p.start();
+    await pumpEventQueue();
+    await p.enable();
+    expect(p.deviceId, deviceOne);
+    await session.logout();
+
+    user = '22222222-2222-4222-8222-222222222222';
+    await session.establish(rotatedTokens);
+    await pumpEventQueue();
+    await p.enable();
+    expect(p.pending?.token, nextInstallation);
+    await p.enable();
+
+    expect(registrations, [
+      syntheticRegistration,
+      syntheticRegistration,
+      nextInstallation,
+      nextInstallation,
+    ]);
+    expect(gateway.renewals, 1);
+    expect(p.deviceId, deviceTwo);
+    expect(p.pending, isNull);
+    expect(vault.record?.owner, user);
+    expect(
+      vault.writes.any((value) => value.contains(nextInstallation)),
+      isFalse,
+    );
+  });
+
+  test('the device limit keeps the current installation for retry after freeing a slot', () async {
+    var atLimit = true;
+    final session = testSession((r) async {
+      if (atLimit && r.method == 'POST' && r.url.path.endsWith('/devices')) {
+        return apiError(409, 'device_limit_reached');
+      }
+      return defaultNotificationsResponse(r);
+    });
+    addTearDown(session.dispose);
+    await session.establish(testTokens);
+    final gateway = FakePushGateway();
+    addTearDown(gateway.close);
+    final p = PushController(
+      DeviceRepository(session),
+      gateway,
+      MemoryPushVault(),
+      appVersion: () async => '1.0',
+    );
+    addTearDown(p.dispose);
+    await p.start();
+    await p.enable();
+    expect(p.failure?.code, 'device_limit_reached');
+    expect(p.pending?.token, syntheticRegistration);
+    atLimit = false;
+    await p.enable();
+    expect(p.deviceId, deviceOne);
+    expect(gateway.renewals, 0);
+  });
   test('cold restore verifies owner and remote device existence before registration; removed devices never resurrect', () async {
     for (final mismatch in [false, true]) {
       var posts = 0;

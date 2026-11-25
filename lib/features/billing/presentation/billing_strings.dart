@@ -8,13 +8,9 @@ class BillingStrings {
   String date(DateTime value) => strings.date(value);
 
   String status(String? value) => switch (value) {
-    'trialing' => strings.messages.billingStringsTrialPeriod,
     'active' => strings.messages.billingStringsActiveSubscription,
     'past_due' => strings.messages.billingStringsPaymentNeedsAttention,
-    'incomplete' => strings.messages.billingStringsCompletePayment,
-    'incomplete_expired' => strings.messages.billingStringsSubscriptionExpired,
     'canceled' => strings.messages.billingStringsSubscriptionCanceled,
-    'unpaid' => strings.messages.billingStringsUnpaid,
     'paused' => strings.messages.billingStringsSubscriptionPaused,
     'pending' => strings.messages.billingStorePending,
     'grace_period' => strings.messages.billingStoreGrace,

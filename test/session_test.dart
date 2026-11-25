@@ -419,6 +419,35 @@ void main() {
     },
   );
 
+  test('logout refreshes and revokes when the server explicitly rejects expired access', () async {
+    final calls = <String>[];
+    final session = testSession((request) async {
+      if (request.url.path == '/api/auth/refresh') {
+        calls.add('refresh');
+      }
+      if (request.url.path == '/api/auth/logout') {
+        final bearer = request.headers['Authorization'];
+        calls.add(bearer!);
+        if (bearer == 'Bearer ${testTokens.accessToken}') {
+          return apiError(401, 'invalid_or_expired_access_token');
+        }
+        expect(jsonDecode(request.body), {
+          'refresh_token': rotatedTokens.refreshToken,
+        });
+      }
+      return defaultAuthResponse(request, complete: true);
+    });
+    addTearDown(session.dispose);
+    await session.establish(testTokens);
+    await session.logout();
+    expect(calls, [
+      'Bearer ${testTokens.accessToken}',
+      'refresh',
+      'Bearer ${rotatedTokens.accessToken}',
+    ]);
+    expect(session.phase, SessionPhase.signedOut);
+  });
+
   test('offline logout purges locally without a sign-out notice', () async {
     final vault = MemorySessionVault();
     final session = testSession((request) async {

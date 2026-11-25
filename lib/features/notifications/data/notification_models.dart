@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import '../../../core/l10n/api_language.dart';
 import '../../../core/network/json_fields.dart';
+import '../../../core/text/whitespace.dart';
 
 class PushDevice {
   PushDevice.fromJson(Object? value) : this._(jsonObject(value));
@@ -96,11 +99,22 @@ class PushIntent {
 }
 
 class DeviceRegistration {
-  DeviceRegistration(this.token, this.platform, this.version, {this.language}) {
-    if (token.trim().length < 20 ||
-        token.length > 4096 ||
+  DeviceRegistration(
+    String token,
+    this.platform,
+    String? version, {
+    this.language,
+  }) : token = trimOuterWhitespace(token),
+       version = version == null ? null : trimOuterWhitespace(version) {
+    final tokenLength = utf8.encode(this.token).length;
+    final controls = RegExp(r'[\x00-\x1F\x7F-\x9F]');
+    final appVersion = this.version ?? '';
+    if (tokenLength < 20 ||
+        tokenLength > 2048 ||
+        controls.hasMatch(this.token) ||
         !['android', 'ios'].contains(platform) ||
-        (version?.length ?? 0) > 50) {
+        utf8.encode(appVersion).length > 50 ||
+        controls.hasMatch(appVersion)) {
       invalidResponse();
     }
   }
@@ -111,7 +125,7 @@ class DeviceRegistration {
   Map<String, Object?> get body => {
     'push_token': token,
     'platform': platform,
-    'app_version': ?version,
+    if (version case final value? when value.isNotEmpty) 'app_version': value,
     'language': language?.code,
   };
 

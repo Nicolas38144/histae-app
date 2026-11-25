@@ -111,12 +111,7 @@ void main() {
         scrollable: verticalScrollables.first,
       );
       await screenshot('subscription-disabled');
-      state = subscriptionJson(
-        access: true,
-        status: 'past_due',
-        cancel: true,
-        portal: true,
-      );
+      state = subscriptionJson(access: true, status: 'past_due', cancel: true);
       await c.load();
       await tester.drag(find.byType(ListView).first, const Offset(0, 1800));
       await screenshot('subscription-past-due');

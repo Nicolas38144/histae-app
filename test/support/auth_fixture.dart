@@ -14,6 +14,16 @@ import 'package:http/testing.dart';
 const testTokens = TokenPair('test-access-old', 'test-refresh-old');
 const rotatedTokens = TokenPair('test-access-new', 'test-refresh-new');
 const testUser = '11111111-1111-4111-8111-111111111111';
+const testOtpChallenge = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+
+http.Response otpReceipt({
+  int resendAfter = 60,
+  String challengeId = testOtpChallenge,
+}) => jsonResponse({
+  'message': 'accepted',
+  'resend_after_seconds': resendAfter,
+  'challenge_id': challengeId,
+}, 202);
 
 Map<String, dynamic> tokenJson(TokenPair tokens) => {
   'access_token': tokens.accessToken,
@@ -121,7 +131,7 @@ http.Response defaultAuthResponse(
   '/api/users/me/language' => jsonResponse({'language': 'fr'}),
   '/api/auth/me' => jsonResponse(identityJson(complete: complete)),
   '/api/users/me/consents' => jsonResponse(consentJson(complete: complete)),
-  '/api/auth/otp/send' => jsonResponse({'message': 'accepted'}, 202),
+  '/api/auth/otp/send' => otpReceipt(),
   '/api/auth/otp/verify' => jsonResponse(tokenJson(testTokens)),
   '/api/auth/refresh' => jsonResponse(tokenJson(rotatedTokens)),
   '/api/auth/logout' => http.Response('', 204),

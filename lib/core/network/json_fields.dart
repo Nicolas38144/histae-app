@@ -19,6 +19,12 @@ String serverId(Map<String, dynamic> json, String key) {
   return id;
 }
 
+final _uuidV4 = RegExp(
+  r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$',
+);
+
+bool isUuidV4(String? value) => value != null && _uuidV4.hasMatch(value);
+
 DateTime wireTime(Object? value) {
   if (value is! String || !RegExp(r'(Z|[+-]\d{2}:\d{2})$').hasMatch(value)) {
     invalidResponse();

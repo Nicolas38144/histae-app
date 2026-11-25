@@ -351,12 +351,7 @@ class BillingController extends ChangeNotifier {
 
   Future<void> portal() async {
     final provider = subscription?.provider;
-    if (!active ||
-        busy ||
-        loading ||
-        !fresh ||
-        provider == null ||
-        provider == 'stripe') {
+    if (!active || busy || loading || !fresh || provider == null) {
       return;
     }
     final epoch = _epoch;

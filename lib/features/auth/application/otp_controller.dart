@@ -22,10 +22,10 @@ class OtpController extends ChangeNotifier {
   final DateTime Function() _now;
   String? _phone;
   String? _key;
+  String? _challengeId;
   ApiLanguage? _language;
   bool _sendRetryPending = false;
   bool busy = false;
-  bool requested = false;
   bool verificationUncertain = false;
   String? notice;
   ApiFailure? failure;
@@ -47,10 +47,11 @@ class OtpController extends ChangeNotifier {
   }
 
   bool get hasIntention => _key != null;
+  bool get requested => _challengeId != null;
   bool get canRetrySend => hasIntention && _sendRetryPending;
   String? get maskedPhone => _phone == null ? null : maskFrenchPhone(_phone!);
   // New send/resend explicitly creates an intention. Technical resume keeps
-  // BOTH its phone and UUID, which are held in memory only.
+  // its phone, UUID and language. The challenge also stays in memory.
 
   Future<void> send(String input, {bool newIntention = true}) async {
     if (busy || _disposed || retrySeconds > 0) return;
@@ -68,6 +69,7 @@ class OtpController extends ChangeNotifier {
     if (newIntention) {
       _phone = phone;
       _key = newUuidV4();
+      _challengeId = null;
       _language = session.language;
       _sendRetryPending = false;
       verificationUncertain = false;
@@ -88,7 +90,7 @@ class OtpController extends ChangeNotifier {
       if (_disposed) return;
       _resendAt = _now().add(receipt.resendAfter);
       _timer.restart();
-      requested = true;
+      _challengeId = receipt.challengeId;
       _sendRetryPending = false;
       verificationUncertain = false;
       notice = 'otp_accepted';
@@ -103,14 +105,10 @@ class OtpController extends ChangeNotifier {
   }
 
   Future<void> verify(String otp) async {
-    if (busy ||
-        !requested ||
-        verificationUncertain ||
-        _disposed ||
-        retrySeconds > 0) {
+    final challengeId = _challengeId;
+    if (busy || challengeId == null || _disposed || retrySeconds > 0) {
       return;
     }
-    _sendRetryPending = false;
     if (!RegExp(r'^[0-9]{6}$').hasMatch(otp)) {
       failure = const ApiFailure(
         ApiFailureKind.validation,
@@ -125,7 +123,9 @@ class OtpController extends ChangeNotifier {
           _phone!,
           otp,
           _request!,
+          challengeId: challengeId,
         );
+        _challengeId = null;
         if (!_disposed) {
           final complete = onAuthenticated;
           if (complete == null) {
@@ -147,6 +147,7 @@ class OtpController extends ChangeNotifier {
             error.kind == ApiFailureKind.invalidResponse ||
             error.kind == ApiFailureKind.server ||
             error.kind == ApiFailureKind.unavailable) {
+          _challengeId = null;
           verificationUncertain = true;
         }
         rethrow;
@@ -174,12 +175,9 @@ class OtpController extends ChangeNotifier {
               error.statusCode == null ||
               error.kind == ApiFailureKind.invalidResponse ||
               error.kind == ApiFailureKind.server;
-          if (_sendRetryPending) requested = true; // A code may still arrive.
         }
         if (error.code == 'otp_resend_too_soon') {
-          // Another device or app instance may already have requested a code.
-          // This deadline limits sending, never verification of that code.
-          requested = true;
+          // A cooldown from another request does not supply its challenge.
           _resendAt = error.retryAt ?? _now().add(const Duration(seconds: 60));
           _retryAt = null;
         } else {
@@ -202,9 +200,9 @@ class OtpController extends ChangeNotifier {
     if (busy) return;
     _phone = null;
     _key = null;
+    _challengeId = null;
     _language = null;
     _sendRetryPending = false;
-    requested = false;
     verificationUncertain = false;
     failure = null;
     notice = null;
@@ -219,6 +217,7 @@ class OtpController extends ChangeNotifier {
     _timer.cancel();
     _phone = null;
     _key = null;
+    _challengeId = null;
     _language = null;
     _sendRetryPending = false;
     super.dispose();

@@ -366,25 +366,16 @@ class AppMessagesEn extends AppMessages {
   String get confirmationDialogConfirm => 'Confirm';
 
   @override
-  String get billingStringsTrialPeriod => 'Trial period';
-
-  @override
   String get billingStringsActiveSubscription => 'Active subscription';
 
   @override
   String get billingStringsPaymentNeedsAttention => 'Payment needs attention';
 
   @override
-  String get billingStringsCompletePayment => 'Complete payment';
-
-  @override
   String get billingStringsSubscriptionExpired => 'Subscription expired';
 
   @override
   String get billingStringsSubscriptionCanceled => 'Subscription canceled';
-
-  @override
-  String get billingStringsUnpaid => 'Unpaid';
 
   @override
   String get billingStringsSubscriptionPaused => 'Subscription paused';
@@ -486,11 +477,6 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get subscriptionSummaryAnnualPlan => 'Annual plan';
-
-  @override
-  String subscriptionSummaryTrialEnds(Object arg0) {
-    return 'Trial ends: $arg0';
-  }
 
   @override
   String subscriptionSummaryPeriodStarts(Object arg0) {
@@ -2752,10 +2738,6 @@ class AppMessagesEn extends AppMessages {
   String get billingStorePriceUnavailable => 'Store price unavailable';
 
   @override
-  String get billingStoreManagedWeb =>
-      'This subscription was purchased on the website. Manage it on the Histae website.';
-
-  @override
   String get billingStorePending =>
       'Purchase awaiting confirmation from the store.';
 
@@ -2945,7 +2927,7 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get otpSendUnconfirmed =>
-      'We could not confirm the request. If you received a code, enter it. Otherwise, retry the request.';
+      'We could not confirm the request. Retry it before entering the code you received.';
 
   @override
   String feedReadingCountdown(int seconds) {
@@ -3657,6 +3639,14 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get photoCropResumeUpload => 'Resume upload';
+
+  @override
+  String get devicesPageTokenConflict =>
+      'This device is still linked to another account. Try again or remove it from that account.';
+
+  @override
+  String get devicesPageDeviceLimit =>
+      'Your account already has three registered devices. Remove one from the list, then try again.';
 
   @override
   String get devicesPageReceiveAlerts => 'Receive notifications';

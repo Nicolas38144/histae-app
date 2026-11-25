@@ -27,6 +27,8 @@ abstract interface class PushGateway {
 
   Future<String> registration();
 
+  Future<String> renewRegistration();
+
   Future<void> disable();
 
   Stream<String> get registrations;
@@ -140,6 +142,16 @@ class FirebasePushGateway implements PushGateway {
     } finally {
       await subscription.cancel();
     }
+  }
+
+  @override
+  Future<String> renewRegistration() async {
+    await disable();
+    // FCM unregistration alone leaves the Firebase Installation ID intact.
+    await const MethodChannel('histae/push')
+        .invokeMethod<void>('deleteInstallation')
+        .timeout(const Duration(seconds: 20));
+    return registration();
   }
 
   @override

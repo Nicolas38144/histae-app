@@ -10,7 +10,6 @@ Map<String, Object?> subscriptionJson({
   String? status,
   String? provider = 'google_play',
   bool cancel = false,
-  bool portal = false,
 }) => {
   'plan': access ? 'premium' : 'free',
   'provider': status == null ? null : provider,
@@ -20,9 +19,7 @@ Map<String, Object?> subscriptionJson({
   'cancel_at_period_end': cancel,
   'current_period_starts_at': status == null ? null : '2026-10-01T00:00:00Z',
   'current_period_ends_at': status == null ? null : '2099-11-01T00:00:00Z',
-  'trial_ends_at': null,
   'canceled_at': status == 'canceled' ? '2026-10-15T00:00:00Z' : null,
-  'customer_portal_available': portal,
   'management_url': null,
 };
 Map<String, Object?> storeProductsJson() => {

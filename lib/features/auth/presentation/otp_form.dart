@@ -73,7 +73,7 @@ class _OtpFormState extends State<OtpForm> {
                     : strings.otpIntroduction,
               ),
               const SizedBox(height: 24),
-              if (!controller.requested) ...[
+              if (!controller.hasIntention) ...[
                 DropdownButtonFormField<PhoneCountry>(
                   key: const Key('phone-country'),
                   initialValue: _country,
@@ -87,7 +87,7 @@ class _OtpFormState extends State<OtpForm> {
                       child: Text(strings.messages.phoneCountryFrance),
                     ),
                   ],
-                  onChanged: controller.busy || controller.hasIntention
+                  onChanged: controller.busy
                       ? null
                       : (value) => setState(() {
                           _country = value ?? PhoneCountry.france;
@@ -97,7 +97,7 @@ class _OtpFormState extends State<OtpForm> {
                 TextField(
                   controller: _phone,
                   key: const Key('phone'),
-                  enabled: !controller.busy && !controller.hasIntention,
+                  enabled: !controller.busy,
                   decoration: InputDecoration(
                     labelText: strings.messages.phoneNationalLabel,
                     hintText: strings.messages.phoneNationalHint,
@@ -112,9 +112,9 @@ class _OtpFormState extends State<OtpForm> {
                 ),
                 const SizedBox(height: 20),
               ],
-              if (controller.requested && controller.maskedPhone != null) ...[
+              if (controller.maskedPhone case final maskedPhone?) ...[
                 Text(
-                  strings.messages.otpPhoneInUse(controller.maskedPhone!),
+                  strings.messages.otpPhoneInUse(maskedPhone),
                   key: const Key('otp-phone-summary'),
                 ),
                 const SizedBox(height: 16),
@@ -134,8 +134,7 @@ class _OtpFormState extends State<OtpForm> {
                 Text(strings.verificationUncertain),
               if (controller.canRetrySend)
                 Text(strings.messages.otpSendUnconfirmed),
-              if (controller.requested &&
-                  !controller.verificationUncertain) ...[
+              if (controller.requested) ...[
                 const SizedBox(height: 20),
                 TextField(
                   controller: _otp,

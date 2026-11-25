@@ -21,8 +21,9 @@ abstract interface class AuthRepository {
   Future<TokenPair> verifyOtp(
     String phone,
     String otp,
-    RequestCancellation cancellation,
-  );
+    RequestCancellation cancellation, {
+    required String challengeId,
+  });
 
   Future<TokenPair> refresh(String refreshToken, {required String attemptId});
 
@@ -46,7 +47,11 @@ final class ApiAuthRepository implements AuthRepository {
       'POST',
       '/api/auth/otp/send',
       language: language,
-      body: {'phone_number': phone, if (registration) 'registration': true},
+      body: {
+        'phone_number': phone,
+        if (registration) 'registration': true,
+        'challenge_bound': true,
+      },
       idempotencyKey: key,
       expectedStatus: 202,
       cancellation: cancellation,
@@ -58,12 +63,13 @@ final class ApiAuthRepository implements AuthRepository {
   Future<TokenPair> verifyOtp(
     String phone,
     String otp,
-    RequestCancellation cancellation,
-  ) async => TokenPair.fromJson(
+    RequestCancellation cancellation, {
+    required String challengeId,
+  }) async => TokenPair.fromJson(
     await api.requestJson(
       'POST',
       '/api/auth/otp/verify',
-      body: {'phone_number': phone, 'otp': otp},
+      body: {'phone_number': phone, 'otp': otp, 'challenge_id': challengeId},
       expectedStatus: 200,
       cancellation: cancellation,
     ),

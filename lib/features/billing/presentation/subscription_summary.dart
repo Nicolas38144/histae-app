@@ -44,12 +44,6 @@ class SubscriptionSummary extends StatelessWidget {
                         .messages
                         .subscriptionSummaryAnnualPlan,
             ),
-          if (state.trialEnd != null)
-            Text(
-              AppStrings.of(context).messages.subscriptionSummaryTrialEnds(
-                BillingStrings(AppStrings.of(context)).date(state.trialEnd!),
-              ),
-            ),
           if (state.periodStart != null)
             Text(
               AppStrings.of(context).messages.subscriptionSummaryPeriodStarts(

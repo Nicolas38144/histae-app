@@ -705,12 +705,6 @@ abstract class AppMessages {
   /// Interface: lib/features/billing/presentation/billing_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Période d’essai'**
-  String get billingStringsTrialPeriod;
-
-  /// Interface: lib/features/billing/presentation/billing_strings.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Abonnement actif'**
   String get billingStringsActiveSubscription;
 
@@ -723,12 +717,6 @@ abstract class AppMessages {
   /// Interface: lib/features/billing/presentation/billing_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Paiement à terminer'**
-  String get billingStringsCompletePayment;
-
-  /// Interface: lib/features/billing/presentation/billing_strings.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Souscription expirée'**
   String get billingStringsSubscriptionExpired;
 
@@ -737,12 +725,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Abonnement résilié'**
   String get billingStringsSubscriptionCanceled;
-
-  /// Interface: lib/features/billing/presentation/billing_strings.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Paiement impayé'**
-  String get billingStringsUnpaid;
 
   /// Interface: lib/features/billing/presentation/billing_strings.dart
   ///
@@ -911,12 +893,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Rythme annuel'**
   String get subscriptionSummaryAnnualPlan;
-
-  /// Interface: lib/features/billing/presentation/subscription_summary.dart
-  ///
-  /// In fr, this message translates to:
-  /// **'Fin de l’essai : {arg0}'**
-  String subscriptionSummaryTrialEnds(Object arg0);
 
   /// Interface: lib/features/billing/presentation/subscription_summary.dart
   ///
@@ -4568,12 +4544,6 @@ abstract class AppMessages {
   /// **'Prix du store indisponible'**
   String get billingStorePriceUnavailable;
 
-  /// No description provided for @billingStoreManagedWeb.
-  ///
-  /// In fr, this message translates to:
-  /// **'Cet abonnement a été souscrit sur le site. Sa gestion s’effectue sur le site Histae.'**
-  String get billingStoreManagedWeb;
-
   /// No description provided for @billingStorePending.
   ///
   /// In fr, this message translates to:
@@ -4883,7 +4853,7 @@ abstract class AppMessages {
   /// Privacy shield and phone verification interface.
   ///
   /// In fr, this message translates to:
-  /// **'Nous n’avons pas pu confirmer la demande. Si vous avez reçu un code, saisissez-le. Sinon, réessayez la demande.'**
+  /// **'Nous n’avons pas pu confirmer la demande. Réessayez la demande pour pouvoir saisir le code reçu.'**
   String get otpSendUnconfirmed;
 
   /// Time left before liking or passing a profile; only counts while the feed is visible.
@@ -6127,6 +6097,18 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Reprendre l’envoi'**
   String get photoCropResumeUpload;
+
+  /// No description provided for @devicesPageTokenConflict.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cet appareil est encore associé à un autre compte. Réessayez ou retirez l’appareil depuis cet autre compte.'**
+  String get devicesPageTokenConflict;
+
+  /// No description provided for @devicesPageDeviceLimit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre compte a déjà trois appareils inscrits. Retirez-en un de la liste, puis réessayez.'**
+  String get devicesPageDeviceLimit;
 
   /// No description provided for @devicesPageReceiveAlerts.
   ///

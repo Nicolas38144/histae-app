@@ -425,10 +425,6 @@
   "@confirmationDialogConfirm": {
     "description": "Interface: lib/core/widgets/confirmation_dialog.dart"
   },
-  "billingStringsTrialPeriod": "Période d’essai",
-  "@billingStringsTrialPeriod": {
-    "description": "Interface: lib/features/billing/presentation/billing_strings.dart"
-  },
   "billingStringsActiveSubscription": "Abonnement actif",
   "@billingStringsActiveSubscription": {
     "description": "Interface: lib/features/billing/presentation/billing_strings.dart"
@@ -437,20 +433,12 @@
   "@billingStringsPaymentNeedsAttention": {
     "description": "Interface: lib/features/billing/presentation/billing_strings.dart"
   },
-  "billingStringsCompletePayment": "Paiement à terminer",
-  "@billingStringsCompletePayment": {
-    "description": "Interface: lib/features/billing/presentation/billing_strings.dart"
-  },
   "billingStringsSubscriptionExpired": "Souscription expirée",
   "@billingStringsSubscriptionExpired": {
     "description": "Interface: lib/features/billing/presentation/billing_strings.dart"
   },
   "billingStringsSubscriptionCanceled": "Abonnement résilié",
   "@billingStringsSubscriptionCanceled": {
-    "description": "Interface: lib/features/billing/presentation/billing_strings.dart"
-  },
-  "billingStringsUnpaid": "Paiement impayé",
-  "@billingStringsUnpaid": {
     "description": "Interface: lib/features/billing/presentation/billing_strings.dart"
   },
   "billingStringsSubscriptionPaused": "Abonnement en pause",
@@ -569,15 +557,6 @@
   "subscriptionSummaryAnnualPlan": "Rythme annuel",
   "@subscriptionSummaryAnnualPlan": {
     "description": "Interface: lib/features/billing/presentation/subscription_summary.dart"
-  },
-  "subscriptionSummaryTrialEnds": "Fin de l’essai : {arg0}",
-  "@subscriptionSummaryTrialEnds": {
-    "description": "Interface: lib/features/billing/presentation/subscription_summary.dart",
-    "placeholders": {
-      "arg0": {
-        "type": "Object"
-      }
-    }
   },
   "subscriptionSummaryPeriodStarts": "Début de période : {arg0}",
   "@subscriptionSummaryPeriodStarts": {
@@ -3274,7 +3253,6 @@
   },
   "billingRestorePurchases": "Restaurer mes achats",
   "billingStorePriceUnavailable": "Prix du store indisponible",
-  "billingStoreManagedWeb": "Cet abonnement a été souscrit sur le site. Sa gestion s’effectue sur le site Histae.",
   "billingStorePending": "Achat en attente de confirmation par le store.",
   "billingStorePurchaseFailed": "L’achat ne peut pas être confirmé pour ce compte.",
   "billingStoreVerifying": "Vérification de l’achat…",
@@ -3475,7 +3453,7 @@
     }
   },
   "otpPhoneInUse": "Numéro utilisé : {phone}",
-  "otpSendUnconfirmed": "Nous n’avons pas pu confirmer la demande. Si vous avez reçu un code, saisissez-le. Sinon, réessayez la demande.",
+  "otpSendUnconfirmed": "Nous n’avons pas pu confirmer la demande. Réessayez la demande pour pouvoir saisir le code reçu.",
   "feedReadingCountdown": "{seconds, plural, one{Encore 1 seconde pour découvrir ce profil} other{Encore {seconds} secondes pour découvrir ce profil}}",
   "feedReadingProgress": "Temps de découverte du profil",
   "@feedReadingProgress": {
@@ -4060,6 +4038,8 @@
   "photoCropSelectionReady": "Votre nouvelle photo n’est pas encore enregistrée.",
   "photoCropSavePhoto": "Enregistrer ma photo",
   "photoCropResumeUpload": "Reprendre l’envoi",
+  "devicesPageTokenConflict": "Cet appareil est encore associé à un autre compte. Réessayez ou retirez l’appareil depuis cet autre compte.",
+  "devicesPageDeviceLimit": "Votre compte a déjà trois appareils inscrits. Retirez-en un de la liste, puis réessayez.",
   "devicesPageReceiveAlerts": "Recevoir les notifications",
   "discoveryIdentityCorrectionNeeded": "Le sexe d’un profil déjà créé se renseigne ou se corrige par un administrateur. Envoyez une demande dans vos choix de vie privée.",
   "discoveryRequestIdentityCorrection": "Demander une correction",

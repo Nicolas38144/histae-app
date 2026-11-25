@@ -425,10 +425,36 @@ class PushController extends ChangeNotifier {
   }
 
   Future<void> _send(int epoch) async {
-    final intent = pending;
-    if (intent == null || !_alive(epoch)) return;
+    final original = pending;
+    if (original == null || !_alive(epoch)) return;
+    var intent = original;
     final old = deviceId;
-    final registered = await repository.register(intent, _scope);
+    PushDevice registered;
+    try {
+      registered = await repository.register(intent, _scope);
+    } on ApiFailure catch (error) {
+      if (error.code != 'device_token_conflict' || !_alive(epoch)) rethrow;
+      final String replacement;
+      try {
+        replacement = await gateway.renewRegistration();
+      } catch (_) {
+        // Keep the actionable server error if Firebase cannot renew the ID.
+        throw error;
+      }
+      if (replacement == original.token) rethrow;
+      if (!identical(pending, original)) return;
+      intent = DeviceRegistration(
+        replacement,
+        original.platform,
+        original.version,
+        language: _language?.call(),
+      );
+      pending = intent;
+      _latestRegistration = null;
+      _languageDirty = false;
+      if (!_alive(epoch)) return;
+      registered = await repository.register(intent, _scope);
+    }
     if (!_alive(epoch)) return;
     if (registered.platform != intent.platform ||
         registered.language != intent.language) {

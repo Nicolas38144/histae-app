@@ -353,12 +353,14 @@ void main() {
       await tapVisible(tester, find.text('Vérifier le code'));
       expect(done, isTrue);
       expect(controller.completed, isTrue);
-      expect(
-        fixture.requests.where(
-          (request) => request.url.path == '/api/auth/otp/verify',
-        ),
-        hasLength(1),
+      final verify = fixture.requests.singleWhere(
+        (request) => request.url.path == '/api/auth/otp/verify',
       );
+      expect(jsonDecode(verify.body), {
+        'phone_number': '+33612345678',
+        'otp': '123456',
+        'challenge_id': testOtpChallenge,
+      });
       final writes = fixture.writes.toList();
       final send = fixture.requests.singleWhere(
         (request) => request.url.path == '/api/auth/otp/send',
@@ -366,6 +368,7 @@ void main() {
       expect(jsonDecode(send.body), {
         'phone_number': '+33612345678',
         'registration': true,
+        'challenge_bound': true,
       });
       expect((jsonDecode(writes[1].body) as Map)['firstname'], 'Camille');
       expect(tester.takeException(), isNull);

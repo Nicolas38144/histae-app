@@ -144,7 +144,7 @@ void main() {
       final session = testSession((request) async {
         if (request.url.path.endsWith('/send')) {
           sends++;
-          return jsonResponse({'resend_after_seconds': 60}, 202);
+          return otpReceipt();
         }
         if (request.url.path.endsWith('/verify')) {
           verifies++;
@@ -216,6 +216,7 @@ void main() {
       await tester.enterText(find.byKey(const Key('phone')), '0612345678');
       await revealAndTap(tester, find.text('Demander un code'));
       expect(find.text('Réessayer la demande'), findsOneWidget);
+      expect(find.byKey(const Key('otp')), findsNothing);
       expect(
         find.textContaining('Nous n’avons pas pu confirmer la demande.'),
         findsOneWidget,

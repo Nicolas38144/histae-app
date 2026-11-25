@@ -22,12 +22,16 @@ import 'notification_system_settings_button.dart';
 String notificationFailure(
   AppStrings strings,
   ApiFailure e,
-) => switch (e.kind) {
-  ApiFailureKind.secureStorage =>
-    strings.messages.devicesPageSecureSettingsAreUnavailableActivationRemains,
-  ApiFailureKind.rateLimited =>
-    strings.messages.devicesPageTooManyRequestsWaitBeforeTrying,
-  _ => strings.messages.devicesPageTheResponseWasNotConfirmedRefresh,
+) => switch (e.code) {
+  'device_token_conflict' => strings.messages.devicesPageTokenConflict,
+  'device_limit_reached' => strings.messages.devicesPageDeviceLimit,
+  _ => switch (e.kind) {
+    ApiFailureKind.secureStorage =>
+      strings.messages.devicesPageSecureSettingsAreUnavailableActivationRemains,
+    ApiFailureKind.rateLimited =>
+      strings.messages.devicesPageTooManyRequestsWaitBeforeTrying,
+    _ => strings.messages.devicesPageTheResponseWasNotConfirmedRefresh,
+  },
 };
 
 class DevicesPage extends StatefulWidget {

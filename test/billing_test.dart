@@ -36,7 +36,7 @@ void main() {
     expect(testBillingConfig.allows(TargetPlatform.linux), isFalse);
   });
   test('effective access is never inferred from native status; invalid owner binding is rejected', () {
-    for (final provider in ['stripe', 'app_store', 'google_play']) {
+    for (final provider in ['app_store', 'google_play', null]) {
       expect(
         SubscriptionState.fromJson(
           subscriptionJson(status: 'active', provider: provider),

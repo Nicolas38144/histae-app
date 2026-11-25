@@ -1,17 +1,23 @@
 import '../../../core/network/json_fields.dart';
 
 class OtpSendReceipt {
-  const OtpSendReceipt({required this.resendAfter});
+  const OtpSendReceipt({required this.resendAfter, required this.challengeId});
 
   factory OtpSendReceipt.fromJson(Object? value) {
     final json = jsonObject(value);
-    // Older API versions did not return the server's resend deadline.
-    final seconds = json['resend_after_seconds'] ?? 60;
-    if (seconds is! int || seconds < 0 || seconds > 3600) invalidResponse();
-    return OtpSendReceipt(resendAfter: Duration(seconds: seconds));
+    final seconds = jsonField<int>(json, 'resend_after_seconds');
+    final challengeId = jsonString(json, 'challenge_id');
+    if (seconds < 0 || seconds > 3600 || !isUuidV4(challengeId)) {
+      invalidResponse();
+    }
+    return OtpSendReceipt(
+      resendAfter: Duration(seconds: seconds),
+      challengeId: challengeId,
+    );
   }
 
   final Duration resendAfter;
+  final String challengeId;
 }
 
 class TokenPair {

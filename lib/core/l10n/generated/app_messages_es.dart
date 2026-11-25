@@ -368,9 +368,6 @@ class AppMessagesEs extends AppMessages {
   String get confirmationDialogConfirm => 'Confirmar';
 
   @override
-  String get billingStringsTrialPeriod => 'Periodo de prueba';
-
-  @override
   String get billingStringsActiveSubscription => 'Suscripción activa';
 
   @override
@@ -378,16 +375,10 @@ class AppMessagesEs extends AppMessages {
       'Pago pendiente de regularizar';
 
   @override
-  String get billingStringsCompletePayment => 'Pago por completar';
-
-  @override
   String get billingStringsSubscriptionExpired => 'Suscripción caducada';
 
   @override
   String get billingStringsSubscriptionCanceled => 'Suscripción cancelada';
-
-  @override
-  String get billingStringsUnpaid => 'Pago impagado';
 
   @override
   String get billingStringsSubscriptionPaused => 'Suscripción en pausa';
@@ -489,11 +480,6 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get subscriptionSummaryAnnualPlan => 'Plan anual';
-
-  @override
-  String subscriptionSummaryTrialEnds(Object arg0) {
-    return 'Fin de la prueba: $arg0';
-  }
 
   @override
   String subscriptionSummaryPeriodStarts(Object arg0) {
@@ -2783,10 +2769,6 @@ class AppMessagesEs extends AppMessages {
   String get billingStorePriceUnavailable => 'Precio del store no disponible';
 
   @override
-  String get billingStoreManagedWeb =>
-      'Esta suscripción se compró en el sitio web. Gestiónala en el sitio de Histae.';
-
-  @override
   String get billingStorePending =>
       'Compra pendiente de confirmación del store.';
 
@@ -2977,7 +2959,7 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get otpSendUnconfirmed =>
-      'No hemos podido confirmar la solicitud. Si has recibido un código, introdúcelo. Si no, vuelve a intentar la solicitud.';
+      'No hemos podido confirmar la solicitud. Vuelve a intentarlo antes de introducir el código recibido.';
 
   @override
   String feedReadingCountdown(int seconds) {
@@ -3695,6 +3677,14 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get photoCropResumeUpload => 'Reanudar el envío';
+
+  @override
+  String get devicesPageTokenConflict =>
+      'Este dispositivo sigue asociado a otra cuenta. Vuelve a intentarlo o elimínalo de esa cuenta.';
+
+  @override
+  String get devicesPageDeviceLimit =>
+      'Tu cuenta ya tiene tres dispositivos registrados. Elimina uno de la lista y vuelve a intentarlo.';
 
   @override
   String get devicesPageReceiveAlerts => 'Recibir notificaciones';

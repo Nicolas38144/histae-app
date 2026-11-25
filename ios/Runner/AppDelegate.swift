@@ -1,4 +1,5 @@
 import Flutter
+import FirebaseInstallations
 import UIKit
 import StoreKit
 import firebase_messaging
@@ -24,6 +25,15 @@ import firebase_messaging
         // Called only after notification activation and the system grant.
         UIApplication.shared.registerForRemoteNotifications()
         result(nil)
+      } else if call.method == "deleteInstallation" {
+        Task { @MainActor in
+          do {
+            try await Installations.installations().delete()
+            result(nil)
+          } catch {
+            result(FlutterError(code: "push_installation_unavailable", message: nil, details: nil))
+          }
+        }
       } else if call.method == "openNotificationSettings" {
         guard let url = URL(string: UIApplication.openSettingsURLString) else {
           result(false)

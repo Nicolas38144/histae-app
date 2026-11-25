@@ -9,6 +9,7 @@ import 'package:http_parser/http_parser.dart';
 import '../l10n/api_language.dart';
 import 'api_failure.dart';
 import 'api_stream.dart';
+import 'json_fields.dart';
 import 'request_cancellation.dart';
 
 export 'api_stream.dart';
@@ -255,7 +256,7 @@ class ApiClient {
         },
       );
       final serverId = response.headers['x-request-id'];
-      final diagnosticId = _validUuidV4(serverId) ? serverId : requestId;
+      final diagnosticId = isUuidV4(serverId) ? serverId : requestId;
       Object? body;
       try {
         if (response.statusCode != 204) {
@@ -338,13 +339,6 @@ class ApiClient {
     _client.close();
   }
 }
-
-final _uuidPattern = RegExp(
-  r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$',
-);
-
-bool _validUuidV4(String? value) =>
-    value != null && _uuidPattern.hasMatch(value);
 
 String newUuidV4() {
   final random = Random.secure();

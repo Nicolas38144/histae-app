@@ -53,6 +53,7 @@ class ApiFailure implements Exception {
       401 => ApiFailureKind.unauthenticated,
       403 => ApiFailureKind.forbidden,
       404 => ApiFailureKind.notFound,
+      408 => ApiFailureKind.timeout,
       409 => ApiFailureKind.conflict,
       410 => ApiFailureKind.expired,
       413 => ApiFailureKind.payloadTooLarge,

@@ -246,10 +246,6 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                       ),
                     ),
                   ],
-                  if (c.subscription?.provider == 'stripe')
-                    Text(
-                      AppStrings.of(context).messages.billingStoreManagedWeb,
-                    ),
                   if (!c.paymentsAvailable) ...[
                     const EditorialDivider(),
                     Text(

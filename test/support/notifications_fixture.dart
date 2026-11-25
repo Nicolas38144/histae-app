@@ -54,7 +54,9 @@ class MemoryPushVault implements PushVault {
 class FakePushGateway implements PushGateway {
   bool available = true, failDisable = false;
   int initializations = 0, requests = 0, registrationsCount = 0, disables = 0;
+  int renewals = 0;
   String registrationId = syntheticRegistration;
+  String? renewedRegistrationId;
   PushPermission authorization = PushPermission.authorized;
   Future<PushPermission>? permissionReply;
   PushIntent? first;
@@ -81,6 +83,12 @@ class FakePushGateway implements PushGateway {
   Future<String> registration() async {
     registrationsCount++;
     return registrationId;
+  }
+
+  @override
+  Future<String> renewRegistration() async {
+    renewals++;
+    return registrationId = renewedRegistrationId ?? registrationId;
   }
 
   @override

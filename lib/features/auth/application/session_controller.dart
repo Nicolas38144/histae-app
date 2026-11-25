@@ -484,11 +484,7 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
                 .hasMatch(confirmationToken))) {
       throw const ApiFailure(ApiFailureKind.invalidResponse);
     }
-    if (action == 'current' &&
-        (sessionId == null ||
-            !RegExp(
-              r'^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[89abAB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}$',
-            ).hasMatch(sessionId))) {
+    if (action == 'current' && !isUuidV4(sessionId)) {
       throw const ApiFailure(ApiFailureKind.invalidResponse);
     }
     _loggingOut = true;
@@ -787,7 +783,7 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
     final tokens = _tokens;
     if (tokens != null) {
       try {
-        await repository.logout(tokens);
+        await _revokeForLogout(tokens);
       } on ApiFailure {
         /* Local logout still proceeds. No blind mutation replay. */
       }
@@ -798,6 +794,21 @@ class SessionController extends ChangeNotifier implements AuthenticatedSession {
     }
     _loggingOut = false;
     _notify();
+  }
+
+  Future<void> _revokeForLogout(TokenPair tokens) async {
+    try {
+      await repository.logout(tokens);
+    } on ApiFailure catch (error) {
+      if (error.statusCode != 401 ||
+          error.code != 'invalid_or_expired_access_token') {
+        rethrow;
+      }
+      await _rotate(tokens.refreshToken);
+      if (_tokens case final renewed? when !_disposed) {
+        await repository.logout(renewed);
+      }
+    }
   }
 
   @override

@@ -371,9 +371,6 @@ class AppMessagesIt extends AppMessages {
   String get confirmationDialogConfirm => 'Conferma';
 
   @override
-  String get billingStringsTrialPeriod => 'Periodo di prova';
-
-  @override
   String get billingStringsActiveSubscription => 'Abbonamento attivo';
 
   @override
@@ -381,16 +378,10 @@ class AppMessagesIt extends AppMessages {
       'Pagamento da regolarizzare';
 
   @override
-  String get billingStringsCompletePayment => 'Pagamento da completare';
-
-  @override
   String get billingStringsSubscriptionExpired => 'Sottoscrizione scaduta';
 
   @override
   String get billingStringsSubscriptionCanceled => 'Abbonamento disdetto';
-
-  @override
-  String get billingStringsUnpaid => 'Pagamento non saldato';
 
   @override
   String get billingStringsSubscriptionPaused => 'Abbonamento in pausa';
@@ -493,11 +484,6 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get subscriptionSummaryAnnualPlan => 'Piano annuale';
-
-  @override
-  String subscriptionSummaryTrialEnds(Object arg0) {
-    return 'Fine della prova: $arg0';
-  }
 
   @override
   String subscriptionSummaryPeriodStarts(Object arg0) {
@@ -2789,10 +2775,6 @@ class AppMessagesIt extends AppMessages {
       'Prezzo dello store non disponibile';
 
   @override
-  String get billingStoreManagedWeb =>
-      'Questo abbonamento è stato acquistato sul sito. Gestiscilo sul sito Histae.';
-
-  @override
   String get billingStorePending =>
       'Acquisto in attesa di conferma dallo store.';
 
@@ -2983,7 +2965,7 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get otpSendUnconfirmed =>
-      'Non è stato possibile confermare la richiesta. Se hai ricevuto un codice, inseriscilo. Altrimenti riprova la richiesta.';
+      'Non è stato possibile confermare la richiesta. Riprova prima di inserire il codice ricevuto.';
 
   @override
   String feedReadingCountdown(int seconds) {
@@ -3703,6 +3685,14 @@ class AppMessagesIt extends AppMessages {
 
   @override
   String get photoCropResumeUpload => 'Riprendi l’invio';
+
+  @override
+  String get devicesPageTokenConflict =>
+      'Questo dispositivo è ancora associato a un altro account. Riprova o rimuovilo da quell\'account.';
+
+  @override
+  String get devicesPageDeviceLimit =>
+      'Il tuo account ha già tre dispositivi registrati. Rimuovine uno dall\'elenco e riprova.';
 
   @override
   String get devicesPageReceiveAlerts => 'Ricevi notifiche';
