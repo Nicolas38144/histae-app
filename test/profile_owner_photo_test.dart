@@ -17,15 +17,14 @@ import 'support/profile_fixture.dart';
 
 void main() {
   testWidgets(
-    'owner preview shows a private photo outside feed content, and logout removes it',
+    'owner preview reuses its private photo until it changes or the session ends',
     (tester) async {
       var downloads = 0;
+      var photoUrl = 'https://storage.example/private-owner-photo';
       final bytes = (await tester.runAsync(() => syntheticCropSource()))!;
       final session = testSession(
         (r) async => r.url.path == '/api/users/me'
-            ? jsonResponse(
-                ownerJson(photo: 'https://storage.example/private-owner-photo'),
-              )
+            ? jsonResponse(ownerJson(photo: photoUrl))
             : defaultProfileResponse(r),
       );
       addTearDown(session.dispose);
@@ -39,20 +38,35 @@ void main() {
           locale: const Locale('fr'),
           localizationsDelegates: AppMessages.localizationsDelegates,
           supportedLocales: AppMessages.supportedLocales,
-          home: ProfileFeedPreviewPage(
-            controller: c,
-            photoClient: () => MockClient((r) async {
-              downloads++;
-              expect(r.headers['authorization'], isNull);
-              expect(r.followRedirects, false);
-              return http.Response.bytes(bytes, 200);
-            }),
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: TextButton(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => ProfileFeedPreviewPage(
+                      controller: c,
+                      photoClient: () => MockClient((r) async {
+                        downloads++;
+                        expect(r.url.toString(), photoUrl);
+                        expect(r.headers['authorization'], isNull);
+                        expect(r.followRedirects, false);
+                        return http.Response.bytes(bytes, 200);
+                      }),
+                    ),
+                  ),
+                ),
+                child: const Text('Open preview'),
+              ),
+            ),
           ),
         ),
       );
+      final openPreview = find.text('Open preview');
+      await tester.tap(openPreview);
       await tester.pumpAndSettle();
+      final photo = find.byType(Image);
       expect(downloads, 1);
-      expect(find.byType(Image), findsOneWidget);
+      final originalImage = tester.widget<Image>(photo).image;
       expect(
         find.descendant(
           of: find.byType(FeedProfileContent),
@@ -66,9 +80,35 @@ void main() {
         tester.widget<Text>(notice).style,
         Theme.of(tester.element(notice)).textTheme.bodySmall,
       );
+
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(photo, findsNothing);
+      c.photoReadAt = DateTime.now().toUtc().subtract(
+        const Duration(minutes: 2),
+      );
+      await tester.tap(openPreview);
+      await tester.pumpAndSettle();
+      expect(downloads, 1);
+      expect(tester.widget<Image>(photo).image, same(originalImage));
+
+      photoUrl = 'https://storage.example/replaced-owner-photo';
+      await c.refreshPhotoPreview();
+      await tester.pumpAndSettle();
+      expect(downloads, 2);
+      final replacementImage = tester.widget<Image>(photo).image;
+      expect(replacementImage, isNot(same(originalImage)));
+
       await session.logout();
       await tester.pumpAndSettle();
-      expect(find.byType(Image), findsNothing);
+      expect(photo, findsNothing);
+      expect(
+        c.ownerPreviewPhotos.owns(
+          ProfileController.ownerPreviewPhotoKey,
+          replacementImage,
+        ),
+        isFalse,
+      );
       await tester.pumpWidget(const SizedBox.shrink());
     },
   );

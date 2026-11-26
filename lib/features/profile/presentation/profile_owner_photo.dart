@@ -19,11 +19,14 @@ class ProfileOwnerPhoto extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = AppStrings.of(context).messages;
     return PrivatePhoto(
+      key: ValueKey(controller.photoRevision),
       url: controller.profile?.photo,
       readAt: controller.photoReadAt,
-      allowed: controller.accessible && controller.hasFeedPreview,
+      allowed: controller.hasFeedPreview,
       decodeWidth: 640,
       photoClient: photoClient,
+      memoryCache: controller.ownerPreviewPhotos,
+      cacheKey: ProfileController.ownerPreviewPhotoKey,
       refreshAccess: controller.refreshPhotoPreview,
       builder: (context, image, loading, failed) => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

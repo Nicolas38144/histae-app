@@ -2653,10 +2653,6 @@
   "@profileFeedPreviewPageMyProfileInTheFeed": {
     "description": "Interface: lib/features/profile/presentation/profile_feed_preview_page.dart"
   },
-  "profileFeedPreviewPageThroughYourWords": "Comme au fil des mots.",
-  "@profileFeedPreviewPageThroughYourWords": {
-    "description": "Interface: lib/features/profile/presentation/profile_feed_preview_page.dart"
-  },
   "profileFeedPreviewPageTheseAreThePartsOfYour": "Voici les éléments de votre profil présentés aux autres. Votre photo reste absente du feed.",
   "@profileFeedPreviewPageTheseAreThePartsOfYour": {
     "description": "Interface: lib/features/profile/presentation/profile_feed_preview_page.dart"

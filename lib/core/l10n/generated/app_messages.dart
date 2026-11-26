@@ -3798,12 +3798,6 @@ abstract class AppMessages {
   /// Interface: lib/features/profile/presentation/profile_feed_preview_page.dart
   ///
   /// In fr, this message translates to:
-  /// **'Comme au fil des mots.'**
-  String get profileFeedPreviewPageThroughYourWords;
-
-  /// Interface: lib/features/profile/presentation/profile_feed_preview_page.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Voici les éléments de votre profil présentés aux autres. Votre photo reste absente du feed.'**
   String get profileFeedPreviewPageTheseAreThePartsOfYour;
 

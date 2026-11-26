@@ -48,13 +48,6 @@ class _ProfileFeedPreviewPageState extends State<ProfileFeedPreviewPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  AppStrings.of(context)
-                      .messages
-                      .profileFeedPreviewPageThroughYourWords,
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-                const SizedBox(height: HistaeTokens.contentSpacing),
                 if (preview != null && c.profile?.photo != null) ...[
                   ProfileOwnerPhoto(
                     controller: c,

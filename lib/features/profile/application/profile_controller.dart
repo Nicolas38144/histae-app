@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 
+import '../../../core/media/private_photo_cache.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/network/read_snapshots.dart';
@@ -22,6 +23,8 @@ class ProfileController extends ChangeNotifier {
   }
   final ProfileRepository repository;
   final DraftController? drafts;
+  static const ownerPreviewPhotoKey = 'owner-preview';
+  final ownerPreviewPhotos = PrivatePhotoCache(maxEntries: 1);
 
   AuthenticatedSession get session => repository.session;
   OwnerProfile? profile;
@@ -89,7 +92,10 @@ class ProfileController extends ChangeNotifier {
       : null;
 
   void _notify() {
-    if (!_disposed) notifyListeners();
+    if (_disposed) return;
+    final photo = hasFeedPreview ? profile?.photo : null;
+    ownerPreviewPhotos.retainAuthorized({ownerPreviewPhotoKey: ?photo});
+    notifyListeners();
   }
 
   void _sessionChanged() {
@@ -367,7 +373,10 @@ class ProfileController extends ChangeNotifier {
     } finally {
       if (!_disposed && generation == _generation) {
         saving = false;
-        if (photo) photoRevision++;
+        if (photo) {
+          ownerPreviewPhotos.clear();
+          photoRevision++;
+        }
         _notify();
         if (_languageDirty) {
           _localeRevision = session.localizationRevision;
@@ -416,6 +425,7 @@ class ProfileController extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    ownerPreviewPhotos.dispose();
     _generation++;
     _scope.cancel();
     _timer.cancel();

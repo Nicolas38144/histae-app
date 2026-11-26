@@ -2300,10 +2300,6 @@ class AppMessagesIt extends AppMessages {
       'Il mio profilo nel feed';
 
   @override
-  String get profileFeedPreviewPageThroughYourWords =>
-      'Attraverso le tue parole.';
-
-  @override
   String get profileFeedPreviewPageTheseAreThePartsOfYour =>
       'Questi sono gli elementi del tuo profilo mostrati agli altri. La tua foto non compare nel feed.';
 
