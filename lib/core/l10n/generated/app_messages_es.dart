@@ -2475,9 +2475,6 @@ class AppMessagesEs extends AppMessages {
       'Ya no se puede retomar esta solicitud de foto. Consulta el perfil antes de elegir otra.';
 
   @override
-  String get profileStringsNoAnalysisAvailable => 'No hay análisis disponible.';
-
-  @override
   String get profileStringsUnderReview => 'En revisión';
 
   @override

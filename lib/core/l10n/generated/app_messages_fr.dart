@@ -2480,9 +2480,6 @@ class AppMessagesFr extends AppMessages {
       'Cette demande photo ne peut plus être reprise. Relisez votre profil avant de choisir une nouvelle photo.';
 
   @override
-  String get profileStringsNoAnalysisAvailable => 'Aucune analyse disponible.';
-
-  @override
   String get profileStringsUnderReview => 'En cours de vérification';
 
   @override

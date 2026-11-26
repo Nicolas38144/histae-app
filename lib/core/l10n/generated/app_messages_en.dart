@@ -2448,9 +2448,6 @@ class AppMessagesEn extends AppMessages {
       'This photo request can no longer be resumed. Refresh your profile before choosing a new photo.';
 
   @override
-  String get profileStringsNoAnalysisAvailable => 'No analysis available.';
-
-  @override
   String get profileStringsUnderReview => 'Under review';
 
   @override

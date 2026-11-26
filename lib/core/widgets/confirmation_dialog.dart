@@ -30,11 +30,3 @@ Future<bool> confirmAction(
       ),
     ) ??
     false;
-// Compatibility for clients importing the original profile editor barrel.
-
-Future<bool> confirmProfileAction(
-  BuildContext context,
-  String title,
-  String message, {
-  String? action,
-}) => confirmAction(context, title, message, action: action);

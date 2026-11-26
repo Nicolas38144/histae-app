@@ -42,26 +42,6 @@ class DiscoveryStrings {
       strings.messages.discoveryStringsLocationWasInterruptedYouCanRequest,
   };
 
-  String actionTitle(DiscoveryAction action) => switch (action) {
-    DiscoveryAction.photo => strings.messages.profileSectionsAPhotoForLater,
-    DiscoveryAction.profile || DiscoveryAction.biography =>
-      strings.messages.identityEditorAFewWordsAboutYou,
-    DiscoveryAction.traits => strings.messages.profileSectionsWhatMakesYouYou,
-    DiscoveryAction.conversationStarters =>
-      strings.messages.profileSectionsConversationStarters,
-    DiscoveryAction.resumeDiscovery =>
-      strings.messages.discoveryStringsYourProfileIsPaused,
-    DiscoveryAction.sex => strings.messages.discoveryStringsYourProfileSSex,
-    DiscoveryAction.preferences =>
-      strings.messages.discoveryStringsYourDatingPreferences,
-    DiscoveryAction.sensitiveConsent =>
-      strings.messages.discoveryStringsSensitiveData,
-    DiscoveryAction.locationConsent =>
-      strings.messages.discoveryStringsYourLocationChoice,
-    DiscoveryAction.freshPresence =>
-      strings.messages.discoveryStringsARecentLocation,
-  };
-
   String actionBody(DiscoveryAction action) => switch (action) {
     DiscoveryAction.photo => strings.messages.discoveryPhotoBody,
     DiscoveryAction.biography => strings.messages.discoveryBiographyBody,
@@ -81,30 +61,6 @@ class DiscoveryStrings {
       strings.messages.discoveryStringsDecideWhetherHistaeCanUseYour,
     DiscoveryAction.freshPresence =>
       strings.messages.discoveryStringsOneLocationReadingIsEnoughYour,
-  };
-
-  String actionLabel(
-    DiscoveryAction action, {
-    required bool sensitiveAllowed,
-  }) => switch (action) {
-    DiscoveryAction.sensitiveConsent || DiscoveryAction.locationConsent =>
-      strings.messages.profileSectionsChooseMyConsents,
-    DiscoveryAction.sex || DiscoveryAction.preferences when !sensitiveAllowed =>
-      strings.messages.profileSectionsChooseMyConsents,
-    DiscoveryAction.preferences =>
-      strings.messages.profileSectionsEditMyPreferences,
-    DiscoveryAction.freshPresence =>
-      strings.messages.discoveryPageRefreshMyLocation,
-    DiscoveryAction.sex => strings.messages.discoveryRequestIdentityCorrection,
-    DiscoveryAction.photo => strings.messages.profileSectionsManageMyPhoto,
-    DiscoveryAction.biography =>
-      strings.messages.profileSectionsEditMyIntroduction,
-    DiscoveryAction.profile => strings.messages.profileSectionsCreateMyProfile,
-    DiscoveryAction.traits => strings.messages.profileSectionsChooseMyTraits,
-    DiscoveryAction.conversationStarters =>
-      strings.messages.profileSectionsWriteMyAnswers,
-    DiscoveryAction.resumeDiscovery =>
-      strings.messages.discoveryStatusSectionsResumeDiscovery,
   };
 
   String notice(String? code) => switch (code) {

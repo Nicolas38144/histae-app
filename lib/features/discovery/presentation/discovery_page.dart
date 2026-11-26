@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_failure.dart';
-import '../../../core/network/read_snapshots.dart';
 import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
@@ -60,39 +59,28 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
   HelpController? _help;
   bool _guideScheduled = false, _guideOpen = false;
   bool _readingOpen = false;
-  int _checkedDiscoveryDetailsRevision = 0;
-  bool _checkingDiscoveryDetails = false;
+  ModalRoute<dynamic>? _route;
+  bool _profileRefreshScheduled = false;
 
-  bool get _canCheckDiscoveryDetails =>
-      widget.visible &&
-      !_opening &&
-      c.accessible &&
-      c.session.resourceKey == _key &&
-      !c.busy &&
-      c.retrySeconds == 0 &&
-      !widget.profile.loading &&
-      !widget.profile.saving &&
-      widget.profile.retrySeconds == 0 &&
-      ModalRoute.isCurrentOf(context) == true;
+  bool get _canPresentProfileRefresh =>
+      mounted && widget.visible && !_opening && _route?.isCurrent == true;
 
-  void _checkDiscoveryDetails() {
-    if (_checkingDiscoveryDetails || !_canCheckDiscoveryDetails) return;
-    _checkingDiscoveryDetails = true;
+  void _scheduleProfileRefresh() {
+    if (_profileRefreshScheduled ||
+        !_canPresentProfileRefresh ||
+        !c.canRefreshProfile(widget.profile)) {
+      return;
+    }
+    _profileRefreshScheduled = true;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
       try {
-        if (!_canCheckDiscoveryDetails) return;
-        final profile = widget.profile;
-        final revision = profile.discoveryDetailsRevision;
-        if (!profile.discoveryDetailsConfirmed) {
-          await profile.refreshDiscoveryDetails();
-        }
-        if (!mounted || !_canCheckDiscoveryDetails) return;
-        _checkedDiscoveryDetailsRevision = revision;
-        c.deactivate();
-        await c.activate(profileDetailsPolicy: ReadPolicy.cached);
+        await c.refreshAfterProfileEdit(
+          widget.profile,
+          isVisible: () => _canPresentProfileRefresh,
+        );
       } finally {
-        if (mounted) setState(() => _checkingDiscoveryDetails = false);
+        if (mounted) setState(() => _profileRefreshScheduled = false);
       }
     });
   }
@@ -101,6 +89,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _help = HelpScope.maybeOf(context);
+    _route = ModalRoute.of(context);
   }
 
   void _offerGuide(bool showFeed) {
@@ -359,10 +348,8 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
       if (!c.accessible || c.session.resourceKey != _key) {
         return const HistaeScaffold(body: SizedBox.shrink());
       }
-      final detailsChanged =
-          widget.profile.discoveryDetailsRevision !=
-          _checkedDiscoveryDetailsRevision;
-      if (detailsChanged) _checkDiscoveryDetails();
+      final detailsChanged = c.needsProfileRefresh(widget.profile);
+      if (detailsChanged) _scheduleProfileRefresh();
       final ready = !detailsChanged && c.ready;
       final profile = detailsChanged ? null : c.current;
       final required = c.requiredActions;

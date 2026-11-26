@@ -2854,10 +2854,6 @@
   "@profileStringsThisPhotoRequestCanNoLonger": {
     "description": "Interface: lib/features/profile/presentation/profile_strings.dart"
   },
-  "profileStringsNoAnalysisAvailable": "Aucune analyse disponible.",
-  "@profileStringsNoAnalysisAvailable": {
-    "description": "Interface: lib/features/profile/presentation/profile_strings.dart"
-  },
   "profileStringsUnderReview": "En cours de vérification",
   "@profileStringsUnderReview": {
     "description": "Interface: lib/features/profile/presentation/profile_strings.dart"

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/l10n/app_strings.dart';
 import '../application/profile_controller.dart';
 import 'profile_panels.dart';
+import 'profile_section.dart';
 import 'profile_strings.dart';
 
 class ProfileIntroductionCard extends StatelessWidget {
@@ -20,12 +21,14 @@ class ProfileIntroductionCard extends StatelessWidget {
     final p = c.profile;
     final bio = p?.bio?.trim();
     final editable = !c.loading && !c.saving && !c.uncertain;
+    final section = ProfileSection.introduction.describe(
+      AppStrings.of(context).messages,
+      createProfile: p == null,
+    );
     return ProfilePanel(
-      title: AppStrings.of(context).messages.identityEditorAFewWordsAboutYou,
-      icon: Icons.format_quote_rounded,
-      action: p == null
-          ? AppStrings.of(context).messages.profileSectionsCreateMyProfile
-          : AppStrings.of(context).messages.profileSectionsEditMyIntroduction,
+      title: section.title,
+      icon: section.icon,
+      action: section.action,
       onPressed: editable && !c.errors.containsKey('profile') ? onEdit : null,
       child: c.errors.containsKey('profile')
           ? Text(
@@ -59,16 +62,17 @@ class ProfileAnswersCard extends StatelessWidget {
     final c = controller;
     final p = c.profile;
     final editable = !c.loading && !c.saving && !c.uncertain;
+    final section = ProfileSection.answers.describe(
+      AppStrings.of(context).messages,
+    );
     return ProfilePanel(
-      title: AppStrings.of(context)
-          .messages
-          .profileSectionsConversationStarters,
-      icon: Icons.chat_bubble_outline_rounded,
+      title: section.title,
+      icon: section.icon,
       count: c.errors.containsKey('answers')
           ? AppStrings.of(context).messages.profileSectionsRefreshNeeded
           : AppStrings.of(context).messages
                 .answersEditor3Answers(c.answers.length),
-      action: AppStrings.of(context).messages.profileSectionsWriteMyAnswers,
+      action: section.action,
       onPressed:
           editable &&
               p != null &&
@@ -97,11 +101,13 @@ class ProfilePreferencesTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = controller;
     final editable = !c.loading && !c.saving && !c.uncertain;
+    final section = ProfileSection.preferences.describe(
+      AppStrings.of(context).messages,
+      sensitiveAllowed: c.sensitiveAllowed,
+    );
     return ProfileDetailTile(
-      title: AppStrings.of(context)
-          .messages
-          .discoveryStringsYourDatingPreferences,
-      icon: Icons.tune_rounded,
+      title: section.title,
+      icon: section.icon,
       summary: c.errors.containsKey('preferences')
           ? AppStrings.of(context)
                 .messages
@@ -117,9 +123,7 @@ class ProfilePreferencesTile extends StatelessWidget {
               c.preferences!.maxAge,
               c.preferences!.distance,
             ),
-      action: c.sensitiveAllowed
-          ? AppStrings.of(context).messages.profileSectionsEditMyPreferences
-          : AppStrings.of(context).messages.profileSectionsChooseMyConsents,
+      action: section.action,
       onTap: editable && !c.errors.containsKey('preferences') ? onEdit : null,
     );
   }
@@ -138,9 +142,12 @@ class ProfileTraitsTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = controller;
     final editable = !c.loading && !c.saving && !c.uncertain;
+    final section = ProfileSection.traits.describe(
+      AppStrings.of(context).messages,
+    );
     return ProfileDetailTile(
-      title: AppStrings.of(context).messages.profileSectionsWhatMakesYouYou,
-      icon: Icons.spa_outlined,
+      title: section.title,
+      icon: section.icon,
       summary: c.errors.containsKey('selectedTraits')
           ? AppStrings.of(context)
                 .messages
@@ -161,7 +168,7 @@ class ProfileTraitsTile extends StatelessWidget {
                   Chip(label: Text(trait.name)),
               ],
             ),
-      action: AppStrings.of(context).messages.profileSectionsChooseMyTraits,
+      action: section.action,
       onTap:
           editable &&
               !c.errors.containsKey('traits') &&
@@ -186,13 +193,14 @@ class ProfilePhotoTile extends StatelessWidget {
     final c = controller;
     final text = AppStrings.of(context).messages;
     final profileUnavailable = c.errors.containsKey('profile');
+    final section = ProfileSection.photo.describe(text);
     return ProfileDetailTile(
-      title: text.profileSectionsAPhotoForLater,
-      icon: Icons.photo_outlined,
+      title: section.title,
+      icon: section.icon,
       summary: profileUnavailable
           ? text.profilePhotoLoadFailed
           : text.profileSectionsOnePhotoRevealedAfterMutualConsent,
-      action: text.profileSectionsManageMyPhoto,
+      action: section.action,
       onTap: c.profile != null && !c.loading && !profileUnavailable
           ? onEdit
           : null,

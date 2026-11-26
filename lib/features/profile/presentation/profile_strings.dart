@@ -36,8 +36,7 @@ class ProfileStrings {
     _ => strings.failureMessage(e.kind),
   };
 
-  String moderation(Moderation? m) {
-    if (m == null) return strings.messages.profileStringsNoAnalysisAvailable;
+  String moderation(Moderation m) {
     final status = switch (m.status) {
       'pending' => strings.messages.profileStringsUnderReview,
       'approved' => strings.messages.profileStringsApproved,

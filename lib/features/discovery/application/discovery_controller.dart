@@ -8,6 +8,7 @@ import '../../../core/network/read_snapshots.dart';
 import '../../../core/network/retry_after.dart';
 import '../../auth/domain/authenticated_session.dart';
 import '../../consents/domain/consent_state.dart';
+import '../../profile/application/profile_controller.dart';
 import '../data/device_location.dart';
 import '../data/discovery_models.dart';
 import '../data/discovery_repository.dart';
@@ -44,6 +45,7 @@ class DiscoveryController extends ChangeNotifier {
   bool _languageDirty = false;
   RequestCancellation _scope = RequestCancellation();
   int _epoch = 0;
+  int _checkedProfileRevision = 0;
   bool _active = false, _disposed = false;
   bool loading = false, locating = false, sending = false;
   DiscoveryStatus? status;
@@ -91,6 +93,44 @@ class DiscoveryController extends ChangeNotifier {
 
   bool get busy => loading || locating || sending;
 
+  bool needsProfileRefresh(ProfileController profile) =>
+      profile.discoveryDetailsRevision != _checkedProfileRevision;
+
+  bool canRefreshProfile(ProfileController profile) =>
+      active &&
+      profile.accessible &&
+      !busy &&
+      retrySeconds == 0 &&
+      !profile.loading &&
+      !profile.saving &&
+      profile.retrySeconds == 0;
+
+  /// Recheck only after a relevant edit, when the feed can present its result.
+  Future<void> refreshAfterProfileEdit(
+    ProfileController profile, {
+    required bool Function() isVisible,
+  }) async {
+    if (!needsProfileRefresh(profile) ||
+        !canRefreshProfile(profile) ||
+        !isVisible()) {
+      return;
+    }
+    final epoch = _epoch;
+    final revision = profile.discoveryDetailsRevision;
+    if (!profile.discoveryDetailsConfirmed) {
+      await profile.refreshDiscoveryDetails();
+    }
+    if (!_alive(epoch) ||
+        profile.discoveryDetailsRevision != revision ||
+        !canRefreshProfile(profile) ||
+        !isVisible()) {
+      return;
+    }
+    _checkedProfileRevision = revision;
+    deactivate();
+    await activate(profileDetailsPolicy: ReadPolicy.cached);
+  }
+
   bool get canChoose =>
       active &&
       ready &&
@@ -136,6 +176,7 @@ class DiscoveryController extends ChangeNotifier {
     }
     _resourceKey = session.resourceKey;
     _localeRevision = session.localizationRevision;
+    _checkedProfileRevision = 0;
     deactivate();
     status = null;
     pending = null;

@@ -5,6 +5,7 @@ import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../profile/presentation/profile_panels.dart';
+import '../../profile/presentation/profile_section.dart';
 import '../data/device_location.dart';
 import '../data/discovery_models.dart';
 import 'discovery_strings.dart';
@@ -45,41 +46,67 @@ class DiscoveryReadinessCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final strings = DiscoveryStrings(AppStrings.of(context));
-    final title = strings.actionTitle(action);
-    final summary = strings.actionBody(action);
-    final label = strings.actionLabel(
-      action,
-      sensitiveAllowed: sensitiveAllowed,
-    );
-    final icon = switch (action) {
+    final strings = AppStrings.of(context);
+    final text = strings.messages;
+    final summary = DiscoveryStrings(strings).actionBody(action);
+    final section = switch (action) {
       DiscoveryAction.profile ||
-      DiscoveryAction.biography => Icons.format_quote_rounded,
-      DiscoveryAction.conversationStarters => Icons.chat_bubble_outline_rounded,
-      DiscoveryAction.traits => Icons.spa_outlined,
-      DiscoveryAction.photo => Icons.photo_outlined,
-      DiscoveryAction.preferences => Icons.tune_rounded,
-      DiscoveryAction.sex => Icons.badge_outlined,
-      DiscoveryAction.sensitiveConsent => Icons.shield_outlined,
-      DiscoveryAction.locationConsent ||
-      DiscoveryAction.freshPresence => Icons.location_on_outlined,
-      DiscoveryAction.resumeDiscovery => Icons.pause_circle_outline_rounded,
+      DiscoveryAction.biography => ProfileSection.introduction.describe(
+        text,
+        createProfile: action == DiscoveryAction.profile,
+      ),
+      DiscoveryAction.conversationStarters => ProfileSection.answers.describe(
+        text,
+      ),
+      DiscoveryAction.traits => ProfileSection.traits.describe(text),
+      DiscoveryAction.photo => ProfileSection.photo.describe(text),
+      DiscoveryAction.preferences => ProfileSection.preferences.describe(
+        text,
+        sensitiveAllowed: sensitiveAllowed,
+      ),
+      DiscoveryAction.sex => (
+        title: text.discoveryStringsYourProfileSSex,
+        action: sensitiveAllowed
+            ? text.discoveryRequestIdentityCorrection
+            : text.profileSectionsChooseMyConsents,
+        icon: Icons.badge_outlined,
+      ),
+      DiscoveryAction.sensitiveConsent => (
+        title: text.discoveryStringsSensitiveData,
+        action: text.profileSectionsChooseMyConsents,
+        icon: Icons.shield_outlined,
+      ),
+      DiscoveryAction.locationConsent => (
+        title: text.discoveryStringsYourLocationChoice,
+        action: text.profileSectionsChooseMyConsents,
+        icon: Icons.location_on_outlined,
+      ),
+      DiscoveryAction.freshPresence => (
+        title: text.discoveryStringsARecentLocation,
+        action: text.discoveryPageRefreshMyLocation,
+        icon: Icons.location_on_outlined,
+      ),
+      DiscoveryAction.resumeDiscovery => (
+        title: text.discoveryStringsYourProfileIsPaused,
+        action: text.discoveryStatusSectionsResumeDiscovery,
+        icon: Icons.pause_circle_outline_rounded,
+      ),
     };
     return switch (action) {
       DiscoveryAction.profile ||
       DiscoveryAction.biography ||
       DiscoveryAction.conversationStarters => ProfilePanel(
-        title: title,
-        icon: icon,
-        action: label,
+        title: section.title,
+        icon: section.icon,
+        action: section.action,
         onPressed: onRepair,
         child: Text(summary),
       ),
       _ => ProfileDetailTile(
-        title: title,
-        icon: icon,
+        title: section.title,
+        icon: section.icon,
         summary: summary,
-        action: label,
+        action: section.action,
         onTap: onRepair,
         feedback: feedback,
       ),

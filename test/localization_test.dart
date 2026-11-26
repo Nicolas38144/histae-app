@@ -67,13 +67,7 @@ class InterfaceLiteralAudit extends RecursiveAstVisitor<void> {
     }
     if (parent is ArgumentList && parent.parent is MethodInvocation) {
       final name = (parent.parent! as MethodInvocation).methodName.name;
-      if ({
-        'page',
-        'field',
-        'confirmAction',
-        'confirmProfileAction',
-        'text',
-      }.contains(name)) {
+      if ({'page', 'field', 'confirmAction', 'text'}.contains(name)) {
         violations.add(node.offset);
       }
     }

@@ -4092,12 +4092,6 @@ abstract class AppMessages {
   /// Interface: lib/features/profile/presentation/profile_strings.dart
   ///
   /// In fr, this message translates to:
-  /// **'Aucune analyse disponible.'**
-  String get profileStringsNoAnalysisAvailable;
-
-  /// Interface: lib/features/profile/presentation/profile_strings.dart
-  ///
-  /// In fr, this message translates to:
   /// **'En cours de vérification'**
   String get profileStringsUnderReview;
 

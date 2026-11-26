@@ -664,7 +664,6 @@
   "profileStringsPhotosAreTemporarilyUnavailable": "Photos are temporarily unavailable.",
   "profileStringsAPhotoUpdateIsInProgress": "A photo update is in progress. Refresh your profile, then resume the same request.",
   "profileStringsThisPhotoRequestCanNoLonger": "This photo request can no longer be resumed. Refresh your profile before choosing a new photo.",
-  "profileStringsNoAnalysisAvailable": "No analysis available.",
   "profileStringsUnderReview": "Under review",
   "profileStringsApproved": "Approved",
   "profileStringsNeedsEditing": "Needs editing",

@@ -142,7 +142,7 @@ class ProfileAnswersPreview extends StatelessWidget {
 
 class ProfileModerationLabel extends StatelessWidget {
   const ProfileModerationLabel({super.key, required this.moderation});
-  final Moderation? moderation;
+  final Moderation moderation;
 
   @override
   Widget build(BuildContext context) {
@@ -150,7 +150,7 @@ class ProfileModerationLabel extends StatelessWidget {
     return Text(
       ProfileStrings(AppStrings.of(context)).moderation(moderation),
       style: theme.textTheme.bodySmall?.copyWith(
-        color: moderation?.status == 'rejected'
+        color: moderation.status == 'rejected'
             ? theme.colorScheme.error
             : theme.colorScheme.onSurfaceVariant,
       ),
