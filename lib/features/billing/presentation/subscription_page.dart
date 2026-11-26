@@ -39,6 +39,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
   PushController? _push;
 
   BillingController get c => widget.controller;
+  bool get _showPageProgress => c.accessible && (c.loading || c.busy);
 
   @override
   void initState() {
@@ -175,7 +176,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                   ),
                   _plans(context),
                 ] else ...[
-                  if (c.loading || c.busy)
+                  if (_showPageProgress)
                     LinearProgressIndicator(
                       semanticsLabel: c.busy
                           ? AppStrings.of(context)
@@ -287,7 +288,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
             hasPending: c.purchasePending,
             storeOffers: c.offers,
             canAct: _canAct,
-            showLoadingIndicator: !c.accessible || (!c.loading && !c.busy),
+            showLoadingIndicator: !_showPageProgress,
             onChoose: _choose,
           ),
         ),

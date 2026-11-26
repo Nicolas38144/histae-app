@@ -50,7 +50,6 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   Timer? _readTimer;
   String? _head;
   bool _profileOpening = false;
-  bool _continuing = false;
   bool get _foreground =>
       WidgetsBinding.instance.lifecycleState == null ||
       WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
@@ -423,13 +422,16 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
             : LayoutBuilder(
                 builder: (context, layout) => Column(
                   children: [
-                    ConversationHeader(
-                      match: match,
-                      compact:
-                          layout.maxHeight < 480 ||
-                          MediaQuery.textScalerOf(context).scale(1) > 1.4,
-                      loading: c.showLoading && !_continuing,
-                      onDecisions: _decisions,
+                    ListenableBuilder(
+                      listenable: c.continuation,
+                      builder: (context, _) => ConversationHeader(
+                        match: match,
+                        compact:
+                            layout.maxHeight < 480 ||
+                            MediaQuery.textScalerOf(context).scale(1) > 1.4,
+                        loading: c.showLoading && !c.continuation.continuing,
+                        onDecisions: _decisions,
+                      ),
                     ),
                     Expanded(
                       child: SizedBox(
@@ -640,11 +642,6 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                                 controller: c.continuation,
                                 matchId: widget.matchId,
                                 catalog: widget.catalog,
-                                onProgressChanged: (working) {
-                                  if (mounted) {
-                                    setState(() => _continuing = working);
-                                  }
-                                },
                               ),
                             if (match.sendAllowed)
                               Padding(

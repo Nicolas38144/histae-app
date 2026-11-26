@@ -96,7 +96,7 @@ class RewardVideoCard extends StatelessWidget {
               label: Text(label),
             ),
             const SizedBox(height: 12),
-            if (video.unavailableReason case final reason?)
+            if (video.unavailableReason case final reason? when !video.busy)
               Text(
                 AppStrings.of(context).clientMessage(reason),
                 style: theme.textTheme.bodySmall,

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/theme.dart';
@@ -28,6 +30,58 @@ Future<void> mountChat(
 }
 
 void main() {
+  testWidgets(
+    'match details keeps one progress indicator until the agreement is sent',
+    (tester) async {
+      final scenario = ContinuationScenario();
+      addTearDown(scenario.dispose);
+      await mountChat(tester, scenario);
+      await tester.tap(find.byKey(const Key('chat-options')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('chat-decisions')));
+      await tester.pumpAndSettle();
+      expect(find.byType(ContinuationPage), findsOneWidget);
+
+      final button = find.byKey(const Key('continue-conversation'));
+      final spinner = find.descendant(
+        of: button,
+        matching: find.byType(CircularProgressIndicator),
+      );
+      final quota = Completer<void>();
+      scenario.quotaGate = quota.future;
+      await tester.ensureVisible(button);
+      await tester.pumpAndSettle();
+      await tester.tap(button);
+      await tester.pump();
+      await tester.pump();
+      expect(scenario.matches.continuation.loading, isTrue);
+      expect(spinner, findsOneWidget);
+      expect(find.byType(LinearProgressIndicator), findsNothing);
+
+      quota.complete();
+      await tester.pumpAndSettle();
+      final agreement = Completer<void>();
+      scenario.continuationGate = agreement.future;
+      await tester.tap(
+        find.text(
+          const AppStrings().messages.continuationPageAcceptUpTo1Credit,
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 350));
+      expect(scenario.costs, [1]);
+      expect(spinner, findsOneWidget);
+      expect(find.byType(LinearProgressIndicator), findsNothing);
+
+      agreement.complete();
+      await tester.pumpAndSettle();
+      expect(spinner, findsNothing);
+      expect(scenario.matches.continuation.myContinued, isTrue);
+      await tester.pumpWidget(const SizedBox.shrink());
+      scenario.dispose();
+    },
+  );
+
   for (final premium in [false, true]) {
     testWidgets(
       'chat confirms the ${premium ? 'Premium' : 'credit'} cost and opens automatically after both agreements',

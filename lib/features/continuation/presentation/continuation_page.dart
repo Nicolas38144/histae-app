@@ -38,7 +38,6 @@ class _ContinuationPageState extends State<ContinuationPage>
     with WidgetsBindingObserver {
   ContinuationController get c => widget.controller;
   late final _key = c.access.session.resourceKey;
-  bool _continuing = false;
 
   @override
   void initState() {
@@ -133,124 +132,125 @@ class _ContinuationPageState extends State<ContinuationPage>
           ),
         ),
         body: SafeArea(
-          child: ListView(
+          child: SingleChildScrollView(
             padding: HistaeTokens.pagePadding,
-            children: [
-              if (m == null)
-                EditorialCard(
-                  title: AppStrings.of(context)
-                      .messages
-                      .continuationPageThisMatchIsNoLongerAvailable,
-                  body: AppStrings.of(context)
-                      .messages
-                      .continuationPageReturnToYourMatchesToCheck,
-                )
-              else ...[
-                if (m.status != MatchStatus.active)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: HistaeTokens.textSpacing,
-                    ),
-                    child: Text(
-                      MatchesStrings(strings).stateBody(m),
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (m == null)
+                  EditorialCard(
+                    title: AppStrings.of(context)
+                        .messages
+                        .continuationPageThisMatchIsNoLongerAvailable,
+                    body: AppStrings.of(context)
+                        .messages
+                        .continuationPageReturnToYourMatchesToCheck,
+                  )
+                else ...[
+                  if (m.status != MatchStatus.active)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: HistaeTokens.textSpacing,
+                      ),
+                      child: Text(
+                        MatchesStrings(strings).stateBody(m),
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ),
-                  ),
-                if (!_continuing && (c.loading || c.busy || !c.access.verified))
-                  LinearProgressIndicator(
-                    semanticsLabel: AppStrings.of(context)
-                        .messages
-                        .continuationPageRefreshingMatch,
-                  ),
-                if (c.failure case final error?)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: Text(
-                      ContinuationStrings(AppStrings.of(context))
-                          .failure(error),
+                  if (!c.continuing &&
+                      (c.loading || c.busy || !c.access.verified))
+                    LinearProgressIndicator(
+                      semanticsLabel: AppStrings.of(context)
+                          .messages
+                          .continuationPageRefreshingMatch,
                     ),
-                  ),
-                if (c.notice == 'cost_changed')
-                  Text(
-                    AppStrings.of(context)
-                        .messages
-                        .continuationPageTheCostMustBeCheckedAnd,
-                  ),
-                const SizedBox(height: 20),
-                PhotoRevealPanel(
-                  controller: c,
-                  onReveal: _reveal,
-                  onWithdraw: _withdrawReveal,
-                  onOpenProfile: widget.onOpenProfile,
-                ),
-                if (m.status == MatchStatus.awaitingContinuation) ...[
-                  const EditorialDivider(),
-                  Text(
-                    AppStrings.of(context)
-                        .messages
-                        .continuationPageContinueThisConversation,
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    AppStrings.of(context).messages
-                        .continuationPageYouCanDecideUntilYouCan(
-                          MatchesStrings(AppStrings.of(context))
-                              .date(m.expiresAt),
-                        ),
-                  ),
-                  if (c.myContinued && !_continuing)
+                  if (c.failure case final error?)
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       child: Text(
-                        AppStrings.of(context)
-                            .messages
-                            .continuationPageYourChoiceToContinueHasBeen,
+                        ContinuationStrings(AppStrings.of(context))
+                            .failure(error),
                       ),
-                    )
-                  else ...[
-                    if (c.pendingCost case final cost?)
-                      Text(
-                        AppStrings.of(context).messages
-                            .continuationPageThisRequestStillNeedsConfirmationWith(
-                              cost,
-                            ),
-                      ),
-                    ContinuationAction(
-                      key: ValueKey(m.id),
-                      controller: c,
-                      matchId: widget.matchId,
-                      catalog: widget.catalog,
-                      showFeedback: false,
-                      onProgressChanged: (working) {
-                        if (mounted) setState(() => _continuing = working);
-                      },
                     ),
-                  ],
-                  HistaeButton.text(
-                    onPressed: c.busy ? null : _openCredits,
-                    child: Text(
+                  if (c.notice == 'cost_changed')
+                    Text(
                       AppStrings.of(context)
                           .messages
-                          .continuationPageViewMyCredits,
+                          .continuationPageTheCostMustBeCheckedAnd,
                     ),
+                  const SizedBox(height: 20),
+                  PhotoRevealPanel(
+                    controller: c,
+                    onReveal: _reveal,
+                    onWithdraw: _withdrawReveal,
+                    onOpenProfile: widget.onOpenProfile,
                   ),
-                  const SizedBox(height: 12),
-                  Text(
-                    AppStrings.of(context)
-                        .messages
-                        .continuationPageEachPersonChoosesIndependentlyTheOther,
-                  ),
-                  if (c.retrySeconds > 0)
+                  if (m.status == MatchStatus.awaitingContinuation) ...[
+                    const EditorialDivider(),
+                    Text(
+                      AppStrings.of(context)
+                          .messages
+                          .continuationPageContinueThisConversation,
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    const SizedBox(height: 12),
                     Text(
                       AppStrings.of(context).messages
-                          .appStringsTryAgainInS(c.retrySeconds),
+                          .continuationPageYouCanDecideUntilYouCan(
+                            MatchesStrings(AppStrings.of(context))
+                                .date(m.expiresAt),
+                          ),
                     ),
+                    if (c.myContinued && !c.continuing)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Text(
+                          AppStrings.of(context)
+                              .messages
+                              .continuationPageYourChoiceToContinueHasBeen,
+                        ),
+                      )
+                    else ...[
+                      if (c.pendingCost case final cost?)
+                        Text(
+                          AppStrings.of(context).messages
+                              .continuationPageThisRequestStillNeedsConfirmationWith(
+                                cost,
+                              ),
+                        ),
+                      ContinuationAction(
+                        key: ValueKey(m.id),
+                        controller: c,
+                        matchId: widget.matchId,
+                        catalog: widget.catalog,
+                        showFeedback: false,
+                      ),
+                    ],
+                    HistaeButton.text(
+                      onPressed: c.busy ? null : _openCredits,
+                      child: Text(
+                        AppStrings.of(context)
+                            .messages
+                            .continuationPageViewMyCredits,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      AppStrings.of(context)
+                          .messages
+                          .continuationPageEachPersonChoosesIndependentlyTheOther,
+                    ),
+                    if (c.retrySeconds > 0)
+                      Text(
+                        AppStrings.of(context).messages
+                            .appStringsTryAgainInS(c.retrySeconds),
+                      ),
+                  ],
                 ],
               ],
-            ],
+            ),
           ),
         ),
       );

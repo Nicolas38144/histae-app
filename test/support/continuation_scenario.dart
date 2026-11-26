@@ -35,6 +35,7 @@ class ContinuationScenario {
   final costs = <int>[];
   final responses = <String, Map<String, Object?>>{};
   int quotaReads = 0, historyReads = 0;
+  Future<void>? quotaGate, continuationGate;
   bool _disposed = false;
 
   Future<void> start() async {
@@ -71,6 +72,7 @@ class ContinuationScenario {
     }
     if (request.url.path.endsWith('/continuation-quota')) {
       quotaReads++;
+      if (quotaGate case final gate?) await gate;
       return jsonResponse({
         ...quotaJson(premium: premium, remaining: remaining),
         'free_remaining': premium ? 0 : (remaining - advertising).clamp(0, 2),
@@ -84,6 +86,7 @@ class ContinuationScenario {
         (jsonDecode(request.body) as Map<String, dynamic>)['credit_cost']
             as int,
       );
+      if (continuationGate case final gate?) await gate;
       if (loseFirstResponse) {
         loseFirstResponse = false;
         remaining = 0;

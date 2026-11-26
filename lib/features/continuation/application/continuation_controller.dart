@@ -57,6 +57,7 @@ class ContinuationController extends ChangeNotifier {
   ApiFailure? failure, catalogFailure;
   String? notice;
   ContinuationOffer? _offer;
+  ({String matchId, Object token})? _continuationTask;
   final _pendingContinue = <String, int>{};
   final _pendingReveal = <String, bool>{};
   final _continued = <String>{}, _revealed = <String>{};
@@ -69,6 +70,11 @@ class ContinuationController extends ChangeNotifier {
   bool get active => _active && accessible;
 
   UserMatch? get match => access.selected;
+
+  bool get continuing {
+    final task = _continuationTask;
+    return task != null && task.matchId == access.selectedId;
+  }
 
   int? get pendingCost => _pendingContinue[access.selectedId];
 
@@ -167,11 +173,14 @@ class ContinuationController extends ChangeNotifier {
         if (_pendingReveal[m.id] == m.myRevealed) _pendingReveal.remove(m.id);
       }
     }
-    if (!access.active && busy) {
-      _epoch++;
-      _scope.cancel();
-      _scope = RequestCancellation();
-      busy = false;
+    if (!access.active) {
+      _continuationTask = null;
+      if (busy) {
+        _epoch++;
+        _scope.cancel();
+        _scope = RequestCancellation();
+        busy = false;
+      }
     }
     _notify();
   }
@@ -215,6 +224,7 @@ class ContinuationController extends ChangeNotifier {
     _continued.remove(id);
     _revealed.remove(id);
     if (_offer?.matchId == id) _offer = null;
+    if (_continuationTask?.matchId == id) _continuationTask = null;
     if (access.selectedId == id && busy) {
       _epoch++;
       _scope.cancel();
@@ -231,6 +241,7 @@ class ContinuationController extends ChangeNotifier {
     _epoch++;
     _scope.cancel();
     _offer = null;
+    _continuationTask = null;
     loading = false;
     busy = false;
     if (notify) _notify();
@@ -330,27 +341,55 @@ class ContinuationController extends ChangeNotifier {
     invalidateQuota();
   }
 
+  Future<T> _trackContinuation<T>(
+    String matchId,
+    Future<T> Function() operation,
+  ) async {
+    final token = Object();
+    _continuationTask = (matchId: matchId, token: token);
+    try {
+      final result = operation();
+      _notify();
+      return await result;
+    } finally {
+      if (identical(_continuationTask?.token, token)) {
+        _continuationTask = null;
+        _notify();
+      }
+    }
+  }
+
   Future<ContinuationOffer?> prepareContinuation() async {
-    if (!active || busy || retrySeconds > 0 || pendingCost != null) return null;
-    final id = access.selectedId, epoch = _epoch;
-    await access.refresh();
-    if (!_alive(epoch) || access.selectedId != id) return null;
-    await loadQuota();
-    if (!_alive(epoch) ||
-        !canContinue ||
-        quotaReadAt == null ||
-        quota == null ||
-        !quota!.canStart ||
-        access.selectedId != id) {
+    final id = access.selectedId;
+    if (id == null ||
+        !active ||
+        busy ||
+        continuing ||
+        retrySeconds > 0 ||
+        pendingCost != null) {
       return null;
     }
-    return _offer = ContinuationOffer(
-      id!,
-      quota!.creditCost,
-      access.readRevision,
-      _now().toUtc(),
-      _key,
-    );
+    final epoch = _epoch;
+    return _trackContinuation(id, () async {
+      await access.refresh();
+      if (!_alive(epoch) || access.selectedId != id) return null;
+      await loadQuota();
+      if (!_alive(epoch) ||
+          !canContinue ||
+          quotaReadAt == null ||
+          quota == null ||
+          !quota!.canStart ||
+          access.selectedId != id) {
+        return null;
+      }
+      return _offer = ContinuationOffer(
+        id,
+        quota!.creditCost,
+        access.readRevision,
+        _now().toUtc(),
+        _key,
+      );
+    });
   }
 
   DateTime _week(DateTime date) {
@@ -363,34 +402,39 @@ class ContinuationController extends ChangeNotifier {
   }
 
   Future<void> accept(ContinuationOffer offer) async {
-    if (!canContinue || pendingCost != null) return;
-    final now = _now().toUtc();
-    if (!identical(_offer, offer) ||
-        offer.resourceKey != _key ||
-        offer.matchId != access.selectedId ||
-        offer.readRevision != access.readRevision ||
-        now.difference(offer.createdAt) > const Duration(minutes: 1) ||
-        _week(now) != _week(offer.createdAt)) {
-      notice = 'cost_changed';
+    if (!canContinue || continuing || pendingCost != null) return;
+    final id = match!.id;
+    await _trackContinuation(id, () async {
+      final now = _now().toUtc();
+      if (!identical(_offer, offer) ||
+          offer.resourceKey != _key ||
+          offer.matchId != access.selectedId ||
+          offer.readRevision != access.readRevision ||
+          now.difference(offer.createdAt) > const Duration(minutes: 1) ||
+          _week(now) != _week(offer.createdAt)) {
+        notice = 'cost_changed';
+        _offer = null;
+        _notify();
+        await loadQuota();
+        return;
+      }
       _offer = null;
-      _notify();
-      await loadQuota();
-      return;
-    }
-    _offer = null;
-    _pendingContinue[offer.matchId] = offer.cost;
-    await resumeContinuation();
+      _pendingContinue[id] = offer.cost;
+      await _continueMatch(id, offer.cost);
+    });
   }
 
   Future<void> resumeContinuation() async {
     final m = match, cost = pendingCost;
-    if (!canContinue || m == null || cost == null) return;
-    await _decision(
-      m.id,
-      () => repository.continueMatch(m.id, cost, _scope),
-      continuation: true,
-    );
+    if (!canContinue || continuing || m == null || cost == null) return;
+    await _trackContinuation(m.id, () => _continueMatch(m.id, cost));
   }
+
+  Future<void> _continueMatch(String id, int cost) => _decision(
+    id,
+    () => repository.continueMatch(id, cost, _scope),
+    continuation: true,
+  );
 
   Future<void> reveal() async {
     final m = match;
