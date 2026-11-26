@@ -921,8 +921,6 @@
   "feedGuideLikeBody": "Tocca due volte il profilo per inviare un mi piace. Puoi anche usare il pulsante con il cuore.",
   "feedGuidePassTitle": "Leggi, poi passa",
   "feedGuidePassBody": "Scorri fino in fondo al profilo, poi verso l’alto per passare. Il pulsante Passa fa la stessa cosa.",
-  "feedGuideMenuTitle": "Menu del feed",
-  "feedGuideMenuBody": "Apri il menu con i tre puntini in alto a destra. Scegli «{refreshFeed}» per cercare altri profili o «{refreshLocation}» se hai cambiato zona.",
   "feedGuideTabsTitle": "Passa da uno spazio all'altro",
   "feedGuideTabsBody": "Scorri orizzontalmente tra Profilo, Feed e Match oppure usa i pulsanti in basso.",
   "feedGuideDone": "Ho capito",

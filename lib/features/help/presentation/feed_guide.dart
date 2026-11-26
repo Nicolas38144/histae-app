@@ -49,14 +49,6 @@ Future<void> showFeedGuide(BuildContext context) async {
                     text.feedGuidePassBody,
                   ),
                   (
-                    Icons.more_vert,
-                    text.feedGuideMenuTitle,
-                    text.feedGuideMenuBody(
-                      text.discoveryPageRefreshFeed,
-                      text.discoveryPageRefreshMyLocation,
-                    ),
-                  ),
-                  (
                     Icons.swipe_outlined,
                     text.feedGuideTabsTitle,
                     text.feedGuideTabsBody,

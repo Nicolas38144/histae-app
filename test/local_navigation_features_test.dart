@@ -171,11 +171,6 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('feed-mini-guide')), findsOneWidget);
-      final menuInstructions = tester.widget<Text>(
-        find.textContaining('menu à trois points en haut à droite'),
-      );
-      expect(menuInstructions.data, contains('« Actualiser le feed »'));
-      expect(menuInstructions.data, contains('« Actualiser ma position »'));
       expect(
         tester.widget<FeedProfileCard>(find.byType(FeedProfileCard)).active,
         isFalse,

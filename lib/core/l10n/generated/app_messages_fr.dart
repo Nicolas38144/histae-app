@@ -3185,14 +3185,6 @@ class AppMessagesFr extends AppMessages {
       'Faites défiler le profil jusqu’en bas, puis glissez vers le haut pour passer. Le bouton « Passer » fait la même chose.';
 
   @override
-  String get feedGuideMenuTitle => 'Le menu du feed';
-
-  @override
-  String feedGuideMenuBody(String refreshFeed, String refreshLocation) {
-    return 'Ouvrez le menu à trois points en haut à droite. Choisissez « $refreshFeed » pour relancer la recherche ou « $refreshLocation » si vous avez changé de lieu.';
-  }
-
-  @override
   String get feedGuideTabsTitle => 'Retrouver vos espaces';
 
   @override
