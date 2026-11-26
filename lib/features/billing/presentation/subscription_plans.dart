@@ -19,10 +19,12 @@ class SubscriptionPlans extends StatelessWidget {
     required this.canAct,
     required this.onChoose,
     required this.storeOffers,
+    this.showLoadingIndicator = true,
   });
   final CatalogController catalog;
   final List<StoreOffer> storeOffers;
   final bool paymentsAvailable, canSubscribe, hasPending, canAct;
+  final bool showLoadingIndicator;
   final Future<void> Function(SubscriptionOffer offer) onChoose;
 
   String? _price(BuildContext context, SubscriptionOffer offer) {
@@ -41,6 +43,7 @@ class SubscriptionPlans extends StatelessWidget {
   Widget build(BuildContext context) {
     if (catalog.status == CatalogStatus.loading ||
         catalog.status == CatalogStatus.idle) {
+      if (!showLoadingIndicator) return const SizedBox.shrink();
       return LinearProgressIndicator(
         semanticsLabel: AppStrings.of(context)
             .messages

@@ -175,11 +175,15 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                   ),
                   _plans(context),
                 ] else ...[
-                  if (c.loading)
+                  if (c.loading || c.busy)
                     LinearProgressIndicator(
-                      semanticsLabel: AppStrings.of(context)
-                          .messages
-                          .subscriptionPageCheckingYourSubscription,
+                      semanticsLabel: c.busy
+                          ? AppStrings.of(context)
+                                .messages
+                                .billingStoreVerifying
+                          : AppStrings.of(context)
+                                .messages
+                                .subscriptionPageCheckingYourSubscription,
                     ),
                   if (c.subscription case final state?)
                     SubscriptionSummary(state: state, fresh: c.fresh),
@@ -219,12 +223,6 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                       child: Text(
                         AppStrings.of(context).messages.appStringsTryAgain,
                       ),
-                    ),
-                  if (c.busy)
-                    LinearProgressIndicator(
-                      semanticsLabel: AppStrings.of(context)
-                          .messages
-                          .billingStoreVerifying,
                     ),
                   if (c.purchasePending)
                     Text(AppStrings.of(context).messages.billingStorePending),
@@ -289,6 +287,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
             hasPending: c.purchasePending,
             storeOffers: c.offers,
             canAct: _canAct,
+            showLoadingIndicator: !c.accessible || (!c.loading && !c.busy),
             onChoose: _choose,
           ),
         ),

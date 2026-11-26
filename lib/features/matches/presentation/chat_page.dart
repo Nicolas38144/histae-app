@@ -50,6 +50,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   Timer? _readTimer;
   String? _head;
   bool _profileOpening = false;
+  bool _continuing = false;
   bool get _foreground =>
       WidgetsBinding.instance.lifecycleState == null ||
       WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed;
@@ -427,7 +428,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                       compact:
                           layout.maxHeight < 480 ||
                           MediaQuery.textScalerOf(context).scale(1) > 1.4,
-                      loading: c.showLoading,
+                      loading: c.showLoading && !_continuing,
                       onDecisions: _decisions,
                     ),
                     Expanded(
@@ -639,6 +640,11 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                                 controller: c.continuation,
                                 matchId: widget.matchId,
                                 catalog: widget.catalog,
+                                onProgressChanged: (working) {
+                                  if (mounted) {
+                                    setState(() => _continuing = working);
+                                  }
+                                },
                               ),
                             if (match.sendAllowed)
                               Padding(

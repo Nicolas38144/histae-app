@@ -38,6 +38,7 @@ class _ContinuationPageState extends State<ContinuationPage>
     with WidgetsBindingObserver {
   ContinuationController get c => widget.controller;
   late final _key = c.access.session.resourceKey;
+  bool _continuing = false;
 
   @override
   void initState() {
@@ -157,7 +158,7 @@ class _ContinuationPageState extends State<ContinuationPage>
                       ),
                     ),
                   ),
-                if (c.loading || c.busy || !c.access.verified)
+                if (!_continuing && (c.loading || c.busy || !c.access.verified))
                   LinearProgressIndicator(
                     semanticsLabel: AppStrings.of(context)
                         .messages
@@ -200,7 +201,7 @@ class _ContinuationPageState extends State<ContinuationPage>
                               .date(m.expiresAt),
                         ),
                   ),
-                  if (c.myContinued)
+                  if (c.myContinued && !_continuing)
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       child: Text(
@@ -218,10 +219,14 @@ class _ContinuationPageState extends State<ContinuationPage>
                             ),
                       ),
                     ContinuationAction(
+                      key: ValueKey(m.id),
                       controller: c,
                       matchId: widget.matchId,
                       catalog: widget.catalog,
                       showFeedback: false,
+                      onProgressChanged: (working) {
+                        if (mounted) setState(() => _continuing = working);
+                      },
                     ),
                   ],
                   HistaeButton.text(

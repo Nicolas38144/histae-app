@@ -204,7 +204,7 @@ class _CreditsPageState extends State<CreditsPage> with WidgetsBindingObserver {
                   ),
                 ),
                 const SizedBox(height: 24),
-                if (c.loading) ...[
+                if (c.loading && !video.busy) ...[
                   LinearProgressIndicator(
                     semanticsLabel: AppStrings.of(context)
                         .messages
