@@ -3145,6 +3145,14 @@ class AppMessagesEn extends AppMessages {
       'Scroll to the bottom of the profile, then swipe up to pass. The Pass button does the same thing.';
 
   @override
+  String get feedGuideMenuTitle => 'Feed menu';
+
+  @override
+  String feedGuideMenuBody(String refreshFeed, String refreshLocation) {
+    return 'Open the three-dot menu in the top right. Choose “$refreshFeed” to look for more profiles or “$refreshLocation” if you’re somewhere new.';
+  }
+
+  @override
   String get feedGuideTabsTitle => 'Move between your spaces';
 
   @override

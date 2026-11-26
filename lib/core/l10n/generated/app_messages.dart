@@ -5210,6 +5210,18 @@ abstract class AppMessages {
   /// **'Faites défiler le profil jusqu’en bas, puis glissez vers le haut pour passer. Le bouton « Passer » fait la même chose.'**
   String get feedGuidePassBody;
 
+  /// Title of the feed guide step about the overflow menu
+  ///
+  /// In fr, this message translates to:
+  /// **'Le menu du feed'**
+  String get feedGuideMenuTitle;
+
+  /// Where to find and when to use the two refresh actions in the feed
+  ///
+  /// In fr, this message translates to:
+  /// **'Ouvrez le menu à trois points en haut à droite. Choisissez « {refreshFeed} » pour relancer la recherche ou « {refreshLocation} » si vous avez changé de lieu.'**
+  String feedGuideMenuBody(String refreshFeed, String refreshLocation);
+
   /// Local drafts, feed guidance, help, local match search and weekly renewal.
   ///
   /// In fr, this message translates to:

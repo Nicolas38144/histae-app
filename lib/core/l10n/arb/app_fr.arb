@@ -3676,6 +3676,18 @@
   "@feedGuidePassBody": {
     "description": "Local drafts, feed guidance, help, local match search and weekly renewal."
   },
+  "feedGuideMenuTitle": "Le menu du feed",
+  "@feedGuideMenuTitle": {
+    "description": "Title of the feed guide step about the overflow menu"
+  },
+  "feedGuideMenuBody": "Ouvrez le menu à trois points en haut à droite. Choisissez « {refreshFeed} » pour relancer la recherche ou « {refreshLocation} » si vous avez changé de lieu.",
+  "@feedGuideMenuBody": {
+    "description": "Where to find and when to use the two refresh actions in the feed",
+    "placeholders": {
+      "refreshFeed": { "type": "String" },
+      "refreshLocation": { "type": "String" }
+    }
+  },
   "feedGuideTabsTitle": "Retrouver vos espaces",
   "@feedGuideTabsTitle": {
     "description": "Local drafts, feed guidance, help, local match search and weekly renewal."

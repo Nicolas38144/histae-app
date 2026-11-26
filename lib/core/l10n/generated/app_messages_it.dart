@@ -3182,7 +3182,15 @@ class AppMessagesIt extends AppMessages {
       'Scorri fino in fondo al profilo, poi verso l’alto per passare. Il pulsante Passa fa la stessa cosa.';
 
   @override
-  String get feedGuideTabsTitle => 'Passa da uno spazio all’altro';
+  String get feedGuideMenuTitle => 'Menu del feed';
+
+  @override
+  String feedGuideMenuBody(String refreshFeed, String refreshLocation) {
+    return 'Apri il menu con i tre puntini in alto a destra. Scegli «$refreshFeed» per cercare altri profili o «$refreshLocation» se hai cambiato zona.';
+  }
+
+  @override
+  String get feedGuideTabsTitle => 'Passa da uno spazio all\'altro';
 
   @override
   String get feedGuideTabsBody =>

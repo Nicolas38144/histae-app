@@ -921,6 +921,8 @@
   "feedGuideLikeBody": "Toca dos veces el perfil para enviar un me gusta. También puedes usar el botón del corazón.",
   "feedGuidePassTitle": "Lee y después pasa",
   "feedGuidePassBody": "Desplázate hasta el final del perfil y desliza hacia arriba para pasar. El botón Pasar hace lo mismo.",
+  "feedGuideMenuTitle": "Menú del feed",
+  "feedGuideMenuBody": "Abre el menú de tres puntos arriba a la derecha. Elige «{refreshFeed}» para volver a buscar perfiles o «{refreshLocation}» si has cambiado de lugar.",
   "feedGuideTabsTitle": "Cambia de sección",
   "feedGuideTabsBody": "Desliza horizontalmente entre Perfil, Feed y Matches, o usa los botones de la parte inferior.",
   "feedGuideDone": "Entendido",

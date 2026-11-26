@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/main_shell.dart';
 import 'package:histae_app/app/theme.dart';
 import 'package:histae_app/core/widgets/histae_button.dart';
+import 'package:histae_app/core/widgets/histae_empty_state.dart';
 import 'package:histae_app/features/consents/domain/consent_state.dart';
 import 'package:histae_app/features/discovery/application/discovery_controller.dart';
 import 'package:histae_app/features/discovery/data/device_location.dart';
@@ -26,6 +27,53 @@ import 'support/scrolling.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  testWidgets(
+    'an exhausted feed refreshes from the menu and retries errors in place',
+    (tester) async {
+      var feedReads = 0;
+      final session = testSession((r) async {
+        if (r.url.path == '/api/feed') {
+          if (++feedReads == 2) return apiError(500, 'internal_error');
+          return jsonResponse({'profiles': <Object?>[], 'next_cursor': null});
+        }
+        return defaultDiscoveryResponse(r);
+      });
+      addTearDown(session.dispose);
+      await session.establish(testTokens);
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: histaeTheme(Brightness.dark),
+          home: MainShell(session: session),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final emptyState = find.byType(HistaeEmptyState);
+      final refresh = find.text('Actualiser le feed');
+      expect(feedReads, 1);
+      expect(emptyState, findsOneWidget);
+      expect(refresh, findsNothing);
+
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+      expect(refresh, findsOneWidget);
+      expect(find.text('Actualiser ma position'), findsOneWidget);
+      await tester.tap(refresh);
+      await tester.pumpAndSettle();
+      expect(feedReads, 2);
+      expect(emptyState, findsNothing);
+
+      final retry = find.widgetWithText(OutlinedButton, 'Réessayer');
+      await tester.tap(retry);
+      await tester.pumpAndSettle();
+      expect(feedReads, 3);
+      expect(emptyState, findsOneWidget);
+      expect(refresh, findsNothing);
+      expect(retry, findsNothing);
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
+
   testWidgets(
     'a missing biography blocks the feed until a nonblank edit is saved',
     (tester) async {

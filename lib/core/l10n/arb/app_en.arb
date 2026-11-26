@@ -921,6 +921,8 @@
   "feedGuideLikeBody": "Tap the profile twice to send a like. You can also use the heart button.",
   "feedGuidePassTitle": "Read, then move on",
   "feedGuidePassBody": "Scroll to the bottom of the profile, then swipe up to pass. The Pass button does the same thing.",
+  "feedGuideMenuTitle": "Feed menu",
+  "feedGuideMenuBody": "Open the three-dot menu in the top right. Choose “{refreshFeed}” to look for more profiles or “{refreshLocation}” if you’re somewhere new.",
   "feedGuideTabsTitle": "Move between your spaces",
   "feedGuideTabsBody": "Swipe horizontally between Profile, Feed and Matches, or use the buttons at the bottom of the screen.",
   "feedGuideDone": "Got it",

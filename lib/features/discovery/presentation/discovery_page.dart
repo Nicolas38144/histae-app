@@ -353,6 +353,10 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
       final ready = !detailsChanged && c.ready;
       final profile = detailsChanged ? null : c.current;
       final required = c.requiredActions;
+      final text = AppStrings.of(context).messages;
+      final showFeedStatus =
+          ready && profile == null && !c.loading && c.failure == null;
+      final showExhaustedState = showFeedStatus && c.exhausted;
       final showFeed =
           ready &&
           !c.locating &&
@@ -393,23 +397,16 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                   : null,
             ),
         ],
-        if (ready && profile == null && !c.loading && c.failure == null)
-          if (c.exhausted)
-            HistaeEmptyState(
-              title: AppStrings.of(context)
-                  .messages
-                  .discoveryPageAQuietMomentForNow,
-              body: AppStrings.of(context)
-                  .messages
-                  .discoveryPageYouHaveSeenTheAvailableProfiles,
-            )
-          else
-            EditorialCard(
-              title: AppStrings.of(context).messages.discoveryPageJustAMoment,
-              body: AppStrings.of(context)
-                  .messages
-                  .discoveryPageTheSearchCanContinueLoadMore,
-            ),
+        if (showExhaustedState)
+          HistaeEmptyState(
+            title: text.discoveryPageAQuietMomentForNow,
+            body: text.discoveryPageYouHaveSeenTheAvailableProfiles,
+          )
+        else if (showFeedStatus)
+          EditorialCard(
+            title: text.discoveryPageJustAMoment,
+            body: text.discoveryPageTheSearchCanContinueLoadMore,
+          ),
         if (c.pending case final intent?)
           DiscoveryPendingChoiceCard(
             intent: intent,
@@ -463,7 +460,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
             AppStrings.of(context).messages
                 .appStringsTryAgainInS(c.retrySeconds),
           ),
-        if (!showFeed)
+        if (!showFeed && !showExhaustedState && !c.loading)
           HistaeButton.outlined(
             onPressed: enabled
                 ? (c.ready &&
@@ -474,7 +471,9 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                       : c.refresh)
                 : null,
             child: Text(
-              AppStrings.of(context).messages.discoveryPageRefreshFeed,
+              c.failure != null && c.pending == null
+                  ? text.appStringsTryAgain
+                  : text.discoveryPageRefreshFeed,
             ),
           ),
         if (c.encounter case final encounter?)
@@ -533,18 +532,12 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                 PopupMenuItem(
                   value: 'refresh',
                   enabled: enabled,
-                  child: Text(
-                    AppStrings.of(context).messages.discoveryPageRefreshFeed,
-                  ),
+                  child: Text(text.discoveryPageRefreshFeed),
                 ),
                 PopupMenuItem(
                   value: 'location',
                   enabled: enabled,
-                  child: Text(
-                    AppStrings.of(context)
-                        .messages
-                        .discoveryPageRefreshMyLocation,
-                  ),
+                  child: Text(text.discoveryPageRefreshMyLocation),
                 ),
                 if (profile != null)
                   PopupMenuItem(
