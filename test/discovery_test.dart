@@ -32,6 +32,7 @@ void main() {
     (tester) async {
       final source = TestLocationSource();
       final savedPosition = Completer<http.Response>();
+      final refreshedFeed = Completer<http.Response>();
       final requests = <String>[];
       final session = testSession((r) async {
         switch (r.url.path) {
@@ -39,12 +40,9 @@ void main() {
             requests.add('presence');
             return savedPosition.future;
           case '/api/feed':
-            final positionUpdated = requests.lastOrNull == 'presence';
             requests.add('feed');
-            return jsonResponse({
-              'profiles': [if (positionUpdated) candidateJson(candidateOne)],
-              'next_cursor': null,
-            });
+            if (requests.length > 1) return refreshedFeed.future;
+            return jsonResponse({'profiles': <Object?>[], 'next_cursor': null});
         }
         return defaultDiscoveryResponse(r);
       });
@@ -77,10 +75,26 @@ void main() {
       expect(find.byType(AlertDialog), findsNothing);
       expect(source.calls, 1);
       expect(requests, ['feed', 'presence']);
+      final emptyState = find.byType(HistaeEmptyState);
+      final linearProgress = find.byType(LinearProgressIndicator);
+      expect(emptyState, findsOneWidget);
+      expect(linearProgress, findsNothing);
 
       savedPosition.complete(jsonResponse({'message': 'presence updated'}));
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump();
       expect(requests, ['feed', 'presence', 'feed']);
+      expect(emptyState, findsOneWidget);
+      expect(linearProgress, findsNothing);
+      expect(find.byType(RefreshProgressIndicator), findsOneWidget);
+
+      refreshedFeed.complete(
+        jsonResponse({
+          'profiles': [candidateJson(candidateOne)],
+          'next_cursor': null,
+        }),
+      );
+      await tester.pumpAndSettle();
       expect(find.byType(FeedProfileCard), findsOneWidget);
       expect(find.byType(RefreshIndicator), findsNothing);
       await tester.pumpWidget(const SizedBox.shrink());

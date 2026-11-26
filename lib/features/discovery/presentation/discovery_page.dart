@@ -60,7 +60,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
   bool _guideScheduled = false, _guideOpen = false;
   bool _readingOpen = false;
   ModalRoute<dynamic>? _route;
-  bool _profileRefreshScheduled = false;
+  bool _profileRefreshScheduled = false, _pullRefreshing = false;
 
   bool get _canPresentProfileRefresh =>
       mounted && widget.visible && !_opening && _route?.isCurrent == true;
@@ -269,6 +269,19 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
     await c.publishLocation();
   }
 
+  Future<void> _refreshFromPull() async {
+    setState(() => _pullRefreshing = true);
+    try {
+      if (c.locationConsent) {
+        await c.publishLocation();
+      } else {
+        await c.refresh();
+      }
+    } finally {
+      if (mounted) setState(() => _pullRefreshing = false);
+    }
+  }
+
   Future<void> _openLocationSettings() async {
     final opened = await c.location.openSettings(
       services: c.locationIssue == LocationIssue.disabled,
@@ -357,14 +370,20 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
       final showFeedStatus =
           ready && profile == null && !c.loading && c.failure == null;
       final showExhaustedState = showFeedStatus && c.exhausted;
+      final emptyState = HistaeEmptyState(
+        title: text.discoveryPageAQuietMomentForNow,
+        body: text.discoveryPageYouHaveSeenTheAvailableProfiles,
+      );
       final showFeed =
           ready &&
+          !_pullRefreshing &&
           !c.locating &&
           c.locationIssue == null &&
           profile != null &&
           (c.pending == null || (c.sending && !c.uncertain)) &&
           c.failure == null;
-      final enabled = !detailsChanged && !c.busy && c.retrySeconds == 0;
+      final enabled =
+          !detailsChanged && !_pullRefreshing && !c.busy && c.retrySeconds == 0;
       _offerGuide(showFeed);
       final locationInCard =
           !detailsChanged &&
@@ -398,10 +417,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
             ),
         ],
         if (showExhaustedState)
-          HistaeEmptyState(
-            title: text.discoveryPageAQuietMomentForNow,
-            body: text.discoveryPageYouHaveSeenTheAvailableProfiles,
-          )
+          emptyState
         else if (showFeedStatus)
           EditorialCard(
             title: text.discoveryPageJustAMoment,
@@ -627,19 +643,18 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                     ],
                   )
                 : RefreshIndicator(
-                    onRefresh: () =>
-                        c.locationConsent ? c.publishLocation() : c.refresh(),
+                    onRefresh: _refreshFromPull,
                     semanticsLabel: text.discoveryPageRefreshFeed,
                     notificationPredicate: (notification) =>
                         showExhaustedState &&
                         enabled &&
                         defaultScrollNotificationPredicate(notification),
                     child: ListView(
-                      physics: showExhaustedState
+                      physics: showExhaustedState || _pullRefreshing
                           ? const AlwaysScrollableScrollPhysics()
                           : null,
                       padding: HistaeTokens.pagePadding,
-                      children: statusBody,
+                      children: _pullRefreshing ? [emptyState] : statusBody,
                     ),
                   ),
           ),
