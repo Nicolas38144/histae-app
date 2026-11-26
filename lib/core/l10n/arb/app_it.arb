@@ -553,6 +553,7 @@
   "firstnameInvalid": "Il nome è obbligatorio (massimo 100 byte).",
   "sexInvalid": "Scegli uno dei valori proposti.",
   "bioTooLong": "La presentazione è troppo lunga.",
+  "bioRequired": "Scrivi qualche parola per presentarti.",
   "ageRangeInvalid": "Le età devono andare da 18 a 99 anni, in questo ordine.",
   "distanceInvalid": "La distanza deve essere compresa tra 1 e 500 km.",
   "answerInvalid": "Ogni risposta deve contenere da 10 a 300 caratteri su una riga (massimo 1000 byte).",
@@ -810,6 +811,10 @@
   "@discoveryPhotoBody": {
     "description": "Private photo readiness and mutual sharing controls."
   },
+  "discoveryTraitsBody": "Scegli almeno un tratto che ti descriva per accedere al feed.",
+  "discoveryBiographyBody": "Aggiungi una presentazione per accedere al feed.",
+  "discoveryWriteBiography": "Scrivi la mia presentazione",
+  "discoveryAnswersBody": "Salva almeno una risposta per accedere al feed.",
   "photoRevealTitle": "Un volto dietro le parole.",
   "@photoRevealTitle": {
     "description": "Private photo readiness and mutual sharing controls."

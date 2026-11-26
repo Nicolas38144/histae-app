@@ -38,7 +38,7 @@ class _RegistrationProfileStepState extends State<RegistrationProfileStep> {
       _firstname.text,
       _birthdate?.toIso8601String().substring(0, 10) ?? '',
       _sex,
-      _bio.text.trim().isEmpty ? null : _bio.text,
+      _bio.text,
     );
     if (_error != null) setState(() => _error = null);
   }
@@ -122,7 +122,7 @@ class _RegistrationProfileStepState extends State<RegistrationProfileStep> {
           valueListenable: _bio,
           builder: (context, value, _) => HistaeButton(
             key: const Key('registration-next'),
-            onPressed: biographyWithinLimit(value.text) ? _continue : null,
+            onPressed: validateBiography(value.text) == null ? _continue : null,
             child: Text(copy.registrationContinue),
           ),
         ),

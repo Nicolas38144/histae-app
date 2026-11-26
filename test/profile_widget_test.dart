@@ -395,12 +395,15 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('OK'));
       await tester.pumpAndSettle();
+      final bio = find.widgetWithText(TextField, 'Quelques mots sur vous');
+      await tapVisible(tester, bio);
+      await tester.enterText(bio, 'Une promenade en forêt.');
       await tapVisible(tester, find.text('Enregistrer'));
       expect(profile, {
         'firstname': 'Alex',
         'birthdate': '1995-06-12',
         'sex': null,
-        'bio': null,
+        'bio': 'Une promenade en forêt.',
       });
       expect(find.byType(IdentityEditor), findsNothing);
     },
@@ -427,7 +430,15 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('main-tab-profile')));
       await tester.pumpAndSettle();
-      await tapVisible(tester, find.text('Modifier ma présentation'));
+      final introduction = find.text('Modifier ma présentation');
+      await tester.scrollUntilVisible(
+        introduction,
+        180,
+        scrollable: verticalScrollables.first,
+      );
+      expect(find.text(owner['bio'] as String), findsOneWidget);
+      expect(find.text('Approuvé'), findsNothing);
+      await tapVisible(tester, introduction);
       await tapVisible(
         tester,
         find.widgetWithText(TextField, 'Quelques mots sur vous'),

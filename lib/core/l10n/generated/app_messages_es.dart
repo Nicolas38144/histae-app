@@ -2083,6 +2083,9 @@ class AppMessagesEs extends AppMessages {
   String get bioTooLong => 'Tu presentación es demasiado larga.';
 
   @override
+  String get bioRequired => 'Escribe unas palabras para presentarte.';
+
+  @override
   String get ageRangeInvalid =>
       'Las edades deben ir de 18 a 99 años, en ese orden.';
 
@@ -2992,6 +2995,21 @@ class AppMessagesEs extends AppMessages {
   @override
   String get discoveryPhotoBody =>
       'Añade una foto para acceder al feed. Será privada: solo tus encuentros podrán verla después de que ambos aceptéis revelar vuestras fotos.';
+
+  @override
+  String get discoveryTraitsBody =>
+      'Elige al menos un rasgo que te describa para acceder al feed.';
+
+  @override
+  String get discoveryBiographyBody =>
+      'Añade una presentación para acceder al feed.';
+
+  @override
+  String get discoveryWriteBiography => 'Escribir mi presentación';
+
+  @override
+  String get discoveryAnswersBody =>
+      'Guarda al menos una respuesta para acceder al feed.';
 
   @override
   String get photoRevealTitle => 'Un rostro detrás de las palabras.';

@@ -44,6 +44,11 @@ class DiscoveryStrings {
 
   String actionTitle(DiscoveryAction action) => switch (action) {
     DiscoveryAction.photo => strings.messages.discoveryPhotoTitle,
+    DiscoveryAction.biography =>
+      strings.messages.identityEditorAFewWordsAboutYou,
+    DiscoveryAction.traits => strings.messages.profileSectionsWhatMakesYouYou,
+    DiscoveryAction.conversationStarters =>
+      strings.messages.profileSectionsConversationStarters,
     DiscoveryAction.profile =>
       strings.messages.discoveryStringsYourIntroduction,
     DiscoveryAction.resumeDiscovery =>
@@ -61,6 +66,10 @@ class DiscoveryStrings {
 
   String actionBody(DiscoveryAction action) => switch (action) {
     DiscoveryAction.photo => strings.messages.discoveryPhotoBody,
+    DiscoveryAction.biography => strings.messages.discoveryBiographyBody,
+    DiscoveryAction.traits => strings.messages.discoveryTraitsBody,
+    DiscoveryAction.conversationStarters =>
+      strings.messages.discoveryAnswersBody,
     DiscoveryAction.profile =>
       strings.messages.discoveryStringsAddYourFirstNameDateOf,
     DiscoveryAction.resumeDiscovery =>
@@ -80,6 +89,11 @@ class DiscoveryStrings {
     DiscoveryAction.freshPresence =>
       strings.messages.discoveryPageRefreshMyLocation,
     DiscoveryAction.sex => strings.messages.discoveryRequestIdentityCorrection,
+    DiscoveryAction.photo => strings.messages.profileSectionsManageMyPhoto,
+    DiscoveryAction.biography => strings.messages.discoveryWriteBiography,
+    DiscoveryAction.traits => strings.messages.profileSectionsChooseMyTraits,
+    DiscoveryAction.conversationStarters =>
+      strings.messages.profileSectionsWriteMyAnswers,
     DiscoveryAction.resumeDiscovery =>
       strings.messages.discoveryStatusSectionsResumeDiscovery,
     _ => strings.messages.discoveryStatusSectionsCompleteThisStep,

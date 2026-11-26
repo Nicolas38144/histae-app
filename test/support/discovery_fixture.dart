@@ -60,6 +60,11 @@ http.Response defaultDiscoveryResponse(http.Request r) => switch (r.url.path) {
     ),
   ),
   '/api/users/me/discovery-status' => jsonResponse(discoveryStatusJson()),
+  '/api/users/me/profile-answers' when r.method == 'GET' => jsonResponse({
+    'answers': [
+      answerJson(questionOne, 'Un café, un livre et une promenade.', 0),
+    ],
+  }),
   '/api/feed' => jsonResponse({
     'profiles': [
       candidateJson(candidateOne),

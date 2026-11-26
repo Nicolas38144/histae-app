@@ -40,6 +40,7 @@ class AppStrings {
     ClientMessage.underage => messages.underage,
     ClientMessage.birthdateInvalid => messages.birthdateInvalid,
     ClientMessage.distanceInvalid => messages.distanceInvalid,
+    ClientMessage.bioRequired => messages.bioRequired,
     ClientMessage.bioTooLong => messages.bioTooLong,
     ClientMessage.firstnameInvalid => messages.firstnameInvalid,
     ClientMessage.ageRangeInvalid => messages.ageRangeInvalid,

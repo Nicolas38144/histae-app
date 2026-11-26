@@ -34,6 +34,8 @@ class BiographyField extends StatelessWidget {
             decoration: InputDecoration(
               labelText: text.identityEditorAFewWordsAboutYou,
               alignLabelWithHint: true,
+              helperText: value.text.trim().isEmpty ? text.bioRequired : null,
+              helperMaxLines: 3,
             ),
             builder: (decoration) => TextField(
               controller: controller,

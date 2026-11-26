@@ -44,6 +44,8 @@ class ProfileController extends ChangeNotifier {
     },
   );
   int photoRevision = 0;
+  int discoveryDetailsRevision = 0;
+  bool discoveryDetailsConfirmed = false;
   PhotoIntent? photoIntent;
   DateTime? photoReadAt;
 
@@ -185,7 +187,15 @@ class ProfileController extends ChangeNotifier {
     });
   }
 
-  Future<void> load({ReadPolicy policy = ReadPolicy.refresh}) async {
+  Future<void> refreshDiscoveryDetails() => _load(discoveryDetailsOnly: true);
+
+  Future<void> load({ReadPolicy policy = ReadPolicy.refresh}) =>
+      _load(policy: policy);
+
+  Future<void> _load({
+    ReadPolicy policy = ReadPolicy.refresh,
+    bool discoveryDetailsOnly = false,
+  }) async {
     if (_disposed || !accessible || loading || saving || retrySeconds > 0) {
       return;
     }
@@ -226,25 +236,27 @@ class ProfileController extends ChangeNotifier {
         profile = p;
         photoReadAt = repository.profileReadAt;
       }),
-      read(
-        'preferences',
-        () => repository.preferences(scope, policy: policy),
-        (p) => preferences = p,
-      ),
-      read(
-        'traits',
-        () => repository.traits(scope, policy: policy),
-        (v) => _traits = v,
-      ),
+      if (!discoveryDetailsOnly) ...[
+        read(
+          'preferences',
+          () => repository.preferences(scope, policy: policy),
+          (p) => preferences = p,
+        ),
+        read(
+          'traits',
+          () => repository.traits(scope, policy: policy),
+          (v) => _traits = v,
+        ),
+        read(
+          'questions',
+          () => repository.questions(scope, policy: policy),
+          (v) => _questions = v,
+        ),
+      ],
       read(
         'selectedTraits',
         () => repository.selectedTraits(scope, policy: policy),
         (v) => _selectedTraits = v,
-      ),
-      read(
-        'questions',
-        () => repository.questions(scope, policy: policy),
-        (v) => _questions = v,
       ),
       read(
         'answers',
@@ -274,31 +286,51 @@ class ProfileController extends ChangeNotifier {
         code: 'profile_identity_locked',
       );
     }
-    await mutate(() => repository.saveProfile(draft));
+    await mutate(
+      () => repository.saveProfile(draft),
+      confirmsDiscoveryDetails: () =>
+          !_errors.containsKey('profile') && profile?.bio == draft.bio?.trim(),
+    );
   }
 
   Future<void> savePreferences(Preferences preferences) =>
       mutate(() => repository.savePreferences(preferences));
 
-  Future<void> setTrait(String id, bool selected) =>
-      mutate(() => repository.setTrait(id, selected));
+  Future<void> setTrait(String id, bool selected) => mutate(
+    () => repository.setTrait(id, selected),
+    confirmsDiscoveryDetails: () =>
+        !_errors.containsKey('selectedTraits') &&
+        _selectedTraits.any((trait) => trait.id == id) == selected,
+  );
 
-  Future<void> saveAnswers(List<AnswerDraft> drafts) =>
-      mutate(() => repository.saveAnswers(drafts));
+  Future<void> saveAnswers(List<AnswerDraft> drafts) => mutate(
+    () => repository.saveAnswers(drafts),
+    confirmsDiscoveryDetails: () =>
+        !_errors.containsKey('answers') &&
+        _answers.any((answer) => answer.answer.trim().isNotEmpty) ==
+            drafts.isNotEmpty,
+  );
 
   Future<void> removePhoto() async {
-    await mutate(repository.removePhoto, photo: true);
+    await mutate(
+      repository.removePhoto,
+      photo: true,
+      confirmsDiscoveryDetails: () =>
+          !_errors.containsKey('profile') && profile?.photo == null,
+    );
     setPhoto(null);
   }
 
   Future<void> mutate(
     Future<void> Function() action, {
     bool photo = false,
+    bool Function()? confirmsDiscoveryDetails,
   }) async {
     if (!canWrite) throw const ApiFailure(ApiFailureKind.conflict);
     final generation = _generation;
     saving = true;
     _notify();
+    var saved = false;
     try {
       await action();
       if (_disposed || generation != _generation || !accessible) {
@@ -309,6 +341,7 @@ class ProfileController extends ChangeNotifier {
         profile = null;
         photoReadAt = null;
       }
+      saved = true;
     } on ApiFailure catch (e) {
       if (!_disposed && generation == _generation) {
         _cooldown(e);
@@ -338,11 +371,17 @@ class ProfileController extends ChangeNotifier {
         _notify();
         if (_languageDirty) {
           _localeRevision = session.localizationRevision;
-          unawaited(load());
+        }
+        if (saved || _languageDirty) await load();
+        if (confirmsDiscoveryDetails != null &&
+            !_disposed &&
+            generation == _generation) {
+          discoveryDetailsConfirmed = saved && confirmsDiscoveryDetails();
+          discoveryDetailsRevision++;
+          _notify();
         }
       }
     }
-    await load();
   }
 
   Future<void> upload() async {
@@ -353,7 +392,12 @@ class ProfileController extends ChangeNotifier {
     if (uncertain && accessible && !saving && !loading && retrySeconds == 0) {
       uncertain = false;
     }
-    await mutate(() => repository.upload(intent), photo: true);
+    await mutate(
+      () => repository.upload(intent),
+      photo: true,
+      confirmsDiscoveryDetails: () =>
+          !_errors.containsKey('profile') && profile?.photo != null,
+    );
   }
 
   void setPhoto(List<int>? bytes) {

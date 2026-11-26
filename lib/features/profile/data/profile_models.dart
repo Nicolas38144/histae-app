@@ -113,6 +113,11 @@ const biographyTextLimit = TextLengthLimit(
 bool biographyWithinLimit(String value) =>
     biographyTextLimit.allows(value.trim());
 
+ClientMessage? validateBiography(String? value) {
+  if (value == null || value.trim().isEmpty) return ClientMessage.bioRequired;
+  return biographyWithinLimit(value) ? null : ClientMessage.bioTooLong;
+}
+
 class ProfileDraft {
   const ProfileDraft(this.firstname, this.birthdate, this.sex, this.bio);
 
@@ -138,10 +143,7 @@ class ProfileDraft {
     if (sex != null && !['male', 'female', 'other'].contains(sex)) {
       return ClientMessage.sexInvalid;
     }
-    if (bio case final biography? when !biographyWithinLimit(biography)) {
-      return ClientMessage.bioTooLong;
-    }
-    return null;
+    return validateBiography(bio);
   }
 
   Map<String, Object?> toJson() => {
@@ -149,7 +151,7 @@ class ProfileDraft {
     'birthdate': birthdate,
     'sex': sex,
     'bio': bio?.trim(),
-  }; // Both nullable fields are intentionally sent.
+  };
 }
 
 class Preferences {

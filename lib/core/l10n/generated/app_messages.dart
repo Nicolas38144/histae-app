@@ -3423,6 +3423,12 @@ abstract class AppMessages {
   /// **'La présentation est trop longue.'**
   String get bioTooLong;
 
+  /// No description provided for @bioRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Écrivez quelques mots pour vous présenter.'**
+  String get bioRequired;
+
   /// Interface: lib/features/profile/data/profile_models.dart
   ///
   /// In fr, this message translates to:
@@ -4897,6 +4903,30 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Ajoutez une photo pour accéder au feed. Elle restera privée : seuls vos matchs pourront la découvrir après votre accord mutuel.'**
   String get discoveryPhotoBody;
+
+  /// No description provided for @discoveryTraitsBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisissez au moins un trait qui vous ressemble pour accéder au feed.'**
+  String get discoveryTraitsBody;
+
+  /// No description provided for @discoveryBiographyBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajoutez une présentation pour accéder au feed.'**
+  String get discoveryBiographyBody;
+
+  /// No description provided for @discoveryWriteBiography.
+  ///
+  /// In fr, this message translates to:
+  /// **'Écrire ma présentation'**
+  String get discoveryWriteBiography;
+
+  /// No description provided for @discoveryAnswersBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrez au moins une réponse pour accéder au feed.'**
+  String get discoveryAnswersBody;
 
   /// Private photo readiness and mutual sharing controls.
   ///

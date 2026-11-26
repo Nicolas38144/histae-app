@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/network/read_snapshots.dart';
 import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/editorial_card.dart';
@@ -59,6 +60,42 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
   HelpController? _help;
   bool _guideScheduled = false, _guideOpen = false;
   bool _readingOpen = false;
+  int _checkedDiscoveryDetailsRevision = 0;
+  bool _checkingDiscoveryDetails = false;
+
+  bool get _canCheckDiscoveryDetails =>
+      widget.visible &&
+      !_opening &&
+      c.accessible &&
+      c.session.resourceKey == _key &&
+      !c.busy &&
+      c.retrySeconds == 0 &&
+      !widget.profile.loading &&
+      !widget.profile.saving &&
+      widget.profile.retrySeconds == 0 &&
+      ModalRoute.isCurrentOf(context) == true;
+
+  void _checkDiscoveryDetails() {
+    if (_checkingDiscoveryDetails || !_canCheckDiscoveryDetails) return;
+    _checkingDiscoveryDetails = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      try {
+        if (!_canCheckDiscoveryDetails) return;
+        final profile = widget.profile;
+        final revision = profile.discoveryDetailsRevision;
+        if (!profile.discoveryDetailsConfirmed) {
+          await profile.refreshDiscoveryDetails();
+        }
+        if (!mounted || !_canCheckDiscoveryDetails) return;
+        _checkedDiscoveryDetailsRevision = revision;
+        c.deactivate();
+        await c.activate(profileDetailsPolicy: ReadPolicy.cached);
+      } finally {
+        if (mounted) setState(() => _checkingDiscoveryDetails = false);
+      }
+    });
+  }
 
   @override
   void didChangeDependencies() {
@@ -176,7 +213,10 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
       await _locate();
       return;
     }
-    _opening = true;
+    setState(() {
+      _opening = true;
+      _message = null;
+    });
     try {
       if (action == DiscoveryAction.locationConsent ||
           action == DiscoveryAction.sensitiveConsent ||
@@ -189,11 +229,14 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
       final profile = widget.profile;
       await profile.load();
       if (!mounted || !c.accessible || c.session.resourceKey != _key) return;
-      final section = action == DiscoveryAction.preferences
-          ? 'preferences'
-          : 'profile';
+      final sections = switch (action) {
+        DiscoveryAction.preferences => ['preferences'],
+        DiscoveryAction.traits => ['traits', 'selectedTraits'],
+        DiscoveryAction.conversationStarters => ['questions', 'answers'],
+        _ => ['profile'],
+      };
       if (profile.loading ||
-          profile.errors.containsKey(section) ||
+          sections.any(profile.errors.containsKey) ||
           profile.uncertain) {
         setState(() {
           _message = AppStrings.of(context)
@@ -205,13 +248,18 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
       await _open(switch (action) {
         DiscoveryAction.photo => PhotoPage(controller: profile),
         DiscoveryAction.preferences => PreferencesEditor(controller: profile),
+        DiscoveryAction.traits => TraitsEditor(controller: profile),
+        DiscoveryAction.biography => IdentityEditor(controller: profile),
+        DiscoveryAction.conversationStarters => AnswersEditor(
+          controller: profile,
+        ),
         DiscoveryAction.sex when profile.profile != null => PrivacyHubPage(
           session: c.session,
         ),
         _ => IdentityEditor(controller: profile),
       });
     } finally {
-      _opening = false;
+      if (mounted) setState(() => _opening = false);
     }
   }
 
@@ -306,24 +354,31 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
-    listenable: Listenable.merge([c, widget.visibility, _help]),
+    listenable: Listenable.merge([c, widget.profile, widget.visibility, _help]),
     builder: (context, _) {
       if (!c.accessible || c.session.resourceKey != _key) {
         return const HistaeScaffold(body: SizedBox.shrink());
       }
-      final profile = c.current;
+      final detailsChanged =
+          widget.profile.discoveryDetailsRevision !=
+          _checkedDiscoveryDetailsRevision;
+      if (detailsChanged) _checkDiscoveryDetails();
+      final ready = !detailsChanged && c.ready;
+      final profile = detailsChanged ? null : c.current;
       final required = c.requiredActions;
       final showFeed =
-          c.ready &&
+          ready &&
           !c.locating &&
           c.locationIssue == null &&
           profile != null &&
           (c.pending == null || (c.sending && !c.uncertain)) &&
           c.failure == null;
-      final enabled = !c.busy && c.retrySeconds == 0;
+      final enabled = !detailsChanged && !c.busy && c.retrySeconds == 0;
       _offerGuide(showFeed);
       final locationInCard =
-          !c.ready && required.contains(DiscoveryAction.freshPresence);
+          !detailsChanged &&
+          !ready &&
+          required.contains(DiscoveryAction.freshPresence);
       final locationFeedback = c.locationIssue == null
           ? null
           : DiscoveryLocationFeedback(
@@ -331,13 +386,13 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
               onOpenSettings: enabled ? _openLocationSettings : null,
             );
       final statusBody = <Widget>[
-        if (c.status == null && !c.busy && c.failure == null)
+        if (!detailsChanged && c.status == null && !c.busy && c.failure == null)
           Text(
             AppStrings.of(context)
                 .messages
                 .discoveryStringsThisPageHasExpiredRefreshProfiles,
           ),
-        if (!c.ready && c.status != null) ...[
+        if (!detailsChanged && !ready && c.status != null) ...[
           DiscoveryReadinessIntro(
             paused: required.contains(DiscoveryAction.resumeDiscovery),
           ),
@@ -350,7 +405,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                   : null,
             ),
         ],
-        if (c.ready && profile == null && !c.loading && c.failure == null)
+        if (ready && profile == null && !c.loading && c.failure == null)
           if (c.exhausted)
             HistaeEmptyState(
               title: AppStrings.of(context)
@@ -371,9 +426,9 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
           DiscoveryPendingChoiceCard(
             intent: intent,
             uncertain: c.uncertain,
-            onResume: c.canResume ? _retry : null,
+            onResume: enabled && c.canResume ? _retry : null,
           ),
-        if (c.loading || c.locating || c.sending) ...[
+        if (c.busy || (detailsChanged && c.retrySeconds == 0)) ...[
           const SizedBox(height: 16),
           LinearProgressIndicator(
             semanticsLabel: AppStrings.of(context)

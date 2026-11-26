@@ -18,6 +18,7 @@ class ProfileIntroductionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = controller;
     final p = c.profile;
+    final bio = p?.bio?.trim();
     final editable = !c.loading && !c.saving && !c.uncertain;
     return ProfilePanel(
       title: AppStrings.of(context).messages.identityEditorAFewWordsAboutYou,
@@ -32,21 +33,13 @@ class ProfileIntroductionCard extends StatelessWidget {
                   .messages
                   .profileSectionsYourIntroductionCouldNotBeRefreshed,
             )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  p?.bio ??
-                      AppStrings.of(context)
-                          .messages
-                          .profileSectionsBooksYouLovePlacesYouFeel,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-                if (p?.bioModeration != null) ...[
-                  const SizedBox(height: 12),
-                  ProfileModerationLabel(moderation: p!.bioModeration),
-                ],
-              ],
+          : Text(
+              bio == null || bio.isEmpty
+                  ? AppStrings.of(context)
+                        .messages
+                        .profileSectionsBooksYouLovePlacesYouFeel
+                  : bio,
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
     );
   }

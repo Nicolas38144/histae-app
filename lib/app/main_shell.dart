@@ -73,8 +73,6 @@ class _MainShellState extends State<MainShell> {
     if (_profile.photoRevision == _lastPhotoRevision) return;
     _lastPhotoRevision = _profile.photoRevision;
     _matches.profilePhotoChanged();
-    _discovery.deactivate();
-    if (!_covered) Future.microtask(_discovery.activate);
   }
 
   void _visibilityChanged() {
@@ -83,6 +81,10 @@ class _MainShellState extends State<MainShell> {
     final initial = _lastPaused == null;
     _lastPaused = paused;
     if (paused == null || initial) return;
+    _reloadDiscovery();
+  }
+
+  void _reloadDiscovery() {
     _discovery.deactivate();
     if (!_covered) {
       Future.microtask(_discovery.activate);
@@ -106,6 +108,7 @@ class _MainShellState extends State<MainShell> {
     if (covered == _covered) return;
     _matches.setRealtimeEnabled(!covered);
     setState(() => _covered = covered);
+    if (!covered) unawaited(_discovery.activate());
   }
 
   void _select(int index) {

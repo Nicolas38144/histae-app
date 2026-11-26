@@ -2,6 +2,7 @@ import '../../../core/network/api_client.dart';
 import '../../../core/network/json_fields.dart';
 import '../../../core/network/read_snapshots.dart';
 import '../../auth/domain/authenticated_session.dart';
+import '../../profile/data/profile_repository.dart';
 import 'discovery_models.dart';
 
 abstract interface class DiscoveryRepository {
@@ -12,7 +13,10 @@ abstract interface class DiscoveryRepository {
 
   AuthenticatedSession get session;
 
-  Future<DiscoveryStatus> status(RequestCancellation scope);
+  Future<DiscoveryStatus> status(
+    RequestCancellation scope, {
+    ReadPolicy profileDetailsPolicy = ReadPolicy.refresh,
+  });
 
   Future<FeedPage> feed(String? cursor, RequestCancellation scope);
 
@@ -31,6 +35,7 @@ final class ApiDiscoveryRepository implements DiscoveryRepository {
   ApiDiscoveryRepository(this.session, {ReadSnapshots? cache})
     : _reads = cache ?? ReadSnapshots();
   final ReadSnapshots _reads;
+  late final _profile = ProfileRepository(session, cache: _reads);
   @override
   final AuthenticatedSession session;
 
@@ -59,10 +64,42 @@ final class ApiDiscoveryRepository implements DiscoveryRepository {
   );
 
   @override
-  Future<DiscoveryStatus> status(RequestCancellation scope) async =>
-      DiscoveryStatus.fromJson(
-        await _request('GET', '/api/users/me/discovery-status', scope),
-      );
+  Future<DiscoveryStatus> status(
+    RequestCancellation scope, {
+    ReadPolicy profileDetailsPolicy = ReadPolicy.refresh,
+  }) async {
+    final status = DiscoveryStatus.fromJson(
+      await _request('GET', '/api/users/me/discovery-status', scope),
+    );
+    if (status.requiredActions.contains(DiscoveryAction.profile)) return status;
+
+    final missing = await Future.wait([
+      _profile
+          .profile(scope, policy: profileDetailsPolicy)
+          .then(
+            (profile) => profile?.bio?.trim().isNotEmpty == true
+                ? null
+                : DiscoveryAction.biography,
+          ),
+      _profile
+          .selectedTraits(scope, policy: profileDetailsPolicy)
+          .then((traits) => traits.isEmpty ? DiscoveryAction.traits : null),
+      _profile
+          .answers(scope, policy: profileDetailsPolicy)
+          .then(
+            (answers) =>
+                answers.any((answer) => answer.answer.trim().isNotEmpty)
+                ? null
+                : DiscoveryAction.conversationStarters,
+          ),
+    ]);
+    final actions = {...status.requiredActions, ...missing.nonNulls};
+    return DiscoveryStatus(
+      actions.isEmpty,
+      List.unmodifiable(actions),
+      status.presenceExpiresAt,
+    );
+  }
 
   @override
   Future<FeedPage> feed(String? cursor, RequestCancellation scope) async =>

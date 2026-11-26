@@ -3,7 +3,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:histae_app/app/main_shell.dart';
 import 'package:histae_app/app/theme.dart';
+import 'package:histae_app/core/widgets/histae_button.dart';
 import 'package:histae_app/features/consents/domain/consent_state.dart';
 import 'package:histae_app/features/discovery/application/discovery_controller.dart';
 import 'package:histae_app/features/discovery/data/device_location.dart';
@@ -14,13 +16,264 @@ import 'package:histae_app/features/discovery/presentation/discovery_status_sect
 import 'package:histae_app/features/discovery/presentation/feed_profile_card.dart';
 import 'package:histae_app/features/profile/application/profile_controller.dart';
 import 'package:histae_app/features/profile/data/profile_repository.dart';
+import 'package:histae_app/features/profile/presentation/profile_editors.dart';
 import 'package:http/http.dart' as http;
 
 import 'support/auth_fixture.dart';
 import 'support/discovery_fixture.dart';
+import 'support/profile_fixture.dart';
+import 'support/scrolling.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  testWidgets(
+    'a missing biography blocks the feed until a nonblank edit is saved',
+    (tester) async {
+      String? bio;
+      var saves = 0, feedReads = 0;
+      final session = testSession((r) async {
+        switch (r.url.path) {
+          case '/api/users/me':
+            return jsonResponse(ownerJson(bio: bio));
+          case '/api/users/me/profile':
+            saves++;
+            bio = jsonDecode(r.body)['bio'] as String;
+          case '/api/feed':
+            feedReads++;
+        }
+        return defaultDiscoveryResponse(r);
+      });
+      addTearDown(session.dispose);
+      await session.establish(testTokens);
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: histaeTheme(Brightness.dark),
+          home: MainShell(session: session),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(feedReads, 0);
+      await tester.tap(find.text('Écrire ma présentation'));
+      await tester.pumpAndSettle();
+      expect(find.byType(IdentityEditor), findsOneWidget);
+
+      final field = find.widgetWithText(TextField, 'Quelques mots sur vous');
+      final save = find.widgetWithText(HistaeButton, 'Enregistrer');
+      await tester.scrollUntilVisible(
+        save,
+        180,
+        scrollable: verticalScrollables.first,
+      );
+      expect(tester.widget<HistaeButton>(save).onPressed, isNull);
+      await tester.ensureVisible(field);
+      await tester.enterText(field, ' \n\t  ');
+      await tester.pumpAndSettle();
+      expect(tester.widget<HistaeButton>(save).onPressed, isNull);
+      expect(saves, 0);
+
+      await tester.enterText(field, '  Les livres et les longues balades.  ');
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(save);
+      await tester.pumpAndSettle();
+      await tester.tap(save);
+      await tester.pumpAndSettle();
+      expect(bio, 'Les livres et les longues balades.');
+      expect(saves, 1);
+      expect(feedReads, 1);
+      expect(find.text('Écrire ma présentation'), findsNothing);
+      expect(find.byType(FeedProfileCard), findsOneWidget);
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
+
+  testWidgets(
+    'returning from Mon profil rechecks a trait change once the server read catches up',
+    (tester) async {
+      var selected = false;
+      bool? previousSelection;
+      var statusReads = 0;
+      final session = testSession((r) async {
+        switch (r.url.path) {
+          case '/api/users/me/discovery-status':
+            statusReads++;
+          case '/api/users/me/traits':
+            if (r.method == 'GET') {
+              return jsonResponse({
+                'traits': [
+                  if (previousSelection ?? selected)
+                    {'id': traitOne, 'name': 'Curieux'},
+                ],
+              });
+            }
+            previousSelection = selected;
+            selected = true;
+            return http.Response('', 204);
+          case '/api/users/me/traits/$traitOne':
+            previousSelection = selected;
+            selected = false;
+            return http.Response('', 204);
+        }
+        return defaultDiscoveryResponse(r);
+      });
+      addTearDown(session.dispose);
+      await session.establish(testTokens);
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: histaeTheme(Brightness.dark),
+          home: MainShell(session: session),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      Future<void> selectTab(String tab) async {
+        await tester.tap(find.byKey(ValueKey('main-tab-$tab')));
+        await tester.pumpAndSettle();
+      }
+
+      Future<void> editTraits() async {
+        await selectTab('profile');
+        final edit = find.text('Choisir mes traits');
+        await tester.scrollUntilVisible(
+          edit,
+          160,
+          scrollable: verticalScrollables.first,
+        );
+        await tester.ensureVisible(edit);
+        await tester.pumpAndSettle();
+        await tester.tap(edit);
+        await tester.pumpAndSettle();
+        expect(find.byType(TraitsEditor), findsOneWidget);
+        await tester.tap(find.byType(FilterChip));
+        await tester.pumpAndSettle();
+        await tester.pageBack();
+        await tester.pumpAndSettle();
+      }
+
+      expect(find.text('Choisir mes traits'), findsOneWidget);
+      final initialReads = statusReads;
+      await editTraits();
+      previousSelection = null;
+      await selectTab('discovery');
+      expect(find.text('Choisir mes traits'), findsNothing);
+      expect(find.byType(FeedProfileCard), findsOneWidget);
+      expect(statusReads, initialReads + 1);
+
+      await editTraits();
+      previousSelection = null;
+      await selectTab('discovery');
+      expect(find.text('Choisir mes traits'), findsOneWidget);
+      expect(find.byType(FeedProfileCard), findsNothing);
+      expect(statusReads, initialReads + 2);
+
+      await selectTab('profile');
+      await selectTab('discovery');
+      expect(statusReads, initialReads + 2);
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
+
+  testWidgets(
+    'feed opens after saving both profile details and closes when the last trait is removed',
+    (tester) async {
+      var selected = false, feedReads = 0, traitReadsAfterSelection = 0;
+      var delayTraitRead = true;
+      var answers = <Map<String, dynamic>>[];
+      final session = testSession((r) async {
+        switch (r.url.path) {
+          case '/api/users/me/traits':
+            if (r.method == 'GET') {
+              // An independent read can lag behind the editor's confirmation.
+              if (selected) traitReadsAfterSelection++;
+              final hasTrait =
+                  selected &&
+                  !(delayTraitRead && traitReadsAfterSelection == 2);
+              return jsonResponse({
+                'traits': [
+                  if (hasTrait) {'id': traitOne, 'name': 'Curieux'},
+                ],
+              });
+            }
+            selected = true;
+            return http.Response('', 204);
+          case '/api/users/me/traits/$traitOne':
+            selected = false;
+            return http.Response('', 204);
+          case '/api/users/me/profile-answers':
+            if (r.method == 'PUT') {
+              final draft = (jsonDecode(r.body)['answers'] as List).single;
+              answers = [answerJson(questionOne, draft['answer'] as String, 0)];
+            }
+            return jsonResponse({'answers': answers});
+          case '/api/feed':
+            feedReads++;
+        }
+        return defaultDiscoveryResponse(r);
+      });
+      addTearDown(session.dispose);
+      await session.establish(testTokens);
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: histaeTheme(Brightness.dark),
+          home: MainShell(session: session),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      Future<void> tapText(String label) async {
+        final finder = find.text(label);
+        await tester.scrollUntilVisible(
+          finder,
+          150,
+          scrollable: verticalScrollables.first,
+        );
+        await tester.tap(finder);
+        await tester.pumpAndSettle();
+      }
+
+      expect(feedReads, 0);
+      await tapText('Choisir mes traits');
+      expect(find.byType(TraitsEditor), findsOneWidget);
+      await tapText('Curieux');
+      expect(
+        tester.widget<FilterChip>(find.byType(FilterChip)).selected,
+        isTrue,
+      );
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      expect(find.text('Choisir mes traits'), findsNothing);
+      expect(feedReads, 0);
+      expect(traitReadsAfterSelection, 1);
+      delayTraitRead = false;
+
+      await tapText('Écrire mes réponses');
+      expect(find.byType(AnswersEditor), findsOneWidget);
+      await tapText('Ajouter une question');
+      await tester.tap(find.text('Votre dimanche idéal ?'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byType(TextField),
+        'Un café et une promenade.',
+      );
+      expect(feedReads, 0);
+      await tester.tap(find.text('Enregistrer mes réponses'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Enregistrer'));
+      await tester.pumpAndSettle();
+      expect(find.byType(FeedProfileCard), findsOneWidget);
+      expect(feedReads, 1);
+
+      final profile = tester
+          .widget<DiscoveryPage>(find.byType(DiscoveryPage))
+          .profile;
+      await profile.setTrait(traitOne, false);
+      await tester.pumpAndSettle();
+      expect(find.text('Choisir mes traits'), findsOneWidget);
+      expect(find.byType(FeedProfileCard), findsNothing);
+      expect(feedReads, 1);
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
+
   test('opaque cursor is encoded, pages deduplicated and expired cursor restarted without reversing choices', () async {
     final cursors = <String?>[];
     const opaque = 'opaque+/= cursor?&';

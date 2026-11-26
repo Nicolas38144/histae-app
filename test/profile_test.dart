@@ -154,6 +154,21 @@ void main() {
       addTearDown(session.dispose);
       await session.establish(testTokens);
       final repo = ProfileRepository(session);
+      for (final bio in [null, '', ' \n\t ']) {
+        await expectLater(
+          repo.saveProfile(
+            ProfileDraft('Camille', '1995-06-12', 'female', bio),
+          ),
+          throwsA(
+            isA<ApiFailure>().having(
+              (error) => error.kind,
+              'kind',
+              ApiFailureKind.validation,
+            ),
+          ),
+        );
+      }
+      expect(writes, isEmpty);
       await repo.saveProfile(
         const ProfileDraft(
           'Camille',
@@ -348,7 +363,12 @@ void main() {
       final c = ProfileController(ProfileRepository(session));
       addTearDown(c.dispose);
       await c.load();
-      const draft = ProfileDraft('Camille', '1995-06-12', null, null);
+      const draft = ProfileDraft(
+        'Camille',
+        '1995-06-12',
+        null,
+        'Un dimanche dehors.',
+      );
       await expectLater(
         c.mutate(() => c.repository.saveProfile(draft)),
         throwsA(isA<ApiFailure>()),

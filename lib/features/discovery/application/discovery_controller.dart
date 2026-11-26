@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
+import '../../../core/network/read_snapshots.dart';
 import '../../../core/network/retry_after.dart';
 import '../../auth/domain/authenticated_session.dart';
 import '../../consents/domain/consent_state.dart';
@@ -154,11 +155,13 @@ class DiscoveryController extends ChangeNotifier {
     _notify();
   }
 
-  Future<void> activate() async {
+  Future<void> activate({
+    ReadPolicy profileDetailsPolicy = ReadPolicy.refresh,
+  }) async {
     if (!accessible || _active) return;
     _active = true;
     _scope = RequestCancellation();
-    await refresh();
+    await refresh(profileDetailsPolicy: profileDetailsPolicy);
   }
 
   void deactivate({bool notify = true}) {
@@ -220,7 +223,9 @@ class DiscoveryController extends ChangeNotifier {
     });
   }
 
-  Future<void> refresh() async {
+  Future<void> refresh({
+    ReadPolicy profileDetailsPolicy = ReadPolicy.refresh,
+  }) async {
     if (!active || busy || retrySeconds > 0) return;
     final epoch = _epoch;
     final languageRevision = session.localizationRevision;
@@ -236,7 +241,10 @@ class DiscoveryController extends ChangeNotifier {
     }
     _notify();
     try {
-      final next = await repository.status(_scope);
+      final next = await repository.status(
+        _scope,
+        profileDetailsPolicy: profileDetailsPolicy,
+      );
       if (!_alive(epoch) || languageRevision != session.localizationRevision) {
         return;
       }
@@ -252,8 +260,9 @@ class DiscoveryController extends ChangeNotifier {
     } on ApiFailure catch (e) {
       if (_alive(epoch)) {
         _error(e);
+        status = null;
+        _expiryTimer?.cancel();
         if (e.kind == ApiFailureKind.discoveryNotReady) {
-          status = null;
           _queue.clear();
           try {
             final diagnostic = await repository.status(_scope);

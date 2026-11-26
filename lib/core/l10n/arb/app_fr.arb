@@ -2398,6 +2398,7 @@
   "@bioTooLong": {
     "description": "Interface: lib/features/profile/data/profile_models.dart"
   },
+  "bioRequired": "Écrivez quelques mots pour vous présenter.",
   "ageRangeInvalid": "Les âges doivent aller de 18 à 99 ans, dans cet ordre.",
   "@ageRangeInvalid": {
     "description": "Interface: lib/features/profile/data/profile_models.dart"
@@ -3498,6 +3499,10 @@
   "@discoveryPhotoBody": {
     "description": "Profile photo capture, availability and private sharing."
   },
+  "discoveryTraitsBody": "Choisissez au moins un trait qui vous ressemble pour accéder au feed.",
+  "discoveryBiographyBody": "Ajoutez une présentation pour accéder au feed.",
+  "discoveryWriteBiography": "Écrire ma présentation",
+  "discoveryAnswersBody": "Enregistrez au moins une réponse pour accéder au feed.",
   "photoRevealTitle": "Un visage derrière les mots.",
   "@photoRevealTitle": {
     "description": "Private photo readiness and mutual sharing controls."

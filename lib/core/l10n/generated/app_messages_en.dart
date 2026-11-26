@@ -2060,6 +2060,9 @@ class AppMessagesEn extends AppMessages {
   String get bioTooLong => 'Your introduction is too long.';
 
   @override
+  String get bioRequired => 'Write a few words to introduce yourself.';
+
+  @override
   String get ageRangeInvalid => 'Ages must range from 18 to 99, in that order.';
 
   @override
@@ -2960,6 +2963,21 @@ class AppMessagesEn extends AppMessages {
   @override
   String get discoveryPhotoBody =>
       'Add a photo to access the feed. It will stay private: only your matches can see it after you both agree to reveal your photos.';
+
+  @override
+  String get discoveryTraitsBody =>
+      'Choose at least one trait that describes you to access the feed.';
+
+  @override
+  String get discoveryBiographyBody =>
+      'Add an introduction to access the feed.';
+
+  @override
+  String get discoveryWriteBiography => 'Write my introduction';
+
+  @override
+  String get discoveryAnswersBody =>
+      'Save at least one answer to access the feed.';
 
   @override
   String get photoRevealTitle => 'A face behind the words.';

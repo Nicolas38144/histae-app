@@ -10,6 +10,7 @@ enum ClientMessage {
   underage,
   birthdateInvalid,
   distanceInvalid,
+  bioRequired,
   bioTooLong,
   firstnameInvalid,
   ageRangeInvalid,

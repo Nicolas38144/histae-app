@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
 import 'package:histae_app/core/l10n/locale_controller.dart';
 import 'package:histae_app/features/discovery/presentation/discovery_status_sections.dart';
+import 'package:histae_app/features/discovery/presentation/feed_profile_card.dart';
 import 'package:histae_app/features/matches/application/matches_controller.dart';
 import 'package:histae_app/features/matches/data/matches_repository.dart';
 import 'package:histae_app/features/matches/presentation/match_photo_avatar.dart';
@@ -15,22 +16,40 @@ import 'package:http/testing.dart';
 
 import 'support/auth_fixture.dart';
 import 'support/continuation_fixture.dart';
+import 'support/discovery_fixture.dart';
 import 'support/matches_fixture.dart';
+import 'support/photo_crop_fixture.dart';
+import 'support/profile_fixture.dart';
+import 'support/scrolling.dart';
 
 void main() {
   testWidgets(
-    'missing photo shows the feed requirement and opens photo management',
+    'the photo step follows upload and removal on return to the feed',
     (tester) async {
+      const photo = 'https://storage.example/owner?signature=synthetic';
+      var hasPhoto = false, statusReads = 0, uploads = 0, feedReads = 0;
+      bool? previousApproval;
       final session = testSession((r) async {
-        if (r.url.path == '/api/users/me/discovery-status') {
-          return jsonResponse({
-            'ready': false,
-            'required_actions': ['photo'],
-            'presence_expires_at': null,
-          });
-        }
-        if (r.url.path == '/api/feed') {
-          fail('Feed must not load without a photo');
+        switch (r.url.path) {
+          case '/api/users/me/discovery-status':
+            statusReads++;
+            return jsonResponse(
+              previousApproval ?? hasPhoto
+                  ? discoveryStatusJson()
+                  : {
+                      'ready': false,
+                      'required_actions': ['photo'],
+                      'presence_expires_at': null,
+                    },
+            );
+          case '/api/users/me':
+            return jsonResponse(ownerJson(photo: hasPhoto ? photo : null));
+          case '/api/users/me/photo':
+            previousApproval = hasPhoto;
+            hasPhoto = r.method == 'PUT';
+            if (hasPhoto) uploads++;
+          case '/api/feed':
+            feedReads++;
         }
         return defaultContinuationResponse(r);
       });
@@ -41,9 +60,14 @@ void main() {
         HistaeApp(sessionController: session, localeController: locale),
       );
       await tester.pumpAndSettle();
+      final initialReads = statusReads;
+      expect(feedReads, 0);
       expect(find.text('Un visage, pour plus tard'), findsOneWidget);
       final action = find.descendant(
-        of: find.byType(DiscoveryReadinessCard),
+        of: find.widgetWithText(
+          DiscoveryReadinessCard,
+          'Un visage, pour plus tard',
+        ),
         matching: find.byType(OutlinedButton),
       );
       await tester.ensureVisible(action);
@@ -51,6 +75,52 @@ void main() {
       await tester.tap(action);
       await tester.pumpAndSettle();
       expect(find.byType(PhotoPage), findsOneWidget);
+      final save = find.text('Enregistrer ma photo');
+      expect(save, findsNothing);
+      final bytes = (await tester.runAsync(syntheticCropSource))!;
+      tester
+          .widget<PhotoPage>(find.byType(PhotoPage))
+          .controller
+          .setPhoto(bytes);
+      await tester.pumpAndSettle();
+
+      Future<void> tapVisible(Finder finder) async {
+        await tester.scrollUntilVisible(
+          finder,
+          175,
+          scrollable: verticalScrollables.first,
+        );
+        await tester.ensureVisible(finder);
+        await tester.pumpAndSettle();
+        await tester.tap(finder);
+        await tester.pumpAndSettle();
+      }
+
+      await tapVisible(save);
+      expect(uploads, 1);
+      expect(statusReads, initialReads);
+      previousApproval = null;
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(find.byType(FeedProfileCard), findsOneWidget);
+      expect(feedReads, 1);
+
+      await tester.tap(find.byKey(const Key('main-tab-profile')));
+      await tester.pumpAndSettle();
+      await tapVisible(find.text('Gérer ma photo'));
+      await tapVisible(find.text('Retirer ma photo'));
+      await tester.tap(find.text('Retirer la photo'));
+      await tester.pumpAndSettle();
+      expect(hasPhoto, isFalse);
+      expect(statusReads, initialReads + 1);
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      previousApproval = null;
+      await tester.tap(find.byKey(const Key('main-tab-discovery')));
+      await tester.pumpAndSettle();
+      expect(find.text('Un visage, pour plus tard'), findsOneWidget);
+      expect(find.byType(FeedProfileCard), findsNothing);
+      expect(feedReads, 1);
       await tester.pumpWidget(const SizedBox.shrink());
     },
   );

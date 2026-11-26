@@ -66,7 +66,7 @@ class _IdentityEditorState extends ProfileEditorState<IdentityEditor> {
         ),
       ],
       save: _save,
-      saveEnabled: biographyWithinLimit(bio.text),
+      saveEnabled: validateBiography(bio.text) == null,
     );
   }
 
@@ -115,17 +115,14 @@ class _IdentityEditorState extends ProfileEditorState<IdentityEditor> {
 
   Future<void> _save() async {
     final current = controller.profile;
-    final biography = bio.text.isEmpty && current?.bio == null
-        ? null
-        : bio.text;
     final draft = current == null
         ? ProfileDraft(
             firstname.text,
             birthdate?.toIso8601String().substring(0, 10) ?? '',
             sex.isEmpty ? null : sex,
-            biography,
+            bio.text,
           )
-        : ProfileDraft.forBiography(current, biography);
+        : ProfileDraft.forBiography(current, bio.text);
     final error = draft.validate(DateTime.now());
     if (error != null) {
       setState(() => message = error);
