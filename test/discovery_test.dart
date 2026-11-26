@@ -28,6 +28,66 @@ import 'support/scrolling.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   testWidgets(
+    'pulling an empty feed saves the location before reloading profiles',
+    (tester) async {
+      final source = TestLocationSource();
+      final savedPosition = Completer<http.Response>();
+      final requests = <String>[];
+      final session = testSession((r) async {
+        switch (r.url.path) {
+          case '/api/users/me/presence':
+            requests.add('presence');
+            return savedPosition.future;
+          case '/api/feed':
+            final positionUpdated = requests.lastOrNull == 'presence';
+            requests.add('feed');
+            return jsonResponse({
+              'profiles': [if (positionUpdated) candidateJson(candidateOne)],
+              'next_cursor': null,
+            });
+        }
+        return defaultDiscoveryResponse(r);
+      });
+      addTearDown(session.dispose);
+      await session.establish(testTokens);
+      final discovery = DiscoveryController(
+        DiscoveryRepository(session),
+        source,
+      );
+      final profile = ProfileController(ProfileRepository(session));
+      addTearDown(discovery.dispose);
+      addTearDown(profile.dispose);
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: histaeTheme(Brightness.dark),
+          home: DiscoveryPage(controller: discovery, profile: profile),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(HistaeEmptyState), findsOneWidget);
+
+      final start = tester.getTopLeft(find.byType(ListView));
+      await tester.dragFrom(
+        start + const Offset(100, 80),
+        const Offset(0, 320),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
+      await tester.pump();
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(source.calls, 1);
+      expect(requests, ['feed', 'presence']);
+
+      savedPosition.complete(jsonResponse({'message': 'presence updated'}));
+      await tester.pumpAndSettle();
+      expect(requests, ['feed', 'presence', 'feed']);
+      expect(find.byType(FeedProfileCard), findsOneWidget);
+      expect(find.byType(RefreshIndicator), findsNothing);
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
+
+  testWidgets(
     'an exhausted feed refreshes from the menu and retries errors in place',
     (tester) async {
       var feedReads = 0;

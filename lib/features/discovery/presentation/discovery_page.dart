@@ -626,9 +626,21 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                         ),
                     ],
                   )
-                : ListView(
-                    padding: HistaeTokens.pagePadding,
-                    children: statusBody,
+                : RefreshIndicator(
+                    onRefresh: () =>
+                        c.locationConsent ? c.publishLocation() : c.refresh(),
+                    semanticsLabel: text.discoveryPageRefreshFeed,
+                    notificationPredicate: (notification) =>
+                        showExhaustedState &&
+                        enabled &&
+                        defaultScrollNotificationPredicate(notification),
+                    child: ListView(
+                      physics: showExhaustedState
+                          ? const AlwaysScrollableScrollPhysics()
+                          : null,
+                      padding: HistaeTokens.pagePadding,
+                      children: statusBody,
+                    ),
                   ),
           ),
         ),
