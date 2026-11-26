@@ -2,7 +2,7 @@ name: histae_app
 description: "Histae mobile app"
 publish_to: 'none'
 
-version: 1.0.10+10
+version: 1.0.11+11
 
 environment:
   sdk: ^3.13.1
