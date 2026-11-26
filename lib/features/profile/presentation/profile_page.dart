@@ -107,11 +107,22 @@ class _ProfilePageState extends State<ProfilePage> {
       final c = controller;
       final p = c.profile;
       final strings = AppStrings.of(context);
-      final editable = !c.loading && !c.saving && !c.uncertain;
+      final canPreview =
+          !c.loading && !c.saving && !c.uncertain && c.hasFeedPreview;
       return HistaeScaffold(
         appBar: AppBar(
           title: Text(strings.accountTitle),
-          actions: [const LanguageButton()],
+          actions: [
+            IconButton(
+              key: const Key('profile-feed-preview'),
+              tooltip: strings.messages.profilePagePreviewMyProfile,
+              onPressed: canPreview
+                  ? () => _open(ProfileFeedPreviewPage(controller: c))
+                  : null,
+              icon: const Icon(Icons.visibility_outlined),
+            ),
+            const LanguageButton(),
+          ],
         ),
         body: SafeArea(
           child: ListView(
@@ -128,17 +139,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 body: AppStrings.of(context)
                     .messages
                     .profilePageAWayToTellYourStory,
-              ),
-              const SizedBox(height: 16),
-              HistaeButton.outlinedIcon(
-                key: const Key('profile-feed-preview'),
-                onPressed: editable && c.hasFeedPreview
-                    ? () => _open(ProfileFeedPreviewPage(controller: c))
-                    : null,
-                icon: const Icon(Icons.visibility_outlined),
-                label: Text(
-                  AppStrings.of(context).messages.profilePagePreviewMyProfile,
-                ),
               ),
               const SizedBox(height: 16),
               if (c.loading)

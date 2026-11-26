@@ -236,7 +236,6 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Quitter'));
     await tester.pumpAndSettle();
-    await reveal(find.byKey(const Key('profile-feed-preview')));
     await tester.tap(find.byKey(const Key('profile-feed-preview')));
     await tester.pumpAndSettle();
     await capture('feed-preview');

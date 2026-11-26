@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
+import 'package:histae_app/core/l10n/app_strings.dart';
 import 'package:histae_app/features/discovery/presentation/feed_profile_content.dart';
 import 'package:histae_app/features/profile/presentation/profile_feed_preview_page.dart';
 import 'package:histae_app/features/profile/presentation/profile_panels.dart';
@@ -84,9 +85,29 @@ void main() {
         ),
         findsNothing,
       );
-      tester.state<ScrollableState>(scrollable).position.jumpTo(0);
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const Key('profile-feed-preview')));
+      final previewButton = find.byKey(const Key('profile-feed-preview'));
+      final languageButton = find.byKey(const Key('choose-language'));
+      final strings = AppStrings.of(tester.element(previewButton));
+      expect(
+        find.descendant(of: find.byType(AppBar), matching: previewButton),
+        findsOneWidget,
+      );
+      expect(
+        tester.getCenter(previewButton).dx,
+        lessThan(tester.getCenter(languageButton).dx),
+      );
+      expect(
+        find.descendant(
+          of: previewButton,
+          matching: find.byIcon(Icons.visibility_outlined),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.byTooltip(strings.messages.profilePagePreviewMyProfile),
+        findsOneWidget,
+      );
+      await tester.tap(previewButton);
       await tester.pumpAndSettle();
       final page = find.byType(ProfileFeedPreviewPage);
       expect(page, findsOneWidget);
