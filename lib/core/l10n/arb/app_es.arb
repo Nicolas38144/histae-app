@@ -306,7 +306,6 @@
   "discoveryStatusSectionsNewEncountersCanWaitYourMatches": "Los nuevos encuentros pueden esperar. Tus matches y conversaciones siguen accesibles.",
   "discoveryStatusSectionsCompleteTheseStepsAtYourOwn": "Completa estos pasos a tu ritmo. Tus opciones de privacidad siguen accesibles.",
   "discoveryStatusSectionsResumeDiscovery": "Reanudar los descubrimientos",
-  "discoveryStatusSectionsCompleteThisStep": "Completar este paso",
   "discoveryStatusSectionsYourChoiceFor": "Tu decisión para {arg0}",
   "discoveryStatusSectionsTheResponseIsUnconfirmedYourChoice": "Su elección sigue aquí, pero no hemos podido comprobar si se recibió. Puede retomar esa misma elección.",
   "discoveryStatusSectionsYourRequestIsAwaitingConfirmationNo": "Esperamos la confirmación de su elección antes de continuar.",
@@ -802,17 +801,12 @@
   "feedReadingReady": "Ya puedes indicar que te gusta este perfil o pasar al siguiente.",
   "screenPrivacyLabel": "Contenido protegido",
   "screenCaptureHelp": "Detén la grabación o el uso compartido de pantalla para volver a Histae.",
-  "discoveryPhotoTitle": "Un rostro, para más adelante",
-  "@discoveryPhotoTitle": {
-    "description": "Private photo readiness and mutual sharing controls."
-  },
   "discoveryPhotoBody": "Añade una foto para acceder al feed. Será privada: solo tus encuentros podrán verla después de que ambos aceptéis revelar vuestras fotos.",
   "@discoveryPhotoBody": {
     "description": "Private photo readiness and mutual sharing controls."
   },
   "discoveryTraitsBody": "Elige al menos un rasgo que te describa para acceder al feed.",
   "discoveryBiographyBody": "Añade una presentación para acceder al feed.",
-  "discoveryWriteBiography": "Escribir mi presentación",
   "discoveryAnswersBody": "Guarda al menos una respuesta para acceder al feed.",
   "photoRevealTitle": "Un rostro detrás de las palabras.",
   "@photoRevealTitle": {

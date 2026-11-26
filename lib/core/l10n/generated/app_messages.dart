@@ -1944,12 +1944,6 @@ abstract class AppMessages {
   /// Interface: lib/features/discovery/presentation/discovery_status_sections.dart
   ///
   /// In fr, this message translates to:
-  /// **'Compléter cette étape'**
-  String get discoveryStatusSectionsCompleteThisStep;
-
-  /// Interface: lib/features/discovery/presentation/discovery_status_sections.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Votre choix pour {arg0}'**
   String discoveryStatusSectionsYourChoiceFor(Object arg0);
 
@@ -4886,12 +4880,6 @@ abstract class AppMessages {
   /// **'Arrêtez l’enregistrement ou le partage d’écran pour retrouver Histae.'**
   String get screenCaptureHelp;
 
-  /// Private photo readiness and mutual sharing controls.
-  ///
-  /// In fr, this message translates to:
-  /// **'Un visage, pour plus tard'**
-  String get discoveryPhotoTitle;
-
   /// Profile photo capture, availability and private sharing.
   ///
   /// In fr, this message translates to:
@@ -4909,12 +4897,6 @@ abstract class AppMessages {
   /// In fr, this message translates to:
   /// **'Ajoutez une présentation pour accéder au feed.'**
   String get discoveryBiographyBody;
-
-  /// No description provided for @discoveryWriteBiography.
-  ///
-  /// In fr, this message translates to:
-  /// **'Écrire ma présentation'**
-  String get discoveryWriteBiography;
 
   /// No description provided for @discoveryAnswersBody.
   ///

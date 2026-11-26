@@ -62,13 +62,13 @@ void main() {
       await tester.pumpAndSettle();
       final initialReads = statusReads;
       expect(feedReads, 0);
-      expect(find.text('Un visage, pour plus tard'), findsOneWidget);
+      expect(find.text('Une photo, pour plus tard'), findsOneWidget);
       final action = find.descendant(
         of: find.widgetWithText(
           DiscoveryReadinessCard,
-          'Un visage, pour plus tard',
+          'Une photo, pour plus tard',
         ),
-        matching: find.byType(OutlinedButton),
+        matching: find.widgetWithText(TextButton, 'Gérer ma photo'),
       );
       await tester.ensureVisible(action);
       await tester.pumpAndSettle();
@@ -118,7 +118,7 @@ void main() {
       previousApproval = null;
       await tester.tap(find.byKey(const Key('main-tab-discovery')));
       await tester.pumpAndSettle();
-      expect(find.text('Un visage, pour plus tard'), findsOneWidget);
+      expect(find.text('Une photo, pour plus tard'), findsOneWidget);
       expect(find.byType(FeedProfileCard), findsNothing);
       expect(feedReads, 1);
       await tester.pumpWidget(const SizedBox.shrink());

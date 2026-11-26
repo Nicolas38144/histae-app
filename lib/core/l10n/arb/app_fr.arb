@@ -1345,10 +1345,6 @@
   "@discoveryStatusSectionsResumeDiscovery": {
     "description": "Interface: lib/features/discovery/presentation/discovery_status_sections.dart"
   },
-  "discoveryStatusSectionsCompleteThisStep": "Compléter cette étape",
-  "@discoveryStatusSectionsCompleteThisStep": {
-    "description": "Interface: lib/features/discovery/presentation/discovery_status_sections.dart"
-  },
   "discoveryStatusSectionsYourChoiceFor": "Votre choix pour {arg0}",
   "@discoveryStatusSectionsYourChoiceFor": {
     "description": "Interface: lib/features/discovery/presentation/discovery_status_sections.dart",
@@ -3477,17 +3473,12 @@
   "@screenCaptureHelp": {
     "description": "Privacy shield and phone verification interface."
   },
-  "discoveryPhotoTitle": "Un visage, pour plus tard",
-  "@discoveryPhotoTitle": {
-    "description": "Private photo readiness and mutual sharing controls."
-  },
   "discoveryPhotoBody": "Ajoutez une photo pour accéder au feed. Elle restera privée : seuls vos matchs pourront la découvrir après votre accord mutuel.",
   "@discoveryPhotoBody": {
     "description": "Profile photo capture, availability and private sharing."
   },
   "discoveryTraitsBody": "Choisissez au moins un trait qui vous ressemble pour accéder au feed.",
   "discoveryBiographyBody": "Ajoutez une présentation pour accéder au feed.",
-  "discoveryWriteBiography": "Écrire ma présentation",
   "discoveryAnswersBody": "Enregistrez au moins une réponse pour accéder au feed.",
   "photoRevealTitle": "Un visage derrière les mots.",
   "@photoRevealTitle": {

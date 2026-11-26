@@ -1190,9 +1190,6 @@ class AppMessagesFr extends AppMessages {
       'Reprendre la découverte';
 
   @override
-  String get discoveryStatusSectionsCompleteThisStep => 'Compléter cette étape';
-
-  @override
   String discoveryStatusSectionsYourChoiceFor(Object arg0) {
     return 'Votre choix pour $arg0';
   }
@@ -2986,9 +2983,6 @@ class AppMessagesFr extends AppMessages {
       'Arrêtez l’enregistrement ou le partage d’écran pour retrouver Histae.';
 
   @override
-  String get discoveryPhotoTitle => 'Un visage, pour plus tard';
-
-  @override
   String get discoveryPhotoBody =>
       'Ajoutez une photo pour accéder au feed. Elle restera privée : seuls vos matchs pourront la découvrir après votre accord mutuel.';
 
@@ -2999,9 +2993,6 @@ class AppMessagesFr extends AppMessages {
   @override
   String get discoveryBiographyBody =>
       'Ajoutez une présentation pour accéder au feed.';
-
-  @override
-  String get discoveryWriteBiography => 'Écrire ma présentation';
 
   @override
   String get discoveryAnswersBody =>

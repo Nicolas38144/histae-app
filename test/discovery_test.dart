@@ -53,7 +53,12 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(feedReads, 0);
-      await tester.tap(find.text('Écrire ma présentation'));
+      final edit = find.widgetWithText(TextButton, 'Modifier ma présentation');
+      expect(
+        find.text('Ajoutez une présentation pour accéder au feed.'),
+        findsOneWidget,
+      );
+      await tester.tap(edit);
       await tester.pumpAndSettle();
       expect(find.byType(IdentityEditor), findsOneWidget);
 
@@ -80,7 +85,7 @@ void main() {
       expect(bio, 'Les livres et les longues balades.');
       expect(saves, 1);
       expect(feedReads, 1);
-      expect(find.text('Écrire ma présentation'), findsNothing);
+      expect(edit, findsNothing);
       expect(find.byType(FeedProfileCard), findsOneWidget);
       await tester.pumpWidget(const SizedBox.shrink());
     },
@@ -231,6 +236,11 @@ void main() {
       }
 
       expect(feedReads, 0);
+      expect(
+        find.widgetWithText(TextButton, 'Choisir mes traits'),
+        findsOneWidget,
+      );
+      expect(find.textContaining('pour accéder au feed'), findsWidgets);
       await tapText('Choisir mes traits');
       expect(find.byType(TraitsEditor), findsOneWidget);
       await tapText('Curieux');

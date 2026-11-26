@@ -306,7 +306,6 @@
   "discoveryStatusSectionsNewEncountersCanWaitYourMatches": "New encounters can wait. Your matches and conversations remain accessible.",
   "discoveryStatusSectionsCompleteTheseStepsAtYourOwn": "Complete these steps at your own pace. Your privacy choices remain accessible.",
   "discoveryStatusSectionsResumeDiscovery": "Resume discovery",
-  "discoveryStatusSectionsCompleteThisStep": "Complete this step",
   "discoveryStatusSectionsYourChoiceFor": "Your choice for {arg0}",
   "discoveryStatusSectionsTheResponseIsUnconfirmedYourChoice": "Your choice is kept here, but we couldn’t check whether it arrived. You can resume the same choice.",
   "discoveryStatusSectionsYourRequestIsAwaitingConfirmationNo": "We’re waiting for confirmation of your choice before moving on.",
@@ -802,17 +801,12 @@
   "feedReadingReady": "You can now like this profile or move to the next one.",
   "screenPrivacyLabel": "Content protected",
   "screenCaptureHelp": "Stop screen recording or sharing to return to Histae.",
-  "discoveryPhotoTitle": "A face, for later",
-  "@discoveryPhotoTitle": {
-    "description": "Private photo readiness and mutual sharing controls."
-  },
   "discoveryPhotoBody": "Add a photo to access the feed. It will stay private: only your matches can see it after you both agree to reveal your photos.",
   "@discoveryPhotoBody": {
     "description": "Private photo readiness and mutual sharing controls."
   },
   "discoveryTraitsBody": "Choose at least one trait that describes you to access the feed.",
   "discoveryBiographyBody": "Add an introduction to access the feed.",
-  "discoveryWriteBiography": "Write my introduction",
   "discoveryAnswersBody": "Save at least one answer to access the feed.",
   "photoRevealTitle": "A face behind the words.",
   "@photoRevealTitle": {

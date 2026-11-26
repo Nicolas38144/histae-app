@@ -167,11 +167,12 @@ class ProfileDetailTile extends StatelessWidget {
     required this.icon,
     required this.onTap,
     this.details,
+    this.feedback,
   });
   final String title, summary, action;
   final IconData icon;
   final VoidCallback? onTap;
-  final Widget? details;
+  final Widget? details, feedback;
 
   @override
   Widget build(BuildContext context) {
@@ -209,6 +210,7 @@ class ProfileDetailTile extends StatelessWidget {
                 icon: const Icon(Icons.arrow_forward_rounded, size: 18),
               ),
             ),
+            ?feedback,
           ],
         ),
       ),

@@ -43,14 +43,12 @@ class DiscoveryStrings {
   };
 
   String actionTitle(DiscoveryAction action) => switch (action) {
-    DiscoveryAction.photo => strings.messages.discoveryPhotoTitle,
-    DiscoveryAction.biography =>
+    DiscoveryAction.photo => strings.messages.profileSectionsAPhotoForLater,
+    DiscoveryAction.profile || DiscoveryAction.biography =>
       strings.messages.identityEditorAFewWordsAboutYou,
     DiscoveryAction.traits => strings.messages.profileSectionsWhatMakesYouYou,
     DiscoveryAction.conversationStarters =>
       strings.messages.profileSectionsConversationStarters,
-    DiscoveryAction.profile =>
-      strings.messages.discoveryStringsYourIntroduction,
     DiscoveryAction.resumeDiscovery =>
       strings.messages.discoveryStringsYourProfileIsPaused,
     DiscoveryAction.sex => strings.messages.discoveryStringsYourProfileSSex,
@@ -85,18 +83,28 @@ class DiscoveryStrings {
       strings.messages.discoveryStringsOneLocationReadingIsEnoughYour,
   };
 
-  String actionLabel(DiscoveryAction action) => switch (action) {
+  String actionLabel(
+    DiscoveryAction action, {
+    required bool sensitiveAllowed,
+  }) => switch (action) {
+    DiscoveryAction.sensitiveConsent || DiscoveryAction.locationConsent =>
+      strings.messages.profileSectionsChooseMyConsents,
+    DiscoveryAction.sex || DiscoveryAction.preferences when !sensitiveAllowed =>
+      strings.messages.profileSectionsChooseMyConsents,
+    DiscoveryAction.preferences =>
+      strings.messages.profileSectionsEditMyPreferences,
     DiscoveryAction.freshPresence =>
       strings.messages.discoveryPageRefreshMyLocation,
     DiscoveryAction.sex => strings.messages.discoveryRequestIdentityCorrection,
     DiscoveryAction.photo => strings.messages.profileSectionsManageMyPhoto,
-    DiscoveryAction.biography => strings.messages.discoveryWriteBiography,
+    DiscoveryAction.biography =>
+      strings.messages.profileSectionsEditMyIntroduction,
+    DiscoveryAction.profile => strings.messages.profileSectionsCreateMyProfile,
     DiscoveryAction.traits => strings.messages.profileSectionsChooseMyTraits,
     DiscoveryAction.conversationStarters =>
       strings.messages.profileSectionsWriteMyAnswers,
     DiscoveryAction.resumeDiscovery =>
       strings.messages.discoveryStatusSectionsResumeDiscovery,
-    _ => strings.messages.discoveryStatusSectionsCompleteThisStep,
   };
 
   String notice(String? code) => switch (code) {

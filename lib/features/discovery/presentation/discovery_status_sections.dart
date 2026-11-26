@@ -4,6 +4,7 @@ import '../../../core/l10n/app_strings.dart';
 import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/editorial_card.dart';
 import '../../../core/widgets/histae_button.dart';
+import '../../profile/presentation/profile_panels.dart';
 import '../data/device_location.dart';
 import '../data/discovery_models.dart';
 import 'discovery_strings.dart';
@@ -34,37 +35,55 @@ class DiscoveryReadinessCard extends StatelessWidget {
     super.key,
     required this.action,
     required this.onRepair,
+    required this.sensitiveAllowed,
     this.feedback,
   });
   final DiscoveryAction action;
   final VoidCallback? onRepair;
+  final bool sensitiveAllowed;
   final Widget? feedback;
 
   @override
   Widget build(BuildContext context) {
     final strings = DiscoveryStrings(AppStrings.of(context));
-    return Card(
-      child: Padding(
-        padding: HistaeTokens.panelPadding,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              strings.actionTitle(action),
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: HistaeTokens.textSpacing),
-            Text(strings.actionBody(action)),
-            const SizedBox(height: HistaeTokens.labelSpacing),
-            HistaeButton.outlined(
-              onPressed: onRepair,
-              child: Text(strings.actionLabel(action)),
-            ),
-            ?feedback,
-          ],
-        ),
-      ),
+    final title = strings.actionTitle(action);
+    final summary = strings.actionBody(action);
+    final label = strings.actionLabel(
+      action,
+      sensitiveAllowed: sensitiveAllowed,
     );
+    final icon = switch (action) {
+      DiscoveryAction.profile ||
+      DiscoveryAction.biography => Icons.format_quote_rounded,
+      DiscoveryAction.conversationStarters => Icons.chat_bubble_outline_rounded,
+      DiscoveryAction.traits => Icons.spa_outlined,
+      DiscoveryAction.photo => Icons.photo_outlined,
+      DiscoveryAction.preferences => Icons.tune_rounded,
+      DiscoveryAction.sex => Icons.badge_outlined,
+      DiscoveryAction.sensitiveConsent => Icons.shield_outlined,
+      DiscoveryAction.locationConsent ||
+      DiscoveryAction.freshPresence => Icons.location_on_outlined,
+      DiscoveryAction.resumeDiscovery => Icons.pause_circle_outline_rounded,
+    };
+    return switch (action) {
+      DiscoveryAction.profile ||
+      DiscoveryAction.biography ||
+      DiscoveryAction.conversationStarters => ProfilePanel(
+        title: title,
+        icon: icon,
+        action: label,
+        onPressed: onRepair,
+        child: Text(summary),
+      ),
+      _ => ProfileDetailTile(
+        title: title,
+        icon: icon,
+        summary: summary,
+        action: label,
+        onTap: onRepair,
+        feedback: feedback,
+      ),
+    };
   }
 }
 

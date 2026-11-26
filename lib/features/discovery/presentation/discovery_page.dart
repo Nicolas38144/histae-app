@@ -399,6 +399,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
           for (final action in required)
             DiscoveryReadinessCard(
               action: action,
+              sensitiveAllowed: widget.profile.sensitiveAllowed,
               onRepair: enabled && !_opening ? () => _repair(action) : null,
               feedback: action == DiscoveryAction.freshPresence
                   ? locationFeedback
