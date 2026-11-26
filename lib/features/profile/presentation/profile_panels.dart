@@ -134,8 +134,6 @@ class ProfileAnswersPreview extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(ordered[i].answer, style: theme.textTheme.bodyLarge),
-          const SizedBox(height: 8),
-          ProfileModerationLabel(moderation: ordered[i].moderation),
         ],
       ],
     );

@@ -472,24 +472,16 @@ class AppMessagesEs extends AppMessages {
       'Acceso Premium confirmado en la última verificación.';
 
   @override
-  String get subscriptionSummaryYouCurrentlyHaveTheFreePlan =>
-      'Tu acceso actual corresponde al plan gratuito.';
-
-  @override
   String get subscriptionSummaryMonthlyPlan => 'Plan mensual';
 
   @override
   String get subscriptionSummaryAnnualPlan => 'Plan anual';
 
   @override
-  String subscriptionSummaryPeriodStarts(Object arg0) {
-    return 'Inicio del periodo: $arg0';
-  }
+  String get subscriptionSummaryPeriodStartLabel => 'Inicio del periodo';
 
   @override
-  String subscriptionSummaryPeriodEnds(Object arg0) {
-    return 'Fin del periodo: $arg0';
-  }
+  String get subscriptionSummaryPeriodEndLabel => 'Fin del periodo';
 
   @override
   String get subscriptionSummaryCancellationScheduledForTheEndOf =>

@@ -546,10 +546,6 @@
   "@subscriptionSummaryPremiumAccessConfirmedAtTheLast": {
     "description": "Interface: lib/features/billing/presentation/subscription_summary.dart"
   },
-  "subscriptionSummaryYouCurrentlyHaveTheFreePlan": "Votre accès actuel correspond à la formule gratuite.",
-  "@subscriptionSummaryYouCurrentlyHaveTheFreePlan": {
-    "description": "Interface: lib/features/billing/presentation/subscription_summary.dart"
-  },
   "subscriptionSummaryMonthlyPlan": "Rythme mensuel",
   "@subscriptionSummaryMonthlyPlan": {
     "description": "Interface: lib/features/billing/presentation/subscription_summary.dart"
@@ -558,23 +554,13 @@
   "@subscriptionSummaryAnnualPlan": {
     "description": "Interface: lib/features/billing/presentation/subscription_summary.dart"
   },
-  "subscriptionSummaryPeriodStarts": "Début de période : {arg0}",
-  "@subscriptionSummaryPeriodStarts": {
-    "description": "Interface: lib/features/billing/presentation/subscription_summary.dart",
-    "placeholders": {
-      "arg0": {
-        "type": "Object"
-      }
-    }
+  "subscriptionSummaryPeriodStartLabel": "Début de période",
+  "@subscriptionSummaryPeriodStartLabel": {
+    "description": "Label for the current subscription period start date."
   },
-  "subscriptionSummaryPeriodEnds": "Fin de période : {arg0}",
-  "@subscriptionSummaryPeriodEnds": {
-    "description": "Interface: lib/features/billing/presentation/subscription_summary.dart",
-    "placeholders": {
-      "arg0": {
-        "type": "Object"
-      }
-    }
+  "subscriptionSummaryPeriodEndLabel": "Fin de période",
+  "@subscriptionSummaryPeriodEndLabel": {
+    "description": "Label for the current subscription period end date."
   },
   "subscriptionSummaryCancellationScheduledForTheEndOf": "Résiliation prévue à la fin de la période en cours.",
   "@subscriptionSummaryCancellationScheduledForTheEndOf": {

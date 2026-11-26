@@ -3,10 +3,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
 import 'package:histae_app/features/discovery/presentation/feed_profile_content.dart';
 import 'package:histae_app/features/profile/presentation/profile_feed_preview_page.dart';
+import 'package:histae_app/features/profile/presentation/profile_panels.dart';
 
 import 'support/auth_fixture.dart';
 import 'support/continuation_fixture.dart';
 import 'support/profile_fixture.dart';
+import 'support/scrolling.dart';
 
 void main() {
   testWidgets(
@@ -57,6 +59,32 @@ void main() {
       await tester.pumpWidget(HistaeApp(sessionController: session));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('main-tab-profile')));
+      await tester.pumpAndSettle();
+      final answers = find.byType(ProfileAnswersPreview);
+      final scrollable = verticalScrollables.first;
+      await tester.scrollUntilVisible(answers, 180, scrollable: scrollable);
+      expect(
+        find.descendant(
+          of: answers,
+          matching: find.text('Première réponse publique.'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: answers,
+          matching: find.text('Réponse encore privée.'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: answers,
+          matching: find.byType(ProfileModerationLabel),
+        ),
+        findsNothing,
+      );
+      tester.state<ScrollableState>(scrollable).position.jumpTo(0);
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('profile-feed-preview')));
       await tester.pumpAndSettle();

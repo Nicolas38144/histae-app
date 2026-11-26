@@ -879,12 +879,6 @@ abstract class AppMessages {
   /// Interface: lib/features/billing/presentation/subscription_summary.dart
   ///
   /// In fr, this message translates to:
-  /// **'Votre accès actuel correspond à la formule gratuite.'**
-  String get subscriptionSummaryYouCurrentlyHaveTheFreePlan;
-
-  /// Interface: lib/features/billing/presentation/subscription_summary.dart
-  ///
-  /// In fr, this message translates to:
   /// **'Rythme mensuel'**
   String get subscriptionSummaryMonthlyPlan;
 
@@ -894,17 +888,17 @@ abstract class AppMessages {
   /// **'Rythme annuel'**
   String get subscriptionSummaryAnnualPlan;
 
-  /// Interface: lib/features/billing/presentation/subscription_summary.dart
+  /// Label for the current subscription period start date.
   ///
   /// In fr, this message translates to:
-  /// **'Début de période : {arg0}'**
-  String subscriptionSummaryPeriodStarts(Object arg0);
+  /// **'Début de période'**
+  String get subscriptionSummaryPeriodStartLabel;
 
-  /// Interface: lib/features/billing/presentation/subscription_summary.dart
+  /// Label for the current subscription period end date.
   ///
   /// In fr, this message translates to:
-  /// **'Fin de période : {arg0}'**
-  String subscriptionSummaryPeriodEnds(Object arg0);
+  /// **'Fin de période'**
+  String get subscriptionSummaryPeriodEndLabel;
 
   /// Interface: lib/features/billing/presentation/subscription_summary.dart
   ///

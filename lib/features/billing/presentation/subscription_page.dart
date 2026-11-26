@@ -182,13 +182,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                           .subscriptionPageCheckingYourSubscription,
                     ),
                   if (c.subscription case final state?)
-                    SubscriptionSummary(state: state),
-                  if (!c.fresh && c.subscription != null)
-                    Text(
-                      AppStrings.of(context)
-                          .messages
-                          .subscriptionPageLastKnownStatusRefreshToConfirm,
-                    ),
+                    SubscriptionSummary(state: state, fresh: c.fresh),
                   if (c.failure case final error?) ...[
                     const SizedBox(height: 16),
                     Semantics(
