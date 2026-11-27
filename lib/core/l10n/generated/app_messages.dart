@@ -4709,8 +4709,20 @@ abstract class AppMessages {
   /// Registration flow before phone verification
   ///
   /// In fr, this message translates to:
-  /// **'Pour accéder à toutes les fonctionnalités, validez les quatre choix ci-dessous. Si vous refusez l’utilisation de vos données sensibles ou de votre position, vous pourrez terminer l’inscription. Histae vous redemandera votre accord dans le feed.'**
+  /// **'Donnez votre consentement pour continuer. Vous pourrez retirer votre accord pour l\'utilisation de vos données sensibles et de votre position à tout moment dans les paramètres.'**
   String get registrationConsentIntro;
+
+  /// Checkbox label for sensitive-data use during registration
+  ///
+  /// In fr, this message translates to:
+  /// **'J’accepte que Histae utilise mon sexe et mes préférences pour me proposer des profils'**
+  String get registrationSensitiveConsent;
+
+  /// Checkbox label for location use during registration
+  ///
+  /// In fr, this message translates to:
+  /// **'J’accepte que Histae utilise ma position pour me proposer des profils'**
+  String get registrationLocationConsent;
 
   /// Registration flow before phone verification
   ///

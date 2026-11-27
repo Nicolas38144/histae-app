@@ -9,7 +9,6 @@ import '../../../core/network/retry_after.dart';
 import '../../auth/application/session_controller.dart';
 import '../../auth/domain/auth_models.dart';
 import '../../consents/domain/consent_state.dart';
-import '../../profile/data/profile_models.dart';
 import '../../profile/data/profile_repository.dart';
 import '../data/registration_legal_repository.dart';
 import 'registration_draft.dart';
@@ -72,11 +71,10 @@ class RegistrationController extends ChangeNotifier {
       draft.preferences.validate() == null;
   bool get canVerify =>
       _validDraft &&
-      documents.length == 4 &&
+      documents.length == ConsentType.values.length &&
       _documentsAvailable &&
       !loadingDocuments &&
-      choice(ConsentType.terms) &&
-      choice(ConsentType.privacy);
+      ConsentType.values.every(choice);
 
   void _notify() {
     if (!_disposed) notifyListeners();
@@ -247,16 +245,13 @@ class RegistrationController extends ChangeNotifier {
 
   Future<void> _saveDraft() async {
     _checkOwner();
-    if (!_validDraft) {
+    if (!canVerify) {
       throw const ApiFailure(ApiFailureKind.validation);
     }
     if (!_consentsSaved) {
       try {
         await session.saveConsents(
-          {
-            for (final document in documents)
-              if (choice(document.type)) document.type: true,
-          },
+          {for (final document in documents) document.type: true},
           {
             for (final document in documents)
               document.type: document.requiredVersion,
@@ -276,22 +271,12 @@ class RegistrationController extends ChangeNotifier {
       _checkOwner();
       _consentsSaved = true;
     }
-    final sensitive = choice(ConsentType.sensitive);
-    if (sensitive &&
-        session.consents?.consents.any(
-              (c) => c.type == ConsentType.sensitive && c.current,
-            ) !=
-            true) {
+    if (session.consents?.consents.every((consent) => consent.current) !=
+        true) {
       _consentsSaved = false;
       throw const ApiFailure(ApiFailureKind.consentRequired);
     }
-    final profile = draft.profile;
-    final intended = ProfileDraft(
-      profile.firstname,
-      profile.birthdate,
-      sensitive ? profile.sex : null,
-      profile.bio,
-    );
+    final intended = draft.profile;
     if (!_profileSaved) {
       final current = await _profiles.profile(_scope);
       _checkOwner();
@@ -312,7 +297,7 @@ class RegistrationController extends ChangeNotifier {
       _checkOwner();
       _profileSaved = true;
     }
-    if (sensitive && !_preferencesSaved) {
+    if (!_preferencesSaved) {
       final current = await _profiles.preferences(_scope);
       _checkOwner();
       final intended = draft.preferences;

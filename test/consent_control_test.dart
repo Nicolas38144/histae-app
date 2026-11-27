@@ -3,11 +3,41 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/core/l10n/app_strings.dart';
 import 'package:histae_app/core/l10n/generated/app_messages.dart';
 import 'package:histae_app/core/network/api_failure.dart';
+import 'package:histae_app/features/consents/data/legal_document_opener.dart';
 import 'package:histae_app/features/consents/domain/consent_state.dart';
 import 'package:histae_app/features/consents/presentation/consent_control.dart';
 import 'package:histae_app/features/consents/presentation/consent_strings.dart';
 
 void main() {
+  test(
+    'legacy Histae legal links open the published document in its language',
+    () {
+      const documents = {
+        'conditions-utilisation': 'terms-of-use',
+        'politique-confidentialite': 'privacy-policy',
+        'consentement-donnees-sensibles': 'sensitive-data-consent',
+        'consentement-localisation': 'location-consent',
+      };
+      for (final locale in ['fr', 'en', 'es', 'it']) {
+        final base = 'https://www.histae.com/$locale/legal';
+        for (final document in documents.entries) {
+          expect(
+            canonicalHistaeLegalUrl(Uri.parse('$base/${document.key}/')),
+            Uri.parse('$base/${document.value}/'),
+          );
+        }
+      }
+      for (final url in [
+        'https://www.histae.com/fr/legal/terms-of-use/',
+        'https://www.histae.com/fr/legal/terms-of-use/archive/',
+        'https://legal.example/fr/legal/conditions-utilisation/',
+      ]) {
+        final uri = Uri.parse(url);
+        expect(canonicalHistaeLegalUrl(uri), uri);
+      }
+    },
+  );
+
   test('document dates are strict calendar dates independent of consent timestamps', () {
     final payload = <String, Object?>{
       'consent_type': ConsentType.terms.wireName,

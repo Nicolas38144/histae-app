@@ -18,10 +18,7 @@ import 'support/auth_fixture.dart';
 import 'support/profile_fixture.dart';
 import 'support/registration_fixture.dart';
 
-Future<RegistrationController> prepared(
-  RegistrationFixture fixture, {
-  bool sensitive = true,
-}) async {
+Future<RegistrationController> prepared(RegistrationFixture fixture) async {
   final session = testSession(fixture.handle);
   final controller = RegistrationController(session);
   addTearDown(() {
@@ -38,9 +35,9 @@ Future<RegistrationController> prepared(
   await controller.loadDocuments();
   controller.next();
   controller.next();
-  controller.setChoice(ConsentType.terms, true);
-  controller.setChoice(ConsentType.privacy, true);
-  controller.setChoice(ConsentType.sensitive, sensitive);
+  for (final type in ConsentType.values) {
+    controller.setChoice(type, true);
+  }
   controller.next();
   return controller;
 }
@@ -90,20 +87,22 @@ void main() {
   });
 
   test(
-    'refusing sensitive consent never transmits sex or preferences',
+    'each unchecked consent prevents phone verification and saving',
     () async {
       final fixture = RegistrationFixture();
-      final controller = await prepared(fixture, sensitive: false);
+      final controller = await prepared(fixture);
+      controller.back();
+      for (final type in ConsentType.values) {
+        controller.setChoice(type, false);
+        expect(controller.canVerify, isFalse);
+        controller.next();
+        expect(controller.step, RegistrationStep.consents);
+        controller.setChoice(type, true);
+      }
+      controller.setChoice(ConsentType.sensitive, false);
       await controller.authenticate(testTokens);
-      expect(controller.completed, isTrue);
-      expect(fixture.profile!['sex'], isNull);
-      expect(
-        fixture.requests.where(
-          (request) => request.url.path.endsWith('/preferences'),
-        ),
-        isEmpty,
-      );
-      expect(fixture.grants[ConsentType.sensitive], isNull);
+      expect(controller.completed, isFalse);
+      expect(fixture.writes, isEmpty);
     },
   );
 
@@ -119,9 +118,9 @@ void main() {
     expect(fixture.writes, isEmpty);
     expect(controller.draft.profile.firstname, 'Camille');
 
-    controller.setChoice(ConsentType.terms, true);
-    controller.setChoice(ConsentType.privacy, true);
-    controller.setChoice(ConsentType.sensitive, true);
+    for (final type in ConsentType.values) {
+      controller.setChoice(type, true);
+    }
     controller.next();
     await controller.retrySave();
     expect(controller.completed, isTrue);
@@ -350,10 +349,19 @@ void main() {
       ]);
       expect(find.byKey(const Key('phone')), findsNothing);
       expect(fixture.writes, isEmpty);
-      for (final type in [ConsentType.terms, ConsentType.privacy]) {
-        await tapVisible(tester, find.byKey(Key(type.wireName)));
+      for (final type in ConsentType.values) {
+        final checkbox = find.byKey(Key(type.wireName));
+        await reveal(tester, next);
+        expect(tester.widget<HistaeButton>(next).onPressed, isNull);
+        await reveal(tester, checkbox);
+        final tile = tester.widget<CheckboxListTile>(checkbox);
+        expect(tile.value, isFalse);
+        expect(tile.subtitle, isNull);
+        await tapVisible(tester, checkbox);
       }
-      await tapVisible(tester, find.byKey(const Key('registration-next')));
+      await reveal(tester, next);
+      expect(tester.widget<HistaeButton>(next).onPressed, isNotNull);
+      await tapVisible(tester, next);
       expect(find.text('France (+33)'), findsOneWidget);
       await enter(tester, 'phone', '06 12 34 56 78');
       await tapVisible(tester, find.text('Demander un code'));
@@ -361,7 +369,10 @@ void main() {
       await tapVisible(tester, find.text('Vérifier le code'));
       expect(find.byKey(const Key('main-tab-profile')), findsOneWidget);
       expect(fixture.profile!['firstname'], 'Camille');
-      expect(fixture.profile!['sex'], isNull);
+      expect(fixture.profile!['sex'], 'female');
+      expect(fixture.grants, {
+        for (final type in ConsentType.values) type: true,
+      });
       expect(tester.takeException(), isNull);
     },
   );

@@ -5,7 +5,7 @@ import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../consents/data/legal_document_opener.dart';
 import '../../consents/domain/consent_state.dart';
-import '../../consents/presentation/consent_control.dart';
+import '../../consents/presentation/consent_strings.dart';
 import '../application/registration_controller.dart';
 
 class RegistrationConsentsStep extends StatefulWidget {
@@ -38,8 +38,6 @@ class _RegistrationConsentsStepState extends State<RegistrationConsentsStep> {
       key: const PageStorageKey('registration-consents'),
       padding: HistaeTokens.pagePadding,
       children: [
-        Text(strings.consentsIntro),
-        const SizedBox(height: HistaeTokens.contentSpacing),
         Text(strings.messages.registrationConsentIntro),
         const SizedBox(height: HistaeTokens.contentSpacing),
         if (controller.loadingDocuments)
@@ -63,20 +61,7 @@ class _RegistrationConsentsStepState extends State<RegistrationConsentsStep> {
           ),
         ],
         if (_openFailed) Text(strings.openDocumentError),
-        for (final consent in controller.documents)
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(HistaeTokens.contentSpacing),
-              child: ConsentControl(
-                consent: consent,
-                value: controller.choice(consent.type),
-                onChanged: controller.loadingDocuments || controller.saving
-                    ? null
-                    : (value) => controller.setChoice(consent.type, value),
-                onOpen: () => _open(consent),
-              ),
-            ),
-          ),
+        for (final consent in controller.documents) _documentCard(consent),
         const SizedBox(height: HistaeTokens.contentSpacing),
         HistaeButton(
           key: const Key('registration-next'),
@@ -89,6 +74,43 @@ class _RegistrationConsentsStepState extends State<RegistrationConsentsStep> {
           child: Text(strings.messages.registrationContinue),
         ),
       ],
+    );
+  }
+
+  Widget _documentCard(PublicConsent consent) {
+    final controller = widget.controller;
+    final strings = AppStrings.of(context);
+    final type = consent.type;
+    final label = switch (type) {
+      ConsentType.terms || ConsentType.privacy => strings.consentLabel(type),
+      ConsentType.sensitive => strings.messages.registrationSensitiveConsent,
+      ConsentType.location => strings.messages.registrationLocationConsent,
+    };
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: HistaeTokens.contentSpacing,
+          vertical: HistaeTokens.labelSpacing,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CheckboxListTile(
+              key: Key(type.wireName),
+              contentPadding: EdgeInsets.zero,
+              title: Text(label),
+              value: controller.choice(type),
+              onChanged: controller.loadingDocuments || controller.saving
+                  ? null
+                  : (value) => controller.setChoice(type, value ?? false),
+            ),
+            HistaeButton.text(
+              onPressed: () => _open(consent),
+              child: Text(strings.readDocument),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

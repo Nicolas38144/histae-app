@@ -3290,7 +3290,9 @@
   "registrationContinue": "Continuer",
   "registrationLocalDraft": "Prenez le temps de vous présenter. Vos informations restent sur cet appareil pendant ce parcours et ne seront envoyées qu’après la vérification de votre numéro.",
   "registrationSensitiveDraft": "Votre sexe et vos préférences ne seront transmis qu’avec votre accord à l’étape suivante, après la vérification de votre numéro.",
-  "registrationConsentIntro": "Pour accéder à toutes les fonctionnalités, validez les quatre choix ci-dessous. Si vous refusez l’utilisation de vos données sensibles ou de votre position, vous pourrez terminer l’inscription. Histae vous redemandera votre accord dans le feed.",
+  "registrationConsentIntro": "Donnez votre consentement pour continuer. Vous pourrez retirer votre accord pour l'utilisation de vos données sensibles et de votre position à tout moment dans les paramètres.",
+  "registrationSensitiveConsent": "J’accepte que Histae utilise mon sexe et mes préférences pour me proposer des profils",
+  "registrationLocationConsent": "J’accepte que Histae utilise ma position pour me proposer des profils",
   "registrationPhoneTitle": "Un dernier pas, et vous y êtes.",
   "registrationPhoneIntro": "Vérifiez votre numéro par SMS pour créer votre compte et enregistrer votre présentation. Votre numéro n’apparaîtra pas sur votre profil.",
   "registrationLeaveTitle": "Quitter cette inscription ?",
@@ -3332,6 +3334,12 @@
   },
   "@registrationConsentIntro": {
     "description": "Registration flow before phone verification"
+  },
+  "@registrationSensitiveConsent": {
+    "description": "Checkbox label for sensitive-data use during registration"
+  },
+  "@registrationLocationConsent": {
+    "description": "Checkbox label for location use during registration"
   },
   "@registrationPhoneTitle": {
     "description": "Registration flow before phone verification"

@@ -2868,7 +2868,15 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get registrationConsentIntro =>
-      'Pour accéder à toutes les fonctionnalités, validez les quatre choix ci-dessous. Si vous refusez l’utilisation de vos données sensibles ou de votre position, vous pourrez terminer l’inscription. Histae vous redemandera votre accord dans le feed.';
+      'Donnez votre consentement pour continuer. Vous pourrez retirer votre accord pour l\'utilisation de vos données sensibles et de votre position à tout moment dans les paramètres.';
+
+  @override
+  String get registrationSensitiveConsent =>
+      'J’accepte que Histae utilise mon sexe et mes préférences pour me proposer des profils';
+
+  @override
+  String get registrationLocationConsent =>
+      'J’accepte que Histae utilise ma position pour me proposer des profils';
 
   @override
   String get registrationPhoneTitle => 'Un dernier pas, et vous y êtes.';
