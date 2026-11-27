@@ -272,11 +272,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
   Future<void> _refreshFromPull() async {
     setState(() => _pullRefreshing = true);
     try {
-      if (c.locationConsent) {
-        await c.publishLocation();
-      } else {
-        await c.refresh();
-      }
+      await c.refresh();
     } finally {
       if (mounted) setState(() => _pullRefreshing = false);
     }

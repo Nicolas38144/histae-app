@@ -28,17 +28,16 @@ import 'support/scrolling.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   testWidgets(
-    'pulling an empty feed saves the location before reloading profiles',
+    'pulling an empty feed reloads profiles without updating location',
     (tester) async {
       final source = TestLocationSource();
-      final savedPosition = Completer<http.Response>();
       final refreshedFeed = Completer<http.Response>();
       final requests = <String>[];
       final session = testSession((r) async {
         switch (r.url.path) {
           case '/api/users/me/presence':
             requests.add('presence');
-            return savedPosition.future;
+            return jsonResponse({'message': 'presence updated'});
           case '/api/feed':
             requests.add('feed');
             if (requests.length > 1) return refreshedFeed.future;
@@ -73,17 +72,10 @@ void main() {
       await tester.pump(const Duration(milliseconds: 200));
       await tester.pump();
       expect(find.byType(AlertDialog), findsNothing);
-      expect(source.calls, 1);
-      expect(requests, ['feed', 'presence']);
+      expect(source.calls, 0);
+      expect(requests, ['feed', 'feed']);
       final emptyState = find.byType(HistaeEmptyState);
       final linearProgress = find.byType(LinearProgressIndicator);
-      expect(emptyState, findsOneWidget);
-      expect(linearProgress, findsNothing);
-
-      savedPosition.complete(jsonResponse({'message': 'presence updated'}));
-      await tester.pump();
-      await tester.pump();
-      expect(requests, ['feed', 'presence', 'feed']);
       expect(emptyState, findsOneWidget);
       expect(linearProgress, findsNothing);
       expect(find.byType(RefreshProgressIndicator), findsOneWidget);
@@ -97,6 +89,12 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(FeedProfileCard), findsOneWidget);
       expect(find.byType(RefreshIndicator), findsNothing);
+      await tester.drag(
+        find.byKey(const Key('feed-profile-scroll')),
+        const Offset(0, 240),
+      );
+      await tester.pumpAndSettle();
+      expect(requests, ['feed', 'feed']);
       await tester.pumpWidget(const SizedBox.shrink());
     },
   );
