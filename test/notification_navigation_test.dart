@@ -25,6 +25,12 @@ void main() {
     final support = '/api/users/me/support-cases/$privacyId';
     final rights = '/api/users/me/data-subject-requests';
     final thread = '$rights/$privacyId/messages';
+    const exportRequest = '12121212-1212-4212-8212-121212121212';
+    const exportGrant = '23232323-2323-4232-8232-232323232323';
+    const exportNotice = '34343434-3434-4343-8343-343434343434';
+    final exportThread = '$rights/$exportRequest/messages';
+    final grantPath = '$rights/$exportRequest/assisted-export';
+    final expiresAt = DateTime.now().toUtc().add(const Duration(minutes: 1));
     final session = testSession((request) async {
       final path = request.url.path;
       if (path == support) {
@@ -40,7 +46,10 @@ void main() {
       if (path == rights) {
         opened.add(path);
         return jsonResponse({
-          'requests': [rightsJson(type: 'rectification')],
+          'requests': [
+            rightsJson(type: 'rectification'),
+            {...rightsJson(status: 'in_progress'), 'id': exportRequest},
+          ],
         });
       }
       if (path == thread) {
@@ -56,6 +65,22 @@ void main() {
             },
           ],
           'next_cursor': null,
+        });
+      }
+      if (path == exportThread) {
+        opened.add(path);
+        return jsonResponse({
+          'details': null,
+          'status': 'in_progress',
+          'messages': <Object?>[],
+          'next_cursor': null,
+        });
+      }
+      if (path == grantPath) {
+        opened.add(path);
+        return jsonResponse({
+          'id': exportGrant,
+          'expires_at': expiresAt.toIso8601String(),
         });
       }
       return defaultNotificationsResponse(request);
@@ -104,6 +129,33 @@ void main() {
     );
     expect(find.text('Private RGPD reply'), findsOneWidget);
     expect(find.byType(TextField), findsNothing);
+
+    gateway.taps.add(
+      PushIntent.parse({
+        'notification_id': exportNotice,
+        'type': 'data_request_replied',
+        'request_id': exportRequest,
+        'request_event': 'export_ready',
+      })!,
+    );
+    await tester.pumpAndSettle();
+    expect(opened.last, grantPath);
+    expect(opened, contains(exportThread));
+    final export = find.text('Télécharger l’export assisté');
+    await tester.ensureVisible(export);
+    await tester.tap(export);
+    await tester.pumpAndSettle();
+    expect(
+      tester
+          .widget<PrivacyDetailPage>(find.byType(PrivacyDetailPage))
+          .assistedExportId,
+      exportGrant,
+    );
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+    expect(export, findsOneWidget);
+    await tester.pump(const Duration(minutes: 1));
+    expect(export, findsNothing);
     await tester.pumpWidget(const SizedBox.shrink());
     await gateway.close();
   });

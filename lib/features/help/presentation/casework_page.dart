@@ -52,7 +52,8 @@ class _CaseworkPageState extends State<CaseworkPage>
   String? _before;
   String? _initial;
   String? _threadStatus;
-  String? _exportId;
+  ({String id, DateTime expiresAt})? _export;
+  Timer? _exportDeadline;
   String? _issuedCode;
   DateTime? _codeExpiry;
   ApiFailure? _error;
@@ -98,7 +99,7 @@ class _CaseworkPageState extends State<CaseworkPage>
       _rows.clear();
       _initial = null;
       _issuedCode = null;
-      _exportId = null;
+      _clearExport();
       _message.clear();
     });
   }
@@ -108,6 +109,7 @@ class _CaseworkPageState extends State<CaseworkPage>
     WidgetsBinding.instance.removeObserver(this);
     widget.session.removeListener(_onSessionChanged);
     _scope.cancel();
+    _clearExport();
     _message.dispose();
     super.dispose();
   }
@@ -147,7 +149,7 @@ class _CaseworkPageState extends State<CaseworkPage>
           _before = null;
           _initial = null;
           _threadStatus = null;
-          _exportId = null;
+          _clearExport();
         }
       }
     } finally {
@@ -203,22 +205,39 @@ class _CaseworkPageState extends State<CaseworkPage>
       _initial = initial;
       _threadStatus = status;
       if (widget.showExport && !more) {
-        _exportId = null;
+        _clearExport();
         final grant = await _authenticated(
           'GET',
           '/api/users/me/data-subject-requests/${Uri.encodeComponent(widget.requestId!)}/assisted-export',
         );
-        if (!_scope.isCancelled) {
-          final document = grant == null ? null : jsonObject(grant);
-          _exportId =
-              document != null &&
-                  wireTime(document['expires_at'])
-                      .isAfter(DateTime.now().toUtc())
-              ? serverId(document, 'id')
-              : null;
-        }
+        if (!_scope.isCancelled && grant != null) _setExport(grant);
       }
     }
+  }
+
+  void _clearExport() {
+    _exportDeadline?.cancel();
+    _exportDeadline = null;
+    _export = null;
+  }
+
+  void _setExport(Object grant) {
+    final document = jsonObject(grant);
+    final expiresAt = wireTime(document['expires_at']);
+    final remaining = expiresAt.difference(DateTime.now().toUtc());
+    if (remaining <= Duration.zero) return;
+    _export = (id: serverId(document, 'id'), expiresAt: expiresAt);
+    _exportDeadline = Timer(remaining, () => setState(_clearExport));
+  }
+
+  void _openAssistedExport() {
+    final grant = _export;
+    if (grant == null) return;
+    if (!grant.expiresAt.isAfter(DateTime.now().toUtc())) {
+      setState(_clearExport);
+      return;
+    }
+    widget.openExport?.call(grant.id);
   }
 
   bool get _validMessage {
@@ -382,9 +401,9 @@ class _CaseworkPageState extends State<CaseworkPage>
                 ],
                 if (widget.view == CaseworkView.thread && _canReply)
                   _compose(text),
-                if (_exportId case final id?)
+                if (_export != null)
                   HistaeButton.outlined(
-                    onPressed: () => widget.openExport?.call(id),
+                    onPressed: _busy ? null : _openAssistedExport,
                     child: Text(text.caseworkAssistedExport),
                   ),
               ],
