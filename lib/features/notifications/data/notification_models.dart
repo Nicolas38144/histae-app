@@ -28,7 +28,7 @@ class PushDevice {
   final DateTime? lastUsedAt;
 }
 
-enum PushDestination { match, subscription, requests, sessions }
+enum PushDestination { match, subscription, requests, support, sessions }
 
 enum PushKind {
   newMatch,
@@ -40,6 +40,7 @@ enum PushKind {
   photosRevealed,
   firstPeriodEnding,
   dataRequestReplied,
+  supportCaseUpdated,
   newSession;
 
   PushDestination get destination => switch (this) {
@@ -52,6 +53,7 @@ enum PushKind {
     PushKind.firstPeriodEnding => PushDestination.match,
     PushKind.billingPaymentFailed => PushDestination.subscription,
     PushKind.dataRequestReplied => PushDestination.requests,
+    PushKind.supportCaseUpdated => PushDestination.support,
     PushKind.newSession => PushDestination.sessions,
   };
 
@@ -59,7 +61,14 @@ enum PushKind {
 }
 
 class PushIntent {
-  const PushIntent(this.id, this.kind, this.matchId, {this.requestId});
+  const PushIntent(
+    this.id,
+    this.kind,
+    this.matchId, {
+    this.requestId,
+    this.supportCaseId,
+    this.openRequestThread = false,
+  });
 
   static PushIntent? parse(Map<String, dynamic> data) {
     try {
@@ -74,6 +83,7 @@ class PushIntent {
         'photos_revealed' => PushKind.photosRevealed,
         'first_period_ending' => PushKind.firstPeriodEnding,
         'data_request_replied' => PushKind.dataRequestReplied,
+        'support_case_updated' => PushKind.supportCaseUpdated,
         'new_session' => PushKind.newSession,
         _ => null,
       };
@@ -82,8 +92,23 @@ class PushIntent {
       final request = kind == PushKind.dataRequestReplied
           ? serverId(data, 'request_id')
           : null;
+      final support = kind == PushKind.supportCaseUpdated
+          ? serverId(data, 'support_case_id')
+          : null;
+      final message = request != null && data['request_message_id'] != null
+          ? serverId(data, 'request_message_id')
+          : null;
       // Ignore all remote display text, links, senders and non-contract fields.
-      return PushIntent(id, kind, match, requestId: request);
+      return PushIntent(
+        id,
+        kind,
+        match,
+        requestId: request,
+        supportCaseId: support,
+        openRequestThread:
+            request != null &&
+            (message != null || data['request_event'] == 'export_ready'),
+      );
     } catch (_) {
       return null;
     }
@@ -93,6 +118,8 @@ class PushIntent {
   final PushKind kind;
   final String? matchId;
   final String? requestId;
+  final String? supportCaseId;
+  final bool openRequestThread;
 
   @override
   String toString() => 'PushIntent(redacted)';

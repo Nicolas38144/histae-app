@@ -3525,7 +3525,7 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get notificationAccountSecurityDescription =>
-      'A new sign-in, a reply to a request or a payment issue.';
+      'New sign-ins, support and data request updates, or payment issues.';
 
   @override
   String get notificationDiscreet => 'Discreet notifications';

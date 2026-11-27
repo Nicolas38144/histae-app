@@ -7,6 +7,7 @@ import '../features/billing/application/billing_controller.dart';
 import '../features/billing/presentation/subscription_page.dart';
 import '../features/catalog/data/catalog_repository.dart';
 import '../features/catalog/presentation/catalog_page.dart';
+import '../features/help/presentation/casework_page.dart';
 import '../features/matches/application/matches_controller.dart';
 import '../features/matches/data/matches_repository.dart';
 import '../features/matches/presentation/matches_page.dart';
@@ -101,6 +102,16 @@ class NotificationNavigation {
             notificationFlow: true,
           ),
         );
+      } else if (intent.kind.destination == PushDestination.support &&
+          intent.supportCaseId != null) {
+        _pushRoute = MaterialPageRoute<void>(
+          settings: const RouteSettings(name: '/notification/support'),
+          builder: (_) => CaseworkPage(
+            view: CaseworkView.support,
+            session: session,
+            requestId: intent.supportCaseId,
+          ),
+        );
       } else if (intent.kind.destination == PushDestination.requests ||
           intent.kind.destination == PushDestination.sessions) {
         _pushRoute = MaterialPageRoute<void>(
@@ -112,6 +123,7 @@ class NotificationNavigation {
                 ? PrivacySection.rights
                 : PrivacySection.sessions,
             requestId: intent.requestId,
+            openRequestThread: intent.openRequestThread,
             exportStore: privacyExportStore,
           ),
         );

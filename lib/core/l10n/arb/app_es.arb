@@ -1100,7 +1100,7 @@
   "notificationReminders": "Recordatorios de plazos",
   "notificationRemindersDescription": "El fin del primer periodo o la próxima eliminación de una conversación inactiva.",
   "notificationAccountSecurity": "Cuenta y seguridad",
-  "notificationAccountSecurityDescription": "Un nuevo acceso, una respuesta a una solicitud o un problema de pago.",
+  "notificationAccountSecurityDescription": "Nuevos accesos, novedades de asistencia o de solicitudes de datos y problemas de pago.",
   "notificationDiscreet": "Notificaciones discretas",
   "notificationDiscreetDescription": "Ocultar los nombres en todas las notificaciones, también en la pantalla de bloqueo.",
   "notificationSystemSettings": "Ajustes del teléfono",

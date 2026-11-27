@@ -1100,7 +1100,7 @@
   "notificationReminders": "Deadline reminders",
   "notificationRemindersDescription": "The end of the first period or the upcoming deletion of an inactive conversation.",
   "notificationAccountSecurity": "Account and security",
-  "notificationAccountSecurityDescription": "A new sign-in, a reply to a request or a payment issue.",
+  "notificationAccountSecurityDescription": "New sign-ins, support and data request updates, or payment issues.",
   "notificationDiscreet": "Discreet notifications",
   "notificationDiscreetDescription": "Hide first names in every notification, including on the lock screen.",
   "notificationSystemSettings": "Phone settings",

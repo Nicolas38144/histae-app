@@ -3971,7 +3971,7 @@
   "notificationReminders": "Rappels d’échéance",
   "notificationRemindersDescription": "La fin des premiers mots ou la suppression prochaine d’une conversation inactive.",
   "notificationAccountSecurity": "Compte et sécurité",
-  "notificationAccountSecurityDescription": "Nouvelle connexion, réponse à une démarche ou problème de paiement.",
+  "notificationAccountSecurityDescription": "Nouvelle connexion, mise à jour de l’assistance ou d’une démarche, ou problème de paiement.",
   "notificationDiscreet": "Notifications discrètes",
   "notificationDiscreetDescription": "Masquer les prénoms dans toutes les notifications, y compris sur l’écran verrouillé.",
   "notificationSystemSettings": "Réglages du téléphone",

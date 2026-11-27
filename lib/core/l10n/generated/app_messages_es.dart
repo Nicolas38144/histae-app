@@ -3561,7 +3561,7 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get notificationAccountSecurityDescription =>
-      'Un nuevo acceso, una respuesta a una solicitud o un problema de pago.';
+      'Nuevos accesos, novedades de asistencia o de solicitudes de datos y problemas de pago.';
 
   @override
   String get notificationDiscreet => 'Notificaciones discretas';

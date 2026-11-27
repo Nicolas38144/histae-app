@@ -25,12 +25,14 @@ class PrivacyDetailPage extends StatefulWidget {
     required this.section,
     this.notificationFlow = false,
     this.initialRequestId,
+    this.openInitialThread = false,
     this.assistedExportId,
   });
   final PrivacyController controller;
   final PrivacySection section;
   final bool notificationFlow;
   final String? initialRequestId;
+  final bool openInitialThread;
   final String? assistedExportId;
 
   @override
@@ -44,18 +46,25 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        unawaited(
-          c.enter(
-            widget.section,
-            policy: widget.notificationFlow
-                ? ReadPolicy.refresh
-                : ReadPolicy.cached,
-          ),
-        );
-      }
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => unawaited(_enter()));
+  }
+
+  Future<void> _enter() async {
+    if (!mounted) return;
+    await c.enter(
+      widget.section,
+      policy: widget.notificationFlow ? ReadPolicy.refresh : ReadPolicy.cached,
+    );
+    if (!mounted ||
+        !c.active ||
+        c.failure != null ||
+        !widget.openInitialThread) {
+      return;
+    }
+    final request = c.rights
+        .where((request) => request.id == widget.initialRequestId)
+        .firstOrNull;
+    if (request != null && _hasThread(request)) await _openThread(request);
   }
 
   @override
@@ -70,6 +79,10 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
   Future<bool> _confirm(String title, String body, {String? action}) =>
       confirmAction(context, title, body, action: action);
 
+  bool _hasThread(RightsRequest request) =>
+      request.type != DataRight.restriction &&
+      request.type != DataRight.objection;
+
   Future<void> _openThread(RightsRequest request) async {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -77,7 +90,6 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
           view: CaseworkView.thread,
           session: c.session,
           requestId: request.id,
-          canReply: request.open,
           showExport:
               request.type == DataRight.access ||
               request.type == DataRight.portability,
@@ -387,20 +399,26 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
   ];
 
   List<Widget> _rights() {
+    final requestId = widget.notificationFlow ? widget.initialRequestId : null;
+    final requests = requestId == null
+        ? c.rights
+        : c.rights.where((request) => request.id == requestId);
     return [
-      Text(
-        AppStrings.of(context)
-            .messages
-            .privacyDetailPageTheseRequestsAreSubmittedForProcessing,
-      ),
-      const SizedBox(height: 24),
-      PrivacyRequestForm(controller: c, enabled: enabled),
-      const SizedBox(height: 24),
-      Text(
-        AppStrings.of(context).messages.privacyDetailPageTrackYourRequests,
-        style: Theme.of(context).textTheme.headlineSmall,
-      ),
-      for (final request in c.rights)
+      if (requestId == null) ...[
+        Text(
+          AppStrings.of(context)
+              .messages
+              .privacyDetailPageTheseRequestsAreSubmittedForProcessing,
+        ),
+        const SizedBox(height: 24),
+        PrivacyRequestForm(controller: c, enabled: enabled),
+        const SizedBox(height: 24),
+        Text(
+          AppStrings.of(context).messages.privacyDetailPageTrackYourRequests,
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
+      ],
+      for (final request in requests)
         Card(
           child: request.details == null && request.response == null
               ? ListTile(
@@ -408,11 +426,9 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
                   subtitle: Text(
                     '${rightStatus(AppStrings.of(context), request.status)} · ${privacyDate(AppStrings.of(context), request.requestedAt)}${request.completedAt == null ? '' : AppStrings.of(context).messages.privacyDetailPageCompletedOn(privacyDate(AppStrings.of(context), request.completedAt!))}',
                   ),
-                  onTap:
-                      request.type == DataRight.restriction ||
-                          request.type == DataRight.objection
-                      ? null
-                      : () => _openThread(request),
+                  onTap: _hasThread(request)
+                      ? () => _openThread(request)
+                      : null,
                 )
               : ExpansionTile(
                   key: ValueKey(('privacy-request', request.id)),
@@ -424,8 +440,7 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
                   expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
                   childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
                   children: [
-                    if (request.type != DataRight.restriction &&
-                        request.type != DataRight.objection)
+                    if (_hasThread(request))
                       HistaeButton.text(
                         onPressed: () => _openThread(request),
                         child: Text(
@@ -468,11 +483,15 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
                   ],
                 ),
         ),
-      if (!c.loading && c.rights.isEmpty)
+      if (!c.loading && requests.isEmpty)
         Text(
-          AppStrings.of(context).messages.privacyDetailPageNoRequestsToTrack,
+          requestId == null
+              ? AppStrings.of(context)
+                    .messages
+                    .privacyDetailPageNoRequestsToTrack
+              : AppStrings.of(context).messages.caseworkUnavailable,
         ),
-      if (c.failure != null || c.rights.any((request) => request.open))
+      if (c.failure != null || requests.any((request) => request.open))
         HistaeButton.outlined(
           onPressed: enabled ? c.load : null,
           child: Text(

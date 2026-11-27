@@ -18,6 +18,7 @@ class PrivacyNotificationPage extends StatefulWidget {
     required this.section,
     this.repository,
     this.requestId,
+    this.openRequestThread = false,
     this.exportStore,
   });
 
@@ -25,6 +26,7 @@ class PrivacyNotificationPage extends StatefulWidget {
   final PrivacySection section;
   final PrivacyRepository? repository;
   final String? requestId;
+  final bool openRequestThread;
   final PrivateExportStore? exportStore;
 
   @override
@@ -72,6 +74,7 @@ class _PrivacyNotificationPageState extends State<PrivacyNotificationPage>
             section: widget.section,
             notificationFlow: true,
             initialRequestId: widget.requestId,
+            openInitialThread: widget.openRequestThread,
           )
         : HistaeScaffold(
             body: Center(

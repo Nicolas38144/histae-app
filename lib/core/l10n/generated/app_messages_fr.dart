@@ -3569,7 +3569,7 @@ class AppMessagesFr extends AppMessages {
 
   @override
   String get notificationAccountSecurityDescription =>
-      'Nouvelle connexion, réponse à une démarche ou problème de paiement.';
+      'Nouvelle connexion, mise à jour de l’assistance ou d’une démarche, ou problème de paiement.';
 
   @override
   String get notificationDiscreet => 'Notifications discrètes';

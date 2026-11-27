@@ -5897,7 +5897,7 @@ abstract class AppMessages {
   /// No description provided for @notificationAccountSecurityDescription.
   ///
   /// In fr, this message translates to:
-  /// **'Nouvelle connexion, réponse à une démarche ou problème de paiement.'**
+  /// **'Nouvelle connexion, mise à jour de l’assistance ou d’une démarche, ou problème de paiement.'**
   String get notificationAccountSecurityDescription;
 
   /// No description provided for @notificationDiscreet.

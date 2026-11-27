@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
+import 'package:histae_app/features/help/presentation/casework_page.dart';
 import 'package:histae_app/features/matches/presentation/chat_page.dart';
 import 'package:histae_app/features/matches/presentation/matches_page.dart';
 import 'package:histae_app/features/notifications/application/push_controller.dart';
@@ -17,6 +18,96 @@ import 'support/notifications_fixture.dart';
 import 'support/privacy_fixture.dart';
 
 void main() {
+  testWidgets('casework push opens only the authenticated dossier', (
+    tester,
+  ) async {
+    final opened = <String>[];
+    final support = '/api/users/me/support-cases/$privacyId';
+    final rights = '/api/users/me/data-subject-requests';
+    final thread = '$rights/$privacyId/messages';
+    final session = testSession((request) async {
+      final path = request.url.path;
+      if (path == support) {
+        opened.add(path);
+        return jsonResponse({
+          'id': privacyId,
+          'category': 'other',
+          'status': 'closed',
+          'body': 'Private support request',
+          'response': 'Private support update',
+        });
+      }
+      if (path == rights) {
+        opened.add(path);
+        return jsonResponse({
+          'requests': [rightsJson(type: 'rectification')],
+        });
+      }
+      if (path == thread) {
+        opened.add(path);
+        return jsonResponse({
+          'details': null,
+          'status': 'completed',
+          'messages': [
+            {
+              'id': notificationTwo,
+              'author': 'team',
+              'body': 'Private RGPD reply',
+            },
+          ],
+          'next_cursor': null,
+        });
+      }
+      return defaultNotificationsResponse(request);
+    });
+    await session.establish(testTokens);
+    final gateway = FakePushGateway();
+    final vault = MemoryPushVault()
+      ..record = const PushRecord(
+        'https://api.example',
+        testUser,
+        deviceId: deviceOne,
+      );
+    final push = PushController(DeviceRepository(session), gateway, vault);
+    await tester.pumpWidget(
+      HistaeApp(
+        sessionController: session,
+        pushController: push,
+        privacyExportStore: PreviewExportStore(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    gateway.taps.add(
+      PushIntent.parse({
+        'notification_id': notificationOne,
+        'type': 'support_case_updated',
+        'support_case_id': privacyId,
+      })!,
+    );
+    await tester.pumpAndSettle();
+    expect(opened, [support]);
+    expect(find.text('Private support update'), findsOneWidget);
+    expect(find.byType(TextField), findsNothing);
+    gateway.taps.add(
+      PushIntent.parse({
+        'notification_id': notificationTwo,
+        'type': 'data_request_replied',
+        'request_id': privacyId,
+        'request_message_id': notificationOne,
+      })!,
+    );
+    await tester.pumpAndSettle();
+    expect(opened, [support, rights, thread]);
+    expect(
+      tester.widget<CaseworkPage>(find.byType(CaseworkPage)).view,
+      CaseworkView.thread,
+    );
+    expect(find.text('Private RGPD reply'), findsOneWidget);
+    expect(find.byType(TextField), findsNothing);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await gateway.close();
+  });
+
   for (final kind in [PushKind.dataRequestReplied, PushKind.newSession]) {
     testWidgets('${kind.name} opens a fresh owner-scoped privacy destination', (
       tester,

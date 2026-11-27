@@ -54,6 +54,30 @@ void main() {
     expect(reply?.kind.destination, PushDestination.requests);
     expect(reply?.requestId, notificationTwo);
     expect(reply?.matchId, isNull);
+    expect(reply?.openRequestThread, isFalse);
+    for (final event in [
+      {'request_message_id': testMatch},
+      {'request_event': 'export_ready'},
+    ]) {
+      expect(
+        PushIntent.parse({...request, 'request_id': notificationTwo, ...event})
+            ?.openRequestThread,
+        isTrue,
+      );
+    }
+    final support = {
+      'notification_id': notificationOne,
+      'type': 'support_case_updated',
+    };
+    expect(PushIntent.parse(support), isNull);
+    final supportIntent = PushIntent.parse({
+      ...support,
+      'support_case_id': notificationTwo,
+      'request_id': testMatch,
+    });
+    expect(supportIntent?.kind.destination, PushDestination.support);
+    expect(supportIntent?.supportCaseId, notificationTwo);
+    expect(supportIntent?.requestId, isNull);
     final login = PushIntent.parse({
       'notification_id': notificationOne,
       'type': 'new_session',
