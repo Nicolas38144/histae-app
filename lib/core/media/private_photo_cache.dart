@@ -5,7 +5,9 @@ import 'package:flutter/widgets.dart';
 import '../network/api_failure.dart';
 import '../network/signed_photo_loader.dart';
 
-/// Foreground-only memory for private photos, owned by a session controller.
+typedef PrivatePhotoAccess = ({String url, DateTime? readAt});
+
+/// Foreground-only memory for private photos, owned by a session controller or view.
 class PrivatePhotoCache with WidgetsBindingObserver {
   PrivatePhotoCache({this.maxEntries = 48, this.maxBytes = 8 * 1024 * 1024})
     : assert(maxEntries >= 0),
@@ -70,6 +72,39 @@ class PrivatePhotoCache with WidgetsBindingObserver {
     task.result = _read(key, task);
     return task.result;
   }
+
+  /// Rechecks the current authorization after renewal and retries storage once.
+  Future<ImageProvider?> loadWithRenewal({
+    required String key,
+    required int width,
+    required PrivatePhotoAccess? Function() readAccess,
+    Future<void> Function()? renewAccess,
+    PhotoClientFactory? photoClient,
+  }) async {
+    Future<ImageProvider> download(String url) =>
+        load(key: key, url: url, width: width, photoClient: photoClient);
+
+    final access = readAccess();
+    if (access == null) return null;
+    if (_fresh(access.readAt)) {
+      try {
+        return await download(access.url);
+      } catch (_) {
+        if (renewAccess == null) rethrow;
+      }
+    }
+
+    if (renewAccess == null) throw const ApiFailure(ApiFailureKind.expired);
+    await renewAccess();
+    final renewed = readAccess();
+    if (renewed == null) return null;
+    if (!_fresh(renewed.readAt)) throw const ApiFailure(ApiFailureKind.expired);
+    return download(renewed.url);
+  }
+
+  bool _fresh(DateTime? readAt) =>
+      readAt != null &&
+      DateTime.now().toUtc().difference(readAt) < privatePhotoLifetime;
 
   Future<ImageProvider> _read(String key, _PhotoLoad task) async {
     try {

@@ -8,6 +8,7 @@ import '../../../core/network/api_client.dart';
 import '../../../core/network/api_failure.dart';
 import '../../../core/network/read_snapshots.dart';
 import '../../../core/network/retry_after.dart';
+import '../../../core/network/signed_photo_loader.dart';
 import '../../auth/domain/authenticated_session.dart';
 import '../../consents/domain/consent_state.dart';
 import '../../drafts/application/draft_controller.dart';
@@ -92,6 +93,18 @@ class ProfileController extends ChangeNotifier {
         )
       : null;
 
+  void _acceptProfile(OwnerProfile? value) {
+    String? resource(String? url) =>
+        url == null ? null : signedPhotoResource(url);
+    final previous = profile;
+    if (previous != null &&
+        resource(previous.photo) != resource(value?.photo)) {
+      photoRevision++;
+    }
+    profile = value;
+    photoReadAt = repository.profileReadAt;
+  }
+
   void _notify() {
     if (_disposed) return;
     final photo = accessible ? profile?.photo : null;
@@ -175,11 +188,14 @@ class ProfileController extends ChangeNotifier {
             scope.isCancelled) {
           return;
         }
-        profile = value;
-        photoReadAt = repository.profileReadAt;
+        _acceptProfile(value);
         _notify();
       } on ApiFailure catch (error) {
-        if (accessible && generation == _generation && !scope.isCancelled) {
+        if (accessible &&
+            generation == _generation &&
+            revision == _readRevision &&
+            photo == photoRevision &&
+            !scope.isCancelled) {
           _cooldown(error);
           if (error.kind == ApiFailureKind.consentRequired) {
             unawaited(session.synchronize());
@@ -239,10 +255,11 @@ class ProfileController extends ChangeNotifier {
     }
 
     await Future.wait([
-      read('profile', () => repository.profile(scope, policy: policy), (p) {
-        profile = p;
-        photoReadAt = repository.profileReadAt;
-      }),
+      read(
+        'profile',
+        () => repository.profile(scope, policy: policy),
+        _acceptProfile,
+      ),
       if (!discoveryDetailsOnly) ...[
         read(
           'preferences',
@@ -335,6 +352,10 @@ class ProfileController extends ChangeNotifier {
   }) async {
     if (!canWrite) throw const ApiFailure(ApiFailureKind.conflict);
     final generation = _generation;
+    if (photo) {
+      _readRevision++;
+      _photoRefresh = null;
+    }
     saving = true;
     _notify();
     var saved = false;
@@ -374,10 +395,7 @@ class ProfileController extends ChangeNotifier {
     } finally {
       if (!_disposed && generation == _generation) {
         saving = false;
-        if (photo) {
-          ownerPreviewPhotos.clear();
-          photoRevision++;
-        }
+        if (photo && saved) photoRevision++;
         _notify();
         if (_languageDirty) {
           _localeRevision = session.localizationRevision;
@@ -389,6 +407,13 @@ class ProfileController extends ChangeNotifier {
           discoveryDetailsConfirmed = saved && confirmsDiscoveryDetails();
           discoveryDetailsRevision++;
           _notify();
+        }
+        if (photo && !saved && uncertain && generation == _generation) {
+          try {
+            await refreshPhotoPreview();
+          } on ApiFailure {
+            // Explicit recovery remains available if this check fails.
+          }
         }
       }
     }

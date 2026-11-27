@@ -7,16 +7,20 @@ import '../../../core/network/api_failure.dart';
 import '../../../core/network/json_fields.dart';
 import '../../auth/domain/authenticated_session.dart';
 
+enum MatchUpdateKind { photoSharing, continuation }
+
 class MobileSignal {
   const MobileSignal(
     this.type, {
     this.id,
     this.matchId,
+    this.matchUpdate,
     this.ended = false,
     this.serverTime,
   });
   final String type;
   final String? id, matchId;
+  final MatchUpdateKind? matchUpdate;
   final bool ended;
   final DateTime? serverTime;
 }
@@ -54,6 +58,16 @@ class MobileEventDecoder {
     return signals;
   }
 
+  MatchUpdateKind? _matchUpdate(Map<String, dynamic> data) {
+    if (data.containsKey('photos_revealed')) {
+      return data['photos_revealed'] is bool
+          ? MatchUpdateKind.photoSharing
+          : null;
+    }
+    if (data['match_confirmed'] is bool) return MatchUpdateKind.continuation;
+    return null;
+  }
+
   MobileSignal? _consumeLine() {
     final line = _line;
     _line = '';
@@ -86,6 +100,7 @@ class MobileEventDecoder {
           event,
           id: id.isEmpty ? null : id,
           matchId: matchId,
+          matchUpdate: event == 'match.updated' ? _matchUpdate(j) : null,
           ended:
               event == 'match.updated' &&
               {'ended', 'expired'}.contains(j['status']),

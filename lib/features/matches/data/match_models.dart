@@ -123,6 +123,7 @@ class UserMatch {
     this.lastMessage, {
     this.archived = false,
     this.inactivityExpiresAt,
+    this.lastMessageAt,
   });
 
   factory UserMatch.fromJson(Object? value, String owner) {
@@ -159,6 +160,9 @@ class UserMatch {
               partner.id,
             }, summary: true),
       archived: j['archived'] == null ? false : jsonField<bool>(j, 'archived'),
+      lastMessageAt: j['last_message_at'] == null
+          ? null
+          : wireTime(j['last_message_at']),
       inactivityExpiresAt: j['inactivity_expires_at'] == null
           ? null
           : wireTime(j['inactivity_expires_at']),
@@ -172,7 +176,10 @@ class UserMatch {
   final int unreadCount;
   final ChatMessage? lastMessage;
   final bool archived;
-  final DateTime? inactivityExpiresAt;
+  final DateTime? inactivityExpiresAt, lastMessageAt;
+
+  DateTime get activityAt =>
+      lastMessageAt ?? lastMessage?.createdAt ?? createdAt;
 
   MatchLifecycle get lifecycle => MatchLifecycle(
     status: status,
@@ -196,6 +203,14 @@ class MatchPage {
     : items = List.unmodifiable(items);
   final List<UserMatch> items;
   final String? cursor;
+
+  /// Matches the server's descending activity and ID order.
+  bool reaches(UserMatch boundary) {
+    final last = items.lastOrNull;
+    if (last == null) return false;
+    final order = last.activityAt.compareTo(boundary.activityAt);
+    return order < 0 || (order == 0 && last.id.compareTo(boundary.id) <= 0);
+  }
 }
 
 class MessagePage {

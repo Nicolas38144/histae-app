@@ -454,10 +454,12 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       _listVerified = false;
       _notify();
     } else if (signal.type == 'match.updated' && id != null) {
-      _pendingPhotoChanges[id] = ++_photoChangeRevision;
-      _invalidatePhoto(id);
-      if (selectedId == id) _verified = false;
-      _notify();
+      if (signal.matchUpdate != MatchUpdateKind.continuation) {
+        _pendingPhotoChanges[id] = ++_photoChangeRevision;
+        _invalidatePhoto(id);
+        if (selectedId == id) _verified = false;
+        _notify();
+      }
     } else if (signal.type != 'match.created' &&
         signal.type != 'message.read' &&
         signal.type != 'message.created') {
@@ -563,6 +565,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     final epoch = _epoch, chatEpoch = _chatEpoch;
     final languageRevision = session.localizationRevision;
     final photoChangeRevision = _photoChangeRevision;
+    final previousBoundary = _items.lastOrNull;
     final target = selectedId;
     final scope = _scope;
     listLoading = true;
@@ -577,6 +580,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     try {
       final items = <UserMatch>[];
       final seen = <String>{}, cursors = <String>{}, unavailable = <String>{};
+      var coversLoadedMatches = false;
       String? cursor;
       do {
         final page = await repository.matches(
@@ -602,11 +606,16 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
             items.add(item);
           }
         }
+        coversLoadedMatches =
+            coversLoadedMatches ||
+            previousBoundary == null ||
+            page.reaches(previousBoundary);
         cursor = page.cursor;
         if (cursor != null && !cursors.add(cursor)) {
           throw const ApiFailure(ApiFailureKind.invalidResponse);
         }
-      } while (cursor != null && target != null && !seen.contains(target));
+      } while (cursor != null &&
+          (!coversLoadedMatches || (target != null && !seen.contains(target))));
       if (!_alive(epoch)) return;
       _items
         ..clear()

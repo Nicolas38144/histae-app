@@ -47,9 +47,9 @@ class PrivatePhoto extends StatefulWidget {
 
 class _PrivatePhotoState extends State<PrivatePhoto>
     with WidgetsBindingObserver {
+  PrivatePhotoCache? _localCache;
+  ({PrivatePhotoCache cache, String key, String resource, int width})? _source;
   ImageProvider? _image;
-  SignedPhotoDownload? _download;
-  String? _resource;
   int _epoch = 0;
   bool _routeCurrent = false, _tickersEnabled = false;
   bool _loading = false, _failed = false;
@@ -61,10 +61,6 @@ class _PrivatePhotoState extends State<PrivatePhoto>
       (_tickersEnabled || widget.keepCachedWhileMuted) &&
       (WidgetsBinding.instance.lifecycleState == null ||
           WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed);
-
-  bool get _fresh =>
-      widget.readAt != null &&
-      DateTime.now().toUtc().difference(widget.readAt!) < privatePhotoLifetime;
 
   @override
   void initState() {
@@ -83,13 +79,9 @@ class _PrivatePhotoState extends State<PrivatePhoto>
   @override
   void didUpdateWidget(PrivatePhoto oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.memoryCache != widget.memoryCache ||
-        oldWidget.cacheKey != widget.cacheKey) {
-      _purge();
-    }
     if (_failed &&
         (oldWidget.url != widget.url || oldWidget.readAt != widget.readAt)) {
-      _purge();
+      _reset();
     }
     _sync();
   }
@@ -99,115 +91,87 @@ class _PrivatePhotoState extends State<PrivatePhoto>
     if (mounted) setState(_sync);
   }
 
-  void _purge() {
+  void _reset() {
     _epoch++;
-    _download?.cancel();
-    _download = null;
     if (_image case final image?) {
-      if (widget.cacheKey == null ||
-          widget.memoryCache?.owns(widget.cacheKey!, image) != true) {
-        unawaited(image.evict());
-      }
+      final source = _source!;
+      if (!source.cache.owns(source.key, image)) unawaited(image.evict());
     }
+    _localCache?.clear();
     _image = null;
-    _resource = null;
+    _source = null;
     _loading = false;
     _failed = false;
   }
 
   void _sync() {
     if (!_allowed) {
-      _purge();
+      _reset();
       return;
     }
-    final resource = signedPhotoResource(widget.url!);
-    if (_resource == resource) return;
-    _purge();
-    final cached = widget.cacheKey == null
-        ? null
-        : widget.memoryCache?.lookup(
-            widget.cacheKey!,
-            widget.url!,
-            widget.decodeWidth,
-          );
-    if (cached != null) {
-      _resource = resource;
-      _image = cached;
-      return;
+    final url = widget.url!;
+    final source = (
+      cache:
+          widget.memoryCache ??
+          (_localCache ??= PrivatePhotoCache(maxEntries: 1)),
+      key: widget.cacheKey ?? 'photo',
+      resource: signedPhotoResource(url),
+      width: widget.decodeWidth,
+    );
+    if (_source == source) return;
+    _reset();
+
+    final cached = source.cache.lookup(source.key, url, source.width);
+    // A tab can still be painted while its tickers are muted.
+    if (cached == null && !_tickersEnabled) return;
+    _source = source;
+    _image = cached;
+    if (cached == null) {
+      _loading = true;
+      unawaited(_load(_epoch));
     }
-    // The tab pager can still paint this route while its tickers are muted.
-    // A hidden tab can retain pixels, but waits to start its first load.
-    if (!_tickersEnabled) return;
-    _resource = resource;
-    _loading = true;
-    // A stale snapshot can be encountered on navigation. Refresh only while
-    // visible, once per attempt; controller reads coalesce across avatars.
-    unawaited(_load(_epoch));
   }
 
   bool _alive(int epoch) => mounted && epoch == _epoch && _allowed;
 
   Future<void> _load(int epoch) async {
-    var refreshed = false;
+    final source = _source!;
+    final refresh = widget.refreshAccess;
+    ImageProvider? image;
+    var failed = false;
     try {
-      if (!_fresh) {
-        refreshed = true;
-        // Avoid notifying an ancestor during this widget's build.
-        await Future<void>.delayed(Duration.zero);
-        if (!_alive(epoch)) return;
-        await widget.refreshAccess?.call();
-        if (!_alive(epoch)) return;
-        // A controller notification rebuilds the URL/authorization first.
-        await WidgetsBinding.instance.endOfFrame;
-        if (!_alive(epoch)) return;
-      }
-      while (_alive(epoch)) {
-        if (!_fresh) throw StateError('Expired photo URL');
-        try {
-          if (widget.memoryCache case final cache?
-              when widget.cacheKey != null) {
-            final image = await cache.load(
-              key: widget.cacheKey!,
-              url: widget.url!,
-              width: widget.decodeWidth,
-              photoClient: widget.photoClient,
-            );
-            if (_alive(epoch)) setState(() => _image = image);
-            return;
-          }
-          final request = SignedPhotoLoader(clientFactory: widget.photoClient)
-              .load(widget.url!);
-          _download = request;
-          final bytes = await request.bytes;
-          if (!_alive(epoch)) return;
-          setState(() {
-            _image = ResizeImage(MemoryImage(bytes), width: widget.decodeWidth);
-          });
-          return;
-        } catch (_) {
-          if (!_alive(epoch) || refreshed || widget.refreshAccess == null) {
-            rethrow;
-          }
-          refreshed = true;
-          await widget.refreshAccess!();
-          if (!_alive(epoch)) return;
-          await WidgetsBinding.instance.endOfFrame;
-        }
-      }
+      image = await source.cache.loadWithRenewal(
+        key: source.key,
+        width: source.width,
+        readAccess: () =>
+            _alive(epoch) ? (url: widget.url!, readAt: widget.readAt) : null,
+        renewAccess: refresh == null ? null : () => _renew(refresh, epoch),
+        photoClient: widget.photoClient,
+      );
     } catch (_) {
-      if (_alive(epoch)) setState(() => _failed = true);
-    } finally {
-      if (mounted && epoch == _epoch) {
-        _download = null;
-        setState(() => _loading = false);
-      }
+      failed = true;
     }
+    if (!_alive(epoch)) return;
+    setState(() {
+      _image = image;
+      _failed = failed;
+      _loading = false;
+    });
+  }
+
+  Future<void> _renew(Future<void> Function() refresh, int epoch) async {
+    // Let the current build finish, then give the refreshed URL a chance to rebuild.
+    await Future<void>.delayed(Duration.zero);
+    if (!_alive(epoch)) return;
+    await refresh();
+    if (_alive(epoch)) await WidgetsBinding.instance.endOfFrame;
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _purge();
+    _reset();
+    _localCache?.dispose();
     super.dispose();
   }
 

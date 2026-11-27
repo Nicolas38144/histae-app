@@ -264,6 +264,60 @@ void main() {
     );
     expect(puts, 0);
   });
+  test('a refused photo deletion leaves the current photo and its revision unchanged', () async {
+    const photo = 'https://photos.example/current';
+    var reads = 0;
+    final session = testSession((r) async {
+      if (r.url.path == '/api/users/me') {
+        reads++;
+        return jsonResponse(ownerJson(photo: photo));
+      }
+      if (r.url.path == '/api/users/me/photo' && r.method == 'DELETE') {
+        return apiError(429, 'rate_limit_exceeded');
+      }
+      return defaultProfileResponse(r);
+    });
+    addTearDown(session.dispose);
+    await session.establish(testTokens);
+    final c = ProfileController(ProfileRepository(session));
+    addTearDown(c.dispose);
+    await c.load();
+    final revision = c.photoRevision;
+
+    await expectLater(c.removePhoto(), throwsA(isA<ApiFailure>()));
+    expect(c.profile?.photo, photo);
+    expect(c.photoRevision, revision);
+    expect(c.uncertain, isFalse);
+    expect(reads, 1);
+  });
+
+  test('a lost photo deletion response verifies the server photo before advancing the revision', () async {
+    String? photo = 'https://photos.example/current';
+    var reads = 0;
+    final session = testSession((r) async {
+      if (r.url.path == '/api/users/me') {
+        reads++;
+        return jsonResponse(ownerJson(photo: photo));
+      }
+      if (r.url.path == '/api/users/me/photo' && r.method == 'DELETE') {
+        photo = null;
+        throw TimeoutException('Simulated lost deletion response');
+      }
+      return defaultProfileResponse(r);
+    });
+    addTearDown(session.dispose);
+    await session.establish(testTokens);
+    final c = ProfileController(ProfileRepository(session));
+    addTearDown(c.dispose);
+    await c.load();
+    final revision = c.photoRevision;
+
+    await expectLater(c.removePhoto(), throwsA(isA<ApiFailure>()));
+    expect(c.profile?.photo, isNull);
+    expect(c.photoRevision, revision + 1);
+    expect(reads, 2);
+  });
+
   test('multipart photo timeout keeps the same key, filename, MIME and bytes for explicit resume', () async {
     final bodies = <String>[];
     final keys = <String?>[];

@@ -142,6 +142,57 @@ void main() {
     expect(c.verified, isTrue);
   });
 
+  test('background refresh keeps the loaded match range when a new match shifts the page boundary', () async {
+    const newMatch = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+    const olderMatch = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+    final queries = <String?>[];
+    var inserted = false;
+    final session = testSession((r) async {
+      if (r.url.path != '/api/matches/me') return defaultMatchesResponse(r);
+      final cursor = r.url.queryParameters['cursor'];
+      queries.add(cursor);
+      final ordered = [
+        if (inserted) (newMatch, '2026-10-20T00:00:00Z'),
+        (testMatch, '2026-10-19T00:00:00Z'),
+        (secondMatch, '2026-10-18T00:00:00Z'),
+        (olderMatch, '2026-10-17T00:00:00Z'),
+      ];
+      final index = int.parse(cursor ?? '0');
+      final (id, activityAt) = ordered[index];
+      return jsonResponse({
+        'matches': [
+          {...publicMatchJson(id: id), 'last_message_at': activityAt},
+        ],
+        'next_cursor': index + 1 < ordered.length
+            ? (index + 1).toString()
+            : null,
+      });
+    });
+    addTearDown(session.dispose);
+    await session.establish(testTokens);
+    final c = MatchesController(
+      MatchesRepository(session),
+      realtime: QuietRealtime(session),
+    );
+    addTearDown(c.dispose);
+    await c.activate();
+    await c.loadMore();
+    expect(c.items.map((m) => m.id), [testMatch, secondMatch]);
+
+    inserted = true;
+    await c.refreshPhotos();
+    expect(c.items.map((m) => m.id), [newMatch, testMatch, secondMatch]);
+    expect(c.listCursor, '3');
+    expect(queries, [null, '1', null, '1', '2']);
+    await c.loadMore();
+    expect(c.items.map((m) => m.id), [
+      newMatch,
+      testMatch,
+      secondMatch,
+      olderMatch,
+    ]);
+  });
+
   test('awaiting continuation keeps history, forbids sends; confirmed ignores old expiry and terminal clears content', () async {
     var status = 'awaiting_continuation';
     var expiry = DateTime.now().add(const Duration(hours: 1));

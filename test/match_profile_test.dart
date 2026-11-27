@@ -280,6 +280,23 @@ void main() {
           expect(find.byType(MatchPreviewCard), findsNWidgets(3));
           expect(downloads, unorderedEquals([firstUrl, secondUrl]));
 
+          pendingList = Completer<http.Response>();
+          realtime.emit(
+            MobileEventDecoder()
+                .add(
+                  'event: match.updated\ndata: {"match_id":"$testMatch","match_confirmed":true}\n\n',
+                )
+                .single,
+          );
+          await tester.pump(const Duration(milliseconds: 200));
+          expect(image(testMatch), same(original));
+          expect(image(secondMatch), same(unaffected));
+          pendingList!.complete(matchList());
+          pendingList = null;
+          await tester.pumpAndSettle();
+          expect(image(testMatch), same(original));
+          expect(downloads, unorderedEquals([firstUrl, secondUrl]));
+
           firstPhoto = replacementUrl;
           await c.refreshPhotos();
           await tester.pumpAndSettle();
@@ -292,7 +309,11 @@ void main() {
           final staleRead = c.refreshPhotos();
           await tester.pump();
           realtime.emit(
-            const MobileSignal('match.updated', matchId: testMatch),
+            MobileEventDecoder()
+                .add(
+                  'event: match.updated\ndata: {"match_id":"$testMatch","photos_revealed":false}\n\n',
+                )
+                .single,
           );
           await tester.pump();
           expect(photo(testMatch), findsNothing);
