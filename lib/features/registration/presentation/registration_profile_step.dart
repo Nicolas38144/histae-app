@@ -54,7 +54,6 @@ class _RegistrationProfileStepState extends State<RegistrationProfileStep> {
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
     final copy = strings.messages;
-    final sexLabel = '${copy.identityEditorSex} *';
     return ListView(
       key: const PageStorageKey('registration-profile'),
       padding: HistaeTokens.pagePadding,
@@ -86,7 +85,7 @@ class _RegistrationProfileStepState extends State<RegistrationProfileStep> {
           key: const Key('registration-sex'),
           initialValue: _sex,
           isExpanded: true,
-          decoration: InputDecoration(labelText: sexLabel),
+          decoration: InputDecoration(labelText: copy.identityEditorSex),
           items: ProfileStrings(strings).sexes.entries
               .where((entry) => entry.key.isNotEmpty)
               .map(
@@ -96,10 +95,10 @@ class _RegistrationProfileStepState extends State<RegistrationProfileStep> {
                 ),
               )
               .toList(),
-          onChanged: (value) {
+          onChanged: (value) => setState(() {
             _sex = value;
             _changed();
-          },
+          }),
         ),
         const SizedBox(height: HistaeTokens.contentSpacing),
         BiographyField(
@@ -123,7 +122,9 @@ class _RegistrationProfileStepState extends State<RegistrationProfileStep> {
           valueListenable: _bio,
           builder: (context, value, _) => HistaeButton(
             key: const Key('registration-next'),
-            onPressed: validateBiography(value.text) == null ? _continue : null,
+            onPressed: _sex != null && validateBiography(value.text) == null
+                ? _continue
+                : null,
             child: Text(copy.registrationContinue),
           ),
         ),

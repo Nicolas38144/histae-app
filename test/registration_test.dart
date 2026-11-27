@@ -293,15 +293,18 @@ void main() {
         'registration-bio',
         'Une présentation qui prend le temps de raconter mes dimanches et ce qui me fait sourire.',
       );
-      await tapVisible(tester, find.byKey(const Key('registration-next')));
-      expect(
-        find.byKey(const PageStorageKey('registration-profile')),
-        findsOneWidget,
-      );
-      await tapVisible(tester, find.byKey(const Key('registration-sex')));
+      final next = find.byKey(const Key('registration-next'));
+      await reveal(tester, next);
+      expect(tester.widget<HistaeButton>(next).onPressed, isNull);
+      final sex = find.byKey(const Key('registration-sex'));
+      await reveal(tester, sex);
+      expect(find.text('Sexe'), findsOneWidget);
+      await tapVisible(tester, sex);
       await tester.tap(find.text('Femme').last);
       await tester.pumpAndSettle();
-      await tapVisible(tester, find.byKey(const Key('registration-next')));
+      await reveal(tester, next);
+      expect(tester.widget<HistaeButton>(next).onPressed, isNotNull);
+      await tapVisible(tester, next);
       expect(find.byKey(const Key('phone')), findsNothing);
       await tapVisible(
         tester,
