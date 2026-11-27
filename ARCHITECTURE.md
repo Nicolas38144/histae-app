@@ -100,6 +100,9 @@ keeps a separate cache for opened partner profiles (2 entries). Each cache caps 
 withdrawal, replacement, access loss and deadlines purge affected photos. An unconfirmed withdrawal
 is an immediate local barrier: stale grant responses cannot restore images.
 
+Match cards keep authorized thumbnails mounted during main-tab transitions. Muted tabs wait until
+they are selected to start new thumbnail loads.
+
 Use the snapshot's original timestamp for the 50-second download window of a 60-second URL.
 A stale/rejected URL permits one authorized renewal, without rereading unchanged message history
 or entering a retry loop. Private photos never use disk caching or speculative partner downloads.

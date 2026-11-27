@@ -27,6 +27,7 @@ class PrivatePhoto extends StatefulWidget {
     this.photoClient,
     this.memoryCache,
     this.cacheKey,
+    this.keepCachedWhileMuted = false,
   }) : assert(memoryCache == null || cacheKey != null);
 
   final String? url;
@@ -38,6 +39,7 @@ class PrivatePhoto extends StatefulWidget {
   final PhotoClientFactory? photoClient;
   final PrivatePhotoCache? memoryCache;
   final String? cacheKey;
+  final bool keepCachedWhileMuted;
 
   @override
   State<PrivatePhoto> createState() => _PrivatePhotoState();
@@ -49,12 +51,14 @@ class _PrivatePhotoState extends State<PrivatePhoto>
   SignedPhotoDownload? _download;
   String? _resource;
   int _epoch = 0;
-  bool _visible = false, _loading = false, _failed = false;
+  bool _routeCurrent = false, _tickersEnabled = false;
+  bool _loading = false, _failed = false;
 
   bool get _allowed =>
       widget.allowed &&
       widget.url != null &&
-      _visible &&
+      _routeCurrent &&
+      (_tickersEnabled || widget.keepCachedWhileMuted) &&
       (WidgetsBinding.instance.lifecycleState == null ||
           WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed);
 
@@ -71,9 +75,8 @@ class _PrivatePhotoState extends State<PrivatePhoto>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _visible =
-        TickerMode.valuesOf(context).enabled &&
-        (ModalRoute.isCurrentOf(context) ?? true);
+    _tickersEnabled = TickerMode.valuesOf(context).enabled;
+    _routeCurrent = ModalRoute.isCurrentOf(context) ?? true;
     _sync();
   }
 
@@ -120,7 +123,6 @@ class _PrivatePhotoState extends State<PrivatePhoto>
     final resource = signedPhotoResource(widget.url!);
     if (_resource == resource) return;
     _purge();
-    _resource = resource;
     final cached = widget.cacheKey == null
         ? null
         : widget.memoryCache?.lookup(
@@ -129,9 +131,14 @@ class _PrivatePhotoState extends State<PrivatePhoto>
             widget.decodeWidth,
           );
     if (cached != null) {
+      _resource = resource;
       _image = cached;
       return;
     }
+    // The tab pager can still paint this route while its tickers are muted.
+    // A hidden tab can retain pixels, but waits to start its first load.
+    if (!_tickersEnabled) return;
+    _resource = resource;
     _loading = true;
     // A stale snapshot can be encountered on navigation. Refresh only while
     // visible, once per attempt; controller reads coalesce across avatars.

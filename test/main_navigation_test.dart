@@ -1,11 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:histae_app/app/app.dart';
 import 'package:histae_app/app/main_navigation_bar.dart';
 import 'package:histae_app/features/discovery/presentation/discovery_page.dart';
 import 'package:histae_app/features/matches/presentation/chat_page.dart';
+import 'package:histae_app/features/matches/presentation/match_photo_avatar.dart';
 import 'package:histae_app/features/matches/presentation/matches_page.dart';
 import 'package:histae_app/features/profile/presentation/profile_page.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 
 import 'support/auth_fixture.dart';
 import 'support/continuation_fixture.dart';
@@ -13,6 +18,97 @@ import 'support/discovery_fixture.dart';
 import 'support/matches_fixture.dart';
 
 void main() {
+  testWidgets('revealed thumbnails stay mounted during tab transitions', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    const photoUrl = 'https://photos.example/revealed-thumbnail';
+    final session = testSession((r) async {
+      if (r.url.path == '/api/matches/me') {
+        final match = publicMatchJson();
+        return jsonResponse({
+          'matches': [
+            {
+              ...match,
+              'my_revealed': true,
+              'photos_revealed': true,
+              'other_user': {
+                ...match['other_user'] as Map<String, dynamic>,
+                'photo': photoUrl,
+              },
+            },
+          ],
+          'next_cursor': null,
+        });
+      }
+      return defaultContinuationResponse(r);
+    });
+    await session.establish(testTokens);
+    final pixels = base64Decode(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGP4z8DwHwAFAAH/iZk9HQAAAABJRU5ErkJggg==',
+    );
+    var downloads = 0;
+
+    await http.runWithClient(
+      () async {
+        await tester.pumpWidget(HistaeApp(sessionController: session));
+        await tester.pumpAndSettle();
+        expect(downloads, 0);
+        final matchesTab = find.byKey(const Key('main-tab-matches'));
+        await tester.tap(matchesTab);
+        await tester.pumpAndSettle();
+        final thumbnail = find.descendant(
+          of: find.byType(MatchPhotoAvatar),
+          matching: find.byType(Image),
+        );
+        final element = tester.element(thumbnail);
+        expect(downloads, 1);
+
+        final swipe = await tester.startGesture(
+          tester.getCenter(find.byKey(const Key('main-tab-pages'))),
+        );
+        await swipe.moveBy(const Offset(110, 0));
+        await tester.pump();
+        await tester.pump();
+        expect(TickerMode.valuesOf(element).enabled, isFalse);
+        expect(tester.element(thumbnail), same(element));
+        await swipe.moveBy(const Offset(235, 0));
+        await swipe.up();
+        await tester.pumpAndSettle();
+        expect(
+          tester
+              .widget<MainNavigationBar>(find.byType(MainNavigationBar))
+              .selectedIndex,
+          MainTab.discovery.index,
+        );
+        expect(thumbnail, findsNothing);
+
+        await tester.tap(find.byKey(const Key('main-tab-profile')));
+        await tester.pumpAndSettle();
+        await tester.tap(matchesTab);
+        await tester.pumpAndSettle();
+        expect(tester.element(thumbnail), same(element));
+        expect(downloads, 1);
+
+        final controller = tester
+            .widget<MatchesPage>(find.byType(MatchesPage))
+            .controller;
+        controller.blockPhotos(testMatch);
+        await tester.pump();
+        expect(thumbnail, findsNothing);
+        await tester.pumpWidget(const SizedBox.shrink());
+      },
+      () => MockClient((request) async {
+        expect(request.url.toString(), photoUrl);
+        downloads++;
+        return http.Response.bytes(pixels, 200);
+      }),
+    );
+  });
+
   testWidgets(
     'private tabs retain data without reads on navigation or focus and stay usable at 200 percent text',
     (tester) async {

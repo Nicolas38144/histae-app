@@ -16,6 +16,7 @@ class MatchPhotoAvatar extends StatelessWidget {
     this.refreshAccess,
     this.memoryCache,
     this.cacheKey,
+    this.keepCachedWhileMuted = false,
   });
 
   final String? url;
@@ -26,6 +27,7 @@ class MatchPhotoAvatar extends StatelessWidget {
   final Future<void> Function()? refreshAccess;
   final PrivatePhotoCache? memoryCache;
   final String? cacheKey;
+  final bool keepCachedWhileMuted;
 
   @override
   Widget build(BuildContext context) => PrivatePhoto(
@@ -37,6 +39,7 @@ class MatchPhotoAvatar extends StatelessWidget {
     refreshAccess: refreshAccess,
     memoryCache: memoryCache,
     cacheKey: cacheKey,
+    keepCachedWhileMuted: keepCachedWhileMuted,
     builder: (context, image, loading, failed) => ExcludeSemantics(
       child: ClipOval(
         child: SizedBox.square(

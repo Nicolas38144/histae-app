@@ -48,6 +48,7 @@ class MatchPreviewCard extends StatelessWidget {
                     refreshAccess: refreshPhotoAccess,
                     memoryCache: photoCache,
                     cacheKey: match.id,
+                    keepCachedWhileMuted: true,
                     allowed:
                         photosAllowed &&
                         match.historyAllowed &&
