@@ -40,14 +40,14 @@ class _RegistrationPreferencesStepState
       _distance,
       _looking ?? '',
     );
-    if (_error != null) setState(() => _error = null);
+    _error = null;
   }
 
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
     final copy = strings.messages;
-    final lookingLabel = '${copy.preferencesEditorIWantToMeet} *';
+    final lookingLabel = copy.preferencesEditorIWantToMeet;
     return ListView(
       key: const PageStorageKey('registration-preferences'),
       padding: HistaeTokens.pagePadding,
@@ -84,10 +84,10 @@ class _RegistrationPreferencesStepState
                     ),
                   )
                   .toList(),
-              onChanged: (value) {
+              onChanged: (value) => setState(() {
                 _looking = value;
                 _changed();
-              },
+              }),
             ),
           ),
         ),
@@ -139,19 +139,20 @@ class _RegistrationPreferencesStepState
         const SizedBox(height: HistaeTokens.contentSpacing),
         HistaeButton(
           key: const Key('registration-next'),
-          onPressed: () {
-            _changed();
-            final error = widget.draft.preferences.validate();
-            if (error != null) {
-              setState(() => _error = error);
-              return;
-            }
-            FocusScope.of(context).unfocus();
-            widget.onContinue();
-          },
+          onPressed: _looking == null ? null : _continue,
           child: Text(copy.registrationContinue),
         ),
       ],
     );
+  }
+
+  void _continue() {
+    final error = widget.draft.preferences.validate();
+    if (error != null) {
+      setState(() => _error = error);
+      return;
+    }
+    FocusScope.of(context).unfocus();
+    widget.onContinue();
   }
 }

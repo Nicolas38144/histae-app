@@ -333,16 +333,18 @@ void main() {
             .value,
         51,
       );
-      await tapVisible(tester, find.byKey(const Key('registration-next')));
+      await reveal(tester, next);
+      expect(tester.widget<HistaeButton>(next).onPressed, isNull);
       expect(fixture.requests, isEmpty);
-      await tapVisible(
-        tester,
-        find.byKey(const Key('registration-looking-for')),
-      );
-      await tester.pumpAndSettle();
+      final lookingFor = find.byKey(const Key('registration-looking-for'));
+      await reveal(tester, lookingFor);
+      expect(find.text('Je souhaite rencontrer'), findsOneWidget);
+      await tapVisible(tester, lookingFor);
       await tester.tap(find.text('Des femmes et des hommes').last);
       await tester.pumpAndSettle();
-      await tapVisible(tester, find.byKey(const Key('registration-next')));
+      await reveal(tester, next);
+      expect(tester.widget<HistaeButton>(next).onPressed, isNotNull);
+      await tapVisible(tester, next);
       expect(fixture.requests.map((request) => request.url.path), [
         '/api/legal/documents',
       ]);
