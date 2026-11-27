@@ -8,6 +8,7 @@ import 'package:histae_app/features/continuation/presentation/continuation_page.
 import 'package:histae_app/features/continuation/presentation/partner_photo.dart';
 import 'package:histae_app/features/matches/application/matches_controller.dart';
 import 'package:histae_app/features/matches/data/matches_repository.dart';
+import 'package:histae_app/features/matches/data/realtime_client.dart';
 import 'package:histae_app/features/matches/presentation/chat_page.dart';
 import 'package:histae_app/features/matches/presentation/match_preview_card.dart';
 import 'package:histae_app/features/matches/presentation/matches_page.dart';
@@ -190,6 +191,152 @@ void main() {
         () => MockClient((_) async {
           downloads++;
           return http.Response.bytes(pixels, 200);
+        }),
+      );
+    },
+  );
+
+  testWidgets(
+    'live changes keep unrelated thumbnails and stale reads cannot restore a withdrawn photo',
+    (tester) async {
+      const firstUrl = 'https://photos.example/first';
+      const secondUrl = 'https://photos.example/second';
+      const replacementUrl = 'https://photos.example/replacement';
+      const newMatch = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+      String? firstPhoto = firstUrl;
+      var firstReveal = true, hasNewMatch = false;
+      Completer<http.Response>? pendingList;
+
+      Map<String, dynamic> item(
+        String id,
+        String? url, {
+        bool revealed = true,
+      }) {
+        final match = publicMatchJson(id: id);
+        return {
+          ...match,
+          'my_revealed': true,
+          'photos_revealed': revealed,
+          'other_user': {...match['other_user'] as Map, 'photo': url},
+        };
+      }
+
+      http.Response matchList() => jsonResponse({
+        'matches': [
+          item(testMatch, firstPhoto, revealed: firstReveal),
+          item(secondMatch, secondUrl),
+          if (hasNewMatch) publicMatchJson(id: newMatch),
+        ],
+        'next_cursor': null,
+      });
+      final session = testSession((r) async {
+        if (r.url.path == '/api/matches/me') {
+          final pending = pendingList;
+          if (pending != null) return pending.future;
+          return matchList();
+        }
+        return defaultContinuationResponse(r);
+      });
+      addTearDown(session.dispose);
+      await session.establish(testTokens);
+      final realtime = QuietRealtime(session);
+      final c = MatchesController(
+        MatchesRepository(session),
+        realtime: realtime,
+      );
+      addTearDown(c.dispose);
+
+      Finder photo(String id) => find.descendant(
+        of: find.byWidgetPredicate(
+          (widget) => widget is MatchPreviewCard && widget.match.id == id,
+        ),
+        matching: find.byType(Image),
+      );
+      ImageProvider image(String id) => tester.widget<Image>(photo(id)).image;
+
+      final downloads = <String>[];
+      final png = base64Decode(
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGP4z8DwHwAFAAH/iZk9HQAAAABJRU5ErkJggg==',
+      );
+      await http.runWithClient(
+        () async {
+          await tester.pumpWidget(localized(MatchesPage(controller: c)));
+          await tester.pumpAndSettle();
+          final original = image(testMatch);
+          final unaffected = image(secondMatch);
+          expect(downloads, unorderedEquals([firstUrl, secondUrl]));
+
+          pendingList = Completer<http.Response>();
+          realtime.emit(const MobileSignal('match.created', matchId: newMatch));
+          await tester.pump(const Duration(milliseconds: 200));
+          expect(image(testMatch), same(original));
+          expect(image(secondMatch), same(unaffected));
+          hasNewMatch = true;
+          pendingList!.complete(matchList());
+          pendingList = null;
+          await tester.pumpAndSettle();
+          expect(image(testMatch), same(original));
+          expect(image(secondMatch), same(unaffected));
+          expect(find.byType(MatchPreviewCard), findsNWidgets(3));
+          expect(downloads, unorderedEquals([firstUrl, secondUrl]));
+
+          firstPhoto = replacementUrl;
+          await c.refreshPhotos();
+          await tester.pumpAndSettle();
+          final replacement = image(testMatch);
+          expect(replacement, isNot(same(original)));
+          expect(image(secondMatch), same(unaffected));
+          expect(c.thumbnails.owns(testMatch, original), isFalse);
+
+          pendingList = Completer<http.Response>();
+          final staleRead = c.refreshPhotos();
+          await tester.pump();
+          realtime.emit(
+            const MobileSignal('match.updated', matchId: testMatch),
+          );
+          await tester.pump();
+          expect(photo(testMatch), findsNothing);
+          expect(image(secondMatch), same(unaffected));
+          expect(c.thumbnails.owns(testMatch, replacement), isFalse);
+          pendingList!.complete(matchList());
+          pendingList = null;
+          await staleRead;
+          await tester.pump();
+          expect(photo(testMatch), findsNothing);
+          expect(image(secondMatch), same(unaffected));
+
+          firstReveal = false;
+          firstPhoto = null;
+          await tester.pump(const Duration(milliseconds: 200));
+          await tester.pumpAndSettle();
+          expect(photo(testMatch), findsNothing);
+          expect(c.photosBlocked(testMatch), isFalse);
+          expect(
+            c.items.firstWhere((item) => item.id == testMatch).photosRevealed,
+            isFalse,
+          );
+          expect(image(secondMatch), same(unaffected));
+          expect(
+            downloads,
+            unorderedEquals([firstUrl, secondUrl, replacementUrl]),
+          );
+
+          firstReveal = true;
+          firstPhoto = replacementUrl;
+          await c.refreshPhotos();
+          await tester.pumpAndSettle();
+          final sharedAgain = image(testMatch);
+          firstPhoto = null;
+          await c.refreshPhotos();
+          await tester.pumpAndSettle();
+          expect(photo(testMatch), findsNothing);
+          expect(c.thumbnails.owns(testMatch, sharedAgain), isFalse);
+          expect(image(secondMatch), same(unaffected));
+          await tester.pumpWidget(const SizedBox.shrink());
+        },
+        () => MockClient((request) async {
+          downloads.add(request.url.toString());
+          return http.Response.bytes(png, 200);
         }),
       );
     },

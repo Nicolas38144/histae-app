@@ -78,9 +78,12 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       _items.any((m) => m.id == id && !m.lifecycle.allowsHistoryAt(serverNow));
 
   final _photoBarriers = <String>{};
+  final _pendingPhotoChanges = <String, int>{};
+  int _photoChangeRevision = 0;
 
   @override
-  bool photosBlocked(String id) => _photoBarriers.contains(id);
+  bool photosBlocked(String id) =>
+      _photoBarriers.contains(id) || _pendingPhotoChanges.containsKey(id);
 
   @override
   void blockPhotos(String id) {
@@ -289,6 +292,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     suspend();
     _items.clear();
     _photoBarriers.clear();
+    _pendingPhotoChanges.clear();
     _clearPhotoCaches();
     _messages.clear();
     _outbox.clear();
@@ -415,17 +419,16 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       _continuation?.invalidateQuota();
       return;
     }
-    if (signal.type == 'matches.invalidated') {
-      _clearPhotoCaches();
-    } else if (signal.type == 'match.updated' && signal.matchId != null) {
-      _invalidatePhoto(signal.matchId!);
-    }
-    repository.invalidate(matchId: signal.matchId);
-    if (signal.ended && signal.matchId != null) {
-      _purge(signal.matchId!, remove: true);
+    final id = signal.matchId;
+    repository.invalidate(matchId: id);
+    if (signal.ended && id != null) {
+      _pendingPhotoChanges.remove(id);
+      _purge(id, remove: true);
       notice = 'ended';
       _notify();
     } else if (signal.type == 'matches.invalidated') {
+      _clearPhotoCaches();
+      _pendingPhotoChanges.clear();
       privacyEpoch++;
       _epoch++;
       _chatEpoch++;
@@ -450,7 +453,13 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       _verified = false;
       _listVerified = false;
       _notify();
-    } else if (signal.type != 'message.read' &&
+    } else if (signal.type == 'match.updated' && id != null) {
+      _pendingPhotoChanges[id] = ++_photoChangeRevision;
+      _invalidatePhoto(id);
+      if (selectedId == id) _verified = false;
+      _notify();
+    } else if (signal.type != 'match.created' &&
+        signal.type != 'message.read' &&
         signal.type != 'message.created') {
       _verified = false;
       _listVerified = false;
@@ -553,6 +562,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   }) async {
     final epoch = _epoch, chatEpoch = _chatEpoch;
     final languageRevision = session.localizationRevision;
+    final photoChangeRevision = _photoChangeRevision;
     final target = selectedId;
     final scope = _scope;
     listLoading = true;
@@ -612,6 +622,10 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       for (final item in items) {
         if (!item.myRevealed) _photoBarriers.remove(item.id);
       }
+      // A list request already in flight can still contain the old grant.
+      _pendingPhotoChanges.removeWhere(
+        (_, changeRevision) => changeRevision <= photoChangeRevision,
+      );
       _syncPhotoGrants();
       if (cursor == null) {
         for (final id in {..._outbox.matchIds, ..._closures.keys}) {

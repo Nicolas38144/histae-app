@@ -24,6 +24,7 @@ class ProfileController extends ChangeNotifier {
   final ProfileRepository repository;
   final DraftController? drafts;
   static const ownerPreviewPhotoKey = 'owner-preview';
+  static const ownerPreviewPhotoWidth = 640;
   final ownerPreviewPhotos = PrivatePhotoCache(maxEntries: 1);
 
   AuthenticatedSession get session => repository.session;
@@ -93,7 +94,7 @@ class ProfileController extends ChangeNotifier {
 
   void _notify() {
     if (_disposed) return;
-    final photo = hasFeedPreview ? profile?.photo : null;
+    final photo = accessible ? profile?.photo : null;
     ownerPreviewPhotos.retainAuthorized({ownerPreviewPhotoKey: ?photo});
     notifyListeners();
   }

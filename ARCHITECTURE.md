@@ -101,7 +101,9 @@ withdrawal, replacement, access loss and deadlines purge affected photos. An unc
 is an immediate local barrier: stale grant responses cannot restore images.
 
 Match cards keep authorized thumbnails mounted during main-tab transitions. Muted tabs wait until
-they are selected to start new thumbnail loads.
+they are selected to start new thumbnail loads. A live match update hides only the affected
+photo until a list request started after the event confirms access. The owner's photo settings
+and feed preview share one foreground cache entry.
 
 Use the snapshot's original timestamp for the 50-second download window of a 60-second URL.
 A stale/rejected URL permits one authorized renewal, without rereading unchanged message history

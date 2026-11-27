@@ -664,15 +664,18 @@ void main() {
     },
   );
   testWidgets(
-    'owner signed URL is fetched without Bearer, purged on deadline and refreshed explicitly',
+    'photo settings reuse the current photo through URL expiry and reopening',
     (tester) async {
       var reads = 0, downloads = 0;
+      String? photo = 'owner';
       final session = testSession((r) async {
         if (r.url.path == '/api/users/me') {
           reads++;
           return jsonResponse(
             ownerJson(
-              photo: 'https://storage.example/owner?signature=synthetic$reads',
+              photo: photo == null
+                  ? null
+                  : 'https://storage.example/$photo?X-Amz-Signature=synthetic$reads',
             ),
           );
         }
@@ -683,41 +686,72 @@ void main() {
       final c = ProfileController(ProfileRepository(session));
       addTearDown(c.dispose);
       await c.load();
+      final pixels = (await tester.runAsync(syntheticCropSource))!;
       await tester.pumpWidget(
         MaterialApp(
-          home: PhotoPage(
-            controller: c,
-            preparer: TestPhotoPreparer(),
-            photoClient: () => MockClient((r) async {
-              downloads++;
-              expect(r.headers['authorization'], isNull);
-              expect(r.followRedirects, isFalse);
-              return http.Response.bytes(
-                base64Decode(
-                  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aL1sAAAAASUVORK5CYII=',
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: TextButton(
+                onPressed: () => Navigator.of(context).push<void>(
+                  MaterialPageRoute(
+                    builder: (_) => PhotoPage(
+                      controller: c,
+                      preparer: TestPhotoPreparer(),
+                      photoClient: () => MockClient((r) async {
+                        downloads++;
+                        expect(r.headers['authorization'], isNull);
+                        expect(r.followRedirects, isFalse);
+                        return http.Response.bytes(pixels, 200);
+                      }),
+                    ),
+                  ),
                 ),
-                200,
-              );
-            }),
+                child: const Text('Open photo settings'),
+              ),
+            ),
           ),
         ),
       );
+
+      final open = find.text('Open photo settings');
+      final images = find.byType(Image);
+      await tester.tap(open);
       await tester.pumpAndSettle();
-      final before = reads;
-      final downloadsBefore = downloads;
-      expect(downloads, greaterThan(0));
+      final original = tester.widget<Image>(images.first).image;
+      expect(downloads, 1);
+      expect(reads, 1);
+
       await tester.pump(privatePhotoLifetime);
       await tester.pumpAndSettle();
-      expect(reads, before);
-      expect(downloads, downloadsBefore);
-      expect(find.byType(Image), findsNothing);
-      await c.load();
+      expect(tester.widget<Image>(images.first).image, same(original));
+      expect(downloads, 1);
+      expect(reads, 1);
+
+      await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();
-      expect(reads, greaterThan(before));
-      expect(downloads, greaterThan(downloadsBefore));
+      c.photoReadAt = DateTime.now().toUtc().subtract(privatePhotoLifetime);
+      await tester.tap(open);
+      await tester.pumpAndSettle();
+      expect(tester.widget<Image>(images.first).image, same(original));
+      expect(downloads, 1);
+      expect(reads, 1);
+
+      await c.refreshPhotoPreview();
+      await tester.pumpAndSettle();
+      expect(tester.widget<Image>(images.first).image, same(original));
+      expect(downloads, 1);
+
+      photo = 'replacement';
+      await c.refreshPhotoPreview();
+      await tester.pumpAndSettle();
+      expect(tester.widget<Image>(images.first).image, isNot(same(original)));
+      expect(downloads, 2);
+
+      photo = null;
+      await c.refreshPhotoPreview();
+      await tester.pumpAndSettle();
+      expect(images, findsNothing);
       await tester.pumpWidget(const SizedBox.shrink());
-      await tester.pump();
-      expect(tester.takeException(), isNull);
     },
   );
 }

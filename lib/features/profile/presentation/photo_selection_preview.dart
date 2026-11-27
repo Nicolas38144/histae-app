@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
@@ -9,10 +7,10 @@ import '../../../core/theme/histae_tokens.dart';
 class PhotoSelectionPreview extends StatelessWidget {
   const PhotoSelectionPreview({
     super.key,
-    required this.bytes,
+    required this.image,
     required this.label,
   });
-  final Uint8List bytes;
+  final ImageProvider image;
   final String label;
   @override
   Widget build(BuildContext context) {
@@ -24,8 +22,8 @@ class PhotoSelectionPreview extends StatelessWidget {
         Center(
           child: ClipRRect(
             borderRadius: BorderRadius.circular(24),
-            child: Image.memory(
-              bytes,
+            child: Image(
+              image: image,
               height: 320,
               fit: BoxFit.contain,
               semanticLabel: label,
@@ -37,8 +35,8 @@ class PhotoSelectionPreview extends StatelessWidget {
         Row(
           children: [
             ClipOval(
-              child: Image.memory(
-                bytes,
+              child: Image(
+                image: image,
                 width: avatarSize,
                 height: avatarSize,
                 fit: BoxFit.cover,

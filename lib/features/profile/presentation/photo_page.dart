@@ -10,10 +10,10 @@ import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/confirmation_dialog.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../../core/widgets/histae_scaffold.dart';
+import '../../../core/widgets/private_photo.dart';
 import '../application/profile_controller.dart';
 import '../data/photo_crop_processor.dart';
 import '../data/photo_preparer.dart';
-import '../data/profile_models.dart';
 import 'photo_crop_page.dart';
 import 'photo_selection_preview.dart';
 import 'profile_strings.dart';
@@ -35,32 +35,21 @@ class PhotoPage extends StatefulWidget {
   State<PhotoPage> createState() => _PhotoPageState();
 }
 
-class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
+class _PhotoPageState extends State<PhotoPage> {
   ProfileController get c => widget.controller;
   late final preparer = widget.preparer ?? PhotoPreparer();
   late final String _ownerScope = c.session.resourceKey;
   bool get _canAccessPhoto =>
       c.accessible && c.session.resourceKey == _ownerScope;
 
-  Uint8List? _remote;
-  String? _url;
   String Function(AppStrings)? _message;
-  DateTime? _readAt;
-  SignedPhotoDownload? _download;
-  Timer? _expiry;
-  bool _choosing = false, _fetching = false, _active = true;
-  bool _needsPreviewRecovery = false;
-  int _downloadGeneration = 0;
+  bool _choosing = false;
+  int _previewAttempt = 0;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    c.addListener(_changed);
     unawaited(_recover());
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _changed();
-    });
   }
 
   Future<void> _recover() async {
@@ -73,104 +62,6 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
       }
     } catch (_) {
       /* Selection still works if Android recovery is unavailable. */
-    }
-  }
-
-  void _purgeRemote() {
-    _downloadGeneration++;
-    _download?.cancel();
-    _download = null;
-    if (_remote case final bytes?) unawaited(MemoryImage(bytes).evict());
-    _remote = null;
-    _url = null;
-    _readAt = null;
-    _fetching = false;
-    _needsPreviewRecovery = false;
-    _expiry?.cancel();
-  }
-
-  void _changed() {
-    if (!mounted) return;
-    if (!_canAccessPhoto) {
-      setState(_purgeRemote);
-      return;
-    }
-    if (!_active) return;
-    if (c.loading) {
-      setState(() {});
-      return;
-    }
-    final url = c.profile?.photo;
-    if (url != _url || c.photoReadAt != _readAt) {
-      _purgeRemote();
-      _url = url;
-      _readAt = c.photoReadAt;
-      // Owner URLs last 60 s in the server contract. Refresh before expiry,
-      // including when the signer happens to return the same URL.
-      final age = DateTime.now().difference(
-        _readAt ?? DateTime.fromMillisecondsSinceEpoch(0),
-      );
-      final remaining = privatePhotoLifetime - age;
-      if (remaining > Duration.zero && url != null) {
-        _expiry = Timer(remaining, () {
-          if (mounted) {
-            setState(() {
-              _purgeRemote();
-              _needsPreviewRecovery = true;
-            });
-          }
-        });
-        unawaited(_fetch(url));
-      } else if (url != null) {
-        _needsPreviewRecovery = true;
-      }
-    }
-    setState(() {});
-  }
-
-  Future<void> _fetch(String url) async {
-    if (!validPhotoUrl(url)) return;
-    final generation = _downloadGeneration;
-    final request = SignedPhotoLoader(clientFactory: widget.photoClient)
-        .load(url);
-    _download = request;
-    _fetching = true;
-    try {
-      final bytes = await request.bytes;
-      if (mounted &&
-          _active &&
-          generation == _downloadGeneration &&
-          _canAccessPhoto) {
-        setState(() {
-          _remote = bytes;
-          _needsPreviewRecovery = false;
-        });
-      }
-    } catch (_) {
-      if (mounted && generation == _downloadGeneration) {
-        setState(() {
-          _needsPreviewRecovery = true;
-          _message = (strings) =>
-              strings.messages.photoPageTheTemporaryPreviewIsUnavailableRefresh;
-        });
-      }
-    } finally {
-      request.cancel();
-      if (mounted && generation == _downloadGeneration) {
-        setState(() {
-          _fetching = false;
-        });
-      }
-    }
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    _active = state == AppLifecycleState.resumed;
-    if (!_active) {
-      setState(_purgeRemote);
-    } else {
-      _changed();
     }
   }
 
@@ -235,14 +126,6 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
   }
 
   @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    c.removeListener(_changed);
-    _purgeRemote();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: c,
     builder: (context, _) {
@@ -252,7 +135,7 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
       final strings = AppStrings.of(context);
       final text = strings.messages;
       final intent = c.photoIntent;
-      final preview = intent?.bytes ?? _remote;
+
       return HistaeScaffold(
         appBar: AppBar(title: Text(text.photoPageYourPhoto)),
         body: SafeArea(
@@ -266,17 +149,51 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
               const SizedBox(height: 20),
               Text(text.photoPageOnePersonalPhotoItDoesNot),
               const SizedBox(height: HistaeTokens.sectionSpacing),
-              if (preview != null)
-                PhotoSelectionPreview(
-                  bytes: preview,
-                  label: intent == null
-                      ? text.photoPageYourCurrentPhoto
-                      : text.photoPageYourSelectionNotYetConfirmedBy,
-                ),
-              if (_fetching || _choosing || c.saving || c.loading)
-                LinearProgressIndicator(
-                  semanticsLabel: text.photoPagePreparingOrLoadingPhoto,
-                ),
+              PrivatePhoto(
+                key: ValueKey((c.photoRevision, _previewAttempt)),
+                url: c.profile?.photo,
+                readAt: c.photoReadAt,
+                allowed: intent == null,
+                decodeWidth: ProfileController.ownerPreviewPhotoWidth,
+                photoClient: widget.photoClient,
+                memoryCache: c.ownerPreviewPhotos,
+                cacheKey: ProfileController.ownerPreviewPhotoKey,
+                refreshAccess: c.refreshPhotoPreview,
+                builder: (context, image, loading, failed) {
+                  final preview = intent == null
+                      ? image
+                      : MemoryImage(intent.bytes);
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (preview != null)
+                        PhotoSelectionPreview(
+                          image: preview,
+                          label: intent == null
+                              ? text.photoPageYourCurrentPhoto
+                              : text.photoPageYourSelectionNotYetConfirmedBy,
+                        ),
+                      if (loading || _choosing || c.saving || c.loading)
+                        LinearProgressIndicator(
+                          semanticsLabel: text.photoPagePreparingOrLoadingPhoto,
+                        ),
+                      if (failed) ...[
+                        const SizedBox(height: HistaeTokens.contentSpacing),
+                        Text(
+                          text.photoPageTheTemporaryPreviewIsUnavailableRefresh,
+                        ),
+                        if (!c.uncertain)
+                          HistaeButton.text(
+                            onPressed: c.canWrite
+                                ? () => setState(() => _previewAttempt++)
+                                : null,
+                            child: Text(text.photoPageRefreshPhoto),
+                          ),
+                      ],
+                    ],
+                  );
+                },
+              ),
               if (intent != null)
                 Padding(
                   padding: const EdgeInsets.only(
@@ -328,15 +245,11 @@ class _PhotoPageState extends State<PhotoPage> with WidgetsBindingObserver {
                       : text.photoPageChooseAnotherPhoto,
                 ),
               ),
-              if (c.uncertain || _needsPreviewRecovery)
+              if (c.uncertain)
                 HistaeButton.text(
                   onPressed: c.loading || c.saving || c.retrySeconds > 0
                       ? null
-                      : () async {
-                          _purgeRemote();
-                          await c.load();
-                          if (mounted) _changed();
-                        },
+                      : c.load,
                   child: Text(text.photoPageRefreshPhoto),
                 ),
               if (c.profile?.photo != null)

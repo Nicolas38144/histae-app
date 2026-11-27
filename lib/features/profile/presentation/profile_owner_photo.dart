@@ -23,7 +23,7 @@ class ProfileOwnerPhoto extends StatelessWidget {
       url: controller.profile?.photo,
       readAt: controller.photoReadAt,
       allowed: controller.hasFeedPreview,
-      decodeWidth: 640,
+      decodeWidth: ProfileController.ownerPreviewPhotoWidth,
       photoClient: photoClient,
       memoryCache: controller.ownerPreviewPhotos,
       cacheKey: ProfileController.ownerPreviewPhotoKey,
