@@ -12,6 +12,7 @@ class RegistrationFixture {
   String version = 'v1';
   bool complete = false;
   bool losePreferencesResponse = false;
+  bool omitSensitiveGrant = false;
   Map<String, dynamic>? profile;
   Map<String, dynamic>? preferences;
 
@@ -38,8 +39,10 @@ class RegistrationFixture {
         if (request.method == 'PUT') {
           final body = jsonDecode(request.body) as Map<String, dynamic>;
           for (final change in body['consents'] as List) {
-            grants[ConsentType.parse(change['consent_type'] as String)] =
-                change['granted'] as bool;
+            final type = ConsentType.parse(change['consent_type'] as String);
+            if (type != ConsentType.sensitive || !omitSensitiveGrant) {
+              grants[type] = change['granted'] as bool;
+            }
           }
           complete =
               grants[ConsentType.terms] == true &&

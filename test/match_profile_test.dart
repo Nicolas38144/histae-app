@@ -199,37 +199,55 @@ void main() {
     'shared-photo details open the profile and back returns directly to the preserved chat',
     (tester) async {
       final c = await revealedMatch();
-      await http.runWithClient(() async {
-        await tester.pumpWidget(
-          localized(ChatPage(controller: c, matchId: testMatch)),
-        );
-        await tester.pumpAndSettle();
-        await tester.enterText(find.byType(TextField), 'Mon brouillon');
-        await tester.tap(find.text('Nos photos'));
-        await tester.pumpAndSettle();
-        expect(find.byType(ContinuationPage), findsOneWidget);
-        await tester.ensureVisible(find.text('Voir son profil'));
-        await tester.tap(find.text('Voir son profil'));
-        await tester.pumpAndSettle();
-        expect(find.byType(PartnerPage), findsOneWidget);
-        expect(
-          find.byType(ContinuationPage, skipOffstage: false),
-          findsNothing,
-        );
-        expect(find.byType(PartnerPhoto), findsOneWidget);
-        await tester.tap(find.byTooltip('Retour'));
-        await tester.pumpAndSettle();
-        expect(find.byType(ChatPage), findsOneWidget);
-        expect(find.byType(PartnerPage), findsNothing);
-        expect(
-          tester.widget<TextField>(find.byType(TextField)).controller!.text,
-          'Mon brouillon',
-        );
-        expect(c.continuation.active, isTrue);
-        c.continuation.suspend();
-        c.suspend();
-        await tester.pumpWidget(const SizedBox.shrink());
-      }, () => MockClient((_) async => http.Response.bytes(pixels, 200)));
+      var downloads = 0;
+      await http.runWithClient(
+        () async {
+          await tester.pumpWidget(
+            localized(ChatPage(controller: c, matchId: testMatch)),
+          );
+          await tester.pumpAndSettle();
+          await tester.enterText(find.byType(TextField), 'Mon brouillon');
+          await tester.tap(find.text('Nos photos'));
+          await tester.pumpAndSettle();
+          expect(find.byType(ContinuationPage), findsOneWidget);
+          await tester.ensureVisible(find.text('Voir son profil'));
+          await tester.tap(find.text('Voir son profil'));
+          await tester.pumpAndSettle();
+          expect(find.byType(PartnerPage), findsOneWidget);
+          expect(
+            find.byType(ContinuationPage, skipOffstage: false),
+            findsNothing,
+          );
+          expect(find.byType(PartnerPhoto), findsOneWidget);
+          final image = tester.widget<Image>(find.byType(Image)).image;
+          final firstDownloads = downloads;
+          await tester.tap(find.byTooltip('Retour'));
+          await tester.pumpAndSettle();
+          expect(find.byType(ChatPage), findsOneWidget);
+          expect(find.byType(PartnerPage), findsNothing);
+          expect(
+            tester.widget<TextField>(find.byType(TextField)).controller!.text,
+            'Mon brouillon',
+          );
+          expect(c.continuation.active, isTrue);
+          await tester.tap(find.text('Léa'));
+          await tester.pumpAndSettle();
+          expect(find.byType(PartnerPage), findsOneWidget);
+          expect(downloads, firstDownloads);
+          expect(tester.widget<Image>(find.byType(Image)).image, same(image));
+          c.blockPhotos(testMatch);
+          await tester.pumpAndSettle();
+          expect(find.byType(PartnerPhoto), findsNothing);
+          expect(c.profilePhotos.owns(testMatch, image), isFalse);
+          c.continuation.suspend();
+          c.suspend();
+          await tester.pumpWidget(const SizedBox.shrink());
+        },
+        () => MockClient((_) async {
+          downloads++;
+          return http.Response.bytes(pixels, 200);
+        }),
+      );
     },
   );
 

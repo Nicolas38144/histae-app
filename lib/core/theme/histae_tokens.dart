@@ -25,6 +25,12 @@ abstract final class HistaeTokens {
   static const textSpacing = 12.0;
   static const labelSpacing = 8.0;
   static const pagePadding = EdgeInsets.all(pageInset);
+  static const sheetPadding = EdgeInsets.fromLTRB(
+    pageInset,
+    0,
+    pageInset,
+    sectionSpacing,
+  );
   static const panelPadding = EdgeInsets.all(panelInset);
   static const actionSpacing = contentSpacing;
   static const actionGradient = LinearGradient(

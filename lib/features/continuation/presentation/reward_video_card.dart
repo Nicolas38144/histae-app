@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../application/continuation_controller.dart';
 import '../application/rewarded_video_controller.dart';
@@ -43,7 +44,7 @@ class RewardVideoCard extends StatelessWidget {
     };
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: HistaeTokens.panelPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -62,14 +63,14 @@ class RewardVideoCard extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: HistaeTokens.contentSpacing),
             Text(
               AppStrings.of(context)
                   .messages
                   .rewardVideoCardAVideoForTheNextChapter,
               style: theme.textTheme.headlineSmall,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: HistaeTokens.textSpacing),
             Text(
               AppStrings.of(context).messages
                   .videoCreditReward(intent?.credits ?? 1),
@@ -77,13 +78,13 @@ class RewardVideoCard extends StatelessWidget {
                 color: colors.secondary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: HistaeTokens.labelSpacing),
             Text(
               AppStrings.of(context)
                   .messages
                   .rewardVideoCardIfYouWishWatchAVideo,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: HistaeTokens.labelSpacing),
             HistaeButton.icon(
               key: const Key('watch-rewarded-video'),
               onPressed: video.canWatch ? onWatch : null,
@@ -95,7 +96,7 @@ class RewardVideoCard extends StatelessWidget {
                   : const Icon(Icons.play_arrow_rounded),
               label: Text(label),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: HistaeTokens.textSpacing),
             if (video.unavailableReason case final reason? when !video.busy)
               Text(
                 AppStrings.of(context).clientMessage(reason),
@@ -111,14 +112,14 @@ class RewardVideoCard extends StatelessWidget {
                 ),
               ),
             if (video.message case final message?) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: HistaeTokens.textSpacing),
               _Status(
                 text: AppStrings.of(context).clientMessage(message),
                 icon: Icons.info_outline,
               ),
             ],
             if (intent != null) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: HistaeTokens.contentSpacing),
               _Status(
                 icon: intent.status == RewardStatus.credited
                     ? Icons.check_circle_outline
@@ -145,7 +146,7 @@ class RewardVideoCard extends StatelessWidget {
               ),
             ],
             if (r.failure case final error?) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: HistaeTokens.textSpacing),
               _Status(
                 text: ContinuationStrings(AppStrings.of(context))
                     .failure(error),

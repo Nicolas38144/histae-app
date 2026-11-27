@@ -30,6 +30,12 @@ class _AnswerInput {
     : text = TextEditingController(text: value);
   final String id, prompt;
   final TextEditingController text;
+  final focus = FocusNode();
+
+  void dispose() {
+    text.dispose();
+    focus.dispose();
+  }
 }
 
 class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
@@ -128,7 +134,7 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
     controller.drafts?.removeListener(_draftChanged);
     unawaited(controller.drafts?.flush());
     for (final a in [...inputs, ...removedInputs]) {
-      a.text.dispose();
+      a.dispose();
     }
     super.dispose();
   }
@@ -147,9 +153,17 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
         inputs.any((a) => a.id == question.id)) {
       return;
     }
+    final input = _AnswerInput(question.id, question.prompt, '');
     setState(() {
-      inputs.add(_AnswerInput(question.id, question.prompt, ''));
+      inputs.add(input);
       changed();
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || busy || !inputs.contains(input)) return;
+      final field = input.focus.context;
+      if (field == null) return;
+      input.focus.requestFocus();
+      unawaited(Scrollable.ensureVisible(field, alignment: .15));
     });
   }
 
@@ -165,7 +179,7 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
             .messages
             .answersEditorChooseWhatYouWantToShare,
       ),
-      const SizedBox(height: 24),
+      const SizedBox(height: HistaeTokens.contentSpacing),
       if (controller.drafts case final local?) ...[
         Text(
           local.storageFailed
@@ -178,11 +192,11 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
             onPressed: busy ? null : _discardDraft,
             child: Text(AppStrings.of(context).messages.draftsDiscard),
           ),
-        const SizedBox(height: 16),
+        const SizedBox(height: HistaeTokens.contentSpacing),
       ],
       Wrap(
-        spacing: 12,
-        runSpacing: 8,
+        spacing: HistaeTokens.textSpacing,
+        runSpacing: HistaeTokens.labelSpacing,
         alignment: WrapAlignment.spaceBetween,
         children: [
           Text(
@@ -197,11 +211,11 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
           ),
         ],
       ),
-      const SizedBox(height: 12),
+      const SizedBox(height: HistaeTokens.textSpacing),
       if (inputs.isEmpty)
         Card(
           child: Padding(
-            padding: const EdgeInsets.all(24),
+            padding: HistaeTokens.panelPadding,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -210,13 +224,13 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
                   size: 36,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: HistaeTokens.textSpacing),
                 Text(
                   AppStrings.of(context).messages.answersEditorYourFirstWord,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: HistaeTokens.labelSpacing),
                 Text(
                   AppStrings.of(context)
                       .messages
@@ -239,9 +253,10 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
                   controller.questionPrompt(inputs[i].id, inputs[i].prompt),
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: HistaeTokens.contentSpacing),
                 TextField(
                   controller: inputs[i].text,
+                  focusNode: inputs[i].focus,
                   onChanged: (_) => setState(changed),
                   enabled: !busy && !controller.saving,
                   keyboardType: TextInputType.text,
@@ -272,7 +287,7 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: HistaeTokens.textSpacing),
                 if (!controller.questions.any((q) => q.id == inputs[i].id))
                   Text(
                     AppStrings.of(context)
@@ -327,7 +342,7 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
             ),
           ),
         ),
-      const SizedBox(height: 16),
+      const SizedBox(height: HistaeTokens.contentSpacing),
       if (inputs.length < 3)
         HistaeButton.outlinedIcon(
           onPressed: busy ? null : _addQuestion,
@@ -346,7 +361,7 @@ class _AnswersEditorState extends ProfileEditorState<AnswersEditor> {
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ),
-      const SizedBox(height: 16),
+      const SizedBox(height: HistaeTokens.contentSpacing),
       Text(
         AppStrings.of(context)
             .messages

@@ -124,8 +124,20 @@ void main() {
     expect(c.messages.map((m) => m.id), [incomingId, outgoingId]);
     await c.refresh();
     invalid = true;
-    await c.refresh();
-    await Future<void>.delayed(const Duration(milliseconds: 240));
+    final recovered = Completer<void>();
+    void onChange() {
+      if (c.verified && c.messages.length == 1 && !recovered.isCompleted) {
+        recovered.complete();
+      }
+    }
+
+    c.addListener(onChange);
+    try {
+      await c.refresh();
+      await recovered.future.timeout(const Duration(seconds: 2));
+    } finally {
+      c.removeListener(onChange);
+    }
     expect(c.messages.map((m) => m.id), [incomingId]);
     expect(c.verified, isTrue);
   });

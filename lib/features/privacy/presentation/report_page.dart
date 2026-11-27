@@ -83,13 +83,13 @@ class _ReportPageState extends State<ReportPage> {
                         .messages
                         .reportPageYourReportWillBeReviewedBlocking,
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: HistaeTokens.sectionSpacing),
                   if (!c.submitted) ...[
                     Text(
                       AppStrings.of(context).messages.reportChildSafetyHint,
                       key: const Key('report-child-safety-hint'),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: HistaeTokens.contentSpacing),
                     PrivacyChoice<ReportReason>(
                       value: _reason,
                       label: AppStrings.of(context).messages.reportPageReason,
@@ -101,7 +101,7 @@ class _ReportPageState extends State<ReportPage> {
                           ? (value) => setState(() => _reason = value)
                           : null,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: HistaeTokens.contentSpacing),
                     TextField(
                       controller: _text,
                       inputFormatters: const [
@@ -124,7 +124,9 @@ class _ReportPageState extends State<ReportPage> {
                       Text(AppStrings.of(context).clientMessage(c.validation!)),
                     if (c.pending != null)
                       Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16),
+                        padding: EdgeInsets.symmetric(
+                          vertical: HistaeTokens.contentSpacing,
+                        ),
                         child: Text(
                           AppStrings.of(context)
                               .messages
@@ -138,7 +140,7 @@ class _ReportPageState extends State<ReportPage> {
                         AppStrings.of(context).messages
                             .appStringsTryAgainInS(c.retrySeconds),
                       ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: HistaeTokens.labelSpacing),
                     HistaeButton(
                       onPressed: c.sending || c.retrySeconds > 0
                           ? null

@@ -166,7 +166,7 @@ void main() {
       gateway.taps.add(
         const PushIntent(
           'efefefef-efef-4fef-8fef-efefefefefef',
-          PushKind.newMessage,
+          PushKind.photosRevealed,
           testMatch,
         ),
       );

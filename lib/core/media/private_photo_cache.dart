@@ -5,8 +5,7 @@ import 'package:flutter/widgets.dart';
 import '../network/api_failure.dart';
 import '../network/signed_photo_loader.dart';
 
-/// Foreground-only thumbnail memory, owned by one verified session controller.
-/// Full-size photos retain their stricter route-owned lifetime.
+/// Foreground-only memory for private photos, owned by a session controller.
 class PrivatePhotoCache with WidgetsBindingObserver {
   PrivatePhotoCache({this.maxEntries = 48, this.maxBytes = 8 * 1024 * 1024})
     : assert(maxEntries >= 0),

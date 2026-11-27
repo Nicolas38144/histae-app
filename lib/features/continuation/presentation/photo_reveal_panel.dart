@@ -52,14 +52,14 @@ class PhotoRevealPanel extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: HistaeTokens.contentSpacing),
             Text(
               text.photoRevealTitle,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: HistaeTokens.textSpacing),
             Text(text.photoRevealBody),
-            const SizedBox(height: 20),
+            const SizedBox(height: HistaeTokens.labelSpacing),
             AnimatedSize(
               duration: const Duration(milliseconds: 250),
               alignment: Alignment.topCenter,

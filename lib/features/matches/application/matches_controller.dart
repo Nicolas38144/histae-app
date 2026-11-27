@@ -50,6 +50,17 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   );
   final DraftController? drafts;
   final thumbnails = PrivatePhotoCache();
+  final profilePhotos = PrivatePhotoCache(maxEntries: 2);
+
+  void _invalidatePhoto(String id) {
+    thumbnails.invalidate(id);
+    profilePhotos.invalidate(id);
+  }
+
+  void _clearPhotoCaches() {
+    thumbnails.clear();
+    profilePhotos.clear();
+  }
 
   String get ownerId => repository.owner;
   ContinuationController? _continuation;
@@ -73,7 +84,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
 
   @override
   void blockPhotos(String id) {
-    thumbnails.invalidate(id);
+    _invalidatePhoto(id);
     _photoBarriers.add(id);
     repository.invalidate(matchId: id);
     _notify();
@@ -81,7 +92,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
 
   void profilePhotoChanged() {
     if (!accessible) return;
-    thumbnails.clear();
+    _clearPhotoCaches();
     repository.invalidate();
     _verified = false;
     _listVerified = false;
@@ -278,7 +289,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
     suspend();
     _items.clear();
     _photoBarriers.clear();
-    thumbnails.clear();
+    _clearPhotoCaches();
     _messages.clear();
     _outbox.clear();
     _removed.clear();
@@ -368,7 +379,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   }
 
   void _purge(String id, {bool remove = false}) {
-    thumbnails.invalidate(id);
+    _invalidatePhoto(id);
     repository.invalidate(matchId: id);
     _continuation?.forgetMatch(id);
     _outbox.forget(id);
@@ -405,9 +416,9 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       return;
     }
     if (signal.type == 'matches.invalidated') {
-      thumbnails.clear();
+      _clearPhotoCaches();
     } else if (signal.type == 'match.updated' && signal.matchId != null) {
-      thumbnails.invalidate(signal.matchId!);
+      _invalidatePhoto(signal.matchId!);
     }
     repository.invalidate(matchId: signal.matchId);
     if (signal.ended && signal.matchId != null) {
@@ -469,14 +480,18 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
 
   void _armDeadline() => _deadlines.update(_items);
 
-  void _syncThumbnailGrants() => thumbnails.retainAuthorized({
-    for (final match in _items)
-      if (match.photosRevealed &&
-          !photosBlocked(match.id) &&
-          match.lifecycle.allowsHistoryAt(serverNow) &&
-          match.partner.photo != null)
-        match.id: match.partner.photo!,
-  });
+  void _syncPhotoGrants() {
+    final photos = {
+      for (final match in _items)
+        if (match.photosRevealed &&
+            !photosBlocked(match.id) &&
+            match.lifecycle.allowsHistoryAt(serverNow) &&
+            match.partner.photo != null)
+          match.id: match.partner.photo!,
+    };
+    thumbnails.retainAuthorized(photos);
+    profilePhotos.retainAuthorized(photos);
+  }
 
   void _deadlineReached(List<UserMatch> expired) {
     if (!active) return;
@@ -597,7 +612,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
       for (final item in items) {
         if (!item.myRevealed) _photoBarriers.remove(item.id);
       }
-      _syncThumbnailGrants();
+      _syncPhotoGrants();
       if (cursor == null) {
         for (final id in {..._outbox.matchIds, ..._closures.keys}) {
           if (!seen.contains(id)) _purge(id);
@@ -739,7 +754,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
         }
       }
       listCursor = page.cursor;
-      _syncThumbnailGrants();
+      _syncPhotoGrants();
       _armDeadline();
     } on ApiFailure catch (e) {
       if (_alive(epoch)) {
@@ -999,6 +1014,7 @@ class MatchesController extends ChangeNotifier implements MatchAccess {
   void dispose() {
     notificationPreferences.clear();
     thumbnails.dispose();
+    profilePhotos.dispose();
     _continuation?.dispose();
     _disposed = true;
     suspend();

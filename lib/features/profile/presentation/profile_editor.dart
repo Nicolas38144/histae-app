@@ -120,7 +120,10 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
                   child: SafeArea(
                     top: false,
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: HistaeTokens.pageInset,
+                        vertical: HistaeTokens.labelSpacing,
+                      ),
                       child: _saveButton(
                         save,
                         saveLabel ??
@@ -177,7 +180,7 @@ abstract class ProfileEditorState<T extends StatefulWidget> extends State<T> {
                           .profileEditorRefreshServerData,
                     ),
                   ),
-                const SizedBox(height: 24),
+                const SizedBox(height: HistaeTokens.contentSpacing),
                 if (save != null && !saveInFooter)
                   _saveButton(
                     save,

@@ -31,7 +31,7 @@ class WelcomePage extends StatelessWidget {
             child: ListView(
               padding: HistaeTokens.pagePadding,
               children: [
-                const SizedBox(height: 12),
+                const SizedBox(height: HistaeTokens.textSpacing),
                 Semantics(
                   header: true,
                   child: Text(
@@ -39,14 +39,14 @@ class WelcomePage extends StatelessWidget {
                     style: Theme.of(context).textTheme.displayMedium,
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: HistaeTokens.contentSpacing),
                 Text(
                   strings.welcomeBody,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: HistaeTokens.sectionSpacing),
                 if (session case final auth?) ...[
                   if (auth.notice != null)
                     Semantics(
@@ -61,7 +61,6 @@ class WelcomePage extends StatelessWidget {
                     onPressed: onRegister,
                     child: Text(strings.createAccount),
                   ),
-                  const SizedBox(height: 12),
                   HistaeButton.outlined(
                     onPressed: () => Navigator.of(context).push(
                       MaterialPageRoute<void>(
@@ -71,9 +70,9 @@ class WelcomePage extends StatelessWidget {
                     child: Text(strings.existingAccount),
                   ),
                 ],
-                const SizedBox(height: 28),
+                const SizedBox(height: HistaeTokens.sectionSpacing),
                 const ConnectionArtwork(),
-                const SizedBox(height: 20),
+                const SizedBox(height: HistaeTokens.contentSpacing),
                 Text(
                   AppStrings.of(context)
                       .messages
@@ -83,7 +82,7 @@ class WelcomePage extends StatelessWidget {
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: HistaeTokens.textSpacing),
               ],
             ),
           ),

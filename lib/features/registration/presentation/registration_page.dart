@@ -106,7 +106,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
               : copy.registrationSaving,
           style: Theme.of(context).textTheme.headlineSmall,
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: HistaeTokens.contentSpacing),
         if (controller.saving)
           LinearProgressIndicator(semanticsLabel: strings.actionInProgress),
         if (controller.failure case final failure?) ...[
@@ -114,10 +114,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
             liveRegion: true,
             child: Text(strings.authFailure(failure)),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: HistaeTokens.textSpacing),
           Text(copy.registrationRetrySave),
         ],
-        const SizedBox(height: 24),
+        const SizedBox(height: HistaeTokens.contentSpacing),
         if (!controller.saving)
           HistaeButton(
             onPressed: controller.retrySeconds > 0
@@ -172,7 +172,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 child: Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+                      padding: const EdgeInsets.fromLTRB(
+                        HistaeTokens.pageInset,
+                        HistaeTokens.contentSpacing,
+                        HistaeTokens.pageInset,
+                        0,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -183,7 +188,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             ),
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: HistaeTokens.textSpacing),
                           LinearProgressIndicator(
                             value: (controller.step.index + 1) / labels.length,
                             semanticsLabel: labels[controller.step.index],

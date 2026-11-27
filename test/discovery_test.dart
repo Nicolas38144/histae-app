@@ -353,6 +353,8 @@ void main() {
           150,
           scrollable: verticalScrollables.first,
         );
+        await tester.ensureVisible(finder);
+        await tester.pumpAndSettle();
         await tester.tap(finder);
         await tester.pumpAndSettle();
       }

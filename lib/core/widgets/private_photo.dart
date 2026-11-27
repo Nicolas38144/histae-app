@@ -12,8 +12,8 @@ typedef PrivatePhotoBuilder = Widget Function(
   bool failed,
 );
 
-/// Private image display, never persisted. Full-size bytes are route-owned;
-/// thumbnails may use a session cache while authorization remains valid.
+/// Private image display, never persisted. Callers can supply a session cache
+/// while access to the photo remains authorized.
 /// URL expiry limits new downloads, not display of authorized downloaded pixels.
 class PrivatePhoto extends StatefulWidget {
   const PrivatePhoto({

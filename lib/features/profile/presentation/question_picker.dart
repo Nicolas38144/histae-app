@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../data/profile_models.dart';
 
 Future<ProfileQuestion?> pickProfileQuestion(
@@ -51,7 +52,7 @@ class _QuestionPickerState extends State<_QuestionPicker> {
       child: SizedBox(
         height: MediaQuery.sizeOf(context).height * .78,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+          padding: HistaeTokens.sheetPadding,
           children: [
             Row(
               children: [
@@ -74,7 +75,7 @@ class _QuestionPickerState extends State<_QuestionPicker> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: HistaeTokens.contentSpacing),
             TextField(
               controller: search,
               onChanged: (_) => setState(() {}),
@@ -84,7 +85,7 @@ class _QuestionPickerState extends State<_QuestionPicker> {
                 prefixIcon: Icon(Icons.search_rounded),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: HistaeTokens.contentSpacing),
             if (filtered.isEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 24),

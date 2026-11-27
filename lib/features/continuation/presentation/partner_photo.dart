@@ -1,23 +1,26 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/media/private_photo_cache.dart';
 import '../../../core/network/signed_photo_loader.dart';
 import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/private_photo.dart';
 import '../application/match_access.dart';
 
-/// Retains the route-owned image when a profile's sliver scrolls off screen.
+/// Keeps the image attached while scrolling a profile.
 class PartnerPhoto extends StatefulWidget {
   const PartnerPhoto({
     super.key,
     required this.access,
     required this.matchId,
     this.photoClient,
+    this.memoryCache,
   });
 
   final MatchAccess access;
   final String matchId;
   final PhotoClientFactory? photoClient;
+  final PrivatePhotoCache? memoryCache;
 
   @override
   State<PartnerPhoto> createState() => _PartnerPhotoState();
@@ -54,6 +57,8 @@ class _PartnerPhotoState extends State<PartnerPhoto>
           allowed: allowed,
           decodeWidth: 1024,
           photoClient: widget.photoClient,
+          memoryCache: widget.memoryCache,
+          cacheKey: widget.matchId,
           refreshAccess: access.refreshPhotos,
           builder: (context, image, loading, failed) => Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -2863,7 +2863,7 @@ class AppMessagesEs extends AppMessages {
 
   @override
   String get registrationConsentIntro =>
-      'Tus elecciones se guardarán después de verificar tu número. Puedes rechazar el tratamiento de datos sensibles y la ubicación; en ese caso, el descubrimiento seguirá sin estar disponible.';
+      'Para acceder a todas las funciones, acepta las cuatro opciones siguientes. Si rechazas el uso de tus datos sensibles o de tu ubicación, podrás terminar el registro. Histae volverá a pedirte tu consentimiento en el feed.';
 
   @override
   String get registrationPhoneTitle => 'Un último paso y ya estás aquí.';

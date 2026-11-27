@@ -67,7 +67,11 @@ class RegistrationController extends ChangeNotifier {
   }
 
   bool choice(ConsentType type) => _choices[type] ?? false;
+  bool get _validDraft =>
+      draft.profileError(DateTime.now()) == null &&
+      draft.preferences.validate() == null;
   bool get canVerify =>
+      _validDraft &&
       documents.length == 4 &&
       _documentsAvailable &&
       !loadingDocuments &&
@@ -97,8 +101,10 @@ class RegistrationController extends ChangeNotifier {
     failure = null;
     switch (step) {
       case RegistrationStep.profile:
+        if (draft.profileError(DateTime.now()) != null) return;
         step = RegistrationStep.preferences;
       case RegistrationStep.preferences:
+        if (!_validDraft) return;
         step = RegistrationStep.consents;
         if (documents.isEmpty && !loadingDocuments) unawaited(loadDocuments());
       case RegistrationStep.consents:
@@ -241,8 +247,7 @@ class RegistrationController extends ChangeNotifier {
 
   Future<void> _saveDraft() async {
     _checkOwner();
-    if (draft.profile.validate(DateTime.now()) != null ||
-        draft.preferences.validate() != null) {
+    if (!_validDraft) {
       throw const ApiFailure(ApiFailureKind.validation);
     }
     if (!_consentsSaved) {
@@ -271,12 +276,15 @@ class RegistrationController extends ChangeNotifier {
       _checkOwner();
       _consentsSaved = true;
     }
-    final sensitive =
-        choice(ConsentType.sensitive) &&
-        (session.consents?.consents.any(
+    final sensitive = choice(ConsentType.sensitive);
+    if (sensitive &&
+        session.consents?.consents.any(
               (c) => c.type == ConsentType.sensitive && c.current,
-            ) ??
-            false);
+            ) !=
+            true) {
+      _consentsSaved = false;
+      throw const ApiFailure(ApiFailureKind.consentRequired);
+    }
     final profile = draft.profile;
     final intended = ProfileDraft(
       profile.firstname,

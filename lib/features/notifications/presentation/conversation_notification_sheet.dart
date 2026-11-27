@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/app_strings.dart';
+import '../../../core/theme/histae_tokens.dart';
 import '../../../core/widgets/histae_button.dart';
 import '../../privacy/presentation/privacy_strings.dart' show privacyDate;
 import '../application/notification_setting_controller.dart';
@@ -62,7 +63,7 @@ class ConversationNotificationSheet extends StatelessWidget {
             ),
           );
           return SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+            padding: HistaeTokens.sheetPadding,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
@@ -71,10 +72,10 @@ class ConversationNotificationSheet extends StatelessWidget {
                   text.notificationConversationTitle,
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: HistaeTokens.textSpacing),
                 Text(text.notificationConversationDescription),
                 if (current != null) ...[
-                  const SizedBox(height: 20),
+                  const SizedBox(height: HistaeTokens.contentSpacing),
                   Semantics(
                     liveRegion: true,
                     child: Text(

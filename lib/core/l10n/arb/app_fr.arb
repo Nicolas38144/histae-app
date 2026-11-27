@@ -3290,7 +3290,7 @@
   "registrationContinue": "Continuer",
   "registrationLocalDraft": "Prenez le temps de vous présenter. Vos informations restent sur cet appareil pendant ce parcours et ne seront envoyées qu’après la vérification de votre numéro.",
   "registrationSensitiveDraft": "Votre sexe et vos préférences ne seront transmis qu’avec votre accord à l’étape suivante, après la vérification de votre numéro.",
-  "registrationConsentIntro": "Vos choix seront enregistrés après la vérification de votre numéro. Vous pouvez refuser les données sensibles et la localisation ; la découverte restera alors indisponible.",
+  "registrationConsentIntro": "Pour accéder à toutes les fonctionnalités, validez les quatre choix ci-dessous. Si vous refusez l’utilisation de vos données sensibles ou de votre position, vous pourrez terminer l’inscription. Histae vous redemandera votre accord dans le feed.",
   "registrationPhoneTitle": "Un dernier pas, et vous y êtes.",
   "registrationPhoneIntro": "Vérifiez votre numéro par SMS pour créer votre compte et enregistrer votre présentation. Votre numéro n’apparaîtra pas sur votre profil.",
   "registrationLeaveTitle": "Quitter cette inscription ?",

@@ -91,12 +91,12 @@ explicit pagination loads further rows. Server fields remain authoritative for i
 that route so Back returns directly to the conversation and preserves its draft.
 
 `SignedPhotoLoader` accepts HTTPS, sends no Bearer token, rejects redirects, caps downloads at
-5 MB and times out after 15 seconds. Full-size photos are route-owned, remain alive while scrolling,
-and are evicted when covered, backgrounded, closed or no longer authorized. Signed-link expiry
-limits new downloads; it does not expire already authorized pixels by itself.
+5 MB and times out after 15 seconds. Private photos are displayed only on the active route.
+Signed-link expiry limits new downloads. Already authorized pixels remain available in memory.
 
-`PrivatePhotoCache` shares foreground thumbnails between list and conversation: at most 48 entries
-and 8 MiB of encoded data, with shared providers/downloads and LRU eviction. Backgrounding, logout,
+`PrivatePhotoCache` shares foreground thumbnails between list and conversation (48 entries) and
+keeps a separate cache for opened partner profiles (2 entries). Each cache caps encoded data at
+8 MiB and shares providers and downloads with LRU eviction. Backgrounding, logout,
 withdrawal, replacement, access loss and deadlines purge affected photos. An unconfirmed withdrawal
 is an immediate local barrier: stale grant responses cannot restore images.
 

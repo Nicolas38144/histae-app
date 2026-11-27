@@ -4709,7 +4709,7 @@ abstract class AppMessages {
   /// Registration flow before phone verification
   ///
   /// In fr, this message translates to:
-  /// **'Vos choix seront enregistrés après la vérification de votre numéro. Vous pouvez refuser les données sensibles et la localisation ; la découverte restera alors indisponible.'**
+  /// **'Pour accéder à toutes les fonctionnalités, validez les quatre choix ci-dessous. Si vous refusez l’utilisation de vos données sensibles ou de votre position, vous pourrez terminer l’inscription. Histae vous redemandera votre accord dans le feed.'**
   String get registrationConsentIntro;
 
   /// Registration flow before phone verification

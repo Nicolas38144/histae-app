@@ -43,8 +43,12 @@ class PartnerPage extends StatelessWidget {
                 Text(text.discoveryStringsThisProfileIsNoLongerAvailable)
               else ...[
                 if (match.photosRevealed && !controller.photosBlocked(id)) ...[
-                  PartnerPhoto(access: controller, matchId: id),
-                  const SizedBox(height: 24),
+                  PartnerPhoto(
+                    access: controller,
+                    matchId: id,
+                    memoryCache: controller.profilePhotos,
+                  ),
+                  const SizedBox(height: HistaeTokens.sectionSpacing),
                 ],
                 FeedProfileContent(
                   firstname: match.partner.firstname,

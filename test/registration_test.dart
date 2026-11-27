@@ -48,7 +48,7 @@ Future<RegistrationController> prepared(
 void main() {
   test('sign-up defaults and latest adult birthdate remain valid at leap-day boundaries', () {
     final draft = RegistrationDraft();
-    expect(draft.profile.sex, 'male');
+    expect(draft.profile.sex, isNull);
     expect(draft.preferences.minAge, 18);
     expect(draft.preferences.maxAge, 50);
     expect(
@@ -172,6 +172,12 @@ void main() {
     });
     await controller.loadDocuments();
     controller.setChoice(ConsentType.terms, true);
+    controller.draft.profile = const ProfileDraft(
+      'Camille',
+      '1995-06-12',
+      'female',
+      'Une promenade en forêt.',
+    );
     controller.next();
     language.value = ApiLanguage.en;
     await Future<void>.delayed(Duration.zero);
@@ -179,6 +185,23 @@ void main() {
     expect(controller.choice(ConsentType.terms), isFalse);
     expect(fixture.writes, isEmpty);
   });
+
+  test(
+    'an unconfirmed sensitive consent is retried before saving the profile',
+    () async {
+      final fixture = RegistrationFixture()..omitSensitiveGrant = true;
+      final controller = await prepared(fixture);
+      await controller.authenticate(testTokens);
+      expect(controller.completed, isFalse);
+      expect(fixture.profile, isNull);
+
+      fixture.omitSensitiveGrant = false;
+      await controller.retrySave();
+      expect(controller.completed, isTrue);
+      expect(fixture.profile!['sex'], 'female');
+      expect(fixture.preferences!['looking_for'], 'both');
+    },
+  );
 
   test('manual recovery checks saved state instead of repeating an uncertain preferences write', () async {
     final fixture = RegistrationFixture()..losePreferencesResponse = true;
@@ -271,6 +294,14 @@ void main() {
         'Une présentation qui prend le temps de raconter mes dimanches et ce qui me fait sourire.',
       );
       await tapVisible(tester, find.byKey(const Key('registration-next')));
+      expect(
+        find.byKey(const PageStorageKey('registration-profile')),
+        findsOneWidget,
+      );
+      await tapVisible(tester, find.byKey(const Key('registration-sex')));
+      await tester.tap(find.text('Femme').last);
+      await tester.pumpAndSettle();
+      await tapVisible(tester, find.byKey(const Key('registration-next')));
       expect(find.byKey(const Key('phone')), findsNothing);
       await tapVisible(
         tester,
@@ -299,6 +330,8 @@ void main() {
             .value,
         51,
       );
+      await tapVisible(tester, find.byKey(const Key('registration-next')));
+      expect(fixture.requests, isEmpty);
       await tapVisible(
         tester,
         find.byKey(const Key('registration-looking-for')),
@@ -323,6 +356,7 @@ void main() {
       await tapVisible(tester, find.text('Vérifier le code'));
       expect(find.byKey(const Key('main-tab-profile')), findsOneWidget);
       expect(fixture.profile!['firstname'], 'Camille');
+      expect(fixture.profile!['sex'], isNull);
       expect(tester.takeException(), isNull);
     },
   );
@@ -411,6 +445,9 @@ void main() {
       await reveal(tester, next);
       expect(tester.widget<HistaeButton>(next).onPressed, isNull);
       await enter(tester, 'registration-bio', 'Une promenade en forêt.');
+      await tapVisible(tester, find.byKey(const Key('registration-sex')));
+      await tester.tap(find.text('Femme').last);
+      await tester.pumpAndSettle();
       await tapVisible(tester, next);
       expect(controller.step, RegistrationStep.preferences);
       expect(tester.takeException(), isNull);

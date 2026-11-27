@@ -772,7 +772,7 @@
   "registrationContinue": "Continuar",
   "registrationLocalDraft": "Tómate tu tiempo para presentarte. Tus datos permanecen en este dispositivo durante el registro y solo se enviarán después de verificar tu número.",
   "registrationSensitiveDraft": "Tu sexo y tus preferencias solo se enviarán con tu consentimiento en el siguiente paso, después de verificar tu número.",
-  "registrationConsentIntro": "Tus elecciones se guardarán después de verificar tu número. Puedes rechazar el tratamiento de datos sensibles y la ubicación; en ese caso, el descubrimiento seguirá sin estar disponible.",
+  "registrationConsentIntro": "Para acceder a todas las funciones, acepta las cuatro opciones siguientes. Si rechazas el uso de tus datos sensibles o de tu ubicación, podrás terminar el registro. Histae volverá a pedirte tu consentimiento en el feed.",
   "registrationPhoneTitle": "Un último paso y ya estás aquí.",
   "registrationPhoneIntro": "Verifica tu número por SMS para crear tu cuenta y guardar tu presentación. Tu número no aparecerá en tu perfil.",
   "registrationLeaveTitle": "¿Salir del registro?",

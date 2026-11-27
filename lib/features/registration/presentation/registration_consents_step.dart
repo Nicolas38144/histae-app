@@ -39,9 +39,9 @@ class _RegistrationConsentsStepState extends State<RegistrationConsentsStep> {
       padding: HistaeTokens.pagePadding,
       children: [
         Text(strings.consentsIntro),
-        const SizedBox(height: 16),
+        const SizedBox(height: HistaeTokens.contentSpacing),
         Text(strings.messages.registrationConsentIntro),
-        const SizedBox(height: 16),
+        const SizedBox(height: HistaeTokens.contentSpacing),
         if (controller.loadingDocuments)
           LinearProgressIndicator(semanticsLabel: strings.actionInProgress),
         if (controller.failure case final failure?) ...[
@@ -49,7 +49,7 @@ class _RegistrationConsentsStepState extends State<RegistrationConsentsStep> {
             liveRegion: true,
             child: Text(strings.authFailure(failure)),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: HistaeTokens.textSpacing),
           HistaeButton.outlined(
             onPressed:
                 controller.loadingDocuments || controller.retrySeconds > 0
@@ -66,7 +66,7 @@ class _RegistrationConsentsStepState extends State<RegistrationConsentsStep> {
         for (final consent in controller.documents)
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(HistaeTokens.contentSpacing),
               child: ConsentControl(
                 consent: consent,
                 value: controller.choice(consent.type),
@@ -77,7 +77,7 @@ class _RegistrationConsentsStepState extends State<RegistrationConsentsStep> {
               ),
             ),
           ),
-        const SizedBox(height: 24),
+        const SizedBox(height: HistaeTokens.contentSpacing),
         HistaeButton(
           key: const Key('registration-next'),
           onPressed:

@@ -47,14 +47,15 @@ class _RegistrationPreferencesStepState
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
     final copy = strings.messages;
+    final lookingLabel = '${copy.preferencesEditorIWantToMeet} *';
     return ListView(
       key: const PageStorageKey('registration-preferences'),
       padding: HistaeTokens.pagePadding,
       children: [
         PreferenceField(
-          label: copy.preferencesEditorIWantToMeet,
+          label: lookingLabel,
           child: Semantics(
-            label: copy.preferencesEditorIWantToMeet,
+            label: lookingLabel,
             child: DropdownButtonFormField<String>(
               key: const Key('registration-looking-for'),
               initialValue: _looking,
@@ -126,16 +127,16 @@ class _RegistrationPreferencesStepState
             _changed();
           }),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: HistaeTokens.contentSpacing),
         Text(copy.registrationSensitiveDraft),
         if (_error case final error?) ...[
-          const SizedBox(height: 12),
+          const SizedBox(height: HistaeTokens.textSpacing),
           Semantics(
             liveRegion: true,
             child: Text(strings.clientMessage(error)),
           ),
         ],
-        const SizedBox(height: 24),
+        const SizedBox(height: HistaeTokens.contentSpacing),
         HistaeButton(
           key: const Key('registration-next'),
           onPressed: () {

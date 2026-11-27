@@ -275,7 +275,7 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
         onPressed: enabled ? () => c.load(more: true) : null,
         child: Text(AppStrings.of(context).messages.privacyDetailPageLoadMore),
       ),
-    const SizedBox(height: 20),
+    const SizedBox(height: HistaeTokens.labelSpacing),
     HistaeButton.text(
       onPressed: enabled
           ? () async {
@@ -491,13 +491,13 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
           .messages
           .privacyDetailPageYourExportContainsPersonalInformationIt,
     ),
-    const SizedBox(height: 20),
+    const SizedBox(height: HistaeTokens.textSpacing),
     Text(
       AppStrings.of(context)
           .messages
           .privacyDetailPagePreparationMayTakeAFewMinutes,
     ),
-    const SizedBox(height: 20),
+    const SizedBox(height: HistaeTokens.labelSpacing),
     HistaeButton.icon(
       onPressed: enabled
           ? () => c.downloadExport(assistedExportId: widget.assistedExportId)
@@ -602,7 +602,7 @@ class _PrivacyDetailPageState extends State<PrivacyDetailPage> {
       ),
       onChanged: (_) => setState(() {}),
     ),
-    const SizedBox(height: 20),
+    const SizedBox(height: HistaeTokens.labelSpacing),
     HistaeButton(
       onPressed:
           enabled &&

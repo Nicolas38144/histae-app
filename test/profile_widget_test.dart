@@ -322,8 +322,8 @@ void main() {
       await tester.tap(find.text('Ce qui vous fait sourire ?'));
       await tester.pumpAndSettle();
       final secondField = find.widgetWithText(TextField, 'Réponse 2');
-      await tester.ensureVisible(secondField);
-      await tester.pumpAndSettle();
+      expect(tester.widget<TextField>(secondField).focusNode!.hasFocus, isTrue);
+      expect(secondField.hitTestable(), findsOneWidget);
       await tester.enterText(secondField, 'La cuisine et les amis.');
       await tapVisible(tester, find.text('Ajouter une question'));
       await tester.tap(find.text('Une petite aventure ?'));

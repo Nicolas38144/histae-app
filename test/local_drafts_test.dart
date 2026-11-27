@@ -209,7 +209,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await tester.scrollUntilVisible(find.byType(TextField), 200);
+      await tester.ensureVisible(find.byType(TextField));
       await tester.pumpAndSettle();
       expect(find.text('Ma réponse encore en préparation'), findsOneWidget);
       await tester.enterText(

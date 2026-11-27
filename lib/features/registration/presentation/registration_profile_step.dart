@@ -30,7 +30,7 @@ class _RegistrationProfileStepState extends State<RegistrationProfileStep> {
   );
   late DateTime? _birthdate = parseBirthdate(widget.draft.profile.birthdate);
   late final _bio = TextEditingController(text: widget.draft.profile.bio);
-  late String _sex = widget.draft.profile.sex ?? 'male';
+  late String? _sex = widget.draft.profile.sex;
   ClientMessage? _error;
 
   void _changed() {
@@ -54,6 +54,7 @@ class _RegistrationProfileStepState extends State<RegistrationProfileStep> {
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
     final copy = strings.messages;
+    final sexLabel = '${copy.identityEditorSex} *';
     return ListView(
       key: const PageStorageKey('registration-profile'),
       padding: HistaeTokens.pagePadding,
@@ -62,7 +63,7 @@ class _RegistrationProfileStepState extends State<RegistrationProfileStep> {
           title: copy.identityEditorYourOwnWay,
           body: copy.identityEditorEverydayDetailsOftenMakeTheBest,
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: HistaeTokens.contentSpacing),
         TextField(
           key: const Key('registration-firstname'),
           controller: _firstname,
@@ -71,7 +72,7 @@ class _RegistrationProfileStepState extends State<RegistrationProfileStep> {
           decoration: InputDecoration(labelText: copy.identityEditorFirstName),
           onChanged: (_) => _changed(),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: HistaeTokens.contentSpacing),
         BirthdateField(
           key: const Key('registration-birthdate'),
           value: _birthdate,
@@ -80,12 +81,12 @@ class _RegistrationProfileStepState extends State<RegistrationProfileStep> {
             _changed();
           }),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: HistaeTokens.contentSpacing),
         DropdownButtonFormField<String>(
           key: const Key('registration-sex'),
           initialValue: _sex,
           isExpanded: true,
-          decoration: InputDecoration(labelText: copy.identityEditorSex),
+          decoration: InputDecoration(labelText: sexLabel),
           items: ProfileStrings(strings).sexes.entries
               .where((entry) => entry.key.isNotEmpty)
               .map(
@@ -96,11 +97,11 @@ class _RegistrationProfileStepState extends State<RegistrationProfileStep> {
               )
               .toList(),
           onChanged: (value) {
-            _sex = value ?? 'male';
+            _sex = value;
             _changed();
           },
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: HistaeTokens.contentSpacing),
         BiographyField(
           key: const Key('registration-bio'),
           controller: _bio,
@@ -108,16 +109,16 @@ class _RegistrationProfileStepState extends State<RegistrationProfileStep> {
           maxLines: 12,
           onChanged: (_) => _changed(),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: HistaeTokens.contentSpacing),
         Text(copy.registrationLocalDraft),
         if (_error case final error?) ...[
-          const SizedBox(height: 12),
+          const SizedBox(height: HistaeTokens.textSpacing),
           Semantics(
             liveRegion: true,
             child: Text(strings.clientMessage(error)),
           ),
         ],
-        const SizedBox(height: 24),
+        const SizedBox(height: HistaeTokens.contentSpacing),
         ValueListenableBuilder<TextEditingValue>(
           valueListenable: _bio,
           builder: (context, value, _) => HistaeButton(
@@ -132,7 +133,7 @@ class _RegistrationProfileStepState extends State<RegistrationProfileStep> {
 
   void _continue() {
     _changed();
-    final error = widget.draft.profile.validate(DateTime.now());
+    final error = widget.draft.profileError(DateTime.now());
     if (error != null) {
       setState(() => _error = error);
       return;

@@ -2832,7 +2832,7 @@ class AppMessagesEn extends AppMessages {
 
   @override
   String get registrationConsentIntro =>
-      'Your choices will be saved after your number is verified. You can decline sensitive data processing and location; discovery will then remain unavailable.';
+      'To use all features, accept the four choices below. If you decline the use of sensitive data or your location, you can still finish signing up. Histae will ask for your consent again in the feed.';
 
   @override
   String get registrationPhoneTitle => 'One last step, and you’re here.';

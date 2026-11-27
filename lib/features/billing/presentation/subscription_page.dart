@@ -167,7 +167,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: HistaeTokens.contentSpacing),
                 if (!c.accessible) ...[
                   Text(
                     AppStrings.of(context)
@@ -189,7 +189,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                   if (c.subscription case final state?)
                     SubscriptionSummary(state: state, fresh: c.fresh),
                   if (c.failure case final error?) ...[
-                    const SizedBox(height: 16),
+                    const SizedBox(height: HistaeTokens.contentSpacing),
                     Semantics(
                       liveRegion: true,
                       child: Text(
@@ -205,7 +205,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                   if (BillingStrings(AppStrings.of(context))
                       .notice(c.notice)
                       .isNotEmpty) ...[
-                    const SizedBox(height: 16),
+                    const SizedBox(height: HistaeTokens.contentSpacing),
                     Semantics(
                       liveRegion: true,
                       child: Text(
@@ -214,7 +214,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                     ),
                   ],
                   _plans(context),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: HistaeTokens.actionSpacing),
 
                   if (c.failure != null && !c.purchasePending)
                     HistaeButton.outlined(
@@ -228,7 +228,7 @@ class _SubscriptionPageState extends State<SubscriptionPage>
                   if (c.purchasePending)
                     Text(AppStrings.of(context).messages.billingStorePending),
                   if (c.config.available) ...[
-                    const SizedBox(height: 12),
+                    const SizedBox(height: HistaeTokens.textSpacing),
                     HistaeButton.outlinedIcon(
                       onPressed: c.busy || c.loading
                           ? null

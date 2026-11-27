@@ -21,6 +21,8 @@ import 'support/notifications_fixture.dart';
 void main() {
   test('push types require scoped identifiers and ignore untrusted navigation fields', () {
     for (final entry in {
+      'new_match': PushKind.newMatch,
+      'new_message': PushKind.newMessage,
       'match_expiring': PushKind.matchExpiring,
       'continuation_requested': PushKind.continuationRequested,
       'conversation_continued': PushKind.conversationContinued,
@@ -59,6 +61,13 @@ void main() {
     });
     expect(login?.kind.destination, PushDestination.sessions);
     expect(login?.matchId, isNull);
+    final billing = PushIntent.parse({
+      'notification_id': notificationOne,
+      'type': 'billing_payment_failed',
+      'match_id': testMatch,
+    });
+    expect(billing?.kind.destination, PushDestination.subscription);
+    expect(billing?.matchId, isNull);
     expect(
       PushIntent.parse({
         'notification_id': notificationOne,

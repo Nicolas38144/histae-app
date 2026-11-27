@@ -72,7 +72,7 @@ class _OtpFormState extends State<OtpForm> {
                     ? strings.messages.registrationPhoneIntro
                     : strings.otpIntroduction,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: HistaeTokens.sectionSpacing),
               if (!controller.hasIntention) ...[
                 DropdownButtonFormField<PhoneCountry>(
                   key: const Key('phone-country'),
@@ -93,7 +93,7 @@ class _OtpFormState extends State<OtpForm> {
                           _country = value ?? PhoneCountry.france;
                         }),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: HistaeTokens.contentSpacing),
                 TextField(
                   controller: _phone,
                   key: const Key('phone'),
@@ -110,14 +110,14 @@ class _OtpFormState extends State<OtpForm> {
                   enableSuggestions: false,
                   textInputAction: TextInputAction.done,
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: HistaeTokens.labelSpacing),
               ],
               if (controller.maskedPhone case final maskedPhone?) ...[
                 Text(
                   strings.messages.otpPhoneInUse(maskedPhone),
                   key: const Key('otp-phone-summary'),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: HistaeTokens.contentSpacing),
               ],
               if (controller.notice == 'otp_accepted')
                 Semantics(liveRegion: true, child: Text(strings.otpAccepted)),
@@ -128,14 +128,14 @@ class _OtpFormState extends State<OtpForm> {
                   liveRegion: true,
                   child: Text(strings.authFailure(controller.failure!)),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: HistaeTokens.contentSpacing),
               ],
               if (controller.verificationUncertain)
                 Text(strings.verificationUncertain),
               if (controller.canRetrySend)
                 Text(strings.messages.otpSendUnconfirmed),
               if (controller.requested) ...[
-                const SizedBox(height: 20),
+                const SizedBox(height: HistaeTokens.contentSpacing),
                 TextField(
                   controller: _otp,
                   key: const Key('otp'),
@@ -159,7 +159,7 @@ class _OtpFormState extends State<OtpForm> {
                       : null,
                   child: Text(strings.verifyOtp),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: HistaeTokens.labelSpacing),
               ],
               if (controller.retrySeconds > 0)
                 Text(strings.retryIn(controller.retrySeconds)),
@@ -206,7 +206,7 @@ class _OtpFormState extends State<OtpForm> {
                   child: Text(strings.existingAccount),
                 ),
               if (controller.busy) ...[
-                const SizedBox(height: 20),
+                const SizedBox(height: HistaeTokens.actionSpacing),
                 LinearProgressIndicator(
                   semanticsLabel: strings.actionInProgress,
                 ),
